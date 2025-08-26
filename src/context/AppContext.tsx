@@ -278,7 +278,7 @@ const initialState: AppState = {
     theme: 'system',
     language: 'de',
     accentColor: localStorage.getItem('customAccentColor') || '#f97316',
-    backgroundImage: 'backgrounds/bg1.jpg',
+    backgroundImage: '/backgrounds/bg1.jpg',
     backgroundType: 'image',
     dateFormat: 'dd.MM.yyyy',
     recentBackgroundImages: [],
@@ -3063,17 +3063,51 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
       if (savedPreferences) {
         const preferences = JSON.parse(savedPreferences);
+
+        // Migration: replace legacy remote background URLs with local default
+        let migratedPreferences = { ...preferences };
+        if (
+          typeof migratedPreferences.backgroundImage === 'string' &&
+          migratedPreferences.backgroundImage &&
+          !migratedPreferences.backgroundImage.startsWith('/')
+        ) {
+          migratedPreferences.backgroundImage = '/backgrounds/bg1.jpg';
+        }
+
+        // Sanitize gallery in localStorage: keep only local paths and ensure defaults are present
+        try {
+          const savedGallery = localStorage.getItem('backgroundImageGallery');
+          if (savedGallery) {
+            const parsed: string[] = JSON.parse(savedGallery);
+            const localOnly = (parsed || []).filter((u) => typeof u === 'string' && u.startsWith('/'));
+            const defaults = Array.from({ length: 12 }, (_, i) => `/backgrounds/bg${i + 1}.jpg`);
+            const merged = [
+              ...defaults,
+              ...localOnly.filter((u) => !defaults.includes(u))
+            ].slice(0, 12);
+            localStorage.setItem('backgroundImageGallery', JSON.stringify(merged));
+          }
+        } catch (e) {
+          // ignore gallery migration errors
+        }
+
         // Ensure calendar preferences have defaults
         const preferencesWithDefaults = {
-          ...preferences,
+          ...migratedPreferences,
           calendars: {
             sources: [],
             showInPlanner: true,
             defaultDuration: 60,
             hiddenEvents: [],
-            ...preferences.calendars
+            ...migratedPreferences.calendars
           }
         };
+
+        // Persist migrated preferences back to storage
+        try {
+          localStorage.setItem('taskfuchs-preferences', JSON.stringify(preferencesWithDefaults));
+        } catch (_err) {}
+
         dispatch({ type: 'UPDATE_PREFERENCES', payload: preferencesWithDefaults });
       }
 

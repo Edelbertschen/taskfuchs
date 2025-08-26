@@ -309,15 +309,17 @@ const Settings = React.memo(() => {
   // Background image gallery state
   const [backgroundImageGallery, setBackgroundImageGallery] = useState(() => {
     // Use local bundled backgrounds from public/backgrounds
-    const desiredDefaults = Array.from({ length: 12 }, (_, i) => `backgrounds/bg${i + 1}.jpg`);
+    const desiredDefaults = Array.from({ length: 12 }, (_, i) => `/backgrounds/bg${i + 1}.jpg`);
     const savedGallery = localStorage.getItem('backgroundImageGallery');
     
     if (savedGallery) {
       const existingGallery = JSON.parse(savedGallery);
-      // Ensure the default set exists at the front, then keep any user-added images after
+      // Drop legacy remote URLs and only keep local paths (e.g., /backgrounds/...)
+      const localOnly = (existingGallery as string[]).filter((url: string) => url.startsWith('/'));
+      // Ensure the default set exists at the front, then keep any remaining user-added local images after
       const merged = [
         ...desiredDefaults,
-        ...existingGallery.filter((url: string) => !desiredDefaults.includes(url))
+        ...localOnly.filter((url: string) => !desiredDefaults.includes(url))
       ];
       if (JSON.stringify(merged) !== JSON.stringify(existingGallery)) {
         localStorage.setItem('backgroundImageGallery', JSON.stringify(merged));
@@ -3832,18 +3834,7 @@ const Settings = React.memo(() => {
                       {/* Restore default images */}
                       <button
                         onClick={() => {
-                          const defaults = [
-                            'https://pixabay.com/get/g130a7d6d61e42bcb9827277b30f578d67e48f415fa0f6c37170495993bb099b60661dc2f5c32879d0888ef0c577a2f24.jpg',
-                            'https://pixabay.com/get/ga609809ed397c8e95ff67b399b7edef2324e2cb09a935ce49f38ef1430f99fc7c635f0bae7d13181670f1db19b74fa3b_1920.jpg',
-                            'https://pixabay.com/get/g7dac66ef4381698b8f63f9e178cc69a1532116982dd74a2b88e0c30a48b67d962cdabc76705fea54a1dc7af7e59b7344_1920.jpg',
-                            'https://images.unsplash.com/photo-1755371033904-21dd8a9d002b?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                            'https://images.unsplash.com/photo-1754401817883-a6749295b0b4?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                            'https://images.unsplash.com/photo-1747619715083-3db63905a75a?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                            'https://images.unsplash.com/photo-1745750747228-d7ae37cba3a5?q=80&w=1744&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                            'https://plus.unsplash.com/premium_photo-1739123252596-b4145bd292d1?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                            'https://images.unsplash.com/photo-1744457167322-1e193924a1fe?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                            'https://images.unsplash.com/photo-1743653537429-a94889a6fd47?q=80&w=1744&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-                          ];
+                          const defaults = Array.from({ length: 12 }, (_, i) => `/backgrounds/bg${i + 1}.jpg`);
                           setBackgroundImageGallery(defaults);
                           localStorage.setItem('backgroundImageGallery', JSON.stringify(defaults));
                         }}

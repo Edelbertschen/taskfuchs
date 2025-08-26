@@ -1,0 +1,44 @@
+# TaskFuchs PWA / SPA routing and caching
+
+# Disable MultiViews to avoid content negotiation interfering with SPA routes
+Options -MultiViews
+
+# Enable rewriting
+RewriteEngine On
+
+# Serve existing files and directories as-is
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Fallback all other requests to index.html (client-side routing)
+RewriteRule . /index.html [L]
+
+# --- Caching Strategy ---
+# Never cache HTML and the service worker
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </FilesMatch>
+
+  <FilesMatch "^(sw\.js|registerSW\.js)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </FilesMatch>
+
+  # Long cache for static assets (immutable filenames)
+  <FilesMatch "\.(js|css|woff2|png|jpg|jpeg|svg|ico|mp3)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # Security headers (best effort)
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set Referrer-Policy "no-referrer-when-downgrade"
+  Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+</IfModule>
+
+
