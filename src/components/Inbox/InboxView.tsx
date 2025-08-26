@@ -39,6 +39,7 @@ import type { Task, Column, ParseResult } from '../../types';
 import { format, addDays, startOfDay, isSameDay, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isAfter, isBefore } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { getBackgroundStyles, getDarkModeBackgroundStyles } from '../../utils/backgroundUtils';
+import { MobilePullToRefresh } from '../Common/MobilePullToRefresh';
 
 export function InboxView() {
   const { state, dispatch } = useApp();
@@ -732,7 +733,8 @@ export function InboxView() {
         }}
       >
         {/* Content Area - main task list */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <MobilePullToRefresh onRefresh={async () => dispatch({ type: 'NO_OP' } as any)}>
+        <div className="p-6">
           {/* Task Count Info in Modern Container */}
           <div className="mb-6 flex items-center justify-between">
             <div className={`px-4 py-3 rounded-xl border ${
@@ -1362,6 +1364,7 @@ export function InboxView() {
             )}
           </div>
         </div>
+        </MobilePullToRefresh>
       </div>
 
       {/* Modals */}
