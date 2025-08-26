@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import type { AuthState, User, UserPreferences } from '../types';
+import type { AuthState, User } from '../types';
+import { supabase } from '../lib/supabaseClient';
 
 interface AuthContextType {
   state: AuthState;
@@ -99,24 +100,51 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-  // Restore session on app start
+  // Restore session via Supabase and listen for changes
   useEffect(() => {
-    const storedToken = localStorage.getItem('taskfuchs_token');
-    const storedUser = localStorage.getItem('taskfuchs_user');
-
-    if (storedToken && storedUser) {
+    let mounted = true;
+    (async () => {
       try {
-        const user = JSON.parse(storedUser);
-        dispatch({
-          type: 'RESTORE_SESSION',
-          payload: { user, token: storedToken }
-        });
-      } catch (error) {
-        console.error('Failed to restore session:', error);
-        localStorage.removeItem('taskfuchs_token');
-        localStorage.removeItem('taskfuchs_user');
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!mounted) return;
+        if (session?.user) {
+          const user: User = {
+            id: session.user.id,
+            email: session.user.email || '',
+            name: session.user.user_metadata?.name || session.user.email || 'User',
+            avatar: session.user.user_metadata?.avatar_url,
+            createdAt: session.user.created_at || new Date().toISOString(),
+            lastLoginAt: new Date().toISOString(),
+            profiles: [],
+            activeProfileId: undefined,
+            preferences: undefined as any
+          } as any;
+          dispatch({ type: 'RESTORE_SESSION', payload: { user, token: session.access_token } });
+        }
+      } catch (e) {
+        // ignore
       }
-    }
+    })();
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        const user: User = {
+          id: session.user.id,
+          email: session.user.email || '',
+          name: session.user.user_metadata?.name || session.user.email || 'User',
+          avatar: session.user.user_metadata?.avatar_url,
+          createdAt: session.user.created_at || new Date().toISOString(),
+          lastLoginAt: new Date().toISOString(),
+          profiles: [],
+          activeProfileId: undefined,
+          preferences: undefined as any
+        } as any;
+        dispatch({ type: 'RESTORE_SESSION', payload: { user, token: session.access_token } });
+      } else {
+        dispatch({ type: 'LOGOUT' });
+      }
+    });
+    return () => { mounted = false; sub?.subscription?.unsubscribe(); };
   }, []);
 
   // Save token and user to localStorage when authenticated
@@ -132,194 +160,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     dispatch({ type: 'LOGIN_START' });
-
     try {
-      // Demo implementation - replace with real API call
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
-      
-      if (email === 'demo@taskfuchs.app' && password === 'demo123') {
-        const user: User = {
-          id: 'demo-user-1',
-          email: email,
-          name: 'Demo User',
-          avatar: undefined,
-          createdAt: new Date().toISOString(),
-          lastLoginAt: new Date().toISOString(),
-          profiles: [
-            {
-              id: 'default-profile',
-              name: 'Standard',
-              description: 'Ihr Standard-Profil',
-              color: '#f97316'
-            }
-          ],
-          activeProfileId: 'default-profile',
-                  preferences: {
-          theme: 'system',
-          language: 'de',
-          accentColor: '#f97316',
-          notifications: {
-            email: true,
-            push: true,
-            timerReminders: true,
-            deadlineReminders: true
-          },
-          privacy: {
-            analytics: false,
-            crashReports: true
-          },
-          dateFormat: 'DD.MM.YYYY',
-          sounds: true,
-          soundVolume: 0.8,
-          completionSound: 'bell',
-            enableCelebration: true,
-            celebrationText: 'Gut gemacht!',
-            celebrationDuration: 3000,
-            columns: {
-              visible: 5,
-              showProjects: true
-            },
-            showPriorities: true,
-            enableFocusMode: true,
-            pomodoro: {
-              enabled: false,
-              workDuration: 25,
-              shortBreakDuration: 5,
-              longBreakDuration: 15,
-              longBreakInterval: 4,
-              autoStartBreaks: false,
-              autoStartWork: false,
-              soundEnabled: true,
-              pomodoroSound: 'bell',
-              breakSound: 'chime',
-              taskSound: 'pop'
-            },
-            timer: {
-              showOverlay: true,
-              overlayPosition: { x: 50, y: 50 },
-              overlayMinimized: false,
-              autoOpenTaskOnStart: true,
-              showRemainingTime: true
-            }
-          }
-        };
-
-        const token = 'demo-token-' + Date.now();
-        
-        dispatch({
-          type: 'LOGIN_SUCCESS',
-          payload: { user, token }
-        });
-        
-        return true;
-      } else {
-        dispatch({
-          type: 'LOGIN_FAILURE',
-          payload: 'Ungültige Anmeldedaten'
-        });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error || !data.session) {
+        dispatch({ type: 'LOGIN_FAILURE', payload: error?.message || 'Login fehlgeschlagen' });
         return false;
       }
-    } catch (error) {
-      dispatch({
-        type: 'LOGIN_FAILURE',
-        payload: 'Verbindungsfehler'
-      });
+      const s = data.session;
+      const user: User = {
+        id: s.user.id,
+        email: s.user.email || '',
+        name: s.user.user_metadata?.name || s.user.email || 'User',
+        avatar: s.user.user_metadata?.avatar_url,
+        createdAt: s.user.created_at || new Date().toISOString(),
+        lastLoginAt: new Date().toISOString(),
+        profiles: [],
+        activeProfileId: undefined,
+        preferences: undefined as any
+      } as any;
+      dispatch({ type: 'LOGIN_SUCCESS', payload: { user, token: s.access_token } });
+      return true;
+    } catch (e: any) {
+      dispatch({ type: 'LOGIN_FAILURE', payload: e?.message || 'Login fehlgeschlagen' });
       return false;
     }
   };
 
   const register = async (email: string, password: string, name: string): Promise<boolean> => {
     dispatch({ type: 'REGISTER_START' });
-
     try {
-      // Demo implementation - replace with real API call
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
-      
-      const user: User = {
-        id: 'user-' + Date.now(),
-        email: email,
-        name: name,
-        avatar: undefined,
-        createdAt: new Date().toISOString(),
-        lastLoginAt: new Date().toISOString(),
-        profiles: [
-          {
-            id: 'default-profile',
-            name: 'Standard',
-            description: 'Ihr Standard-Profil',
-            color: '#f97316'
-          }
-        ],
-        activeProfileId: 'default-profile',
-        preferences: {
-          theme: 'system',
-          language: 'de',
-          accentColor: '#f97316',
-          notifications: {
-            email: true,
-            push: true,
-            timerReminders: true,
-            deadlineReminders: true
-          },
-          privacy: {
-            analytics: false,
-            crashReports: true
-          },
-          dateFormat: 'DD.MM.YYYY',
-          sounds: true,
-          soundVolume: 0.8,
-          completionSound: 'bell',
-          enableCelebration: true,
-          celebrationText: 'Gut gemacht!',
-          celebrationDuration: 3000,
-          columns: {
-            visible: 5,
-            showProjects: true
-          },
-          showPriorities: true,
-          enableFocusMode: true,
-          pomodoro: {
-            enabled: false,
-            workDuration: 25,
-            shortBreakDuration: 5,
-            longBreakDuration: 15,
-            longBreakInterval: 4,
-            autoStartBreaks: false,
-            autoStartWork: false,
-            soundEnabled: true,
-            pomodoroSound: 'bell',
-            breakSound: 'chime',
-            taskSound: 'pop'
-          },
-          timer: {
-            showOverlay: true,
-            overlayPosition: { x: 50, y: 50 },
-            overlayMinimized: false,
-            autoOpenTaskOnStart: true,
-            showRemainingTime: true
-          }
-        }
-      };
-
-      const token = 'token-' + Date.now();
-      
-      dispatch({
-        type: 'REGISTER_SUCCESS',
-        payload: { user, token }
-      });
-      
+      const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { name } } });
+      if (error || !data.user) {
+        dispatch({ type: 'REGISTER_FAILURE', payload: error?.message || 'Registrierung fehlgeschlagen' });
+        return false;
+      }
+      // Supabase sendet Bestätigungs-Mail; Login erfolgt nach Verifizierung
       return true;
-    } catch (error) {
-      dispatch({
-        type: 'REGISTER_FAILURE',
-        payload: 'Registrierung fehlgeschlagen'
-      });
+    } catch (e: any) {
+      dispatch({ type: 'REGISTER_FAILURE', payload: e?.message || 'Registrierung fehlgeschlagen' });
       return false;
     }
   };
 
   const logout = () => {
-    dispatch({ type: 'LOGOUT' });
+    supabase.auth.signOut().finally(() => dispatch({ type: 'LOGOUT' }));
   };
 
   const updateUser = (updates: Partial<User>) => {
