@@ -394,7 +394,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
 
   return (
     <>
-      <div className={`sidebar ${glassClasses} flex flex-col relative z-30 sidebar-container w-20 sidebar-slide-in smooth-scroll`} style={{...sidebarStyle, textRendering: 'optimizeLegibility', WebkitFontSmoothing: 'antialiased', MozOsxFontSmoothing: 'grayscale', transform: 'translateZ(0)'}}>
+      <div className={`sidebar ${glassClasses} flex flex-col h-full relative z-30 sidebar-container w-20 sidebar-slide-in smooth-scroll`} style={{...sidebarStyle, textRendering: 'optimizeLegibility', WebkitFontSmoothing: 'antialiased', MozOsxFontSmoothing: 'grayscale', transform: 'translateZ(0)'}}>
         {/* Logo */}
         <div 
           className={`${glassEffectEnabled ? 'border-b border-white/20' : 'border-b border-gray-800'} flex items-center justify-center sidebar-content relative`}
