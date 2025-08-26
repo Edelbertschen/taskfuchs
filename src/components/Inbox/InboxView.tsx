@@ -40,6 +40,7 @@ import { format, addDays, startOfDay, isSameDay, addMonths, subMonths, startOfMo
 import { de } from 'date-fns/locale';
 import { getBackgroundStyles, getDarkModeBackgroundStyles } from '../../utils/backgroundUtils';
 import { MobilePullToRefresh } from '../Common/MobilePullToRefresh';
+import { SwipeableTaskCard } from './SwipeableTaskCard';
 
 export function InboxView() {
   const { state, dispatch } = useApp();
@@ -552,7 +553,7 @@ export function InboxView() {
       
       {/* Sidebar - Full height from top to bottom */}
       <div 
-        className={`absolute top-0 left-0 bottom-0 w-80 flex flex-col overflow-hidden z-20 ${
+        className={`absolute top-0 left-0 bottom-0 w-full sm:w-80 flex flex-col overflow-hidden z-20 ${
           isMinimalDesign
             ? 'bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700'
             : 'backdrop-blur-xl bg-black/50 border-r border-white/15'
@@ -730,6 +731,19 @@ export function InboxView() {
           left: sidebarVisible ? '320px' : '0px', // 320px = w-80
           transition: 'left 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
           paddingTop: '64px', // Height of header
+        }}
+        onTouchStart={(e) => {
+          const x = e.touches[0].clientX;
+          (window as any)._inboxSwipeStartX = x;
+        }}
+        onTouchEnd={(e) => {
+          const start = (window as any)._inboxSwipeStartX as number | undefined;
+          if (start == null) return;
+          const endX = e.changedTouches[0].clientX;
+          const dx = endX - start;
+          if (!sidebarVisible && start < 24 && dx > 60) setSidebarVisible(true);
+          if (sidebarVisible && dx < -60) setSidebarVisible(false);
+          (window as any)._inboxSwipeStartX = undefined;
         }}
       >
         {/* Content Area - main task list */}
@@ -1337,25 +1351,30 @@ export function InboxView() {
                     {/* Tasks for this date */}
                     <div className="space-y-4">
                       {group.tasks.map((task) => (
-                        <InboxTaskCard
+                        <SwipeableTaskCard
                           key={task.id}
-                          task={task}
-                          isSelected={selectedTasks.has(task.id)}
-                          onSelect={(selected) => handleTaskSelect(task.id, selected)}
-                          onEdit={() => handleEditTask(task)}
-                          onDateSelect={() => handleDateSelect(task)}
-                          onProjectSelect={() => handleProjectSelect(task)}
-                          onAssignToColumn={(columnId) => handleTaskAssign(task, columnId)}
-                          onAddTag={(tagName) => handleTaskAddTag(task, tagName)}
-                          availableColumns={availableColumns}
-                          availableTags={availableTags}
-                          editingTaskId={editingTaskId}
-                          setEditingTaskId={setEditingTaskId}
-                          accentColor={accentColor}
-                          isMinimalDesign={isMinimalDesign}
-                          multiSelectMode={multiSelectMode}
-                          onTaskClick={(event) => handleTaskClick(task, event)}
-                        />
+                          onSwipeLeft={() => handleTaskAssign(task, 'archive')}
+                          onSwipeRight={() => handleTaskClick(task, undefined)}
+                        >
+                          <InboxTaskCard
+                            task={task}
+                            isSelected={selectedTasks.has(task.id)}
+                            onSelect={(selected) => handleTaskSelect(task.id, selected)}
+                            onEdit={() => handleEditTask(task)}
+                            onDateSelect={() => handleDateSelect(task)}
+                            onProjectSelect={() => handleProjectSelect(task)}
+                            onAssignToColumn={(columnId) => handleTaskAssign(task, columnId)}
+                            onAddTag={(tagName) => handleTaskAddTag(task, tagName)}
+                            availableColumns={availableColumns}
+                            availableTags={availableTags}
+                            editingTaskId={editingTaskId}
+                            setEditingTaskId={setEditingTaskId}
+                            accentColor={accentColor}
+                            isMinimalDesign={isMinimalDesign}
+                            multiSelectMode={multiSelectMode}
+                            onTaskClick={(event) => handleTaskClick(task, event)}
+                          />
+                        </SwipeableTaskCard>
                       ))}
                     </div>
                   </div>
