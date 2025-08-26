@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import type { AuthState, User } from '../types';
 import { supabase } from '../lib/supabaseClient';
+import { uploadInitialBackupIfNeeded } from '../utils/supabaseSync';
 
 interface AuthContextType {
   state: AuthState;
@@ -179,6 +180,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         preferences: undefined as any
       } as any;
       dispatch({ type: 'LOGIN_SUCCESS', payload: { user, token: s.access_token } });
+      // Fire and forget: initial backup of local data
+      uploadInitialBackupIfNeeded(user.id).catch(() => {});
       return true;
     } catch (e: any) {
       dispatch({ type: 'LOGIN_FAILURE', payload: e?.message || 'Login fehlgeschlagen' });
