@@ -975,15 +975,29 @@ function MainApp() {
 function AppRouter() {
   const { state } = useAuth();
   const [guestMode, setGuestMode] = React.useState(false);
+  const [showOnboardingAtStart, setShowOnboardingAtStart] = React.useState(false);
 
   // Handle guest mode
   const handleGuestMode = () => {
     setGuestMode(true);
   };
 
+  // Show onboarding on first visit before any screen (LandingPage or App)
+  React.useEffect(() => {
+    try {
+      const hasSeen = localStorage.getItem('taskfuchs-onboarding-complete') === 'true';
+      if (!hasSeen) setShowOnboardingAtStart(true);
+    } catch {}
+  }, []);
+
   // Show welcome screen if not authenticated and not in guest mode
   if (!state.isAuthenticated && !guestMode) {
-    return <WelcomeScreen onGuestMode={handleGuestMode} />;
+    return (
+      <>
+        <WelcomeScreen onGuestMode={handleGuestMode} />
+        <OnboardingTour isOpen={showOnboardingAtStart} onClose={() => setShowOnboardingAtStart(false)} />
+      </>
+    );
   }
 
   // Show main app if authenticated or in guest mode
