@@ -6106,7 +6106,7 @@ const Settings = React.memo(() => {
                         ) : (
                           <div className="space-y-0">
                             {caldavCalendars.map((calendar) => (
-                              <div key={calendar.url} className="flex items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-600 last:border-b-0 transition-colors">
+                              <div key={calendar.url} className="flex items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-700/60 border-b border-gray-100 dark:border-gray-700 last:border-b-0 transition-colors">
                                 <input
                                   type="radio"
                                   id={`calendar-${calendar.name}`}

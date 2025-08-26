@@ -209,7 +209,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: 'REGISTER_START' });
     try {
       if (!supabase) throw new Error('Supabase not configured');
-      const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { name } } });
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { name },
+          emailRedirectTo: window.location.origin,
+        },
+      });
       if (error || !data.user) {
         dispatch({ type: 'REGISTER_FAILURE', payload: error?.message || 'Registrierung fehlgeschlagen' });
         return false;
