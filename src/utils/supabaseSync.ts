@@ -61,4 +61,40 @@ export async function uploadInitialBackupIfNeeded(userId: string): Promise<boole
   throw error;
 }
 
+export async function tryRestoreFromBackup(userId: string): Promise<boolean> {
+  if (!supabase) return false;
+  const flagKey = `taskfuchs-initial-restore-done-${userId}`;
+  if (localStorage.getItem(flagKey) === 'true') return false;
+
+  // Only restore if there are no local tasks yet (new device/browser)
+  const hasLocal = !!localStorage.getItem('taskfuchs-tasks');
+  if (hasLocal) return false;
+
+  const path = `${userId}/initial-backup.json`;
+  const { data, error } = await supabase.storage.from(BUCKET).download(path);
+  if (error || !data) return false;
+
+  try {
+    const text = await data.text();
+    const snapshot = JSON.parse(text);
+    // Write back to localStorage using the same keys the app reads
+    if (snapshot.tasks) localStorage.setItem('taskfuchs-tasks', JSON.stringify(snapshot.tasks));
+    if (snapshot.archivedTasks) localStorage.setItem('taskfuchs-archived-tasks', JSON.stringify(snapshot.archivedTasks));
+    if (snapshot.boards) localStorage.setItem('taskfuchs-boards', JSON.stringify(snapshot.boards));
+    if (snapshot.columns) localStorage.setItem('taskfuchs-columns', JSON.stringify(snapshot.columns));
+    if (snapshot.tags) localStorage.setItem('taskfuchs-tags', JSON.stringify(snapshot.tags));
+    if (snapshot.notes) localStorage.setItem('taskfuchs-notes', JSON.stringify(snapshot.notes));
+    if (snapshot.noteLinks) localStorage.setItem('taskfuchs-note-links', JSON.stringify(snapshot.noteLinks));
+    if (snapshot.preferences) localStorage.setItem('taskfuchs-preferences', JSON.stringify(snapshot.preferences));
+    if (snapshot.viewState) localStorage.setItem('taskfuchs-view-state', JSON.stringify(snapshot.viewState));
+    if (snapshot.events) localStorage.setItem('taskfuchs-events', JSON.stringify(snapshot.events));
+    if (snapshot.calendarSources) localStorage.setItem('taskfuchs-calendar-sources', JSON.stringify(snapshot.calendarSources));
+    if (typeof snapshot.showCompleted !== 'undefined') localStorage.setItem('taskfuchs-show-completed', JSON.stringify(snapshot.showCompleted));
+    localStorage.setItem(flagKey, 'true');
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import type { AuthState, User } from '../types';
 import { supabase } from '../lib/supabaseClient';
-import { uploadInitialBackupIfNeeded } from '../utils/supabaseSync';
+import { uploadInitialBackupIfNeeded, tryRestoreFromBackup } from '../utils/supabaseSync';
 
 interface AuthContextType {
   state: AuthState;
@@ -122,6 +122,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             preferences: undefined as any
           } as any;
           dispatch({ type: 'RESTORE_SESSION', payload: { user, token: session.access_token } });
+          // Ensure initial backup also when session is auto-restored
+          uploadInitialBackupIfNeeded(user.id).catch(() => {});
+          // Try initial restore on fresh devices (no local data yet)
+          tryRestoreFromBackup(user.id).then((restored) => {
+            if (restored) {
+              // Reload to let app load newly restored local data
+              window.location.reload();
+            }
+          }).catch(() => {});
         }
       } catch (e) {
         // ignore
@@ -143,6 +152,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           preferences: undefined as any
         } as any;
         dispatch({ type: 'RESTORE_SESSION', payload: { user, token: session.access_token } });
+        uploadInitialBackupIfNeeded(user.id).catch(() => {});
+        tryRestoreFromBackup(user.id).then((restored) => {
+          if (restored) window.location.reload();
+        }).catch(() => {});
       } else {
         dispatch({ type: 'LOGOUT' });
       }
