@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppTranslation } from '../../utils/i18nHelpers';
 import { useApp } from '../../context/AppContext';
@@ -1573,9 +1574,9 @@ const Settings = React.memo(() => {
                 )}
 
                 {/* Photo Credits Modal */}
-                {showPhotoCreditsModal && (
-                  <div className="fixed inset-0 z-50 flex items-center justify-center">
-                    <div className="absolute inset-0 bg-black/50" onClick={() => setShowPhotoCreditsModal(false)} />
+                {showPhotoCreditsModal && createPortal(
+                  <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowPhotoCreditsModal(false)} />
                     <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-lg w-full mx-4 p-5 border border-gray-200 dark:border-gray-700">
                       <div className="flex items-center justify-between mb-3">
                         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Photo credentials</h3>
@@ -1604,7 +1605,8 @@ const Settings = React.memo(() => {
                         </button>
                       </div>
                     </div>
-                  </div>
+                  </div>,
+                  document.body
                 )}
               </div>
             </div>
