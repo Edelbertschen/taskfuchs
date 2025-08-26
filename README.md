@@ -113,6 +113,11 @@ Die Entwicklung erfolgt in Phasen gemäß [TaskFuchs-Plan.md](../TaskFuchs-Plan.
 
 Pull Requests willkommen. Bitte vorab Issues anlegen, wenn größere Änderungen geplant sind. Lizenz siehe `LICENSE`.
 
+## Sicherheit & Secrets
+- Keine echten Zugangsdaten committen; nutze `.env` lokal und GitHub Secrets im CI.
+- Client-seitig sind nur `VITE_`-Variablen sichtbar – als quasi öffentlich behandeln.
+- Beispieldatei: `.env.example` (lokal zu `.env` kopieren und Werte setzen).
+
 ---
 
 **TaskFuchs** 🦊 - Deine smarte Aufgabenverwaltung
