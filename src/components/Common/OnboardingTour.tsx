@@ -35,7 +35,7 @@ export function OnboardingTour({ isOpen, onClose }: OnboardingTourProps) {
   const getBackgroundImagePath = () => {
     // Use relative path which should work in both environments
     // Vite copies the file to dist/, so this should resolve correctly
-    return 'fox_onboarding2.jpg';
+    return 'onboarding.jpg';
   };
 
   const steps: OnboardingStep[] = [
