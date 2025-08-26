@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFuchs - No-Cache Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        .status {
+            background: #4CAF50;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+        .time {
+            font-family: 'Monaco', 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .fox {
+            font-size: 3em;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .button {
+            background: #FF6B35;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+        .button:hover {
+            background: #E55B2B;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="fox">🦊</div>
+        <h1>TaskFuchs - No-Cache Test</h1>
+        
+        <div class="status">
+            ✅ No-Cache Headers aktiv!
+        </div>
+        
+        <div class="info">
+            <h3>🚫 Cache-Control Headers:</h3>
+            <ul>
+                <li><strong>Cache-Control:</strong> no-cache, no-store, must-revalidate</li>
+                <li><strong>Pragma:</strong> no-cache</li>
+                <li><strong>Expires:</strong> 0</li>
+            </ul>
+        </div>
+        
+        <div class="info">
+            <h3>🕒 Aktuelle Server-Zeit:</h3>
+            <div class="time" id="serverTime">Wird geladen...</div>
+        </div>
+        
+        <div class="info">
+            <h3>🔄 Test-Anweisungen:</h3>
+            <ol>
+                <li>Bearbeite diese HTML-Datei</li>
+                <li>Speichere die Änderungen</li>
+                <li>Lade die Seite neu (F5 oder Cmd+R)</li>
+                <li>Änderungen sollten sofort sichtbar sein!</li>
+            </ol>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <button class="button" onclick="location.reload()">🔄 Seite neu laden</button>
+            <button class="button" onclick="window.location.href='/'">🏠 Zur Hauptseite</button>
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px; opacity: 0.7;">
+            <small>Letzte Änderung: <span id="timestamp"></span></small>
+        </div>
+    </div>
+
+    <script>
+        // Aktuelle Zeit anzeigen
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('serverTime').textContent = now.toLocaleString('de-DE');
+            document.getElementById('timestamp').textContent = now.toLocaleString('de-DE');
+        }
+        
+        updateTime();
+        setInterval(updateTime, 1000);
+        
+        // Console-Log für Entwickler
+        console.log('🦊 TaskFuchs No-Cache Test aktiv!');
+        console.log('Headers sollten no-cache enthalten');
+    </script>
+</body>
+</html> 

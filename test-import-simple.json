@@ -1,0 +1,46 @@
+{
+  "tasks": [
+    {
+      "id": "test-task-1",
+      "title": "Test Aufgabe",
+      "description": "",
+      "completed": false,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "project-test",
+      "kanbanColumnId": "col-test-123",
+      "createdAt": "2025-01-31T00:00:00.000Z",
+      "updatedAt": "2025-01-31T00:00:00.000Z",
+      "position": 1
+    }
+  ],
+  "columns": [
+    {
+      "id": "project-test",
+      "title": "Test Projekt",
+      "type": "project",
+      "order": 1,
+      "tasks": []
+    }
+  ],
+  "tags": [],
+  "boards": [],
+  "notes": {
+    "notes": [
+      {
+        "id": "note-test-1",
+        "title": "Test Notiz",
+        "content": "Test Inhalt",
+        "tags": [],
+        "linkedTasks": [],
+        "linkedNotes": [],
+        "pinned": false,
+        "archived": false,
+        "createdAt": "2025-01-31T00:00:00.000Z",
+        "updatedAt": "2025-01-31T00:00:00.000Z"
+      }
+    ]
+  },
+  "exportDate": "2025-01-31T00:00:00.000Z",
+  "version": "1.0"
+}

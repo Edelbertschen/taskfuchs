@@ -1,0 +1,331 @@
+{
+  "tasks": [
+    {
+      "id": "task-001",
+      "title": "Launch mobile app MVP",
+      "description": "Complete development and launch of the mobile application minimum viable product with core features including user authentication, task management, and offline sync.",
+      "completed": false,
+      "priority": "high",
+      "tags": ["mobile", "development", "mvp", "launch"],
+      "createdAt": "2024-01-20T09:00:00.000Z",
+      "updatedAt": "2024-01-26T14:30:00.000Z",
+      "estimatedTime": 960,
+      "trackedTime": 720,
+      "position": 0,
+      "columnId": "col-in-progress",
+      "deadline": "2024-01-30T18:00:00.000Z",
+      "subtasks": [
+        {"id": "sub-001", "title": "Complete user interface", "completed": true, "estimatedTime": 240, "trackedTime": 280},
+        {"id": "sub-002", "title": "Implement offline sync", "completed": true, "estimatedTime": 360, "trackedTime": 340},
+        {"id": "sub-003", "title": "App store submission", "completed": false, "estimatedTime": 120, "trackedTime": 0}
+      ],
+      "linkedNotes": ["note-mobile-strategy"],
+      "linkedProjects": ["project-mobile-app"]
+    },
+    {
+      "id": "task-002", 
+      "title": "Design system documentation",
+      "description": "Create comprehensive design system documentation including components, colors, typography, and usage guidelines for the entire team.",
+      "completed": false,
+      "priority": "medium",
+      "tags": ["design", "documentation", "design-system"],
+      "createdAt": "2024-01-22T10:00:00.000Z",
+      "updatedAt": "2024-01-26T16:45:00.000Z",
+      "estimatedTime": 480,
+      "trackedTime": 320,
+      "position": 1,
+      "columnId": "col-in-progress",
+      "deadline": "2024-01-29T17:00:00.000Z",
+      "subtasks": [
+        {"id": "sub-004", "title": "Component library audit", "completed": true, "estimatedTime": 120, "trackedTime": 140},
+        {"id": "sub-005", "title": "Documentation structure", "completed": true, "estimatedTime": 60, "trackedTime": 45},
+        {"id": "sub-006", "title": "Usage examples", "completed": false, "estimatedTime": 180, "trackedTime": 135}
+      ],
+      "linkedNotes": ["note-design-guidelines"],
+      "linkedProjects": ["project-design-system"]
+    },
+    {
+      "id": "task-003",
+      "title": "API performance optimization", 
+      "description": "Optimize API endpoints for better performance, implement caching strategies, and reduce response times by at least 40%.",
+      "completed": true,
+      "priority": "high",
+      "tags": ["backend", "performance", "optimization", "api"],
+      "createdAt": "2024-01-18T08:00:00.000Z",
+      "updatedAt": "2024-01-25T15:30:00.000Z",
+      "completedAt": "2024-01-25T15:30:00.000Z",
+      "estimatedTime": 600,
+      "trackedTime": 580,
+      "position": 0,
+      "columnId": "col-done",
+      "subtasks": [
+        {"id": "sub-007", "title": "Database query optimization", "completed": true, "estimatedTime": 240, "trackedTime": 235},
+        {"id": "sub-008", "title": "Redis caching implementation", "completed": true, "estimatedTime": 180, "trackedTime": 190},
+        {"id": "sub-009", "title": "Load testing", "completed": true, "estimatedTime": 120, "trackedTime": 105},
+        {"id": "sub-010", "title": "Performance monitoring setup", "completed": true, "estimatedTime": 60, "trackedTime": 50}
+      ],
+      "linkedNotes": ["note-performance-metrics"],
+      "linkedProjects": ["project-backend-optimization"]
+    },
+    {
+      "id": "task-004",
+      "title": "Customer onboarding workflow redesign",
+      "description": "Redesign the entire customer onboarding experience to reduce drop-off rates and improve user activation within the first 7 days.",
+      "completed": false,
+      "priority": "high", 
+      "tags": ["ux", "onboarding", "conversion"],
+      "createdAt": "2024-01-24T11:00:00.000Z",
+      "updatedAt": "2024-01-26T12:15:00.000Z",
+      "estimatedTime": 720,
+      "trackedTime": 240,
+      "position": 0,
+      "columnId": "col-todo",
+      "deadline": "2024-02-05T18:00:00.000Z",
+      "subtasks": [
+        {"id": "sub-011", "title": "User journey mapping", "completed": true, "estimatedTime": 120, "trackedTime": 140},
+        {"id": "sub-012", "title": "Wireframe creation", "completed": true, "estimatedTime": 180, "trackedTime": 100},
+        {"id": "sub-013", "title": "A/B test implementation", "completed": false, "estimatedTime": 240, "trackedTime": 0},
+        {"id": "sub-014", "title": "Analytics integration", "completed": false, "estimatedTime": 120, "trackedTime": 0}
+      ],
+      "linkedNotes": ["note-onboarding-research"],
+      "linkedProjects": ["project-user-experience"]
+    },
+    {
+      "id": "task-005",
+      "title": "Security audit implementation",
+      "description": "Implement security improvements based on the recent penetration testing report, including authentication hardening and data encryption.",
+      "completed": false,
+      "priority": "high",
+      "tags": ["security", "audit", "implementation"],
+      "createdAt": "2024-01-19T14:00:00.000Z", 
+      "updatedAt": "2024-01-26T10:30:00.000Z",
+      "estimatedTime": 840,
+      "trackedTime": 420,
+      "position": 2,
+      "columnId": "col-in-progress",
+      "deadline": "2024-01-31T18:00:00.000Z",
+      "subtasks": [
+        {"id": "sub-015", "title": "Two-factor authentication", "completed": true, "estimatedTime": 240, "trackedTime": 260},
+        {"id": "sub-016", "title": "Database encryption", "completed": true, "estimatedTime": 180, "trackedTime": 160},
+        {"id": "sub-017", "title": "API security headers", "completed": false, "estimatedTime": 120, "trackedTime": 0},
+        {"id": "sub-018", "title": "Security testing", "completed": false, "estimatedTime": 300, "trackedTime": 0}
+      ],
+      "linkedNotes": ["note-security-checklist"],
+      "linkedProjects": ["project-security-hardening"]
+    },
+    {
+      "id": "task-006",
+      "title": "Marketing automation setup",
+      "description": "Set up comprehensive marketing automation workflows including lead nurturing, customer segmentation, and email campaigns.",
+      "completed": false,
+      "priority": "medium",
+      "tags": ["marketing", "automation", "email"],
+      "createdAt": "2024-01-23T09:30:00.000Z",
+      "updatedAt": "2024-01-26T11:00:00.000Z",
+      "estimatedTime": 600,
+      "trackedTime": 180,
+      "position": 1,
+      "columnId": "col-todo",
+      "deadline": "2024-02-02T17:00:00.000Z",
+      "subtasks": [
+        {"id": "sub-019", "title": "Email template design", "completed": true, "estimatedTime": 120, "trackedTime": 135},
+        {"id": "sub-020", "title": "Workflow configuration", "completed": false, "estimatedTime": 240, "trackedTime": 45},
+        {"id": "sub-021", "title": "A/B testing setup", "completed": false, "estimatedTime": 120, "trackedTime": 0}
+      ],
+      "linkedNotes": ["note-marketing-strategy"],
+      "linkedProjects": ["project-marketing-automation"]
+    },
+    {
+      "id": "task-007",
+      "title": "Data analytics dashboard",
+      "description": "Build comprehensive analytics dashboard for business intelligence with real-time metrics, custom reports, and data visualization.",
+      "completed": false,
+      "priority": "medium",
+      "tags": ["analytics", "dashboard", "business-intelligence"],
+      "createdAt": "2024-01-25T13:00:00.000Z",
+      "updatedAt": "2024-01-26T15:20:00.000Z", 
+      "estimatedTime": 960,
+      "trackedTime": 120,
+      "position": 2,
+      "columnId": "col-todo",
+      "deadline": "2024-02-08T18:00:00.000Z",
+      "subtasks": [
+        {"id": "sub-022", "title": "Data pipeline setup", "completed": false, "estimatedTime": 360, "trackedTime": 60},
+        {"id": "sub-023", "title": "Visualization components", "completed": false, "estimatedTime": 300, "trackedTime": 60},
+        {"id": "sub-024", "title": "Real-time updates", "completed": false, "estimatedTime": 180, "trackedTime": 0}
+      ],
+      "linkedNotes": ["note-analytics-requirements"],
+      "linkedProjects": ["project-data-platform"]
+    },
+    {
+      "id": "task-008", 
+      "title": "CI/CD pipeline enhancement",
+      "description": "Enhance the continuous integration and deployment pipeline with automated testing, code quality checks, and zero-downtime deployments.",
+      "completed": true,
+      "priority": "high",
+      "tags": ["devops", "ci-cd", "automation"],
+      "createdAt": "2024-01-16T10:00:00.000Z",
+      "updatedAt": "2024-01-24T16:45:00.000Z",
+      "completedAt": "2024-01-24T16:45:00.000Z",
+      "estimatedTime": 720,
+      "trackedTime": 690,
+      "position": 1,
+      "columnId": "col-done",
+      "subtasks": [
+        {"id": "sub-025", "title": "GitHub Actions workflow", "completed": true, "estimatedTime": 180, "trackedTime": 165},
+        {"id": "sub-026", "title": "Automated testing integration", "completed": true, "estimatedTime": 240, "trackedTime": 255},
+        {"id": "sub-027", "title": "Deployment automation", "completed": true, "estimatedTime": 180, "trackedTime": 170},
+        {"id": "sub-028", "title": "Monitoring and alerting", "completed": true, "estimatedTime": 120, "trackedTime": 100}
+      ],
+      "linkedNotes": ["note-devops-strategy"],
+      "linkedProjects": ["project-infrastructure"]
+    },
+    {
+      "id": "task-009",
+      "title": "User research study",
+      "description": "Conduct comprehensive user research study to understand customer pain points, usage patterns, and feature requirements for the next quarter.",
+      "completed": false,
+      "priority": "medium",
+      "tags": ["research", "user-experience", "interviews"],
+      "createdAt": "2024-01-21T08:00:00.000Z",
+      "updatedAt": "2024-01-26T09:15:00.000Z",
+      "estimatedTime": 480,
+      "trackedTime": 300,
+      "position": 3,
+      "columnId": "col-in-progress",
+      "deadline": "2024-02-01T17:00:00.000Z",
+      "subtasks": [
+        {"id": "sub-029", "title": "Research plan creation", "completed": true, "estimatedTime": 60, "trackedTime": 75},
+        {"id": "sub-030", "title": "Participant recruitment", "completed": true, "estimatedTime": 120, "trackedTime": 105},
+        {"id": "sub-031", "title": "Interview sessions", "completed": true, "estimatedTime": 180, "trackedTime": 120},
+        {"id": "sub-032", "title": "Data analysis", "completed": false, "estimatedTime": 120, "trackedTime": 0}
+      ],
+      "linkedNotes": ["note-user-research"],
+      "linkedProjects": ["project-user-experience"]
+    },
+    {
+      "id": "task-010",
+      "title": "E-commerce integration",
+      "description": "Integrate payment processing, inventory management, and order fulfillment systems for the new e-commerce platform launch.",
+      "completed": false,
+      "priority": "high",
+      "tags": ["ecommerce", "integration", "payments"],
+      "createdAt": "2024-01-22T12:00:00.000Z",
+      "updatedAt": "2024-01-26T13:30:00.000Z",
+      "estimatedTime": 1200,
+      "trackedTime": 360,
+      "position": 3,
+      "columnId": "col-todo",
+      "deadline": "2024-02-10T18:00:00.000Z",
+      "subtasks": [
+        {"id": "sub-033", "title": "Payment gateway setup", "completed": true, "estimatedTime": 240, "trackedTime": 220},
+        {"id": "sub-034", "title": "Inventory system integration", "completed": false, "estimatedTime": 360, "trackedTime": 140},
+        {"id": "sub-035", "title": "Order processing workflow", "completed": false, "estimatedTime": 300, "trackedTime": 0},
+        {"id": "sub-036", "title": "Testing and validation", "completed": false, "estimatedTime": 180, "trackedTime": 0}
+      ],
+      "linkedNotes": ["note-ecommerce-architecture"],
+      "linkedProjects": ["project-ecommerce-platform"]
+    }
+  ],
+  "columns": [
+    {
+      "id": "col-todo",
+      "title": "Backlog",
+      "color": "#6b7280",
+      "position": 0,
+      "type": "default",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-26T12:00:00.000Z"
+    },
+    {
+      "id": "col-in-progress", 
+      "title": "In Progress",
+      "color": "#3b82f6",
+      "position": 1,
+      "type": "default",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-26T12:00:00.000Z"
+    },
+    {
+      "id": "col-review",
+      "title": "Review",
+      "color": "#f59e0b", 
+      "position": 2,
+      "type": "default",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-26T12:00:00.000Z"
+    },
+    {
+      "id": "col-done",
+      "title": "Completed", 
+      "color": "#10b981",
+      "position": 3,
+      "type": "default",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-26T12:00:00.000Z"
+    }
+  ],
+  "kanbanBoards": [
+    {
+      "id": "project-mobile-app",
+      "title": "Mobile App Development",
+      "description": "Native iOS and Android application with offline capabilities",
+      "color": "#3b82f6",
+      "createdAt": "2024-01-15T00:00:00.000Z",
+      "updatedAt": "2024-01-26T14:30:00.000Z",
+      "columns": [
+        {"id": "mobile-planning", "title": "Planning", "color": "#6b7280", "position": 0},
+        {"id": "mobile-development", "title": "Development", "color": "#3b82f6", "position": 1}, 
+        {"id": "mobile-testing", "title": "Testing", "color": "#f59e0b", "position": 2},
+        {"id": "mobile-deployment", "title": "Deployment", "color": "#10b981", "position": 3}
+      ]
+    },
+    {
+      "id": "project-design-system",
+      "title": "Design System",
+      "description": "Comprehensive design system and component library",
+      "color": "#ec4899",
+      "createdAt": "2024-01-10T00:00:00.000Z", 
+      "updatedAt": "2024-01-26T16:45:00.000Z",
+      "columns": [
+        {"id": "design-research", "title": "Research", "color": "#8b5cf6", "position": 0},
+        {"id": "design-components", "title": "Components", "color": "#ec4899", "position": 1},
+        {"id": "design-documentation", "title": "Documentation", "color": "#f59e0b", "position": 2},
+        {"id": "design-implementation", "title": "Implementation", "color": "#10b981", "position": 3}
+      ]
+    },
+    {
+      "id": "project-backend-optimization",
+      "title": "Backend Performance",
+      "description": "API optimization and infrastructure improvements",
+      "color": "#10b981",
+      "createdAt": "2024-01-12T00:00:00.000Z",
+      "updatedAt": "2024-01-25T15:30:00.000Z",
+      "columns": [
+        {"id": "backend-analysis", "title": "Analysis", "color": "#6b7280", "position": 0},
+        {"id": "backend-optimization", "title": "Optimization", "color": "#3b82f6", "position": 1},
+        {"id": "backend-testing", "title": "Testing", "color": "#f59e0b", "position": 2},
+        {"id": "backend-deployed", "title": "Deployed", "color": "#10b981", "position": 3}
+      ]
+    }
+  ],
+  "preferences": {
+    "language": "en",
+    "accentColor": "#3b82f6", 
+    "theme": "system",
+    "minimalDesign": false,
+    "showWelcomeMessage": false,
+    "columns": {
+      "visible": 5
+    }
+  },
+  "exportDate": "2024-01-26T18:00:00.000Z",
+  "version": "2.2"
+} 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

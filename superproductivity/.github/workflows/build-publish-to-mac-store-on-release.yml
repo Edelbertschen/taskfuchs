@@ -1,0 +1,90 @@
+name: Mac Store Release on Release
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs: {}
+
+jobs:
+  mac-store-release:
+    runs-on: macos-latest
+    env:
+      UNSPLASH_KEY: ${{ secrets.UNSPLASH_KEY }}
+      UNSPLASH_CLIENT_ID: ${{ secrets.UNSPLASH_CLIENT_ID }}
+
+    if: '!github.event.release.prerelease'
+
+    steps:
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      # work around for npm installs from git+https://github.com/johannesjo/J2M.git
+      - name: Reconfigure git to use HTTP authentication
+        run: >
+          git config --global url."https://github.com/".insteadOf
+          ssh://git@github.com/
+
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        run: |
+          echo "::set-output name=dir::$(npm config get cache)"
+      - uses: actions/cache@v4
+        id: npm-cache # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Workaround for nx issue and dmg licence issue
+        run: npm install @nx/nx-darwin-arm64 dmg-license
+
+      - name: Install npm Packages
+        #  if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npm i
+
+      - run: 'echo "$PROVISION_PROFILE" | base64 --decode > embedded.provisionprofile'
+        shell: bash
+        env:
+          PROVISION_PROFILE: ${{secrets.mas_provision_profile}}
+
+      - run: npm run env # Generate env.generated.ts
+
+      - name: Lint
+        run: npm run lint:ci
+
+      - name: Test Unit
+        run: npm run test
+
+      #      - name: Test E2E
+      #        run: npm run e2e
+
+      - name: Build Frontend & Electron
+        run: npm run build
+
+      - uses: apple-actions/import-codesign-certs@v5
+        with:
+          p12-file-base64: ${{ secrets.mac_certs }}
+          p12-password: ${{ secrets.mac_certs_password }}
+
+      - name: Build Electron app
+        run: npm run dist:mac:mas:buildOnly
+
+      - run: ls .tmp/app-builds
+        shell: bash
+
+      - name: Validate App
+        run: ls .tmp/app-builds; ls .tmp/app-builds/mas-universal; xcrun altool --type macos --validate-app -f .tmp/app-builds/mas-universal/super*.pkg -u ${{secrets.APPLE_ID}} -p ${{secrets.APPLE_APP_SPECIFIC_PASSWORD}}
+        env:
+          APPLE_ID: ${{secrets.APPLE_ID}}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{secrets.APPLE_APP_SPECIFIC_PASSWORD}}
+
+      - name: Push to Store
+        run: xcrun altool --type macos --upload-app -f .tmp/app-builds/mas-universal/super*.pkg -u ${{secrets.APPLE_ID}} -p ${{secrets.APPLE_APP_SPECIFIC_PASSWORD}}
+        env:
+          APPLE_ID: ${{secrets.APPLE_ID}}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{secrets.APPLE_APP_SPECIFIC_PASSWORD}}

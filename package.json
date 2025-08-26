@@ -1,0 +1,209 @@
+{
+  "name": "taskfuchs",
+  "private": true,
+  "version": "1.0.0",
+  "description": "TaskFuchs - Intelligente Aufgabenverwaltung für produktive Menschen",
+  "author": {
+    "name": "TaskFuchs Team",
+    "email": "team@taskfuchs.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/taskfuchs/taskfuchs.git"
+  },
+  "main": "public/electron.cjs",
+  "homepage": "./",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:web": "NODE_ENV=production vite build",
+    "build:electron": "vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "deploy:vercel": "vercel --prod",
+    "electron": "wait-on http://localhost:5173 && electron . --no-sandbox --disable-web-security",
+    "electron-dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron . --no-sandbox --disable-web-security --disable-dev-shm-usage\"",
+    "electron-dev-fast": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && ELECTRON_ENABLE_DEVTOOLS=false electron . --no-sandbox --disable-web-security --disable-dev-shm-usage --disable-extensions\"",
+    "electron-pack": "npm run build && electron-builder",
+    "preelectron-pack": "npm run build",
+    "dist": "npm run build && electron-builder --publish=never",
+    "dist:win": "npm run build && electron-builder --win --publish=never",
+    "dist:win-x64": "npm run build && electron-builder --win --x64 --publish=never",
+    "dist:win-ia32": "npm run build && electron-builder --win --ia32 --publish=never",
+    "dist:win-debug": "npm run build && DEBUG=electron-builder electron-builder --win --publish=never",
+    "dist:win-simple": "npm run build && electron-builder --win --x64 --publish=never --config.win.target=nsis",
+    "dist:win-zip": "npm run build && electron-builder --win --x64 --publish=never --config.win.target=zip",
+    "dist:win-portable": "npm run build && electron-builder --win --x64 --publish=never --config.win.target=portable",
+    "dist:win-fast": "electron-builder --win --x64 --publish=never",
+    "dist:mac": "npm run build && electron-builder --mac --publish=never",
+    "dist:mac-dmg": "TF_TARGET=electron npm run build && electron-builder --mac --publish=never --config.mac.target=dmg",
+    "dist:mac-universal": "npm run build && electron-builder --mac --universal --publish=never"
+  },
+  "dependencies": {
+    "@capacitor/cli": "^7.4.2",
+    "@capacitor/core": "^7.4.2",
+    "@capacitor/ios": "^7.4.2",
+    "@dnd-kit/core": "^6.1.0",
+    "@dnd-kit/sortable": "^8.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@types/react-window": "^1.8.8",
+    "date-fns": "^3.3.1",
+    "html2canvas": "^1.4.1",
+    "i18next": "^23.7.16",
+    "i18next-browser-languagedetector": "^7.2.0",
+    "jspdf": "^3.0.1",
+    "lucide-react": "^0.263.1",
+    "postal-mime": "^2.4.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-i18next": "^14.0.0",
+    "react-markdown": "^9.0.1",
+    "react-window": "^1.8.11",
+    "react-window-infinite-loader": "^1.0.10",
+    "remark-gfm": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.16",
+    "concurrently": "^9.2.0",
+    "electron": "^37.2.0",
+    "electron-builder": "^26.0.12",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.2.2",
+    "vite": "^7.0.5",
+    "vite-plugin-pwa": "^1.0.2",
+    "wait-on": "^8.0.3",
+    "workbox-window": "^7.3.0"
+  },
+  "build": {
+    "appId": "com.taskfuchs.app",
+    "productName": "TaskFuchs",
+    "copyright": "Copyright © 2024 TaskFuchs Team",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "publish": {
+      "provider": "github"
+    },
+    "files": [
+      "dist/**/*",
+      "public/electron.cjs",
+      "public/Fuchs.svg",
+      "public/foxicon.svg",
+      "public/foxicon.ico",
+      "public/foxicon-512.png",
+      "public/foxicon-1024.png",
+      "public/icon.ico",
+      "public/icon-512.png",
+      "public/dmg-background.svg",
+      "public/fox_onboarding2.jpg",
+      "public/fox_onboarding.jpg",
+      "public/onboarding*.svg",
+      "!node_modules/**/*",
+      "node_modules/{electron-store,sqlite3,better-sqlite3}/**/*"
+    ],
+    "extraMetadata": {
+      "name": "TaskFuchs",
+      "description": "Intelligente Aufgabenverwaltung für produktive Menschen",
+      "author": "TaskFuchs Team",
+      "version": "1.0.0"
+    },
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "public/foxicon-1024.png",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64"
+          ]
+        }
+      ],
+      "asar": false
+    },
+    "dmg": {
+      "title": "TaskFuchs Installation",
+      "icon": "public/foxicon-1024.png",
+      "window": {
+        "width": 660,
+        "height": 400
+      },
+      "contents": [
+        {
+          "x": 180,
+          "y": 170,
+          "type": "file"
+        },
+        {
+          "x": 480,
+          "y": 170,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ],
+      "format": "ULFO",
+      "internetEnabled": true,
+      "sign": false
+    },
+    "win": {
+      "requestedExecutionLevel": "asInvoker",
+      "artifactName": "${productName}-${version}-${arch}.${ext}",
+      "icon": "public/icon.ico",
+      "asar": false,
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "linux": {
+      "maintainer": "TaskFuchs Team <team@taskfuchs.com>",
+      "category": "Office",
+      "icon": "public/foxicon-1024.png",
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "runAfterFinish": false,
+      "allowElevation": true,
+      "perMachine": false,
+      "differentialPackage": true,
+      "unicode": true,
+      "displayLanguageSelector": false,
+      "include": null,
+      "script": null,
+      "warningsAsErrors": false,
+      "installerIcon": "public/icon.ico",
+      "uninstallerIcon": "public/icon.ico",
+      "installerHeaderIcon": "public/icon.ico"
+    }
+  }
+}

@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impressum - TaskFuchs</title>
+    <meta name="description" content="Impressum der TaskFuchs Produktivitäts-App nach deutschem Recht">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #e06610;
+            --text-dark: #0f0f23;
+            --text-light: #6b7280;
+            --bg-light: #fafafa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: var(--bg-light);
+            padding-top: 80px; /* Space for fixed navigation */
+        }
+
+        /* Navigation Styles */
+        .nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 1rem 0;
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(45deg, var(--primary-color), #ff7a1a);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem 0;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary-color);
+            text-decoration: none;
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem 0;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            color: var(--text-dark);
+            font-size: 1.2rem;
+            margin: 1.5rem 0 0.5rem 0;
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        .contact-info {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+            margin: 2rem 0;
+        }
+
+        .info-section {
+            background: #fff5f0;
+            padding: 1.5rem;
+            border-radius: 6px;
+            border-left: 3px solid var(--primary-color);
+            margin: 1.5rem 0;
+        }
+
+        .highlight {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .legal-text {
+            font-size: 0.95rem;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        .disclaimer {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+            margin: 2rem 0;
+        }
+
+        .last-updated {
+            text-align: center;
+            color: var(--text-light);
+            font-style: italic;
+            margin-top: 3rem;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .contact-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .contact-item h4 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <img src="assets/images/Fuchs.svg" alt="TaskFuchs Logo">
+                TaskFuchs
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html#features">Funktionen</a></li>
+                <li><a href="index.html#demo">Demo</a></li>
+                <li><a href="index.html#gallery">Screenshots</a></li>
+                <li><a href="index.html#zielgruppen">Zielgruppen</a></li>
+                <li><a href="datenschutz.html">Datenschutz</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <a href="index.html" class="back-link">← Zurück zur Startseite</a>
+        
+        <div class="header">
+            <h1>Impressum</h1>
+            <p>TaskFuchs Produktivitäts-App</p>
+        </div>
+
+        <h2>Angaben gemäß § 5 TMG</h2>
+        
+        <div class="contact-info">
+            <p class="highlight">Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV:</p>
+            <p>
+                <strong>Malte Viergutz</strong><br>
+                Jungnauer Str. 1<br>
+                79211 Denzlingen<br>
+                Deutschland
+            </p>
+        </div>
+
+        <div class="contact-grid">
+            <div class="contact-item">
+                <h4>📞 Kontakt</h4>
+                <p>
+                    E-Mail: info@taskfuchs.de<br>
+                    Website: taskfuchs.de
+                </p>
+            </div>
+        </div>
+
+        <h2>Redaktionell verantwortlich</h2>
+        <div class="info-section">
+            <p>
+                Malte Viergutz<br>
+                Jungnauer Str. 1<br>
+                79211 Denzlingen<br>
+                Deutschland
+            </p>
+        </div>
+
+        <h2>Verbraucher­streit­beilegung/Universal­schlichtungs­stelle</h2>
+        <p class="legal-text">
+            Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.
+        </p>
+
+        <h2>Haftung für Inhalte</h2>
+        <div class="disclaimer">
+            <p class="legal-text">
+                Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht unter der Verpflichtung, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen.
+            </p>
+            <p class="legal-text">
+                Verpflichtungen zur Entfernung oder Sperrung der Nutzung von Informationen nach den allgemeinen Gesetzen bleiben hiervon unberührt. Eine diesbezügliche Haftung ist jedoch erst ab dem Zeitpunkt der Kenntnis einer konkreten Rechtsverletzung möglich. Bei Bekanntwerden von entsprechenden Rechtsverletzungen werden wir diese Inhalte umgehend entfernen.
+            </p>
+        </div>
+
+        <h2>Haftung für Links</h2>
+        <div class="disclaimer">
+            <p class="legal-text">
+                Unser Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich. Die verlinkten Seiten wurden zum Zeitpunkt der Verlinkung auf mögliche Rechtsverstöße überprüft. Rechtswidrige Inhalte waren zum Zeitpunkt der Verlinkung nicht erkennbar.
+            </p>
+            <p class="legal-text">
+                Eine permanente inhaltliche Kontrolle der verlinkten Seiten ist jedoch ohne konkrete Anhaltspunkte einer Rechtsverletzung nicht zumutbar. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Links umgehend entfernen.
+            </p>
+        </div>
+
+        <h2>Urheberrecht</h2>
+        <div class="disclaimer">
+            <p class="legal-text">
+                Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers. Downloads und Kopien dieser Seite sind nur für den privaten, nicht kommerziellen Gebrauch gestattet.
+            </p>
+            <p class="legal-text">
+                Soweit die Inhalte auf dieser Seite nicht vom Betreiber erstellt wurden, werden die Urheberrechte Dritter beachtet. Insbesondere werden Inhalte Dritter als solche gekennzeichnet. Sollten Sie trotzdem auf eine Urheberrechtsverletzung aufmerksam werden, bitten wir um einen entsprechenden Hinweis. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Inhalte umgehend entfernen.
+            </p>
+        </div>
+
+        <h2>TaskFuchs App - Besondere Hinweise</h2>
+        <div class="info-section">
+            <p><strong>Softwareentwicklung und -vertrieb:</strong></p>
+            <p class="legal-text">
+                TaskFuchs ist eine Produktivitäts-App für die Verwaltung von Aufgaben, Projekten und Zielen. Die App wird kontinuierlich weiterentwickelt und verbessert. Änderungen an der Software können jederzeit vorgenommen werden.
+            </p>
+            <p class="legal-text">
+                <strong>Technischer Support:</strong> support@taskfuchs.de<br>
+                <strong>Allgemeine Anfragen:</strong> info@taskfuchs.de
+            </p>
+        </div>
+
+        <h2>EU-Streitschlichtung</h2>
+        <p class="legal-text">
+            Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit: 
+            <a href="https://ec.europa.eu/consumers/odr/" target="_blank" style="color: var(--primary-color);">https://ec.europa.eu/consumers/odr/</a>.
+            Unsere E-Mail-Adresse finden Sie oben im Impressum.
+        </p>
+
+        <h2>Bildnachweise</h2>
+        <div class="info-section">
+            <p>Verwendete Icons und Grafiken:</p>
+            <ul class="legal-text">
+                <li>TaskFuchs Logo: Eigene Erstellung</li>
+                <li>Material Design Icons: Google (Apache License 2.0)</li>
+                <li>Screenshots: Eigene Erstellung der TaskFuchs App</li>
+                <li>Hintergrundgrafiken: Eigene Erstellung/Lizenzfreie Nutzung</li>
+            </ul>
+        </div>
+
+        <div class="last-updated">
+            <p>Stand: Juli 2025</p>
+        </div>
+    </div>
+</body>
+</html> 

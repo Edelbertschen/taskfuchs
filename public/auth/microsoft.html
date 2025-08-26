@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microsoft Authentication - TaskFuchs</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-left-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .error {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .success {
+            color: #51cf66;
+            background: rgba(81, 207, 102, 0.1);
+            border: 1px solid rgba(81, 207, 102, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="spinner"></div>
+        <h2>Authentifizierung wird verarbeitet...</h2>
+        <p id="status">Bitte warten Sie, während wir Ihre Anmeldung verarbeiten.</p>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // Parse URL parameters
+        function getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Send message to parent window
+        function sendMessageToParent(data) {
+            if (window.opener) {
+                window.opener.postMessage({
+                    type: 'MICROSOFT_AUTH_CALLBACK',
+                    ...data
+                }, window.location.origin);
+            }
+        }
+
+        // Process authentication result
+        function processAuthResult() {
+            const code = getUrlParameter('code');
+            const state = getUrlParameter('state');
+            const error = getUrlParameter('error');
+            const errorDescription = getUrlParameter('error_description');
+
+            const statusElement = document.getElementById('status');
+            const resultElement = document.getElementById('result');
+
+            if (error) {
+                // Authentication error
+                statusElement.textContent = 'Authentifizierung fehlgeschlagen';
+                resultElement.innerHTML = `
+                    <div class="error">
+                        <strong>Fehler:</strong> ${error}<br>
+                        ${errorDescription ? `<small>${errorDescription}</small>` : ''}
+                    </div>
+                `;
+                
+                sendMessageToParent({ error, errorDescription });
+                
+                setTimeout(() => {
+                    window.close();
+                }, 3000);
+                
+            } else if (code && state) {
+                // Authentication success
+                statusElement.textContent = 'Authentifizierung erfolgreich!';
+                resultElement.innerHTML = `
+                    <div class="success">
+                        Anmeldung erfolgreich. Fenster wird geschlossen...
+                    </div>
+                `;
+                
+                sendMessageToParent({ code, state });
+                
+                setTimeout(() => {
+                    window.close();
+                }, 1500);
+                
+            } else {
+                // Invalid response
+                statusElement.textContent = 'Ungültige Antwort erhalten';
+                resultElement.innerHTML = `
+                    <div class="error">
+                        <strong>Fehler:</strong> Keine gültigen Authentifizierungsdaten erhalten
+                    </div>
+                `;
+                
+                sendMessageToParent({ error: 'invalid_response' });
+                
+                setTimeout(() => {
+                    window.close();
+                }, 3000);
+            }
+        }
+
+        // Handle page load
+        window.addEventListener('load', () => {
+            // Small delay to allow UI to render
+            setTimeout(processAuthResult, 500);
+        });
+
+        // Handle manual close
+        window.addEventListener('beforeunload', () => {
+            if (window.opener && !window.opener.closed) {
+                sendMessageToParent({ error: 'user_cancelled' });
+            }
+        });
+    </script>
+</body>
+</html> 

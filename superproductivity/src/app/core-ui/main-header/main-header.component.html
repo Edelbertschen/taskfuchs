@@ -1,0 +1,161 @@
+<div class="wrapper">
+  @if (!isNavAlwaysVisible()) {
+    <button
+      (click)="layoutService.toggleSideNav()"
+      class="burger-trigger tour-burgerTrigger"
+      mat-icon-button
+    >
+      <mat-icon>menu</mat-icon>
+    </button>
+  }
+
+  <work-context-title
+    [title]="activeWorkContextTitle()"
+    [activeWorkContextTypeAndId]="activeWorkContextTypeAndId()"
+  ></work-context-title>
+
+  @if (isScheduleSection()) {
+    <div class="week-month-selector">
+      <button
+        (click)="selectTimeView('week')"
+        [class.active]="selectedTimeView() === 'week'"
+        class="week-month-btn week-btn"
+        matTooltip="View Week"
+        mat-button
+      >
+        {{ T.GCF.SCHEDULE.WEEK | translate }}
+      </button>
+      <button
+        (click)="selectTimeView('month')"
+        [class.active]="selectedTimeView() === 'month'"
+        class="week-month-btn month-btn"
+        matTooltip="View Month"
+        mat-button
+      >
+        {{ T.GCF.SCHEDULE.MONTH | translate }}
+      </button>
+    </div>
+  }
+
+  <nav class="action-nav">
+    @if (showDesktopButtons()) {
+      <button
+        (click)="layoutService.showAddTaskBar()"
+        matTooltip="{{ T.MH.ADD_NEW_TASK | translate }} {{
+          kb.addNewTask ? '[' + kb.addNewTask + ']' : ''
+        }}"
+        class="tour-addBtn"
+        mat-icon-button
+      >
+        <mat-icon>add</mat-icon>
+      </button>
+    }
+
+    <button
+      class="sync-btn"
+      matTooltip="{{ T.MH.TRIGGER_SYNC | translate }}"
+      (click)="syncIsEnabledAndReady() ? sync() : setupSync()"
+      (longPress)="setupSync()"
+      (contextmenu)="$event.preventDefault(); setupSync()"
+      mat-icon-button
+    >
+      @if (syncIsEnabledAndReady()) {
+        @if (isOnline()) {
+          @if (syncState() === 'ERROR') {
+            <mat-icon>sync_problem</mat-icon>
+          } @else {
+            <mat-icon [class.spin]="isSyncInProgress()">sync</mat-icon>
+          }
+          @if (syncState() === 'IN_SYNC') {
+            <mat-icon class="sync-state-ico">check</mat-icon>
+          }
+        } @else {
+          <mat-icon>wifi_off</mat-icon>
+        }
+      } @else {
+        <mat-icon>sync_disabled</mat-icon>
+      }
+    </button>
+
+    @if (!focusModeConfig()?.isAlwaysUseFocusMode) {
+      @if (!isXxxs()) {
+        <button
+          mat-icon-button
+          matTooltip="{{ T.MH.ENTER_FOCUS_MODE | translate }} {{
+            kb.goToFocusMode ? '[' + kb.goToFocusMode + ']' : ''
+          }}"
+          (click)="enableFocusMode()"
+        >
+          <mat-icon>center_focus_strong</mat-icon>
+        </button>
+      }
+    }
+
+    <plugin-header-btns></plugin-header-btns>
+
+    <play-button
+      [currentTask]="currentTask()"
+      [currentTaskId]="currentTaskId()"
+      [currentTaskContext]="currentTaskContext()"
+      [pomodoroIsEnabled]="pomodoroIsEnabled()"
+      [pomodoroIsBreak]="pomodoroIsBreak()"
+      [pomodoroCurrentSessionTime]="pomodoroCurrentSessionTime()"
+    ></play-button>
+
+    <!-- Desktop: Show all buttons inline -->
+    @if (showDesktopButtons()) {
+      <!-- Simple counter buttons -->
+      @for (
+        simpleCounter of enabledSimpleCounters();
+        track trackById($index, simpleCounter)
+      ) {
+        <simple-counter-button
+          [matTooltip]="simpleCounter.title"
+          [simpleCounter]="simpleCounter"
+        ></simple-counter-button>
+      }
+
+      <plugin-side-panel-btns></plugin-side-panel-btns>
+
+      <desktop-panel-buttons
+        [kb]="kb"
+        [isRouteWithSidePanel]="isRouteWithSidePanel()"
+        [isWorkViewPage]="isWorkViewPage()"
+        [isShowTaskViewCustomizerPanel]="isShowTaskViewCustomizerPanel()"
+        [isShowIssuePanel]="isShowIssuePanel()"
+        [isShowNotes]="isShowNotes()"
+      ></desktop-panel-buttons>
+    }
+
+    <!-- Mobile: Show dropdown menus -->
+    @if (isXs()) {
+      <!-- Simple counter mobile dropdown -->
+      @if (enabledSimpleCounters().length) {
+        <div class="mobile-dropdown-wrapper">
+          <button
+            (click)="isShowSimpleCounterBtnsMobile.set(!isShowSimpleCounterBtnsMobile())"
+            [color]="isCounterRunning(enabledSimpleCounters()) ? 'accent' : ''"
+            mat-icon-button
+          >
+            <mat-icon>{{ isShowSimpleCounterBtnsMobile() ? 'close' : 'timer' }}</mat-icon>
+          </button>
+          <div
+            class="mobile-dropdown"
+            [class.isVisible]="isShowSimpleCounterBtnsMobile()"
+          >
+            @for (
+              simpleCounter of enabledSimpleCounters();
+              track trackById($index, simpleCounter)
+            ) {
+              <simple-counter-button
+                [simpleCounter]="simpleCounter"
+              ></simple-counter-button>
+            }
+          </div>
+        </div>
+      }
+
+      <mobile-side-panel-menu></mobile-side-panel-menu>
+    }
+  </nav>
+</div>

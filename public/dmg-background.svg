@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="660" height="400" viewBox="0 0 660 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Gradient Background -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4f46e5;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#7c3aed;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="glowGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.08" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0" />
+    </radialGradient>
+    <filter id="dropShadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="rgba(0,0,0,0.3)"/>
+    </filter>
+    <filter id="textShadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="rgba(0,0,0,0.8)"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="660" height="400" fill="url(#bgGradient)"/>
+  
+  <!-- Glow Effect -->
+  <ellipse cx="330" cy="200" rx="250" ry="120" fill="url(#glowGradient)"/>
+  
+  <!-- TaskFuchs Logo (oben mittig) -->
+  <g transform="translate(290, 50)">
+    <!-- Fuchs Kopf -->
+    <ellipse cx="40" cy="35" rx="25" ry="20" fill="#ff6b35" filter="url(#dropShadow)"/>
+    <!-- Ohren -->
+    <ellipse cx="25" cy="20" rx="8" ry="12" fill="#ff6b35"/>
+    <ellipse cx="55" cy="20" rx="8" ry="12" fill="#ff6b35"/>
+    <!-- Augen -->
+    <circle cx="32" cy="32" r="3" fill="#000"/>
+    <circle cx="48" cy="32" r="3" fill="#000"/>
+    <!-- Nase -->
+    <ellipse cx="40" cy="40" rx="2" ry="1" fill="#000"/>
+    <!-- Schwanz -->
+    <ellipse cx="15" cy="45" rx="12" ry="6" fill="#ff6b35"/>
+    <ellipse cx="12" cy="45" rx="8" ry="4" fill="#fff"/>
+  </g>
+  
+  <!-- Title - gut lesbar mit Schatten -->
+  <text x="330" y="140" text-anchor="middle" 
+        font-family="system-ui, -apple-system, sans-serif" 
+        font-size="28" font-weight="bold" 
+        fill="#ffffff" filter="url(#textShadow)">
+    TaskFuchs
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="330" y="165" text-anchor="middle" 
+        font-family="system-ui, -apple-system, sans-serif" 
+        font-size="14" 
+        fill="#e5e7eb" filter="url(#textShadow)">
+    Intelligente Aufgabenverwaltung
+  </text>
+  
+  <!-- Installationsanweisungen - klar positioniert -->
+  <text x="330" y="250" text-anchor="middle" 
+        font-family="system-ui, -apple-system, sans-serif" 
+        font-size="16" font-weight="600" 
+        fill="#ffffff" filter="url(#textShadow)">
+    Ziehe TaskFuchs in den Programme-Ordner, um die Installation zu starten
+  </text>
+  
+  <!-- Drag & Drop Pfeil (links) -->
+  <g transform="translate(150, 300)">
+    <path d="M 0 20 L 60 20 L 50 10 M 60 20 L 50 30" 
+          stroke="#ffffff" stroke-width="3" fill="none" 
+          stroke-linecap="round" stroke-linejoin="round"
+          filter="url(#textShadow)"/>
+  </g>
+  
+  <!-- Drag & Drop Pfeil (rechts) -->
+  <g transform="translate(450, 300)">
+    <path d="M 60 20 L 0 20 L 10 10 M 0 20 L 10 30" 
+          stroke="#ffffff" stroke-width="3" fill="none" 
+          stroke-linecap="round" stroke-linejoin="round"
+          filter="url(#textShadow)"/>
+  </g>
+  
+  <!-- Dekorative Elemente -->
+  <circle cx="100" cy="100" r="4" fill="rgba(255,255,255,0.3)"/>
+  <circle cx="560" cy="120" r="6" fill="rgba(255,255,255,0.2)"/>
+  <circle cx="80" cy="300" r="3" fill="rgba(255,255,255,0.4)"/>
+  <circle cx="580" cy="280" r="5" fill="rgba(255,255,255,0.3)"/>
+  
+  <!-- Zusätzliche kleine Sterne -->
+  <g transform="translate(120, 150)">
+    <path d="M 0 -8 L 2 -2 L 8 -2 L 3 2 L 5 8 L 0 4 L -5 8 L -3 2 L -8 -2 L -2 -2 Z" 
+          fill="rgba(255,255,255,0.6)"/>
+  </g>
+  
+  <g transform="translate(520, 180)">
+    <path d="M 0 -6 L 1.5 -1.5 L 6 -1.5 L 2.25 1.5 L 3.75 6 L 0 3 L -3.75 6 L -2.25 1.5 L -6 -1.5 L -1.5 -1.5 Z" 
+          fill="rgba(255,255,255,0.5)"/>
+  </g>
+</svg> 

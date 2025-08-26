@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - TaskFuchs</title>
+    <meta name="description" content="Privacy Policy of the TaskFuchs productivity app according to GDPR">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #e06610;
+            --text-dark: #0f0f23;
+            --text-light: #6b7280;
+            --bg-light: #fafafa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: var(--bg-light);
+            padding-top: 80px; /* Space for fixed navigation */
+        }
+
+        /* Navigation Styles */
+        .nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 1rem 0;
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(45deg, var(--primary-color), #ff7a1a);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem 0;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--text-dark);
+            transform: translateX(-5px);
+        }
+
+        h2 {
+            color: var(--primary-color);
+            margin: 2rem 0 1rem 0;
+            font-size: 1.5rem;
+        }
+
+        h3 {
+            color: var(--text-dark);
+            margin: 1.5rem 0 0.5rem 0;
+            font-size: 1.2rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            text-align: justify;
+        }
+
+        ul {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, transparent 0%, rgba(224, 102, 16, 0.1) 50%, transparent 100%);
+            padding: 0.2rem;
+            border-radius: 3px;
+        }
+
+        .footer-nav {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e5e5e5;
+            text-align: center;
+        }
+
+        .footer-nav a {
+            color: var(--primary-color);
+            text-decoration: none;
+            margin: 0 1rem;
+            font-weight: 500;
+        }
+
+        .footer-nav a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <img src="assets/images/Fuchs.svg" alt="TaskFuchs Logo">
+                TaskFuchs
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html#features">Features</a></li>
+                <li><a href="index.html#demo">Demo</a></li>
+                <li><a href="index.html#gallery">Screenshots</a></li>
+                <li><a href="index.html#zielgruppen">Target Groups</a></li>
+                <li><a href="imprint.html">Imprint</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <a href="index.html" class="back-link">
+            ← Back to TaskFuchs
+        </a>
+        
+        <div class="header">
+            <h1>Privacy Policy</h1>
+            <p>TaskFuchs Productivity App</p>
+        </div>
+
+        <h2>1. Privacy at a Glance</h2>
+
+        <h3>General Information</h3>
+        <p>The following notes provide a simple overview of what happens to your personal data when you visit this website. Personal data is any data with which you could be personally identified. Detailed information on the subject of data protection can be found in our privacy policy listed below this text.</p>
+
+        <h3>Data Collection on this Website</h3>
+        <p><strong>Who is responsible for data collection on this website?</strong></p>
+        <p>Data processing on this website is carried out by the website operator. You can find their contact details in the "Information about the responsible party" section in this privacy policy.</p>
+
+        <h3>Data Protection</h3>
+        <p>We take the protection of your personal data very seriously. We treat your personal data confidentially and in accordance with the statutory data protection regulations and this privacy policy.</p>
+
+        <p>When you use this website, various personal data will be collected. Personal data is any data with which you could be personally identified. This privacy policy explains what information we collect and what we use it for. It also explains how and for what purpose this happens.</p>
+
+        <h2>2. Hosting and Content Delivery Networks (CDN)</h2>
+
+        <h3>External Hosting</h3>
+        <p>This website is hosted by an external service provider (host). The personal data collected on this website are stored on the host's servers. This may include IP addresses, contact requests, meta and communication data, contract data, contact details, names, website accesses, and other data generated via a website.</p>
+
+        <p>The external hosting serves the purpose of fulfilling the contract with our potential and existing customers (Art. 6 para. 1 lit. b GDPR) and in the interest of secure, fast, and efficient provision of our online service by a professional provider (Art. 6 para. 1 lit. f GDPR).</p>
+
+        <h2>3. General Information and Mandatory Information</h2>
+
+        <h3>Data Protection</h3>
+        <p>The operators of this website take the protection of your personal data very seriously. We treat your personal data confidentially and in accordance with the statutory data protection regulations and this privacy policy.</p>
+
+        <h3>Information about the Responsible Party</h3>
+        <p>The responsible party for data processing on this website is:</p>
+        <p>
+            Malte Viergutz<br>
+            Jungnauer Str. 1<br>
+            79211 Denzlingen<br>
+            Germany<br>
+            Email: info@taskfuchs.de<br>
+            Website: taskfuchs.de
+        </p>
+
+        <h3>Storage Duration</h3>
+        <p>Unless a more specific storage period has been specified within this privacy policy, your personal data will remain with us until the purpose for the data processing lapses. If you assert a justified request for deletion or revoke your consent to data processing, your data will be deleted, unless we have other legally permissible reasons for storing your personal data.</p>
+
+        <h3>Your Rights</h3>
+        <p>You have the following rights regarding your personal data:</p>
+        <ul>
+            <li><strong>Right to Information:</strong> You can request confirmation about whether personal data concerning you is being processed by us.</li>
+            <li><strong>Right to Correction:</strong> You have the right to have incorrect personal data corrected immediately.</li>
+            <li><strong>Right to Deletion:</strong> You can request the deletion of your personal data stored by us.</li>
+            <li><strong>Right to Restriction:</strong> You can request the restriction of processing of your personal data.</li>
+            <li><strong>Right to Data Portability:</strong> You have the right to receive your personal data in a structured, common, and machine-readable format.</li>
+            <li><strong>Right to Object:</strong> You have the right to object to the processing of your personal data.</li>
+        </ul>
+
+        <h2>4. Data Collection on this Website</h2>
+
+        <h3>Server Log Files</h3>
+        <p>The provider of the pages automatically collects and stores information in so-called server log files, which your browser automatically transmits to us. These are:</p>
+        <ul>
+            <li>Browser type and browser version</li>
+            <li>Operating system used</li>
+            <li>Referrer URL</li>
+            <li>Host name of the accessing computer</li>
+            <li>Time of the server request</li>
+            <li>IP address</li>
+        </ul>
+
+        <p>This data will not be combined with data from other sources. The collection of this data is based on Art. 6 para. 1 lit. f GDPR. The website operator has a legitimate interest in the technically error-free presentation and optimization of his website.</p>
+
+        <h3>SSL or TLS Encryption</h3>
+        <p>This site uses SSL or TLS encryption for security reasons and to protect the transmission of confidential content, such as orders or inquiries you send to us as the site operator. You can recognize an encrypted connection by the fact that the address line of the browser changes from "http://" to "https://" and by the lock symbol in your browser line.</p>
+
+        <h2>5. Social Media</h2>
+        <p>If you access our website via social media links or share our content on social media, the privacy policies of the respective platforms apply.</p>
+
+        <h2>6. Contact</h2>
+        <p>If you have questions about privacy or this privacy policy, you can contact us at any time:</p>
+        <p>
+            Email: info@taskfuchs.de<br>
+            or via the imprint of this website
+        </p>
+
+        <div class="footer-nav">
+            <a href="index.php">Home</a>
+            <a href="imprint.html">Imprint</a>
+        </div>
+    </div>
+</body>
+</html> 

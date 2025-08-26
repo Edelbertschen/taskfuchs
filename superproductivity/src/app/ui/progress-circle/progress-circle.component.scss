@@ -1,0 +1,24 @@
+:host {
+  display: block;
+}
+
+.svg {
+  display: block;
+  stroke: var(--c-primary);
+}
+
+.circle-bg {
+  fill: none;
+  stroke: var(--progress-bg);
+  stroke-width: 2.8;
+}
+
+.progress-circle {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  animation: progress 1s ease-out forwards;
+  stroke-dashoffset: 0;
+  stroke-dasharray: 0, 100;
+  transition: all 1s;
+}

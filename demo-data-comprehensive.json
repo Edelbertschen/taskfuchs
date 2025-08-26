@@ -1,0 +1,841 @@
+{
+  "tasks": [
+    {
+      "id": "task-1",
+      "title": "Design new landing page",
+      "description": "Create a modern, responsive landing page with hero section and feature highlights. Include animations and mobile optimization.",
+      "completed": false,
+      "priority": "high",
+      "tags": ["design", "web", "marketing"],
+      "createdAt": "2024-01-15T09:00:00.000Z",
+      "updatedAt": "2024-01-20T14:30:00.000Z",
+      "subtasks": [
+        {"id": "sub-1", "title": "Wireframe creation", "completed": true},
+        {"id": "sub-2", "title": "Visual design", "completed": true},
+        {"id": "sub-3", "title": "Mobile optimization", "completed": false}
+      ],
+      "linkedNotes": ["note-design"],
+      "linkedProjects": ["project-website"],
+      "estimatedTime": 480,
+      "position": 0,
+      "columnId": "col-in-progress",
+      "dueDate": "2024-02-01T18:00:00.000Z"
+    },
+    {
+      "id": "task-2",
+      "title": "Implement user authentication",
+      "description": "Set up OAuth 2.0 authentication with Google and GitHub providers. Include session management and security middleware.",
+      "completed": false,
+      "priority": "high",
+      "tags": ["development", "security", "backend"],
+      "createdAt": "2024-01-10T10:00:00.000Z",
+      "updatedAt": "2024-01-22T11:15:00.000Z",
+      "subtasks": [
+        {"id": "sub-4", "title": "OAuth setup", "completed": true},
+        {"id": "sub-5", "title": "Database schema", "completed": true},
+        {"id": "sub-6", "title": "Session handling", "completed": false},
+        {"id": "sub-7", "title": "Security testing", "completed": false}
+      ],
+      "linkedNotes": ["note-auth"],
+      "linkedProjects": ["project-app"],
+      "estimatedTime": 720,
+      "position": 1,
+      "columnId": "col-in-progress",
+      "pinned": true,
+      "pinColumnId": "pin-urgent"
+    },
+    {
+      "id": "task-3",
+      "title": "Write API documentation",
+      "description": "Complete documentation for all REST endpoints with examples, error codes, and authentication requirements.",
+      "completed": false,
+      "priority": "medium",
+      "tags": ["documentation", "api", "development"],
+      "createdAt": "2024-01-18T13:00:00.000Z",
+      "updatedAt": "2024-01-23T09:45:00.000Z",
+      "subtasks": [],
+      "linkedNotes": ["note-api"],
+      "linkedProjects": ["project-app"],
+      "estimatedTime": 240,
+      "position": 0,
+      "columnId": "col-todo",
+      "dueDate": "2024-01-30T17:00:00.000Z"
+    },
+    {
+      "id": "task-4",
+      "title": "Code review: Payment module",
+      "description": "Review the new payment processing module for security vulnerabilities and code quality.",
+      "completed": true,
+      "priority": "high",
+      "tags": ["review", "security", "payments"],
+      "createdAt": "2024-01-12T08:00:00.000Z",
+      "updatedAt": "2024-01-19T16:30:00.000Z",
+      "completedAt": "2024-01-19T16:30:00.000Z",
+      "subtasks": [
+        {"id": "sub-8", "title": "Security audit", "completed": true},
+        {"id": "sub-9", "title": "Performance check", "completed": true}
+      ],
+      "linkedNotes": [],
+      "linkedProjects": ["project-ecommerce"],
+      "estimatedTime": 180,
+      "position": 0,
+      "columnId": "col-done"
+    },
+    {
+      "id": "task-5",
+      "title": "Team meeting: Sprint planning",
+      "description": "Weekly sprint planning meeting to discuss priorities and assign tasks for the upcoming sprint.",
+      "completed": true,
+      "priority": "medium",
+      "tags": ["meeting", "planning", "team"],
+      "createdAt": "2024-01-22T09:00:00.000Z",
+      "updatedAt": "2024-01-22T11:00:00.000Z",
+      "completedAt": "2024-01-22T11:00:00.000Z",
+      "subtasks": [],
+      "linkedNotes": ["note-sprint"],
+      "linkedProjects": [],
+      "estimatedTime": 120,
+      "position": 1,
+      "columnId": "col-done",
+      "dueDate": "2024-01-22T10:00:00.000Z"
+    },
+    {
+      "id": "task-6",
+      "title": "Update dependencies",
+      "description": "Update all npm packages to latest stable versions and test for compatibility issues.",
+      "completed": false,
+      "priority": "low",
+      "tags": ["maintenance", "dependencies", "development"],
+      "createdAt": "2024-01-20T14:00:00.000Z",
+      "updatedAt": "2024-01-23T10:00:00.000Z",
+      "subtasks": [
+        {"id": "sub-10", "title": "Audit current packages", "completed": true},
+        {"id": "sub-11", "title": "Update to latest versions", "completed": false},
+        {"id": "sub-12", "title": "Run tests", "completed": false}
+      ],
+      "linkedNotes": [],
+      "linkedProjects": ["project-app"],
+      "estimatedTime": 120,
+      "position": 1,
+      "columnId": "col-todo"
+    },
+    {
+      "id": "task-7",
+      "title": "Customer feedback analysis",
+      "description": "Analyze recent customer feedback and create action items for product improvements.",
+      "completed": false,
+      "priority": "medium",
+      "tags": ["analysis", "feedback", "product"],
+      "createdAt": "2024-01-21T11:00:00.000Z",
+      "updatedAt": "2024-01-23T13:30:00.000Z",
+      "subtasks": [],
+      "linkedNotes": ["note-feedback"],
+      "linkedProjects": ["project-product"],
+      "estimatedTime": 180,
+      "position": 2,
+      "columnId": "col-todo",
+      "pinned": true,
+      "pinColumnId": "pin-analysis"
+    },
+    {
+      "id": "task-8",
+      "title": "Database optimization",
+      "description": "Optimize database queries and add proper indexing to improve application performance.",
+      "completed": false,
+      "priority": "high",
+      "tags": ["database", "optimization", "performance"],
+      "createdAt": "2024-01-16T12:00:00.000Z",
+      "updatedAt": "2024-01-23T14:15:00.000Z",
+      "subtasks": [
+        {"id": "sub-13", "title": "Query analysis", "completed": true},
+        {"id": "sub-14", "title": "Add indexes", "completed": false},
+        {"id": "sub-15", "title": "Performance testing", "completed": false}
+      ],
+      "linkedNotes": ["note-database"],
+      "linkedProjects": ["project-app"],
+      "estimatedTime": 360,
+      "position": 2,
+      "columnId": "col-in-progress",
+      "dueDate": "2024-01-28T18:00:00.000Z"
+    },
+    {
+      "id": "task-9",
+      "title": "Mobile app wireframes",
+      "description": "Create detailed wireframes for the mobile application focusing on user experience and navigation flow.",
+      "completed": false,
+      "priority": "medium",
+      "tags": ["design", "mobile", "wireframes"],
+      "createdAt": "2024-01-19T15:00:00.000Z",
+      "updatedAt": "2024-01-23T11:20:00.000Z",
+      "subtasks": [
+        {"id": "sub-16", "title": "User flow mapping", "completed": true},
+        {"id": "sub-17", "title": "Screen designs", "completed": false}
+      ],
+      "linkedNotes": ["note-mobile"],
+      "linkedProjects": ["project-mobile"],
+      "estimatedTime": 300,
+      "position": 3,
+      "columnId": "col-todo"
+    },
+    {
+      "id": "task-10",
+      "title": "Setup CI/CD pipeline",
+      "description": "Configure automated testing and deployment pipeline using GitHub Actions for seamless releases.",
+      "completed": false,
+      "priority": "high",
+      "tags": ["devops", "automation", "deployment"],
+      "createdAt": "2024-01-17T10:30:00.000Z",
+      "updatedAt": "2024-01-23T15:45:00.000Z",
+      "subtasks": [
+        {"id": "sub-18", "title": "GitHub Actions setup", "completed": true},
+        {"id": "sub-19", "title": "Test automation", "completed": false},
+        {"id": "sub-20", "title": "Deployment scripts", "completed": false}
+      ],
+      "linkedNotes": ["note-cicd"],
+      "linkedProjects": ["project-app"],
+      "estimatedTime": 480,
+      "position": 3,
+      "columnId": "col-in-progress",
+      "pinned": true,
+      "pinColumnId": "pin-urgent"
+    },
+    {
+      "id": "task-11",
+      "title": "Content marketing strategy",
+      "description": "Develop comprehensive content marketing strategy including blog posts, social media, and email campaigns.",
+      "completed": false,
+      "priority": "medium",
+      "tags": ["marketing", "content", "strategy"],
+      "createdAt": "2024-01-14T13:30:00.000Z",
+      "updatedAt": "2024-01-23T12:00:00.000Z",
+      "subtasks": [
+        {"id": "sub-21", "title": "Content calendar", "completed": false},
+        {"id": "sub-22", "title": "Blog post topics", "completed": false}
+      ],
+      "linkedNotes": ["note-marketing"],
+      "linkedProjects": ["project-marketing"],
+      "estimatedTime": 240,
+      "position": 4,
+      "columnId": "col-todo",
+      "pinned": true,
+      "pinColumnId": "pin-marketing"
+    },
+    {
+      "id": "task-12",
+      "title": "User testing session",
+      "description": "Conduct user testing sessions to gather feedback on the new interface design and usability.",
+      "completed": true,
+      "priority": "high",
+      "tags": ["testing", "user-experience", "research"],
+      "createdAt": "2024-01-11T09:00:00.000Z",
+      "updatedAt": "2024-01-18T17:00:00.000Z",
+      "completedAt": "2024-01-18T17:00:00.000Z",
+      "subtasks": [
+        {"id": "sub-23", "title": "Recruit participants", "completed": true},
+        {"id": "sub-24", "title": "Conduct sessions", "completed": true},
+        {"id": "sub-25", "title": "Analyze results", "completed": true}
+      ],
+      "linkedNotes": ["note-testing"],
+      "linkedProjects": ["project-website"],
+      "estimatedTime": 360,
+      "position": 2,
+      "columnId": "col-done"
+    },
+    {
+      "id": "task-13",
+      "title": "Email template redesign",
+      "description": "Redesign email templates for better engagement and mobile responsiveness.",
+      "completed": false,
+      "priority": "low",
+      "tags": ["design", "email", "templates"],
+      "createdAt": "2024-01-23T10:00:00.000Z",
+      "updatedAt": "2024-01-23T16:30:00.000Z",
+      "subtasks": [],
+      "linkedNotes": [],
+      "linkedProjects": ["project-marketing"],
+      "estimatedTime": 180,
+      "position": 5,
+      "columnId": "col-todo"
+    },
+    {
+      "id": "task-14",
+      "title": "Security audit",
+      "description": "Perform comprehensive security audit of the application including penetration testing.",
+      "completed": false,
+      "priority": "high",
+      "tags": ["security", "audit", "testing"],
+      "createdAt": "2024-01-13T11:00:00.000Z",
+      "updatedAt": "2024-01-23T14:00:00.000Z",
+      "subtasks": [
+        {"id": "sub-26", "title": "Vulnerability scan", "completed": true},
+        {"id": "sub-27", "title": "Penetration testing", "completed": false},
+        {"id": "sub-28", "title": "Security report", "completed": false}
+      ],
+      "linkedNotes": ["note-security"],
+      "linkedProjects": ["project-app"],
+      "estimatedTime": 600,
+      "position": 4,
+      "columnId": "col-in-progress",
+      "dueDate": "2024-02-05T18:00:00.000Z"
+    },
+    {
+      "id": "task-15",
+      "title": "Customer onboarding flow",
+      "description": "Design and implement improved customer onboarding flow with interactive tutorials.",
+      "completed": false,
+      "priority": "medium",
+      "tags": ["onboarding", "user-experience", "development"],
+      "createdAt": "2024-01-22T14:00:00.000Z",
+      "updatedAt": "2024-01-23T16:00:00.000Z",
+      "subtasks": [
+        {"id": "sub-29", "title": "Flow design", "completed": false},
+        {"id": "sub-30", "title": "Tutorial content", "completed": false}
+      ],
+      "linkedNotes": ["note-onboarding"],
+      "linkedProjects": ["project-app"],
+      "estimatedTime": 420,
+      "position": 6,
+      "columnId": "col-todo",
+      "pinned": true,
+      "pinColumnId": "pin-ux"
+    }
+  ],
+  "archivedTasks": [
+    {
+      "id": "archived-1",
+      "title": "Old feature cleanup",
+      "description": "Remove deprecated features and clean up legacy code.",
+      "completed": true,
+      "priority": "low",
+      "tags": ["maintenance", "cleanup"],
+      "createdAt": "2023-12-01T10:00:00.000Z",
+      "updatedAt": "2023-12-15T16:00:00.000Z",
+      "completedAt": "2023-12-15T16:00:00.000Z",
+      "subtasks": [],
+      "linkedNotes": [],
+      "linkedProjects": [],
+      "estimatedTime": 240,
+      "position": 0,
+      "columnId": "col-done",
+      "archived": true
+    }
+  ],
+  "columns": [
+    {
+      "id": "col-todo",
+      "title": "To Do",
+      "color": "#6b7280",
+      "position": 0,
+      "type": "default",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "col-in-progress",
+      "title": "In Progress",
+      "color": "#3b82f6",
+      "position": 1,
+      "type": "default",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "col-review",
+      "title": "Review",
+      "color": "#f59e0b",
+      "position": 2,
+      "type": "default",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "col-done",
+      "title": "Done",
+      "color": "#10b981",
+      "position": 3,
+      "type": "default",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "tags": [
+    {"id": "design", "name": "design", "color": "#ec4899"},
+    {"id": "development", "name": "development", "color": "#3b82f6"},
+    {"id": "marketing", "name": "marketing", "color": "#f59e0b"},
+    {"id": "security", "name": "security", "color": "#ef4444"},
+    {"id": "testing", "name": "testing", "color": "#8b5cf6"},
+    {"id": "documentation", "name": "documentation", "color": "#06b6d4"},
+    {"id": "mobile", "name": "mobile", "color": "#84cc16"},
+    {"id": "web", "name": "web", "color": "#f97316"},
+    {"id": "backend", "name": "backend", "color": "#6366f1"},
+    {"id": "database", "name": "database", "color": "#14b8a6"},
+    {"id": "devops", "name": "devops", "color": "#64748b"},
+    {"id": "analysis", "name": "analysis", "color": "#a855f7"},
+    {"id": "meeting", "name": "meeting", "color": "#f472b6"},
+    {"id": "planning", "name": "planning", "color": "#34d399"},
+    {"id": "review", "name": "review", "color": "#fb923c"},
+    {"id": "maintenance", "name": "maintenance", "color": "#9ca3af"},
+    {"id": "user-experience", "name": "user-experience", "color": "#22d3ee"},
+    {"id": "performance", "name": "performance", "color": "#fbbf24"}
+  ],
+  "kanbanBoards": [
+    {
+      "id": "project-website",
+      "title": "Website Redesign",
+      "description": "Complete redesign of the company website with modern UI/UX",
+      "color": "#3b82f6",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-23T12:00:00.000Z"
+    },
+    {
+      "id": "project-app",
+      "title": "Main Application",
+      "description": "Core application development and maintenance",
+      "color": "#10b981",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-23T14:30:00.000Z"
+    },
+    {
+      "id": "project-mobile",
+      "title": "Mobile App",
+      "description": "Native mobile application for iOS and Android",
+      "color": "#f59e0b",
+      "createdAt": "2024-01-05T00:00:00.000Z",
+      "updatedAt": "2024-01-23T11:20:00.000Z"
+    },
+    {
+      "id": "project-marketing",
+      "title": "Marketing Campaigns",
+      "description": "Digital marketing initiatives and content creation",
+      "color": "#ec4899",
+      "createdAt": "2024-01-08T00:00:00.000Z",
+      "updatedAt": "2024-01-23T16:30:00.000Z"
+    },
+    {
+      "id": "project-ecommerce",
+      "title": "E-commerce Platform",
+      "description": "Online shopping platform with payment integration",
+      "color": "#8b5cf6",
+      "createdAt": "2024-01-10T00:00:00.000Z",
+      "updatedAt": "2024-01-19T16:30:00.000Z"
+    },
+    {
+      "id": "project-product",
+      "title": "Product Development",
+      "description": "New product features and improvements",
+      "color": "#06b6d4",
+      "createdAt": "2024-01-12T00:00:00.000Z",
+      "updatedAt": "2024-01-23T13:30:00.000Z"
+    }
+  ],
+  "pinColumns": [
+    {
+      "id": "pin-urgent",
+      "title": "Urgent Tasks",
+      "color": "#ef4444",
+      "order": 0,
+      "createdAt": "2024-01-15T00:00:00.000Z",
+      "updatedAt": "2024-01-23T15:45:00.000Z"
+    },
+    {
+      "id": "pin-analysis",
+      "title": "Analysis & Research",
+      "color": "#8b5cf6",
+      "order": 1,
+      "createdAt": "2024-01-18T00:00:00.000Z",
+      "updatedAt": "2024-01-23T13:30:00.000Z"
+    },
+    {
+      "id": "pin-marketing",
+      "title": "Marketing Focus",
+      "color": "#f59e0b",
+      "order": 2,
+      "createdAt": "2024-01-20T00:00:00.000Z",
+      "updatedAt": "2024-01-23T12:00:00.000Z"
+    },
+    {
+      "id": "pin-ux",
+      "title": "UX Improvements",
+      "color": "#06b6d4",
+      "order": 3,
+      "createdAt": "2024-01-22T00:00:00.000Z",
+      "updatedAt": "2024-01-23T16:00:00.000Z"
+    }
+  ],
+  "notes": [
+    {
+      "id": "note-design",
+      "title": "Design System Guidelines",
+      "content": "# Design System Guidelines\n\n## Color Palette\n- Primary: #3b82f6\n- Secondary: #10b981\n- Accent: #f59e0b\n\n## Typography\n- Headlines: Inter Bold\n- Body: Inter Regular\n- Code: JetBrains Mono\n\n## Components\n- Buttons with rounded corners\n- Card-based layouts\n- Consistent spacing (8px grid)\n\n## Best Practices\n- Always consider mobile-first design\n- Maintain 4.5:1 contrast ratio\n- Use semantic HTML elements",
+      "tags": ["design", "guidelines"],
+      "createdAt": "2024-01-15T10:30:00.000Z",
+      "updatedAt": "2024-01-20T14:45:00.000Z",
+      "pinned": false,
+      "archived": false,
+      "linkedTasks": ["task-1"],
+      "linkedNotes": ["note-mobile"],
+      "linkedProjects": ["project-website"],
+      "metadata": {
+        "wordCount": 89,
+        "readingTime": 2
+      }
+    },
+    {
+      "id": "note-auth",
+      "title": "Authentication Architecture",
+      "content": "# Authentication System\n\n## Overview\nImplementing OAuth 2.0 with multiple providers for secure user authentication.\n\n## Providers\n- Google OAuth 2.0\n- GitHub OAuth\n- Microsoft Azure AD\n\n## Security Features\n- JWT tokens with refresh mechanism\n- Rate limiting on auth endpoints\n- Secure session storage\n- CSRF protection\n\n## Database Schema\n```sql\nCREATE TABLE users (\n  id UUID PRIMARY KEY,\n  email VARCHAR(255) UNIQUE,\n  provider VARCHAR(50),\n  provider_id VARCHAR(255),\n  created_at TIMESTAMP,\n  updated_at TIMESTAMP\n);\n```\n\n## Implementation Notes\n- Use httpOnly cookies for session storage\n- Implement proper logout functionality\n- Add 2FA support in future iteration",
+      "tags": ["security", "development", "backend"],
+      "createdAt": "2024-01-10T11:00:00.000Z",
+      "updatedAt": "2024-01-22T13:15:00.000Z",
+      "pinned": true,
+      "archived": false,
+      "linkedTasks": ["task-2"],
+      "linkedNotes": ["note-security"],
+      "linkedProjects": ["project-app"],
+      "metadata": {
+        "wordCount": 156,
+        "readingTime": 3
+      }
+    },
+    {
+      "id": "note-api",
+      "title": "API Documentation Standards",
+      "content": "# API Documentation Guidelines\n\n## Structure\nAll API endpoints should follow RESTful conventions:\n\n- GET /api/v1/resources - List resources\n- GET /api/v1/resources/:id - Get specific resource\n- POST /api/v1/resources - Create new resource\n- PUT /api/v1/resources/:id - Update resource\n- DELETE /api/v1/resources/:id - Delete resource\n\n## Response Format\n```json\n{\n  \"success\": true,\n  \"data\": {},\n  \"message\": \"Operation completed\",\n  \"timestamp\": \"2024-01-23T12:00:00Z\"\n}\n```\n\n## Error Handling\n- 400 Bad Request\n- 401 Unauthorized\n- 403 Forbidden\n- 404 Not Found\n- 500 Internal Server Error\n\n## Authentication\nAll protected endpoints require Bearer token in Authorization header.",
+      "tags": ["documentation", "api", "development"],
+      "createdAt": "2024-01-18T14:00:00.000Z",
+      "updatedAt": "2024-01-23T10:30:00.000Z",
+      "pinned": false,
+      "archived": false,
+      "linkedTasks": ["task-3"],
+      "linkedNotes": [],
+      "linkedProjects": ["project-app"],
+      "metadata": {
+        "wordCount": 134,
+        "readingTime": 3
+      }
+    },
+    {
+      "id": "note-sprint",
+      "title": "Sprint 12 Planning Notes",
+      "content": "# Sprint 12 Planning - Week of Jan 22\n\n## Sprint Goal\nComplete authentication system and begin mobile app wireframes\n\n## Team Capacity\n- Total: 80 story points\n- Available developers: 4\n- Sprint duration: 2 weeks\n\n## Planned Stories\n1. User Authentication (13 points) - Sarah\n2. API Documentation (8 points) - Mike\n3. Mobile Wireframes (8 points) - Lisa\n4. Database Optimization (13 points) - John\n5. Security Audit (21 points) - Alex\n\n## Dependencies\n- Authentication must be completed before onboarding flow\n- Mobile wireframes needed for development sprint\n\n## Risks\n- Security audit might reveal critical issues\n- Mobile design approval could be delayed\n\n## Action Items\n- Schedule design review meeting\n- Set up testing environment\n- Prepare demo for stakeholders",
+      "tags": ["planning", "meeting", "team"],
+      "createdAt": "2024-01-22T10:00:00.000Z",
+      "updatedAt": "2024-01-22T11:30:00.000Z",
+      "pinned": false,
+      "archived": false,
+      "linkedTasks": ["task-5"],
+      "linkedNotes": [],
+      "linkedProjects": [],
+      "metadata": {
+        "wordCount": 201,
+        "readingTime": 4
+      }
+    },
+    {
+      "id": "note-feedback",
+      "title": "Customer Feedback Analysis Q1 2024",
+      "content": "# Customer Feedback Summary\n\n## Key Themes\n\n### Positive Feedback\n- Users love the intuitive interface\n- Performance improvements are noticeable\n- Great customer support response times\n\n### Areas for Improvement\n1. **Mobile Experience** (mentioned 23 times)\n   - App crashes on older devices\n   - Touch targets too small\n   - Loading times on mobile\n\n2. **Feature Requests** (18 mentions)\n   - Dark mode support\n   - Bulk operations\n   - Export functionality\n   - Integration with popular tools\n\n3. **Onboarding** (15 mentions)\n   - Too complex for new users\n   - Missing guided tour\n   - Unclear navigation\n\n## Action Items\n- Prioritize mobile optimization\n- Implement dark mode\n- Redesign onboarding flow\n- Add more integrations\n\n## Customer Satisfaction Score\n- Overall: 4.2/5 (up from 3.8)\n- Mobile: 3.1/5 (needs improvement)\n- Support: 4.7/5 (excellent)",
+      "tags": ["analysis", "feedback", "product"],
+      "createdAt": "2024-01-21T12:00:00.000Z",
+      "updatedAt": "2024-01-23T14:30:00.000Z",
+      "pinned": true,
+      "archived": false,
+      "linkedTasks": ["task-7"],
+      "linkedNotes": ["note-mobile", "note-onboarding"],
+      "linkedProjects": ["project-product"],
+      "metadata": {
+        "wordCount": 189,
+        "readingTime": 4
+      }
+    },
+    {
+      "id": "note-database",
+      "title": "Database Performance Optimization",
+      "content": "# Database Optimization Plan\n\n## Current Issues\n- Slow query performance on user dashboard\n- High CPU usage during peak hours\n- Lock contention on user table\n\n## Analysis Results\n```sql\n-- Problematic query (takes 3.2s avg)\nSELECT * FROM users u\nJOIN tasks t ON u.id = t.user_id\nJOIN projects p ON t.project_id = p.id\nWHERE u.created_at > '2024-01-01'\nORDER BY t.updated_at DESC;\n```\n\n## Optimization Strategy\n\n### 1. Indexing\n- Add composite index on (user_id, updated_at)\n- Index on projects.id and users.created_at\n\n### 2. Query Optimization\n- Use LIMIT for pagination\n- Avoid SELECT * statements\n- Implement proper JOINs\n\n### 3. Caching Layer\n- Redis for frequently accessed data\n- Cache user dashboards for 5 minutes\n- Implement cache invalidation strategy\n\n### 4. Connection Pooling\n- Increase pool size to 20 connections\n- Set proper timeout values\n\n## Expected Results\n- 70% reduction in query time\n- 40% reduction in CPU usage\n- Better user experience",
+      "tags": ["database", "optimization", "performance"],
+      "createdAt": "2024-01-16T13:30:00.000Z",
+      "updatedAt": "2024-01-23T15:00:00.000Z",
+      "pinned": false,
+      "archived": false,
+      "linkedTasks": ["task-8"],
+      "linkedNotes": [],
+      "linkedProjects": ["project-app"],
+      "metadata": {
+        "wordCount": 243,
+        "readingTime": 5
+      }
+    },
+    {
+      "id": "note-mobile",
+      "title": "Mobile App Design Strategy",
+      "content": "# Mobile App Design Strategy\n\n## Target Platforms\n- iOS 14+\n- Android 8.0+\n- React Native for cross-platform development\n\n## Design Principles\n\n### 1. Mobile-First Approach\n- Design for smallest screen first\n- Progressive enhancement for tablets\n- Consider one-handed usage\n\n### 2. Performance\n- Lazy loading for images\n- Minimize bundle size\n- Efficient state management\n\n### 3. Accessibility\n- WCAG 2.1 AA compliance\n- Screen reader support\n- High contrast mode\n- Adjustable font sizes\n\n## Key Features\n- Offline functionality\n- Push notifications\n- Biometric authentication\n- Dark mode support\n- Gesture navigation\n\n## User Flow\n1. Splash screen with app logo\n2. Onboarding (first-time users)\n3. Authentication\n4. Main dashboard\n5. Feature-specific screens\n\n## Technical Considerations\n- Use native navigation components\n- Implement proper error boundaries\n- Add crash reporting\n- Include analytics tracking",
+      "tags": ["mobile", "design", "development"],
+      "createdAt": "2024-01-19T16:00:00.000Z",
+      "updatedAt": "2024-01-23T12:15:00.000Z",
+      "pinned": false,
+      "archived": false,
+      "linkedTasks": ["task-9"],
+      "linkedNotes": ["note-design"],
+      "linkedProjects": ["project-mobile"],
+      "metadata": {
+        "wordCount": 201,
+        "readingTime": 4
+      }
+    },
+    {
+      "id": "note-cicd",
+      "title": "CI/CD Pipeline Setup",
+      "content": "# Continuous Integration & Deployment\n\n## Current Workflow\nManual deployments are time-consuming and error-prone. Need automated pipeline.\n\n## GitHub Actions Workflow\n\n```yaml\nname: CI/CD Pipeline\n\non:\n  push:\n    branches: [main, develop]\n  pull_request:\n    branches: [main]\n\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v3\n      - uses: actions/setup-node@v3\n      - run: npm ci\n      - run: npm test\n      - run: npm run build\n\n  deploy:\n    needs: test\n    runs-on: ubuntu-latest\n    if: github.ref == 'refs/heads/main'\n    steps:\n      - name: Deploy to production\n        run: |\n          echo \"Deploying to production\"\n```\n\n## Pipeline Stages\n1. **Linting** - ESLint, Prettier\n2. **Testing** - Unit tests, Integration tests\n3. **Build** - TypeScript compilation, Asset optimization\n4. **Security** - Dependency audit, SAST\n5. **Deploy** - Staging → Production\n\n## Benefits\n- Faster release cycles\n- Reduced human error\n- Automatic rollbacks\n- Better code quality",
+      "tags": ["devops", "automation", "deployment"],
+      "createdAt": "2024-01-17T11:00:00.000Z",
+      "updatedAt": "2024-01-23T16:15:00.000Z",
+      "pinned": false,
+      "archived": false,
+      "linkedTasks": ["task-10"],
+      "linkedNotes": [],
+      "linkedProjects": ["project-app"],
+      "metadata": {
+        "wordCount": 178,
+        "readingTime": 4
+      }
+    },
+    {
+      "id": "note-marketing",
+      "title": "Q1 2024 Marketing Strategy",
+      "content": "# Marketing Strategy Q1 2024\n\n## Goals\n- Increase brand awareness by 40%\n- Generate 500 qualified leads\n- Improve conversion rate to 3.5%\n- Launch in 2 new markets\n\n## Target Audience\n### Primary\n- Small to medium businesses\n- Tech-savvy entrepreneurs\n- Remote teams\n\n### Secondary\n- Enterprise organizations\n- Educational institutions\n- Non-profit organizations\n\n## Channel Strategy\n\n### Content Marketing\n- 2 blog posts per week\n- Weekly newsletter\n- Case studies and success stories\n- How-to guides and tutorials\n\n### Social Media\n- LinkedIn: B2B content, thought leadership\n- Twitter: Product updates, community engagement\n- YouTube: Product demos, tutorials\n\n### Paid Advertising\n- Google Ads: Search campaigns\n- LinkedIn Ads: Sponsored content\n- Retargeting campaigns\n\n### Email Marketing\n- Welcome series for new subscribers\n- Product announcement emails\n- Monthly newsletter with tips\n\n## Content Calendar\n- Week 1: Product feature highlights\n- Week 2: Customer success stories\n- Week 3: Industry insights\n- Week 4: How-to content\n\n## KPIs\n- Website traffic growth\n- Email open rates\n- Social media engagement\n- Lead generation quality\n- Customer acquisition cost",
+      "tags": ["marketing", "strategy", "content"],
+      "createdAt": "2024-01-14T14:30:00.000Z",
+      "updatedAt": "2024-01-23T13:00:00.000Z",
+      "pinned": true,
+      "archived": false,
+      "linkedTasks": ["task-11"],
+      "linkedNotes": [],
+      "linkedProjects": ["project-marketing"],
+      "metadata": {
+        "wordCount": 267,
+        "readingTime": 5
+      }
+    },
+    {
+      "id": "note-testing",
+      "title": "User Testing Session Results",
+      "content": "# User Testing Results - Jan 18, 2024\n\n## Session Overview\n- Participants: 8 users\n- Duration: 45 minutes each\n- Tasks: 5 core user flows\n- Method: Moderated remote testing\n\n## Key Findings\n\n### Positive Feedback\n- \"The interface is clean and intuitive\"\n- \"I love how fast everything loads\"\n- \"The color scheme is very professional\"\n\n### Pain Points\n\n#### Navigation Issues\n- 6/8 users had trouble finding the settings page\n- Search functionality not discoverable\n- Breadcrumb navigation missing\n\n#### Onboarding Confusion\n- First-time users skipped tutorial\n- Too much information presented at once\n- Unclear next steps after signup\n\n#### Mobile Usability\n- Buttons too small on mobile devices\n- Text hard to read on smaller screens\n- Touch targets need to be larger\n\n## Task Completion Rates\n1. Create new project: 100% (8/8)\n2. Add team member: 75% (6/8)\n3. Generate report: 62.5% (5/8)\n4. Change settings: 37.5% (3/8)\n5. Find help documentation: 25% (2/8)\n\n## Recommendations\n1. Redesign navigation structure\n2. Improve onboarding flow\n3. Optimize mobile experience\n4. Add contextual help\n5. Enhance search functionality\n\n## Priority Actions\n- Move settings to main navigation\n- Add progressive onboarding\n- Increase touch target sizes\n- Implement search suggestions",
+      "tags": ["testing", "user-experience", "research"],
+      "createdAt": "2024-01-18T18:00:00.000Z",
+      "updatedAt": "2024-01-19T09:30:00.000Z",
+      "pinned": false,
+      "archived": false,
+      "linkedTasks": ["task-12"],
+      "linkedNotes": ["note-onboarding"],
+      "linkedProjects": ["project-website"],
+      "metadata": {
+        "wordCount": 289,
+        "readingTime": 6
+      }
+    },
+    {
+      "id": "note-security",
+      "title": "Security Best Practices Checklist",
+      "content": "# Security Checklist\n\n## Authentication & Authorization\n- ✅ Implement OAuth 2.0\n- ✅ Use JWT tokens with expiration\n- ✅ Secure password hashing (bcrypt)\n- ⏳ Add two-factor authentication\n- ❌ Implement role-based access control\n\n## Data Protection\n- ✅ HTTPS everywhere\n- ✅ Database encryption at rest\n- ✅ Secure API endpoints\n- ⏳ Regular security audits\n- ❌ Data anonymization\n\n## Input Validation\n- ✅ Sanitize user inputs\n- ✅ SQL injection prevention\n- ✅ XSS protection\n- ✅ CSRF tokens\n- ⏳ Rate limiting\n\n## Infrastructure\n- ✅ Regular dependency updates\n- ✅ Security headers\n- ✅ Access logging\n- ⏳ Intrusion detection\n- ❌ DDoS protection\n\n## Compliance\n- ✅ GDPR compliance\n- ⏳ SOC 2 Type II\n- ❌ HIPAA compliance (if needed)\n\n## Incident Response\n- ✅ Security incident plan\n- ⏳ Automated alerting\n- ❌ Forensic procedures\n\n## Legend\n- ✅ Implemented\n- ⏳ In Progress\n- ❌ Not Started",
+      "tags": ["security", "checklist", "compliance"],
+      "createdAt": "2024-01-13T12:00:00.000Z",
+      "updatedAt": "2024-01-23T15:30:00.000Z",
+      "pinned": true,
+      "archived": false,
+      "linkedTasks": ["task-14"],
+      "linkedNotes": ["note-auth"],
+      "linkedProjects": ["project-app"],
+      "metadata": {
+        "wordCount": 156,
+        "readingTime": 3
+      }
+    },
+    {
+      "id": "note-onboarding",
+      "title": "Improved Onboarding Flow Design",
+      "content": "# Customer Onboarding Redesign\n\n## Current Problems\n- 60% of users abandon during onboarding\n- Average completion time: 15 minutes\n- Too many steps required\n- Information overload\n\n## New Approach: Progressive Onboarding\n\n### Step 1: Welcome & Value Proposition\n- Brief welcome message\n- 30-second product demo video\n- Clear value proposition\n- Single CTA: \"Get Started\"\n\n### Step 2: Essential Setup Only\n- Account creation (name, email)\n- Choose primary use case\n- Skip optional fields initially\n\n### Step 3: Quick Win\n- Create first project/task\n- Show immediate value\n- Provide encouragement\n\n### Step 4: Contextual Guidance\n- Progressive disclosure of features\n- Just-in-time tutorials\n- Interactive tooltips\n- Help when needed\n\n## Design Principles\n\n### 1. Minimize Cognitive Load\n- One concept per screen\n- Clear progress indicators\n- Allow users to skip steps\n\n### 2. Show Value Early\n- Demonstrate core benefits\n- Use realistic example data\n- Celebrate small wins\n\n### 3. Personalization\n- Adapt flow based on use case\n- Remember user preferences\n- Relevant feature recommendations\n\n## Success Metrics\n- Target completion rate: 85%\n- Maximum time: 5 minutes\n- User satisfaction: 4.5/5\n- Feature adoption: 70% within 7 days\n\n## A/B Testing Plan\n- Control: Current flow\n- Variant A: Progressive onboarding\n- Variant B: Video-first approach\n- Duration: 4 weeks\n- Sample size: 1000 users per variant",
+      "tags": ["onboarding", "user-experience", "design"],
+      "createdAt": "2024-01-22T15:00:00.000Z",
+      "updatedAt": "2024-01-23T17:00:00.000Z",
+      "pinned": false,
+      "archived": false,
+      "linkedTasks": ["task-15"],
+      "linkedNotes": ["note-testing"],
+      "linkedProjects": ["project-app"],
+      "metadata": {
+        "wordCount": 312,
+        "readingTime": 6
+      }
+    },
+    {
+      "id": "daily-note-2024-01-23",
+      "title": "Daily Note - January 23, 2024",
+      "content": "# Today's Focus\n\n## Priority Tasks\n- Complete API documentation review\n- Security audit kickoff meeting\n- Mobile wireframe feedback session\n\n## Achievements\n- Finished database optimization plan\n- Reviewed 5 pull requests\n- Conducted team standup\n\n## Challenges\n- Build pipeline failing on staging\n- Customer reported performance issues\n- Design feedback delayed\n\n## Tomorrow's Plan\n- Fix CI/CD pipeline issues\n- Start security penetration testing\n- Review mobile app wireframes\n- Customer support follow-up\n\n## Notes\n- New team member starting next Monday\n- Quarterly review meeting scheduled\n- Consider upgrading server infrastructure\n\n## Ideas\n- Implement feature flags for gradual rollouts\n- Add dark mode toggle\n- Create customer success dashboard",
+      "tags": ["daily", "planning"],
+      "createdAt": "2024-01-23T09:00:00.000Z",
+      "updatedAt": "2024-01-23T18:00:00.000Z",
+      "pinned": false,
+      "archived": false,
+      "linkedTasks": [],
+      "linkedNotes": [],
+      "linkedProjects": [],
+      "dailyNote": true,
+      "metadata": {
+        "wordCount": 145,
+        "readingTime": 3
+      }
+    },
+    {
+      "id": "email-1",
+      "title": "Project Status Update from Client",
+      "content": "<div class=\"email-header\">\n<div><strong>From:</strong> client@company.com</div>\n<div><strong>To:</strong> team@ourcompany.com</div>\n<div><strong>Date:</strong> January 23, 2024 10:30 AM</div>\n<div><strong>Subject:</strong> Project Status Update</div>\n</div>\n\n<div class=\"email-body\">\n<p>Hi Team,</p>\n\n<p>I wanted to provide you with an update on the current project status and share some feedback from our stakeholders.</p>\n\n<h3>Current Progress</h3>\n<ul>\n<li>Phase 1: ✅ Completed (Design mockups approved)</li>\n<li>Phase 2: 🔄 In Progress (Development 70% complete)</li>\n<li>Phase 3: ⏳ Pending (Testing & QA)</li>\n</ul>\n\n<h3>Stakeholder Feedback</h3>\n<p>The executive team is very pleased with the progress so far. The new interface design has received excellent feedback from our beta users. However, we have a few requests:</p>\n\n<ol>\n<li><strong>Mobile Optimization:</strong> Please prioritize mobile responsiveness as 60% of our users access the platform via mobile devices.</li>\n<li><strong>Performance:</strong> Page load times should be under 2 seconds.</li>\n<li><strong>Accessibility:</strong> Ensure WCAG 2.1 AA compliance.</li>\n</ol>\n\n<h3>Timeline Adjustment</h3>\n<p>Due to the additional requirements, we'd like to extend the deadline by one week. The new target completion date is <strong>February 8, 2024</strong>.</p>\n\n<h3>Next Steps</h3>\n<p>Please let me know if you need any clarification on the requirements. I'm available for a call tomorrow afternoon to discuss any concerns.</p>\n\n<p>Best regards,<br>\nSarah Johnson<br>\nProject Manager<br>\nClient Company Inc.</p>\n</div>",
+      "tags": ["email", "project", "client"],
+      "createdAt": "2024-01-23T10:30:00.000Z",
+      "updatedAt": "2024-01-23T10:30:00.000Z",
+      "pinned": false,
+      "archived": false,
+      "linkedTasks": ["task-1", "task-9"],
+      "linkedNotes": [],
+      "linkedProjects": ["project-website"],
+      "metadata": {
+        "contentType": "html",
+        "emailMetadata": {
+          "from": {"email": "client@company.com", "name": "Sarah Johnson"},
+          "to": [{"email": "team@ourcompany.com", "name": "Our Team"}],
+          "date": new Date("2024-01-23T10:30:00.000Z"),
+          "messageId": "msg-001",
+          "originalSubject": "Project Status Update",
+          "headers": {"Message-ID": "msg-001"}
+        },
+        "wordCount": 234,
+        "readingTime": 5
+      }
+    },
+    {
+      "id": "email-2",
+      "title": "Security Vulnerability Report",
+      "content": "<div class=\"email-header\">\n<div><strong>From:</strong> security@securityfirm.com</div>\n<div><strong>To:</strong> dev-team@ourcompany.com</div>\n<div><strong>Date:</strong> January 22, 2024 2:15 PM</div>\n<div><strong>Subject:</strong> [URGENT] Security Vulnerability Report</div>\n</div>\n\n<div class=\"email-body\">\n<p><strong>⚠️ URGENT SECURITY NOTICE ⚠️</strong></p>\n\n<p>Dear Development Team,</p>\n\n<p>Our automated security scan has identified several vulnerabilities in your application that require immediate attention:</p>\n\n<h3>🔴 Critical Vulnerabilities</h3>\n<ol>\n<li><strong>SQL Injection (CVE-2024-001)</strong>\n   <ul>\n   <li>Location: User authentication endpoint</li>\n   <li>Risk Level: CRITICAL</li>\n   <li>CVSS Score: 9.8</li>\n   </ul>\n</li>\n</ol>\n\n<h3>🟡 Medium Risk Issues</h3>\n<ul>\n<li>Outdated dependencies (12 packages)</li>\n<li>Missing security headers</li>\n<li>Weak password policy</li>\n<li>Insufficient input validation</li>\n</ul>\n\n<h3>Recommended Actions</h3>\n<table border=\"1\" style=\"border-collapse: collapse; width: 100%;\">\n<tr style=\"background-color: #f0f0f0;\">\n<th>Issue</th>\n<th>Priority</th>\n<th>Timeline</th>\n</tr>\n<tr>\n<td>SQL Injection fix</td>\n<td>IMMEDIATE</td>\n<td>24 hours</td>\n</tr>\n<tr>\n<td>Dependency updates</td>\n<td>HIGH</td>\n<td>48 hours</td>\n</tr>\n<tr>\n<td>Security headers</td>\n<td>MEDIUM</td>\n<td>1 week</td>\n</tr>\n</table>\n\n<p><strong>Next Steps:</strong></p>\n<ol>\n<li>Patch the SQL injection vulnerability immediately</li>\n<li>Schedule emergency security review</li>\n<li>Implement additional security measures</li>\n<li>Plan for follow-up penetration testing</li>\n</ol>\n\n<p>Please confirm receipt of this report and provide an estimated timeline for fixes.</p>\n\n<p>Best regards,<br>\nAlex Chen<br>\nSenior Security Consultant<br>\nSecurityFirm Ltd.</p>\n\n<p><em>This is an automated report. For questions, contact: security-support@securityfirm.com</em></p>\n</div>",
+      "tags": ["email", "security", "urgent"],
+      "createdAt": "2024-01-22T14:15:00.000Z",
+      "updatedAt": "2024-01-22T14:15:00.000Z",
+      "pinned": true,
+      "archived": false,
+      "linkedTasks": ["task-14"],
+      "linkedNotes": ["note-security"],
+      "linkedProjects": ["project-app"],
+      "metadata": {
+        "contentType": "html",
+        "emailMetadata": {
+          "from": {"email": "security@securityfirm.com", "name": "Alex Chen"},
+          "to": [{"email": "dev-team@ourcompany.com", "name": "Development Team"}],
+          "date": new Date("2024-01-22T14:15:00.000Z"),
+          "messageId": "msg-002",
+          "originalSubject": "[URGENT] Security Vulnerability Report",
+          "headers": {"Message-ID": "msg-002"}
+        },
+        "wordCount": 267,
+        "readingTime": 6
+      }
+    },
+    {
+      "id": "email-3",
+      "title": "Marketing Campaign Performance Report",
+      "content": "<div class=\"email-header\">\n<div><strong>From:</strong> analytics@marketingtools.com</div>\n<div><strong>To:</strong> marketing@ourcompany.com</div>\n<div><strong>Date:</strong> January 21, 2024 9:00 AM</div>\n<div><strong>Subject:</strong> Weekly Marketing Performance Report</div>\n</div>\n\n<div class=\"email-body\">\n<p>Hello Marketing Team,</p>\n\n<p>Here's your weekly performance summary for the period January 14-20, 2024:</p>\n\n<h3>📊 Key Metrics</h3>\n<table border=\"1\" style=\"border-collapse: collapse; width: 100%;\">\n<tr style=\"background-color: #f8f9fa;\">\n<th>Metric</th>\n<th>This Week</th>\n<th>Last Week</th>\n<th>Change</th>\n</tr>\n<tr>\n<td>Website Visitors</td>\n<td>12,450</td>\n<td>10,230</td>\n<td><span style=\"color: green;\">+21.7%</span></td>\n</tr>\n<tr>\n<td>Email Open Rate</td>\n<td>24.3%</td>\n<td>22.1%</td>\n<td><span style=\"color: green;\">+2.2%</span></td>\n</tr>\n<tr>\n<td>Social Media Engagement</td>\n<td>1,890</td>\n<td>2,150</td>\n<td><span style=\"color: red;\">-12.1%</span></td>\n</tr>\n<tr>\n<td>Lead Generation</td>\n<td>89</td>\n<td>76</td>\n<td><span style=\"color: green;\">+17.1%</span></td>\n</tr>\n</table>\n\n<h3>🎯 Campaign Performance</h3>\n<ul>\n<li><strong>Google Ads:</strong> 156 clicks, $2.34 CPC (↑15%)</li>\n<li><strong>LinkedIn Campaign:</strong> 89 leads, $45.60 CPL (↓8%)</li>\n<li><strong>Email Newsletter:</strong> 24.3% open rate, 3.1% CTR</li>\n<li><strong>Blog Content:</strong> 3,400 views, 4.2min avg. time</li>\n</ul>\n\n<h3>🎉 Top Performing Content</h3>\n<ol>\n<li>\"10 Tips for Remote Team Productivity\" - 1,200 views</li>\n<li>\"Product Demo Video\" - 890 views, 67% completion</li>\n<li>\"Customer Success Story: TechCorp\" - 650 views</li>\n</ol>\n\n<h3>⚠️ Areas for Improvement</h3>\n<p>Social media engagement dropped this week. Consider:</p>\n<ul>\n<li>Increasing posting frequency</li>\n<li>More interactive content (polls, Q&A)</li>\n<li>User-generated content campaigns</li>\n</ul>\n\n<h3>📅 Upcoming Week Focus</h3>\n<ul>\n<li>Launch new LinkedIn ad campaign</li>\n<li>Publish mobile app announcement</li>\n<li>Webinar promotion campaign</li>\n<li>Retargeting campaign optimization</li>\n</ul>\n\n<p>Detailed analytics dashboard: <a href=\"https://dashboard.marketingtools.com/report/weekly\" target=\"_blank\">View Full Report</a></p>\n\n<p>Questions? Reply to this email or schedule a call with our team.</p>\n\n<p>Best regards,<br>\nMarketing Analytics Team<br>\nMarketingTools.com</p>\n</div>",
+      "tags": ["email", "marketing", "analytics"],
+      "createdAt": "2024-01-21T09:00:00.000Z",
+      "updatedAt": "2024-01-21T09:00:00.000Z",
+      "pinned": false,
+      "archived": false,
+      "linkedTasks": ["task-11"],
+      "linkedNotes": ["note-marketing"],
+      "linkedProjects": ["project-marketing"],
+      "metadata": {
+        "contentType": "html",
+        "emailMetadata": {
+          "from": {"email": "analytics@marketingtools.com", "name": "Marketing Analytics Team"},
+          "to": [{"email": "marketing@ourcompany.com", "name": "Marketing Team"}],
+          "date": new Date("2024-01-21T09:00:00.000Z"),
+          "messageId": "msg-003",
+          "originalSubject": "Weekly Marketing Performance Report",
+          "headers": {"Message-ID": "msg-003"}
+        },
+        "wordCount": 312,
+        "readingTime": 7
+      }
+    }
+  ],
+  "noteLinks": [
+    {"id": "link-1", "fromNoteId": "note-design", "toNoteId": "note-mobile", "createdAt": "2024-01-20T10:00:00.000Z"},
+    {"id": "link-2", "fromNoteId": "note-auth", "toNoteId": "note-security", "createdAt": "2024-01-22T11:00:00.000Z"},
+    {"id": "link-3", "fromNoteId": "note-feedback", "toNoteId": "note-onboarding", "createdAt": "2024-01-23T12:00:00.000Z"},
+    {"id": "link-4", "fromNoteId": "note-testing", "toNoteId": "note-onboarding", "createdAt": "2024-01-19T14:00:00.000Z"}
+  ],
+  "notesViewState": {
+    "selectedNote": null,
+    "isEditing": false,
+    "searchQuery": "",
+    "selectedTags": [],
+    "view": "grid",
+    "sortBy": "updatedAt",
+    "sortOrder": "desc",
+    "showArchived": false,
+    "showLinkPreviews": true,
+    "editorMode": "markdown",
+    "dailyNotesMode": false,
+    "emailMode": false,
+    "selectedDailyNoteDate": null
+  },
+  "preferences": {
+    "language": "en",
+    "accentColor": "#3b82f6",
+    "theme": "system",
+    "minimalDesign": false,
+    "showWelcomeMessage": false,
+    "columns": {
+      "visible": 5
+    }
+  },
+  "viewState": {
+    "currentView": "kanban",
+    "sidebarCollapsed": false
+  },
+  "imageStorage": {
+    "images": []
+  },
+  "events": [],
+  "calendarSources": [],
+  "searchQuery": "",
+  "activeTagFilters": [],
+  "activePriorityFilters": [],
+  "focusMode": false,
+  "focusedColumnId": null,
+  "showCompletedTasks": true,
+  "projectColumnOffset": 0,
+  "notifications": [],
+  "activeTimer": null,
+  "currentDate": "2024-01-23T12:00:00.000Z",
+  "isNoteEditorFullScreen": false,
+  "recurrence": [],
+  "exportDate": "2024-01-23T12:00:00.000Z",
+  "version": "2.2",
+  "metadata": {
+    "totalTasks": 15,
+    "totalArchivedTasks": 1,
+    "totalNotes": 15,
+    "totalDailyNotes": 1,
+    "totalEmailNotes": 3,
+    "totalTags": 18,
+    "totalBoards": 6,
+    "totalColumns": 4,
+    "totalPinColumns": 4,
+    "totalNoteLinks": 4,
+    "totalImages": 0,
+    "totalNotifications": 0,
+    "totalEvents": 0,
+    "totalCalendarSources": 0,
+    "hasActiveTimer": false,
+    "appVersion": "2.2",
+    "dataSize": 52000,
+    "exportTime": 1706011200000
+  }
+} 

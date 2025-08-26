@@ -1,0 +1,131 @@
+/* TopTimerBar Minimalist Design */
+@keyframes minimal-slide-down {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes minimal-slide-up {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes subtle-progress-glow {
+  0%, 100% {
+    box-shadow: 0 0 4px rgba(239, 68, 68, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+  }
+}
+
+.top-timer-bar {
+  animation: minimal-slide-down 0.3s ease-out;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.top-timer-bar.closing {
+  animation: minimal-slide-up 0.2s ease-in;
+}
+
+.timer-container {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.timer-progress-bar {
+  transition: all 0.8s ease-out;
+  border-radius: 0;
+}
+
+.timer-progress-bar.overtime {
+  animation: subtle-progress-glow 1.5s ease-in-out infinite;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .timer-container {
+    background-color: rgba(31, 41, 55, 0.98) !important;
+    border-bottom-color: rgba(75, 85, 99, 0.3) !important;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .timer-container {
+    padding-left: 16px;
+    padding-right: 16px;
+    height: 40px !important;
+  }
+  
+  .timer-container [class*="text-lg"] {
+    font-size: 1rem;
+  }
+  
+  .timer-container [class*="text-sm"] {
+    font-size: 0.75rem;
+  }
+  
+  .timer-container [class*="w-7"] {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .timer-container {
+    padding-left: 12px;
+    padding-right: 12px;
+    height: 36px !important;
+  }
+  
+  .timer-container .flex {
+    gap: 0.5rem;
+  }
+  
+  .timer-container [class*="space-x-4"] > * + * {
+    margin-left: 0.75rem;
+  }
+  
+  .timer-container [class*="space-x-3"] > * + * {
+    margin-left: 0.5rem;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .top-timer-bar,
+  .timer-progress-bar,
+  .timer-container {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* Focus states for accessibility */
+.timer-container button:focus {
+  outline: 2px solid rgba(59, 130, 246, 0.5);
+  outline-offset: 2px;
+  border-radius: 0.375rem;
+}
+
+/* Minimal hover effects */
+.timer-container button {
+  transition: opacity 0.2s ease;
+}
+
+.timer-container button:hover {
+  opacity: 0.8;
+} 

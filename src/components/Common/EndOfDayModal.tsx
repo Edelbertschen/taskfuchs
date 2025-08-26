@@ -1,0 +1,587 @@
+import React, { useState, useMemo, useEffect } from 'react';
+import { X, Archive, ArrowRight, Clock, CheckCircle, AlertCircle, Cloud, Upload, Wifi, WifiOff } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useApp } from '../../context/AppContext';
+import { syncManager, SyncLogEntry, SyncStats } from '../../utils/syncUtils';
+import type { Task, SyncStatus } from '../../types';
+import { format, addDays } from 'date-fns';
+import { de } from 'date-fns/locale';
+
+interface EndOfDayModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+// Skill system icons and data - function to support i18n
+const getSkillLevels = (language: string) => ({
+  sloth: {
+    name: language === 'en' ? 'Sloth' : 'Faultier',
+    icon: '🦥',
+    color: 'text-gray-500',
+    bgColor: 'bg-gray-100 dark:bg-gray-800',
+    description: language === 'en' ? 'Worked less than 50% of planned time with timer' : 'Weniger als 50% der geplanten Zeit mit Timer gearbeitet'
+  },
+  panda: {
+    name: language === 'en' ? 'Panda' : 'Panda',
+    icon: '🐼',
+    color: 'text-orange-500',
+    bgColor: 'bg-orange-100 dark:bg-orange-900/30',
+    description: language === 'en' ? 'Worked 50-80% of planned time with timer' : '50-80% der geplanten Zeit mit Timer gearbeitet'
+  },
+  fox: {
+    name: language === 'en' ? 'Fox' : 'Fuchs',
+    icon: '🦊',
+    color: 'text-red-500',
+    bgColor: 'bg-red-100 dark:bg-red-900/30',
+    description: language === 'en' ? 'Worked more than 80% of planned time with timer' : 'Mehr als 80% der geplanten Zeit mit Timer gearbeitet'
+  }
+});
+
+export function EndOfDayModal({ isOpen, onClose }: EndOfDayModalProps) {
+  const { state, dispatch } = useApp();
+  const { i18n } = useTranslation();
+  const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
+  const [showMoveConfirm, setShowMoveConfirm] = useState(false);
+  
+  // Sync-related state
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>({
+    isActive: false,
+    lastSync: '',
+    status: 'idle'
+  });
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncResult, setSyncResult] = useState<{ success: boolean; message: string } | null>(null);
+
+  // Get today's tasks
+  const todaysTasks = useMemo(() => {
+    const today = new Date();
+    const todayString = format(today, 'yyyy-MM-dd');
+    
+    return state.tasks.filter(task => {
+      const isInTodayColumn = task.columnId === `date-${todayString}`;
+      return isInTodayColumn;
+    });
+  }, [state.tasks]);
+
+  // Calculate statistics
+  const completedTasks = todaysTasks.filter(task => task.completed);
+  const incompleteTasks = todaysTasks.filter(task => !task.completed);
+  const totalEstimatedTime = todaysTasks.reduce((sum, task) => sum + (task.estimatedTime || 0), 0);
+  const totalWorkedTime = todaysTasks.reduce((sum, task) => sum + (task.trackedTime || 0), 0); // Use tracked timer time from ALL tasks
+  
+  // Calculate work percentage for skill system
+  const workPercentage = totalEstimatedTime > 0 ? (totalWorkedTime / totalEstimatedTime) * 100 : 0;
+  
+  // Determine skill level
+  const getSkillLevel = () => {
+    const skillLevels = getSkillLevels(i18n.language);
+    if (workPercentage < 50) return skillLevels.sloth;
+    if (workPercentage < 80) return skillLevels.panda;
+    return skillLevels.fox;
+  };
+  
+  const skillLevel = getSkillLevel();
+
+  // Initialize sync status monitoring
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    // Temporarily disabled sync monitoring to fix white screen issue
+    // TODO: Fix sync integration after Microsoft To Do integration
+    /*
+    const updateSyncStatus = (status: SyncStatus) => {
+      setSyncStatus(status);
+    };
+    
+    syncManager.onStatusUpdate(updateSyncStatus);
+    
+    // Initial status check
+    const isConfigured = syncManager.isConfigured();
+    const lastSync = syncManager.getLastSyncTime();
+    
+    setSyncStatus({
+      isActive: syncManager.isSyncInProgress(),
+      connected: true,
+      lastSync: lastSync || '',
+      status: syncManager.isSyncInProgress() ? 'syncing' : 'idle'
+    });
+    
+    return () => {
+      syncManager.offStatusUpdate(updateSyncStatus);
+    };
+    */
+  }, [isOpen]);
+
+  // Handle ESC key press
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscapeKey);
+    
+    return () => {
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [isOpen, onClose]);
+
+  // Manual sync function
+  const handleManualSync = async () => {
+    if (isSyncing || !syncManager.isConfigured()) return;
+    
+    setIsSyncing(true);
+    setSyncResult(null);
+    
+    try {
+      const result = await syncManager.syncData({
+        tasks: state.tasks,
+        columns: state.columns,
+        notes: state.notes.notes,
+        preferences: state.preferences
+      });
+      setSyncResult({
+        success: result.success,
+        message: result.success 
+          ? `Erfolgreich synchronisiert!`
+          : 'Synchronisation fehlgeschlagen. Überprüfen Sie Ihre Internetverbindung.'
+      });
+    } catch (error) {
+      setSyncResult({
+        success: false,
+        message: 'Synchronisation fehlgeschlagen: ' + (error instanceof Error ? error.message : 'Unbekannter Fehler')
+      });
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  // Get accent color styles
+  const getAccentColorStyles = () => {
+    const accentColor = state.preferences.accentColor;
+    return {
+      bg: { backgroundColor: accentColor },
+      text: { color: accentColor },
+      bgLight: { backgroundColor: accentColor + '15' },
+      bgMedium: { backgroundColor: accentColor + '25' },
+      border: { borderColor: accentColor + '30' },
+    };
+  };
+
+  const handleArchiveCompleted = () => {
+    completedTasks.forEach(task => {
+      dispatch({
+        type: 'UPDATE_TASK',
+        payload: {
+          ...task,
+          archived: true,
+          updatedAt: new Date().toISOString()
+        }
+      });
+    });
+    setShowArchiveConfirm(false);
+  };
+
+  const handleMoveIncomplete = () => {
+    const tomorrow = addDays(new Date(), 1);
+    const tomorrowString = format(tomorrow, 'yyyy-MM-dd');
+    
+    incompleteTasks.forEach(task => {
+      dispatch({
+        type: 'MOVE_TASK',
+        payload: {
+          taskId: task.id,
+          columnId: `date-${tomorrowString}`
+        }
+      });
+    });
+    setShowMoveConfirm(false);
+  };
+
+  const isConfigured = (() => {
+    try {
+      return syncManager.isConfigured();
+    } catch (error) {
+      console.error('Error checking sync configuration:', error);
+      return false;
+    }
+  })();
+
+  if (!isOpen) return null;
+
+  return (
+    <div 
+      className="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in duration-300"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden animate-in slide-in-from-bottom-4 duration-500"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900"></div>
+          <div className="relative p-8 border-b border-gray-200/50 dark:border-gray-700/50">
+            <div className="absolute top-6 right-6">
+              <button
+                onClick={onClose}
+                className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-all rounded-xl hover:bg-white/50 dark:hover:bg-gray-800/50"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <div className="text-center">
+              {/* All Three Animals with Active Highlighting */}
+              <div className="flex justify-center items-center mb-6 space-x-4">
+                {/* Sloth */}
+                <div className={`flex flex-col items-center transition-all duration-300 ${
+                  skillLevel.name === 'Faultier' ? 'scale-110' : 'scale-90 opacity-60'
+                }`}>
+                  <div className={`w-20 h-20 rounded-full flex items-center justify-center text-4xl border-4 transition-all duration-300 ${
+                    skillLevel.name === 'Faultier' 
+                      ? 'bg-gray-100 dark:bg-gray-800 border-gray-400 shadow-lg' 
+                      : 'bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-600'
+                  }`}>
+                    🦥
+                  </div>
+                  <div className={`mt-2 px-2 py-1 rounded-lg text-xs font-medium transition-all duration-300 ${
+                    skillLevel.name === 'Faultier'
+                      ? 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
+                      : 'text-gray-400 dark:text-gray-600'
+                  }`}>
+                    Faultier
+                  </div>
+                </div>
+
+                {/* Panda */}
+                <div className={`flex flex-col items-center transition-all duration-300 ${
+                  skillLevel.name === 'Panda' ? 'scale-110' : 'scale-90 opacity-60'
+                }`}>
+                  <div className={`w-20 h-20 rounded-full flex items-center justify-center text-4xl border-4 transition-all duration-300 ${
+                    skillLevel.name === 'Panda' 
+                      ? 'bg-orange-100 dark:bg-orange-900/30 border-orange-400 shadow-lg' 
+                      : 'bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-600'
+                  }`}>
+                    🐼
+                  </div>
+                  <div className={`mt-2 px-2 py-1 rounded-lg text-xs font-medium transition-all duration-300 ${
+                    skillLevel.name === 'Panda'
+                      ? 'bg-orange-200 dark:bg-orange-800/30 text-orange-800 dark:text-orange-200'
+                      : 'text-gray-400 dark:text-gray-600'
+                  }`}>
+                    Panda
+                  </div>
+                </div>
+
+                {/* Fox */}
+                <div className={`flex flex-col items-center transition-all duration-300 ${
+                  skillLevel.name === 'Fuchs' ? 'scale-110' : 'scale-90 opacity-60'
+                }`}>
+                  <div className={`w-20 h-20 rounded-full flex items-center justify-center text-4xl border-4 transition-all duration-300 ${
+                    skillLevel.name === 'Fuchs' 
+                      ? 'bg-red-100 dark:bg-red-900/30 border-red-400 shadow-lg' 
+                      : 'bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-600'
+                  }`}>
+                    🦊
+                  </div>
+                  <div className={`mt-2 px-2 py-1 rounded-lg text-xs font-medium transition-all duration-300 ${
+                    skillLevel.name === 'Fuchs'
+                      ? 'bg-red-200 dark:bg-red-800/30 text-red-800 dark:text-red-200'
+                      : 'text-gray-400 dark:text-gray-600'
+                  }`}>
+                    Fuchs
+                  </div>
+                </div>
+              </div>
+
+              {/* Explanation */}
+              <div className={`mx-auto max-w-md p-4 rounded-xl transition-all duration-300 ${skillLevel.bgColor}`}>
+                <div className={`text-sm font-medium ${skillLevel.color} mb-1`}>
+                  {i18n.language === 'en' ? `You are a ${skillLevel.name} today!` : `Du bist heute ein ${skillLevel.name}!`}
+                </div>
+                <div className="text-xs text-gray-600 dark:text-gray-400">
+                  {skillLevel.description}
+                </div>
+              </div>
+              
+              <h2 className="text-3xl font-light text-gray-900 dark:text-white mb-2 mt-4">
+                {i18n.language === 'en' ? 'End Day' : 'Tag beenden'}
+              </h2>
+              
+              <p className="text-lg text-gray-500 dark:text-gray-400">
+                {format(new Date(), 'EEEE, dd. MMMM yyyy', { locale: de })}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-8 overflow-y-auto max-h-[60vh]">
+          {/* Statistics */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            {/* Work Time */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200/50 dark:border-gray-700/50">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 rounded-xl" style={getAccentColorStyles().bgLight}>
+                  <Clock className="w-6 h-6" style={getAccentColorStyles().text} />
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-light text-gray-900 dark:text-white">
+                    {Math.round(totalWorkedTime / 60 * 10) / 10}h
+                  </div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    {i18n.language === 'en' ? `of ${Math.round(totalEstimatedTime / 60 * 10) / 10}h planned` : `von ${Math.round(totalEstimatedTime / 60 * 10) / 10}h geplant`}
+                  </div>
+                </div>
+              </div>
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2">
+                <div 
+                  className="h-2 rounded-full transition-all duration-500 ease-out"
+                  style={{ 
+                    width: `${Math.min(workPercentage, 100)}%`,
+                    ...getAccentColorStyles().bg
+                  }}
+                ></div>
+              </div>
+              <div className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                {i18n.language === 'en' ? `Timer Time (${Math.round(workPercentage)}%)` : `Timer-Zeit (${Math.round(workPercentage)}%)`}
+              </div>
+            </div>
+
+            {/* Completed Tasks */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200/50 dark:border-gray-700/50">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 rounded-xl" style={getAccentColorStyles().bgLight}>
+                  <CheckCircle className="w-6 h-6" style={getAccentColorStyles().text} />
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-light text-gray-900 dark:text-white">
+                    {completedTasks.length}
+                  </div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    von {todaysTasks.length} Aufgaben
+                  </div>
+                </div>
+              </div>
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2">
+                <div 
+                  className="h-2 rounded-full transition-all duration-500 ease-out"
+                  style={{ 
+                    width: `${todaysTasks.length > 0 ? (completedTasks.length / todaysTasks.length) * 100 : 0}%`,
+                    ...getAccentColorStyles().bg
+                  }}
+                ></div>
+              </div>
+              <div className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                {i18n.language === 'en' ? 'Completed Tasks' : 'Erledigte Aufgaben'}
+              </div>
+            </div>
+          </div>
+
+          {/* Sync Status & Control */}
+          {isConfigured && (
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200/50 dark:border-gray-700/50 mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white flex items-center">
+                  <Cloud className="w-5 h-5 mr-2" style={getAccentColorStyles().text} />
+                  Synchronisation
+                </h3>
+                <div className="flex items-center space-x-2">
+                  {isConfigured ? (
+                    <Wifi className="w-4 h-4 text-green-500" />
+                  ) : (
+                    <WifiOff className="w-4 h-4 text-red-500" />
+                  )}
+                  <span className={`text-sm font-medium ${
+                    isConfigured ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                  }`}>
+                    {isConfigured ? 'Konfiguriert' : 'Nicht konfiguriert'}
+                  </span>
+                </div>
+              </div>
+
+              {syncResult && (
+                <div className={`p-3 rounded-lg text-sm mb-4 ${
+                  syncResult.success 
+                    ? 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200 border border-green-200 dark:border-green-800' 
+                    : 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200 border border-red-200 dark:border-red-800'
+                }`}>
+                  {syncResult.message}
+                </div>
+              )}
+
+              <button
+                onClick={handleManualSync}
+                disabled={isSyncing || !isConfigured}
+                className={`w-full px-6 py-3 rounded-xl font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${
+                  !isConfigured
+                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 cursor-not-allowed'
+                    : isSyncing
+                    ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 cursor-not-allowed'
+                    : 'text-white hover:opacity-90 hover:shadow-lg'
+                }`}
+                style={isConfigured && !isSyncing ? getAccentColorStyles().bg : {}}
+              >
+                {isSyncing ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                    <span>Synchronisiere...</span>
+                  </>
+                ) : !isConfigured ? (
+                  <>
+                    <WifiOff className="w-4 h-4" />
+                    <span>Nicht verbunden</span>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4" />
+                    <span>Jetzt synchronisieren</span>
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Footer Actions */}
+        <div className="p-6 border-t border-gray-200/50 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-800/50">
+          <div className="space-y-4">
+            {/* Completed Tasks Section */}
+            {completedTasks.length > 0 && (
+              <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200/50 dark:border-gray-700/50">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={getAccentColorStyles().bgLight}>
+                    <CheckCircle className="w-4 h-4" style={getAccentColorStyles().text} />
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">
+                      {i18n.language === 'en' ? 'Completed Tasks' : 'Erledigte Aufgaben'}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      {i18n.language === 'en' 
+                        ? `${completedTasks.length} task${completedTasks.length !== 1 ? 's' : ''} completed`
+                        : `${completedTasks.length} Aufgabe${completedTasks.length !== 1 ? 'n' : ''} abgeschlossen`}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowArchiveConfirm(true)}
+                  className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-all hover:opacity-90 hover:shadow-md"
+                  style={getAccentColorStyles().bg}
+                >
+                  <Archive className="w-4 h-4 mr-2 inline" />
+                  {i18n.language === 'en' ? 'Archive' : 'Archivieren'}
+                </button>
+              </div>
+            )}
+
+            {/* Incomplete Tasks Section */}
+            {incompleteTasks.length > 0 && (
+              <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200/50 dark:border-gray-700/50">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={getAccentColorStyles().bgLight}>
+                    <ArrowRight className="w-4 h-4" style={getAccentColorStyles().text} />
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">
+                      {i18n.language === 'en' ? 'Incomplete Tasks' : 'Unerledigte Aufgaben'}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      {i18n.language === 'en' 
+                        ? `${incompleteTasks.length} task${incompleteTasks.length !== 1 ? 's' : ''} open`
+                        : `${incompleteTasks.length} Aufgabe${incompleteTasks.length !== 1 ? 'n' : ''} offen`}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowMoveConfirm(true)}
+                  className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-all hover:opacity-90 hover:shadow-md"
+                  style={getAccentColorStyles().bg}
+                >
+                  <ArrowRight className="w-4 h-4 mr-2 inline" />
+                  {i18n.language === 'en' ? 'Move to tomorrow' : 'Auf morgen'}
+                </button>
+              </div>
+            )}
+
+            {/* Close Button */}
+            <div className="flex justify-center pt-2">
+              <button
+                onClick={onClose}
+                className="px-6 py-2 text-sm font-medium bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-all"
+              >
+                {i18n.language === 'en' ? 'Close' : 'Schließen'}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Archive Confirmation */}
+      {showArchiveConfirm && (
+        <div className="fixed inset-0 bg-black/80 z-60 flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full shadow-2xl animate-in slide-in-from-bottom-4 duration-300">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+              {i18n.language === 'en' ? 'Archive Tasks' : 'Aufgaben archivieren'}
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              {i18n.language === 'en' 
+                ? `Do you want to move all ${completedTasks.length} completed tasks to the archive?`
+                : `Möchten Sie alle ${completedTasks.length} erledigten Aufgaben ins Archiv verschieben?`}
+            </p>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setShowArchiveConfirm(false)}
+                className="flex-1 px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"
+              >
+                {i18n.language === 'en' ? 'Cancel' : 'Abbrechen'}
+              </button>
+              <button
+                onClick={handleArchiveCompleted}
+                className="flex-1 px-4 py-2 text-white rounded-xl transition-colors hover:opacity-90"
+                style={getAccentColorStyles().bg}
+              >
+                {i18n.language === 'en' ? 'Archive' : 'Archivieren'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Move Confirmation */}
+      {showMoveConfirm && (
+        <div className="fixed inset-0 bg-black/80 z-60 flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full shadow-2xl animate-in slide-in-from-bottom-4 duration-300">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+              {i18n.language === 'en' ? 'Move Tasks' : 'Aufgaben verschieben'}
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              {i18n.language === 'en' 
+                ? `Do you want to move all ${incompleteTasks.length} open tasks to tomorrow?`
+                : `Möchten Sie alle ${incompleteTasks.length} offenen Aufgaben in den morgigen Tag verschieben?`}
+            </p>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setShowMoveConfirm(false)}
+                className="flex-1 px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"
+              >
+                {i18n.language === 'en' ? 'Cancel' : 'Abbrechen'}
+              </button>
+              <button
+                onClick={handleMoveIncomplete}
+                className="flex-1 px-4 py-2 text-white rounded-xl transition-colors hover:opacity-90"
+                style={getAccentColorStyles().bg}
+              >
+                {i18n.language === 'en' ? 'Move' : 'Verschieben'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+} 

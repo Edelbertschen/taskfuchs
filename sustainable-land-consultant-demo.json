@@ -1,0 +1,849 @@
+{
+  "tasks": [
+    {
+      "id": "task-soil-analysis-1",
+      "title": "Bodenanalyse für Müller'schen Acker durchführen",
+      "description": "Comprehensive soil testing including pH levels, organic matter content, nitrogen, phosphorus, and potassium levels for the 45-hectare field in Bavaria. Focus on soil health indicators for sustainable farming transition.",
+      "completed": false,
+      "priority": "high",
+      "estimatedTime": 180,
+      "trackedTime": 95,
+      "tags": ["soil-analysis", "fieldwork", "bavaria", "sustainable-farming"],
+      "subtasks": [
+        {
+          "id": "subtask-soil-1-1",
+          "title": "Soil sampling grid design (15 points)",
+          "completed": true,
+          "estimatedTime": 30,
+          "trackedTime": 35,
+          "tags": ["planning"],
+          "createdAt": "2024-01-15T08:00:00.000Z",
+          "updatedAt": "2024-01-15T10:30:00.000Z"
+        },
+        {
+          "id": "subtask-soil-1-2",
+          "title": "Field sampling execution",
+          "completed": true,
+          "estimatedTime": 120,
+          "trackedTime": 140,
+          "tags": ["fieldwork"],
+          "createdAt": "2024-01-15T08:00:00.000Z",
+          "updatedAt": "2024-01-16T14:20:00.000Z"
+        },
+        {
+          "id": "subtask-soil-1-3",
+          "title": "Laboratory analysis coordination",
+          "completed": false,
+          "estimatedTime": 30,
+          "tags": ["coordination"],
+          "createdAt": "2024-01-15T08:00:00.000Z",
+          "updatedAt": "2024-01-17T09:15:00.000Z"
+        }
+      ],
+      "projectId": "sustainable-farming-bavaria",
+      "kanbanColumnId": "sf-analysis",
+      "reminderDate": "2024-01-18",
+      "reminderTime": "09:00",
+      "deadline": "2024-01-22",
+      "position": 0,
+      "createdAt": "2024-01-15T08:00:00.000Z",
+      "updatedAt": "2024-01-17T16:30:00.000Z",
+      "linkedNotes": ["note-soil-methodology"],
+      "pinned": true
+    },
+    {
+      "id": "task-biodiversity-assessment",
+      "title": "Biodiversity Impact Assessment - Wind Farm Project",
+      "description": "Conduct comprehensive biodiversity assessment for proposed 25 MW wind farm in Lower Saxony. Include bird migration patterns, habitat mapping, and species inventory for environmental impact statement.",
+      "completed": false,
+      "priority": "high",
+      "estimatedTime": 320,
+      "trackedTime": 185,
+      "tags": ["biodiversity", "wind-energy", "environmental-impact", "lower-saxony"],
+      "subtasks": [
+        {
+          "id": "subtask-bio-1-1",
+          "title": "Desktop study and literature review",
+          "completed": true,
+          "estimatedTime": 60,
+          "trackedTime": 75,
+          "tags": ["research"],
+          "createdAt": "2024-01-10T09:00:00.000Z",
+          "updatedAt": "2024-01-12T16:45:00.000Z"
+        },
+        {
+          "id": "subtask-bio-1-2",
+          "title": "Bird migration monitoring (4 weeks)",
+          "completed": false,
+          "estimatedTime": 200,
+          "trackedTime": 110,
+          "tags": ["monitoring", "birds"],
+          "createdAt": "2024-01-10T09:00:00.000Z",
+          "updatedAt": "2024-01-17T18:00:00.000Z"
+        },
+        {
+          "id": "subtask-bio-1-3",
+          "title": "Habitat quality assessment",
+          "completed": false,
+          "estimatedTime": 60,
+          "tags": ["habitat", "fieldwork"],
+          "createdAt": "2024-01-10T09:00:00.000Z",
+          "updatedAt": "2024-01-17T10:30:00.000Z"
+        }
+      ],
+      "projectId": "renewable-energy-assessments",
+      "kanbanColumnId": "re-active",
+      "reminderDate": "2024-01-19",
+      "reminderTime": "08:30",
+      "deadline": "2024-02-15",
+      "position": 1,
+      "createdAt": "2024-01-10T09:00:00.000Z",
+      "updatedAt": "2024-01-17T18:00:00.000Z",
+      "linkedNotes": ["note-biodiversity-protocols"],
+      "pinned": false
+    },
+    {
+      "id": "task-carbon-footprint",
+      "title": "Farm Carbon Footprint Calculation - Organic Transition",
+      "description": "Calculate current carbon footprint and develop carbon reduction strategy for 120-hectare dairy farm transitioning to organic practices. Include soil carbon sequestration potential analysis.",
+      "completed": false,
+      "priority": "medium",
+      "estimatedTime": 150,
+      "trackedTime": 60,
+      "tags": ["carbon-footprint", "organic-farming", "dairy", "climate"],
+      "subtasks": [
+        {
+          "id": "subtask-carbon-1-1",
+          "title": "Data collection from farm management",
+          "completed": true,
+          "estimatedTime": 45,
+          "trackedTime": 50,
+          "tags": ["data-collection"],
+          "createdAt": "2024-01-16T10:00:00.000Z",
+          "updatedAt": "2024-01-17T14:30:00.000Z"
+        },
+        {
+          "id": "subtask-carbon-1-2",
+          "title": "Emission calculations using IPCC guidelines",
+          "completed": false,
+          "estimatedTime": 75,
+          "trackedTime": 10,
+          "tags": ["calculations", "IPCC"],
+          "createdAt": "2024-01-16T10:00:00.000Z",
+          "updatedAt": "2024-01-17T16:15:00.000Z"
+        },
+        {
+          "id": "subtask-carbon-1-3",
+          "title": "Mitigation strategy development",
+          "completed": false,
+          "estimatedTime": 30,
+          "tags": ["strategy"],
+          "createdAt": "2024-01-16T10:00:00.000Z",
+          "updatedAt": "2024-01-17T16:15:00.000Z"
+        }
+      ],
+      "projectId": "sustainable-farming-bavaria",
+      "kanbanColumnId": "sf-planning",
+      "reminderDate": "2024-01-20",
+      "reminderTime": "14:00",
+      "position": 2,
+      "createdAt": "2024-01-16T10:00:00.000Z",
+      "updatedAt": "2024-01-17T16:15:00.000Z",
+      "linkedNotes": [],
+      "pinned": false
+    },
+    {
+      "id": "task-erosion-control",
+      "title": "Slope Stabilization Plan - Highway Construction",
+      "description": "Develop erosion control and slope stabilization plan for new highway section through hilly terrain. Focus on native vegetation solutions and long-term soil conservation.",
+      "completed": true,
+      "priority": "high",
+      "estimatedTime": 240,
+      "trackedTime": 280,
+      "tags": ["erosion-control", "infrastructure", "native-plants", "engineering"],
+      "subtasks": [
+        {
+          "id": "subtask-erosion-1-1",
+          "title": "Site survey and topographical analysis",
+          "completed": true,
+          "estimatedTime": 80,
+          "trackedTime": 95,
+          "tags": ["survey", "topography"],
+          "createdAt": "2024-01-08T08:00:00.000Z",
+          "updatedAt": "2024-01-10T17:30:00.000Z"
+        },
+        {
+          "id": "subtask-erosion-1-2",
+          "title": "Native plant species selection",
+          "completed": true,
+          "estimatedTime": 60,
+          "trackedTime": 75,
+          "tags": ["botany", "native-species"],
+          "createdAt": "2024-01-08T08:00:00.000Z",
+          "updatedAt": "2024-01-12T15:20:00.000Z"
+        },
+        {
+          "id": "subtask-erosion-1-3",
+          "title": "Implementation timeline and cost estimate",
+          "completed": true,
+          "estimatedTime": 100,
+          "trackedTime": 110,
+          "tags": ["planning", "budgeting"],
+          "createdAt": "2024-01-08T08:00:00.000Z",
+          "updatedAt": "2024-01-15T16:45:00.000Z"
+        }
+      ],
+      "projectId": "renewable-energy-assessments",
+      "kanbanColumnId": "re-completed",
+      "position": 3,
+      "createdAt": "2024-01-08T08:00:00.000Z",
+      "updatedAt": "2024-01-15T16:45:00.000Z",
+      "linkedNotes": [],
+      "pinned": false
+    },
+    {
+      "id": "task-water-management",
+      "title": "Irrigation Efficiency Assessment - Vegetable Farm",
+      "description": "Evaluate current irrigation system efficiency and develop water conservation strategy for 30-hectare intensive vegetable production. Include precision agriculture recommendations.",
+      "completed": false,
+      "priority": "medium",
+      "estimatedTime": 120,
+      "trackedTime": 40,
+      "tags": ["water-management", "irrigation", "vegetables", "precision-agriculture"],
+      "subtasks": [
+        {
+          "id": "subtask-water-1-1",
+          "title": "Current system efficiency measurement",
+          "completed": false,
+          "estimatedTime": 60,
+          "trackedTime": 25,
+          "tags": ["measurement", "efficiency"],
+          "createdAt": "2024-01-17T09:00:00.000Z",
+          "updatedAt": "2024-01-17T14:30:00.000Z"
+        },
+        {
+          "id": "subtask-water-1-2",
+          "title": "Soil moisture monitoring setup",
+          "completed": false,
+          "estimatedTime": 40,
+          "trackedTime": 15,
+          "tags": ["monitoring", "technology"],
+          "createdAt": "2024-01-17T09:00:00.000Z",
+          "updatedAt": "2024-01-17T16:00:00.000Z"
+        },
+        {
+          "id": "subtask-water-1-3",
+          "title": "Technology upgrade recommendations",
+          "completed": false,
+          "estimatedTime": 20,
+          "tags": ["recommendations", "technology"],
+          "createdAt": "2024-01-17T09:00:00.000Z",
+          "updatedAt": "2024-01-17T16:00:00.000Z"
+        }
+      ],
+      "projectId": "sustainable-farming-bavaria",
+      "kanbanColumnId": "sf-implementation",
+      "reminderDate": "2024-01-21",
+      "reminderTime": "10:00",
+      "position": 4,
+      "createdAt": "2024-01-17T09:00:00.000Z",
+      "updatedAt": "2024-01-17T16:00:00.000Z",
+      "linkedNotes": [],
+      "pinned": false
+    },
+    {
+      "id": "task-certification-audit",
+      "title": "Organic Certification Pre-Audit - Mixed Farm",
+      "description": "Conduct pre-audit for organic certification compliance on 80-hectare mixed livestock and crop farm. Prepare documentation and identify potential compliance issues.",
+      "completed": false,
+      "priority": "high",
+      "estimatedTime": 200,
+      "trackedTime": 125,
+      "tags": ["organic-certification", "audit", "compliance", "mixed-farming"],
+      "subtasks": [
+        {
+          "id": "subtask-cert-1-1",
+          "title": "Document review and gap analysis",
+          "completed": true,
+          "estimatedTime": 80,
+          "trackedTime": 90,
+          "tags": ["documentation", "analysis"],
+          "createdAt": "2024-01-14T08:30:00.000Z",
+          "updatedAt": "2024-01-16T17:00:00.000Z"
+        },
+        {
+          "id": "subtask-cert-1-2",
+          "title": "Field inspection and livestock assessment",
+          "completed": false,
+          "estimatedTime": 90,
+          "trackedTime": 35,
+          "tags": ["inspection", "livestock"],
+          "createdAt": "2024-01-14T08:30:00.000Z",
+          "updatedAt": "2024-01-17T15:45:00.000Z"
+        },
+        {
+          "id": "subtask-cert-1-3",
+          "title": "Compliance report preparation",
+          "completed": false,
+          "estimatedTime": 30,
+          "tags": ["reporting"],
+          "createdAt": "2024-01-14T08:30:00.000Z",
+          "updatedAt": "2024-01-17T15:45:00.000Z"
+        }
+      ],
+      "projectId": "sustainable-farming-bavaria",
+      "kanbanColumnId": "sf-active",
+      "reminderDate": "2024-01-19",
+      "reminderTime": "13:30",
+      "deadline": "2024-01-25",
+      "position": 5,
+      "createdAt": "2024-01-14T08:30:00.000Z",
+      "updatedAt": "2024-01-17T15:45:00.000Z",
+      "linkedNotes": ["note-soil-methodology"],
+      "pinned": false
+    },
+    {
+      "id": "task-renewable-energy-feasibility",
+      "title": "Agrophotovoltaics Feasibility Study - Berry Farm",
+      "description": "Assess feasibility of implementing agrophotovoltaic system on 15-hectare berry farm. Analyze crop-solar panel compatibility and economic viability.",
+      "completed": false,
+      "priority": "low",
+      "estimatedTime": 160,
+      "trackedTime": 20,
+      "tags": ["agrophotovoltaics", "renewable-energy", "berries", "feasibility"],
+      "subtasks": [
+        {
+          "id": "subtask-agro-1-1",
+          "title": "Site solar potential assessment",
+          "completed": false,
+          "estimatedTime": 50,
+          "trackedTime": 15,
+          "tags": ["solar", "assessment"],
+          "createdAt": "2024-01-17T14:00:00.000Z",
+          "updatedAt": "2024-01-17T17:30:00.000Z"
+        },
+        {
+          "id": "subtask-agro-1-2",
+          "title": "Crop shading impact analysis",
+          "completed": false,
+          "estimatedTime": 70,
+          "trackedTime": 5,
+          "tags": ["crops", "shading", "analysis"],
+          "createdAt": "2024-01-17T14:00:00.000Z",
+          "updatedAt": "2024-01-17T17:30:00.000Z"
+        },
+        {
+          "id": "subtask-agro-1-3",
+          "title": "Economic model development",
+          "completed": false,
+          "estimatedTime": 40,
+          "tags": ["economics", "modeling"],
+          "createdAt": "2024-01-17T14:00:00.000Z",
+          "updatedAt": "2024-01-17T17:30:00.000Z"
+        }
+      ],
+      "projectId": "renewable-energy-assessments",
+      "kanbanColumnId": "re-planning",
+      "reminderDate": "2024-01-22",
+      "reminderTime": "09:30",
+      "position": 6,
+      "createdAt": "2024-01-17T14:00:00.000Z",
+      "updatedAt": "2024-01-17T17:30:00.000Z",
+      "linkedNotes": [],
+      "pinned": false
+    },
+    {
+      "id": "task-soil-remediation",
+      "title": "Contaminated Site Remediation Plan - Former Industrial Area",
+      "description": "Develop phytoremediation strategy for 5-hectare former industrial site with heavy metal contamination. Focus on cost-effective, nature-based solutions.",
+      "completed": false,
+      "priority": "medium",
+      "estimatedTime": 280,
+      "trackedTime": 150,
+      "tags": ["phytoremediation", "contamination", "heavy-metals", "nature-based"],
+      "subtasks": [
+        {
+          "id": "subtask-rem-1-1",
+          "title": "Contamination level mapping",
+          "completed": true,
+          "estimatedTime": 100,
+          "trackedTime": 120,
+          "tags": ["mapping", "contamination"],
+          "createdAt": "2024-01-12T09:00:00.000Z",
+          "updatedAt": "2024-01-15T16:30:00.000Z"
+        },
+        {
+          "id": "subtask-rem-1-2",
+          "title": "Hyperaccumulator plant selection",
+          "completed": false,
+          "estimatedTime": 80,
+          "trackedTime": 30,
+          "tags": ["plants", "hyperaccumulators"],
+          "createdAt": "2024-01-12T09:00:00.000Z",
+          "updatedAt": "2024-01-17T11:45:00.000Z"
+        },
+        {
+          "id": "subtask-rem-1-3",
+          "title": "Implementation timeline and monitoring plan",
+          "completed": false,
+          "estimatedTime": 100,
+          "tags": ["planning", "monitoring"],
+          "createdAt": "2024-01-12T09:00:00.000Z",
+          "updatedAt": "2024-01-17T11:45:00.000Z"
+        }
+      ],
+      "projectId": "renewable-energy-assessments",
+      "kanbanColumnId": "re-active",
+      "reminderDate": "2024-01-20",
+      "reminderTime": "11:00",
+      "deadline": "2024-02-28",
+      "position": 7,
+      "createdAt": "2024-01-12T09:00:00.000Z",
+      "updatedAt": "2024-01-17T11:45:00.000Z",
+      "linkedNotes": [],
+      "pinned": false
+    },
+    {
+      "id": "task-climate-adaptation",
+      "title": "Climate Change Adaptation Strategy - Wine Estate",
+      "description": "Develop climate adaptation strategy for 25-hectare wine estate facing increasing drought and temperature stress. Include grape variety recommendations and water conservation measures.",
+      "completed": false,
+      "priority": "medium",
+      "estimatedTime": 180,
+      "trackedTime": 85,
+      "tags": ["climate-adaptation", "viticulture", "drought-resistance", "wine"],
+      "subtasks": [
+        {
+          "id": "subtask-climate-1-1",
+          "title": "Historical climate data analysis",
+          "completed": true,
+          "estimatedTime": 60,
+          "trackedTime": 70,
+          "tags": ["climate-data", "analysis"],
+          "createdAt": "2024-01-13T10:00:00.000Z",
+          "updatedAt": "2024-01-16T14:15:00.000Z"
+        },
+        {
+          "id": "subtask-climate-1-2",
+          "title": "Drought-resistant variety research",
+          "completed": false,
+          "estimatedTime": 80,
+          "trackedTime": 15,
+          "tags": ["varieties", "research", "drought"],
+          "createdAt": "2024-01-13T10:00:00.000Z",
+          "updatedAt": "2024-01-17T13:20:00.000Z"
+        },
+        {
+          "id": "subtask-climate-1-3",
+          "title": "Water conservation system design",
+          "completed": false,
+          "estimatedTime": 40,
+          "tags": ["water-conservation", "design"],
+          "createdAt": "2024-01-13T10:00:00.000Z",
+          "updatedAt": "2024-01-17T13:20:00.000Z"
+        }
+      ],
+      "projectId": "sustainable-farming-bavaria",
+      "kanbanColumnId": "sf-planning",
+      "reminderDate": "2024-01-21",
+      "reminderTime": "15:00",
+      "position": 8,
+      "createdAt": "2024-01-13T10:00:00.000Z",
+      "updatedAt": "2024-01-17T13:20:00.000Z",
+      "linkedNotes": [],
+      "pinned": false
+    },
+    {
+      "id": "task-stakeholder-workshop",
+      "title": "Multi-Stakeholder Workshop - Regional Land Use Planning",
+      "description": "Organize and facilitate workshop with farmers, local government, and environmental groups to develop consensus on regional sustainable land use framework for 500 hectare area.",
+      "completed": false,
+      "priority": "high",
+      "estimatedTime": 100,
+      "trackedTime": 45,
+      "tags": ["stakeholder-engagement", "workshop", "regional-planning", "consensus"],
+      "subtasks": [
+        {
+          "id": "subtask-workshop-1-1",
+          "title": "Stakeholder mapping and invitations",
+          "completed": true,
+          "estimatedTime": 30,
+          "trackedTime": 35,
+          "tags": ["stakeholders", "invitations"],
+          "createdAt": "2024-01-16T13:00:00.000Z",
+          "updatedAt": "2024-01-17T10:30:00.000Z"
+        },
+        {
+          "id": "subtask-workshop-1-2",
+          "title": "Workshop agenda and materials preparation",
+          "completed": false,
+          "estimatedTime": 40,
+          "trackedTime": 10,
+          "tags": ["preparation", "materials"],
+          "createdAt": "2024-01-16T13:00:00.000Z",
+          "updatedAt": "2024-01-17T16:45:00.000Z"
+        },
+        {
+          "id": "subtask-workshop-1-3",
+          "title": "Facilitation and documentation",
+          "completed": false,
+          "estimatedTime": 30,
+          "tags": ["facilitation", "documentation"],
+          "createdAt": "2024-01-16T13:00:00.000Z",
+          "updatedAt": "2024-01-17T16:45:00.000Z"
+        }
+      ],
+      "projectId": "sustainable-farming-bavaria",
+      "kanbanColumnId": "sf-active",
+      "reminderDate": "2024-01-19",
+      "reminderTime": "16:00",
+      "deadline": "2024-01-26",
+      "position": 9,
+      "createdAt": "2024-01-16T13:00:00.000Z",
+      "updatedAt": "2024-01-17T16:45:00.000Z",
+      "linkedNotes": ["note-biodiversity-protocols"],
+      "pinned": false
+    }
+  ],
+  "notes": [
+    {
+      "id": "note-soil-methodology",
+      "title": "Soil Analysis Methodology & Best Practices",
+      "content": "# Soil Analysis Methodology for Sustainable Land Use Consulting\n\n## Standard Operating Procedures\n\n### Sampling Strategy\n- **Grid Sampling**: 15-20 points per hectare for intensive analysis\n- **Composite Sampling**: 5-8 points per hectare for general assessment\n- **Depth Profiles**: 0-15cm, 15-30cm, 30-60cm layers\n- **Seasonal Timing**: Avoid sampling during wet conditions or immediately after fertilizer application\n\n### Key Parameters for Sustainability Assessment\n\n#### Physical Properties\n- **Soil Texture**: Clay, silt, sand percentages\n- **Bulk Density**: Compaction indicators\n- **Aggregate Stability**: Erosion resistance\n- **Water Infiltration Rate**: Drainage characteristics\n\n#### Chemical Properties\n- **pH**: Optimal range 6.0-7.5 for most crops\n- **Organic Matter**: Target >3% for sustainable systems\n- **Nutrient Levels**: N, P, K, secondary nutrients\n- **Cation Exchange Capacity**: Nutrient retention ability\n- **Heavy Metals**: Contamination screening\n\n#### Biological Indicators\n- **Microbial Biomass**: Soil health indicator\n- **Earthworm Count**: Biological activity measure\n- **Enzyme Activity**: Soil metabolism indicators\n- **Mycorrhizal Fungi**: Symbiotic relationships\n\n## Equipment and Tools\n\n### Field Equipment\n- **Auger Set**: Various sizes for different depths\n- **GPS Unit**: Precise location recording\n- **pH Meter**: Field pH testing\n- **Penetrometer**: Compaction measurement\n- **Sample Bags**: Labeled, waterproof containers\n- **Field Notebook**: Waterproof, systematic recording\n\n### Laboratory Analysis\n- **Certified Labs**: Use accredited soil testing facilities\n- **Quality Control**: Split samples for verification\n- **Turnaround Time**: Plan for 7-14 day results\n\n## Interpretation Guidelines\n\n### Sustainability Indicators\n1. **Organic Matter Trends**: Increasing = positive\n2. **Nutrient Balance**: Optimal ratios prevent runoff\n3. **Biological Activity**: High diversity = healthy soil\n4. **Physical Structure**: Good aggregation prevents erosion\n\n### Common Problems and Solutions\n- **Compaction**: Reduce traffic, cover crops\n- **Low Organic Matter**: Compost, crop residues\n- **Nutrient Imbalance**: Targeted fertilization\n- **pH Issues**: Lime for acidic, sulfur for alkaline\n- **Erosion Risk**: Cover crops, contour farming\n\n## Reporting Standards\n\n### Client Deliverables\n1. **Executive Summary**: Key findings and recommendations\n2. **Detailed Analysis**: All test results with interpretation\n3. **Action Plan**: Prioritized improvement strategies\n4. **Cost-Benefit Analysis**: Economic implications\n5. **Monitoring Schedule**: Follow-up testing timeline\n\n### Regulatory Compliance\n- **Organic Standards**: USDA/EU organic requirements\n- **Environmental Regulations**: Water quality protection\n- **Certification Bodies**: Third-party verification\n\n---\n*Last Updated: January 17, 2024*\n*Next Review: July 2024*",
+      "tags": ["soil-analysis", "methodology", "best-practices", "sustainability"],
+      "linkedTasks": ["task-soil-analysis-1", "task-certification-audit"],
+      "linkedNotes": [],
+      "linkedProjects": ["sustainable-farming-bavaria"],
+      "pinned": true,
+      "archived": false,
+      "createdAt": "2024-01-10T08:00:00.000Z",
+      "updatedAt": "2024-01-17T14:30:00.000Z",
+      "metadata": {
+        "wordCount": 485,
+        "readingTime": 3,
+        "linkPreviews": []
+      }
+    },
+    {
+      "id": "note-biodiversity-protocols",
+      "title": "Biodiversity Assessment Protocols for Renewable Energy Projects",
+      "content": "# Biodiversity Assessment Protocols\n## Renewable Energy Infrastructure Projects\n\n### Pre-Assessment Phase\n\n#### Desktop Study Requirements\n1. **Species Database Review**\n   - National biodiversity databases\n   - Regional conservation status lists\n   - Migratory species tracking data\n   - Historical sighting records\n\n2. **Habitat Mapping**\n   - Satellite imagery analysis\n   - Land use classification\n   - Connectivity corridor identification\n   - Protected area proximity\n\n3. **Literature Review**\n   - Peer-reviewed research\n   - Environmental impact studies\n   - Best practices guidelines\n   - Mitigation case studies\n\n### Field Assessment Methodology\n\n#### Bird Surveys\n**Breeding Season (March-July)**\n- **Point Counts**: 5-minute observations at 200m intervals\n- **Transect Surveys**: 1km linear transects, dawn and dusk\n- **Nest Monitoring**: Weekly checks for active nests\n- **Recording**: Species, abundance, behavior, flight paths\n\n**Migration Periods (August-November, February-May)**\n- **Radar Monitoring**: Continuous 24-hour tracking\n- **Visual Observations**: Peak migration times\n- **Weather Correlation**: Wind patterns and migration intensity\n- **Collision Risk Assessment**: Flight height analysis\n\n#### Mammal Surveys\n- **Camera Trapping**: 30-day deployment periods\n- **Track Stations**: Sand plots for footprint recording\n- **Acoustic Monitoring**: Bat detectors for ultrasonic calls\n- **Scat Analysis**: Diet and presence confirmation\n\n#### Vegetation Assessment\n- **Quadrat Sampling**: 1m² plots every 50m\n- **Rare Species Search**: Targeted surveys for protected plants\n- **Invasive Species Mapping**: Distribution and density\n- **Phenology Monitoring**: Flowering and fruiting timing\n\n### Impact Assessment Framework\n\n#### Direct Impacts\n- **Habitat Loss**: Permanent footprint calculation\n- **Mortality Risk**: Collision probability models\n- **Disturbance Zones**: Noise and visual impact radii\n- **Fragmentation**: Connectivity analysis\n\n#### Indirect Impacts\n- **Edge Effects**: Microclimate changes\n- **Predator Relationships**: Food web alterations\n- **Pollination Networks**: Plant-pollinator disruption\n- **Cumulative Effects**: Regional development pressure\n\n### Mitigation Hierarchy\n\n1. **Avoidance**\n   - Site selection optimization\n   - Seasonal timing restrictions\n   - Buffer zones around sensitive areas\n   - Technology modifications\n\n2. **Minimization**\n   - Reduced infrastructure footprint\n   - Wildlife-friendly design features\n   - Operational curtailment during peak activity\n   - Restoration of temporary disturbance\n\n3. **Compensation**\n   - Habitat creation elsewhere\n   - Species translocation programs\n   - Conservation fund contributions\n   - Long-term monitoring commitments\n\n### Monitoring Requirements\n\n#### Construction Phase\n- **Daily monitoring** during sensitive periods\n- **Incident reporting** within 24 hours\n- **Adaptive management** protocol activation\n- **Compliance verification** weekly\n\n#### Operational Phase\n- **Annual surveys** for first 5 years\n- **Bi-annual surveys** thereafter\n- **Mortality monitoring** weekly searches\n- **Effectiveness assessment** of mitigation measures\n\n### Stakeholder Engagement\n\n#### Key Stakeholders\n- **Conservation Organizations**: Local and national NGOs\n- **Research Institutions**: Universities and government agencies\n- **Local Communities**: Traditional ecological knowledge\n- **Regulatory Bodies**: Permitting and compliance authorities\n\n#### Engagement Methods\n- **Expert Workshops**: Technical review sessions\n- **Public Meetings**: Community information sharing\n- **Citizen Science**: Volunteer monitoring programs\n- **Advisory Committees**: Ongoing consultation groups\n\n### Reporting Standards\n\n#### Technical Reports\n- **Methodology**: Detailed protocols and justification\n- **Results**: Statistical analysis and interpretation\n- **Impact Assessment**: Quantified risk calculations\n- **Mitigation Plan**: Specific, measurable commitments\n- **Monitoring Program**: Long-term surveillance strategy\n\n#### Regulatory Submissions\n- **Environmental Impact Statement**: Comprehensive assessment\n- **Species-specific Studies**: Detailed analysis for protected species\n- **Mitigation Banking**: Offset calculations and agreements\n- **Adaptive Management Plan**: Response triggers and protocols\n\n---\n*Compliance Standards: EU Birds Directive, Habitats Directive, National Environmental Policy Act*\n*Last Updated: January 17, 2024*",
+      "tags": ["biodiversity", "environmental-assessment", "renewable-energy", "protocols"],
+      "linkedTasks": ["task-biodiversity-assessment", "task-stakeholder-workshop"],
+      "linkedNotes": [],
+      "linkedProjects": ["renewable-energy-assessments"],
+      "pinned": true,
+      "archived": false,
+      "createdAt": "2024-01-08T09:30:00.000Z",
+      "updatedAt": "2024-01-17T16:15:00.000Z",
+      "metadata": {
+        "wordCount": 645,
+        "readingTime": 4,
+        "linkPreviews": []
+      }
+    }
+  ],
+  "taskBoards": [
+    {
+      "id": "board-sustainable-farming",
+      "name": "Sustainable Farming Bavaria",
+      "description": "Regional sustainable agriculture transition project focusing on soil health, organic certification, and climate adaptation",
+      "groupingMode": "projects",
+      "columns": [
+        {
+          "id": "sf-analysis",
+          "title": "Analysis Phase",
+          "color": "#3b82f6",
+          "order": 0,
+          "groupValue": "sustainable-farming-bavaria"
+        },
+        {
+          "id": "sf-planning",
+          "title": "Planning & Strategy",
+          "color": "#f59e0b",
+          "order": 1,
+          "groupValue": "sustainable-farming-bavaria"
+        },
+        {
+          "id": "sf-active",
+          "title": "Active Implementation",
+          "color": "#10b981",
+          "order": 2,
+          "groupValue": "sustainable-farming-bavaria"
+        },
+        {
+          "id": "sf-implementation",
+          "title": "Field Implementation",
+          "color": "#8b5cf6",
+          "order": 3,
+          "groupValue": "sustainable-farming-bavaria"
+        },
+        {
+          "id": "sf-completed",
+          "title": "Completed",
+          "color": "#06b6d4",
+          "order": 4,
+          "groupValue": "sustainable-farming-bavaria"
+        }
+      ],
+      "isDefault": false,
+      "createdAt": "2024-01-08T10:00:00.000Z",
+      "updatedAt": "2024-01-17T12:00:00.000Z"
+    },
+    {
+      "id": "board-renewable-energy",
+      "name": "Renewable Energy Assessments",
+      "description": "Environmental impact assessments and biodiversity studies for renewable energy infrastructure projects",
+      "groupingMode": "projects",
+      "columns": [
+        {
+          "id": "re-planning",
+          "title": "Project Planning",
+          "color": "#6366f1",
+          "order": 0,
+          "groupValue": "renewable-energy-assessments"
+        },
+        {
+          "id": "re-active",
+          "title": "Active Assessment",
+          "color": "#f59e0b",
+          "order": 1,
+          "groupValue": "renewable-energy-assessments"
+        },
+        {
+          "id": "re-monitoring",
+          "title": "Monitoring Phase",
+          "color": "#10b981",
+          "order": 2,
+          "groupValue": "renewable-energy-assessments"
+        },
+        {
+          "id": "re-completed",
+          "title": "Completed Projects",
+          "color": "#06b6d4",
+          "order": 3,
+          "groupValue": "renewable-energy-assessments"
+        }
+      ],
+      "isDefault": false,
+      "createdAt": "2024-01-08T10:30:00.000Z",
+      "updatedAt": "2024-01-17T14:00:00.000Z"
+    }
+  ],
+  "columns": [
+    {
+      "id": "sustainable-farming-bavaria",
+      "title": "Nachhaltige Landwirtschaft Bayern",
+      "type": "project",
+      "order": 0,
+      "tasks": []
+    },
+    {
+      "id": "renewable-energy-assessments", 
+      "title": "Renewable Energy Assessments",
+      "type": "project",
+      "order": 1,
+      "tasks": []
+    },
+    {
+      "id": "date-2024-01-18",
+      "title": "Heute",
+      "type": "date",
+      "date": "2024-01-18",
+      "order": 2,
+      "tasks": []
+    },
+    {
+      "id": "date-2024-01-19",
+      "title": "Morgen",
+      "type": "date",
+      "date": "2024-01-19",
+      "order": 3,
+      "tasks": []
+    },
+    {
+      "id": "date-2024-01-20",
+      "title": "Übermorgen",
+      "type": "date",
+      "date": "2024-01-20",
+      "order": 4,
+      "tasks": []
+    },
+    {
+      "id": "inbox",
+      "title": "Inbox",
+      "type": "general",
+      "order": 5,
+      "tasks": []
+    },
+    {
+      "id": "date-2024-01-17",
+      "title": "Gestern",
+      "type": "date",
+      "date": "2024-01-17",
+      "order": 6,
+      "tasks": []
+    }
+  ],
+  "projectKanbanColumns": [
+    {
+      "id": "sf-analysis",
+      "title": "Analysis Phase",
+      "color": "#3b82f6",
+      "order": 0,
+      "projectId": "sustainable-farming-bavaria"
+    },
+    {
+      "id": "sf-planning",
+      "title": "Planning & Strategy",
+      "color": "#f59e0b",
+      "order": 1,
+      "projectId": "sustainable-farming-bavaria"
+    },
+    {
+      "id": "sf-active",
+      "title": "Active Implementation",
+      "color": "#10b981",
+      "order": 2,
+      "projectId": "sustainable-farming-bavaria"
+    },
+    {
+      "id": "sf-implementation",
+      "title": "Field Implementation",
+      "color": "#8b5cf6",
+      "order": 3,
+      "projectId": "sustainable-farming-bavaria"
+    },
+    {
+      "id": "sf-completed",
+      "title": "Completed",
+      "color": "#06b6d4",
+      "order": 4,
+      "projectId": "sustainable-farming-bavaria"
+    },
+    {
+      "id": "re-planning",
+      "title": "Project Planning",
+      "color": "#6366f1",
+      "order": 0,
+      "projectId": "renewable-energy-assessments"
+    },
+    {
+      "id": "re-active",
+      "title": "Active Assessment",
+      "color": "#f59e0b",
+      "order": 1,
+      "projectId": "renewable-energy-assessments"
+    },
+    {
+      "id": "re-monitoring",
+      "title": "Monitoring Phase",
+      "color": "#10b981",
+      "order": 2,
+      "projectId": "renewable-energy-assessments"
+    },
+    {
+      "id": "re-completed",
+      "title": "Completed Projects",
+      "color": "#06b6d4",
+      "order": 3,
+      "projectId": "renewable-energy-assessments"
+    }
+  ],
+  "viewState": {
+    "projectKanban": {
+      "selectedProjectId": "sustainable-farming-bavaria",
+      "columns": [
+        {
+          "id": "sf-analysis",
+          "title": "Analysis Phase",
+          "color": "#3b82f6",
+          "order": 0,
+          "projectId": "sustainable-farming-bavaria"
+        },
+        {
+          "id": "sf-planning",
+          "title": "Planning & Strategy", 
+          "color": "#f59e0b",
+          "order": 1,
+          "projectId": "sustainable-farming-bavaria"
+        },
+        {
+          "id": "sf-active",
+          "title": "Active Implementation",
+          "color": "#10b981",
+          "order": 2,
+          "projectId": "sustainable-farming-bavaria"
+        },
+        {
+          "id": "sf-implementation",
+          "title": "Field Implementation",
+          "color": "#8b5cf6",
+          "order": 3,
+          "projectId": "sustainable-farming-bavaria"
+        },
+        {
+          "id": "sf-completed",
+          "title": "Completed",
+          "color": "#06b6d4",
+          "order": 4,
+          "projectId": "sustainable-farming-bavaria"
+        },
+        {
+          "id": "re-planning",
+          "title": "Project Planning",
+          "color": "#6366f1",
+          "order": 0,
+          "projectId": "renewable-energy-assessments"
+        },
+        {
+          "id": "re-active",
+          "title": "Active Assessment",
+          "color": "#f59e0b",
+          "order": 1,
+          "projectId": "renewable-energy-assessments"
+        },
+        {
+          "id": "re-monitoring",
+          "title": "Monitoring Phase",
+          "color": "#10b981",
+          "order": 2,
+          "projectId": "renewable-energy-assessments"
+        },
+        {
+          "id": "re-completed",
+          "title": "Completed Projects",
+          "color": "#06b6d4",
+          "order": 3,
+          "projectId": "renewable-energy-assessments"
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "totalTasks": 10,
+    "totalNotes": 2,
+    "totalTags": 45,
+    "totalBoards": 2,
+    "dataSize": 28500,
+    "exportTime": 1705496400000,
+    "totalArchivedTasks": 0,
+    "totalDailyNotes": 0,
+    "totalColumns": 9,
+    "totalNoteLinks": 2,
+    "totalImages": 0,
+    "totalNotifications": 0
+  },
+  "exportDate": "2024-01-17T18:00:00.000Z",
+  "version": "2.0"
+} 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

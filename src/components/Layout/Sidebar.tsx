@@ -1,0 +1,652 @@
+import React, { useState, useEffect, memo, useMemo, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
+import { useDroppable } from '@dnd-kit/core';
+import { 
+  Home,
+  Tag,
+  Archive,
+  BarChart3,
+  Sparkles,
+  Columns,
+  Inbox,
+  FileText,
+  Sun,
+  CheckSquare,
+  Trophy,
+  Target,
+  ClipboardList,
+  RefreshCw,
+  StickyNote,
+  Pin,
+  Download,
+  User,
+  MoreHorizontal
+} from 'lucide-react';
+import { useApp } from '../../context/AppContext';
+import { EndOfDayModal } from '../Common/EndOfDayModal';
+import { PlannerAssignmentModal } from '../Common/PlannerAssignmentModal';
+import { Task } from '../../types';
+
+
+interface SidebarProps {
+  activeView: string;
+  onViewChange: (view: string) => void;
+}
+
+export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: SidebarProps) {
+  const { t } = useTranslation();
+  const { state, dispatch } = useApp();
+  const [showEndOfDayModal, setShowEndOfDayModal] = useState(false);
+  const [showPlannerModal, setShowPlannerModal] = useState(false);
+  const [draggedTask, setDraggedTask] = useState<Task | null>(null);
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false);
+  const [assignedTask, setAssignedTask] = useState<Task | null>(null);
+  const [showPlannerUserMenu, setShowPlannerUserMenu] = useState(false);
+  const userButtonRef = useRef<HTMLButtonElement | null>(null);
+  const [userMenuPos, setUserMenuPos] = useState<{ left: number; top: number }>({ left: 0, top: 0 });
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const moreButtonRef = useRef<HTMLButtonElement | null>(null);
+  const [moreMenuPos, setMoreMenuPos] = useState<{ left: number; top: number }>({ left: 0, top: 0 });
+  
+  // Detect if running in Electron
+  const isElectron = !!(window as any).require;
+  
+  // Use correct logo path for Electron vs Web
+  const logoPath = isElectron ? 'foxiconsb.svg' : '/foxiconsb.svg';
+
+  const handleTasksClick = useCallback(() => {
+    onViewChange('tasks');
+    dispatch({ type: 'NAVIGATE_DATE', payload: 'today' });
+  }, [onViewChange, dispatch]);
+
+  // Drop target for planner
+  const {
+    setNodeRef: setPlannerDropRef,
+    isOver: isPlannerDropActive,
+  } = useDroppable({
+    id: 'planner-drop-zone',
+    data: {
+      type: 'planner-assignment',
+    },
+  });
+
+  const handlePlannerDrop = (task: Task) => {
+    setDraggedTask(task);
+    setShowPlannerModal(true);
+  };
+
+  // Auto-close sidebar menus on outside click and on view change
+  useEffect(() => {
+    const closeAllMenus = () => {
+      setShowPlannerUserMenu(false);
+      setShowMoreMenu(false);
+    };
+    document.addEventListener('mousedown', closeAllMenus);
+    window.addEventListener('resize', closeAllMenus);
+    return () => {
+      document.removeEventListener('mousedown', closeAllMenus);
+      window.removeEventListener('resize', closeAllMenus);
+    };
+  }, []);
+
+  useEffect(() => {
+    // Close menus when navigating to another view
+    setShowPlannerUserMenu(false);
+    setShowMoreMenu(false);
+  }, [activeView]);
+
+  // Listen for planner assignment events from drag & drop
+  useEffect(() => {
+    const handlePlannerAssignment = (event: any) => {
+      if (event.detail && event.detail.task) {
+        handlePlannerDrop(event.detail.task);
+      }
+    };
+
+    window.addEventListener('plannerAssignment', handlePlannerAssignment);
+    return () => {
+      window.removeEventListener('plannerAssignment', handlePlannerAssignment);
+    };
+  }, []);
+
+  const handleDateAssignment = (dateString: string) => {
+    if (draggedTask) {
+      dispatch({
+        type: 'UPDATE_TASK',
+        payload: {
+          ...draggedTask,
+          dueDate: dateString,
+          updatedAt: new Date().toISOString(),
+        },
+      });
+      
+      // Store assigned task for notification
+      setAssignedTask(draggedTask);
+      
+      // Show success notification
+      setShowSuccessNotification(true);
+      setTimeout(() => {
+        setShowSuccessNotification(false);
+        setAssignedTask(null);
+      }, 3000);
+      
+      setDraggedTask(null);
+    }
+  };
+
+  // JSON Export function - IDENTISCH zu Settings.tsx
+  const handleJsonExport = useCallback(() => {
+    const dataToExport = {
+      // Aufgaben und Archiv
+      tasks: state.tasks,
+      archivedTasks: state.archivedTasks,
+      
+      // Strukturen
+      columns: state.columns,
+      tags: state.tags,
+      kanbanBoards: state.kanbanBoards,
+      
+      // 🎯 PIN SYSTEM - NEU!
+      pinColumns: state.pinColumns,
+      
+      // Notizen (inkl. Daily Notes & Emails)
+      notes: state.notes.notes,
+      noteLinks: state.noteLinks,
+      notesViewState: {
+        selectedNote: state.notes.selectedNote,
+        isEditing: state.notes.isEditing,
+        searchQuery: state.notes.searchQuery,
+        selectedTags: state.notes.selectedTags,
+        view: state.notes.view,
+        sortBy: state.notes.sortBy,
+        sortOrder: state.notes.sortOrder,
+        showArchived: state.notes.showArchived,
+        showLinkPreviews: state.notes.showLinkPreviews,
+        editorMode: state.notes.editorMode,
+        dailyNotesMode: state.notes.dailyNotesMode,
+        emailMode: state.notes.emailMode, // 📧 E-MAIL MODUS - NEU!
+        selectedDailyNoteDate: state.notes.selectedDailyNoteDate,
+      },
+      
+      // Einstellungen und Ansichten
+      preferences: state.preferences,
+      viewState: state.viewState,
+      // 📋 Projekt-Kanban-Spalten explizit exportieren für Rückwärtskompatibilität
+      projectKanbanColumns: state.viewState.projectKanban.columns,
+      projectKanbanState: state.viewState.projectKanban,
+      
+      // Kalender-Daten (iCal-Einstellungen)
+      events: state.events,
+      calendarSources: state.calendarSources,
+      
+      // Bilder-Speicher
+      imageStorage: state.imageStorage,
+      
+      // Zusätzliche Daten
+      searchQuery: state.searchQuery,
+      activeTagFilters: state.activeTagFilters,
+      activePriorityFilters: state.activePriorityFilters,
+      focusMode: state.focusMode,
+      focusedColumnId: state.focusedColumnId,
+      showCompletedTasks: state.showCompletedTasks,
+      projectColumnOffset: state.projectColumnOffset,
+      notifications: state.notifications,
+      
+      // Timer-Status
+      activeTimer: state.activeTimer,
+      
+      // Datum und Ansichtsstatus
+      currentDate: state.currentDate.toISOString(),
+      isNoteEditorFullScreen: state.isNoteEditorFullScreen,
+      
+      // Wiederholungsregeln
+      recurrence: state.recurrence,
+      
+      // 🕒 Zeitbudget-Features
+      personalCapacity: state.personalCapacity,
+      
+      // Metadaten
+      exportDate: new Date().toISOString(),
+      version: '2.3', // ✨ Vollständiger Export mit Zeitbudget-Features
+      metadata: {
+        totalTasks: state.tasks.length,
+        totalArchivedTasks: state.archivedTasks.length,
+        totalNotes: state.notes.notes.length,
+        totalDailyNotes: state.notes.notes.filter(note => note.dailyNote).length,
+        totalEmailNotes: state.notes.notes.filter(note => note.metadata?.emailMetadata).length, // 📧 E-MAIL STATISTIK
+        totalTags: state.tags.length,
+        totalBoards: state.kanbanBoards.length,
+        totalColumns: state.columns.length,
+        totalPinColumns: state.pinColumns.length, // 🎯 PIN STATISTIK
+        totalNoteLinks: state.noteLinks.length,
+        totalImages: state.imageStorage.images.length,
+        totalNotifications: state.notifications.length,
+        totalEvents: state.events.length,
+        totalCalendarSources: state.calendarSources.length,
+        hasActiveTimer: !!state.activeTimer,
+        // 🕒 Zeitbudget-Metadaten
+        hasPersonalCapacity: !!state.personalCapacity,
+        projectsWithTimebudgets: state.columns.filter(col => col.type === 'project' && col.timebudget).length,
+        appVersion: '2.3', // ✨ App-Version mit Zeitbudget-Features
+        dataSize: 0, // Wird unten berechnet
+        exportTime: Date.now()
+      }
+    };
+    
+    // Datengröße berechnen
+    const jsonString = JSON.stringify(dataToExport, null, 2);
+    dataToExport.metadata.dataSize = jsonString.length;
+    
+    // Finaler Export-String
+    const finalContent = JSON.stringify(dataToExport, null, 2);
+    const blob = new Blob([finalContent], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `taskfuchs-vollstaendig-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }, [state]);
+
+  const allNavigationItems = useMemo(() => [
+    {
+      id: 'today',
+      label: t('navigation.today'),
+      icon: Home,
+      active: activeView === 'today',
+      onClick: () => onViewChange('today')
+    },
+    // Focus entry removed from sidebar
+    {
+      id: 'review',
+      label: t('navigation.review'),
+      icon: ClipboardList,
+      active: activeView === 'review',
+      onClick: () => onViewChange('review')
+    },
+    {
+      id: 'inbox',
+      label: t('navigation.inbox'),
+      icon: Inbox,
+      active: activeView === 'inbox',
+      onClick: () => onViewChange('inbox')
+    },
+    {
+      id: 'tasks',
+      label: t('navigation.planner'),
+      icon: CheckSquare,
+      active: activeView === 'tasks',
+      onClick: handleTasksClick,
+      dropTarget: true,
+      dropRef: setPlannerDropRef,
+      isDropActive: isPlannerDropActive
+    },
+    {
+      id: 'kanban',
+      label: t('navigation.projects'),
+      icon: Columns,
+      active: activeView === 'kanban',
+      onClick: () => onViewChange('kanban')
+    },
+    {
+      id: 'pins',
+      label: t('navigation.pins'),
+      icon: Pin,
+      active: activeView === 'pins',
+      onClick: () => onViewChange('pins')
+    },
+    {
+      id: 'notes',
+      label: t('navigation.notes'),
+      icon: StickyNote,
+      active: activeView === 'notes',
+      onClick: () => onViewChange('notes')
+    },
+    {
+      id: 'series',
+      label: t('navigation.series'),
+      icon: RefreshCw,
+      active: activeView === 'series',
+      onClick: () => onViewChange('series')
+    },
+    {
+      id: 'tags',
+      label: t('navigation.tags'),
+      icon: Tag,
+      active: activeView === 'tags',
+      onClick: () => onViewChange('tags')
+    },
+    {
+      id: 'statistics',
+      label: t('navigation.reports'),
+      icon: BarChart3,
+      active: activeView === 'statistics',
+      onClick: () => onViewChange('statistics')
+    },
+    {
+      id: 'archive',
+      label: t('navigation.archive'),
+      icon: Archive,
+      active: activeView === 'archive',
+      onClick: () => onViewChange('archive')
+    }
+  ], [activeView, onViewChange, t, handleTasksClick, isPlannerDropActive]);
+
+  // Filter and order navigation items based on preferences
+  const navigationItems = (() => {
+    const hiddenItems = state.preferences.sidebar?.hiddenItems || [];
+    const itemOrder = state.preferences.sidebar?.itemOrder || [];
+    
+    // Create ordered list based on preferences
+    const orderedItems = itemOrder
+      .map(id => allNavigationItems.find(item => item.id === id))
+      .filter(item => item && !hiddenItems.includes(item.id))
+      .filter(Boolean);
+    
+    // Add any items not in the order list (for backwards compatibility)
+    const remainingItems = allNavigationItems.filter(item => 
+      !itemOrder.includes(item.id) && !hiddenItems.includes(item.id)
+    );
+    
+    return [...orderedItems, ...remainingItems];
+  })();
+
+  // Define overflow into "Mehr" menu from preferences (fallback to defaults)
+  const preferredMoreIds = state.preferences.sidebar?.moreItems || ['series', 'review', 'archive', 'tags', 'statistics'];
+  const overflowNavItems = navigationItems.filter(item => preferredMoreIds.includes(item.id));
+  const baseNavItems = navigationItems.filter(item => !preferredMoreIds.includes(item.id));
+
+  // Get glass effect classes and minimal design state
+  const isMinimalDesign = state.preferences.minimalDesign;
+  const glassEffectEnabled = !isMinimalDesign; // Always enable glass when not minimal
+  
+  const glassClasses = isMinimalDesign
+    ? "border-r border-gray-200 dark:border-gray-800"
+    : "backdrop-blur-md bg-black/60 border-white/10";
+  
+  const sidebarStyle = isMinimalDesign
+    ? document.documentElement.classList.contains('dark')
+      ? { backgroundColor: '#111827' }
+      : { backgroundColor: '#1c1f23' }
+    : {};
+
+  // Create exact accent color logo using CSS mask technique
+  const getLogoMaskStyle = (accentColor: string) => {
+    return {
+      maskImage: `url(${logoPath})`,
+      WebkitMaskImage: `url(${logoPath})`,
+      maskSize: 'contain',
+      WebkitMaskSize: 'contain',
+      maskRepeat: 'no-repeat',
+      WebkitMaskRepeat: 'no-repeat',
+      maskPosition: 'center',
+      WebkitMaskPosition: 'center',
+      backgroundColor: accentColor,
+      width: '48px',
+      height: '48px'
+    };
+  };
+
+
+
+  return (
+    <>
+      <div className={`sidebar ${glassClasses} flex flex-col relative z-30 sidebar-container w-20 sidebar-slide-in smooth-scroll`} style={{...sidebarStyle, textRendering: 'optimizeLegibility', WebkitFontSmoothing: 'antialiased', MozOsxFontSmoothing: 'grayscale', transform: 'translateZ(0)'}}>
+        {/* Logo */}
+        <div 
+          className={`${glassEffectEnabled ? 'border-b border-white/20' : 'border-b border-gray-800'} flex items-center justify-center sidebar-content relative`}
+          style={{ 
+            height: '68px',
+            minHeight: '68px',
+            maxHeight: '68px',
+            boxSizing: 'border-box'
+          }}
+        >
+          <button
+            ref={userButtonRef}
+            onClick={() => {
+              setShowPlannerUserMenu(prev => {
+                const willOpen = !prev;
+                if (willOpen && userButtonRef.current) {
+                  const rect = userButtonRef.current.getBoundingClientRect();
+                  setUserMenuPos({ left: rect.left + 8, top: rect.bottom + 8 });
+                }
+                return willOpen;
+              });
+            }}
+            className="w-14 h-14 rounded-lg flex items-center justify-center hover:scale-105 transition-transform"
+            title={t('header.settings')}
+          >
+            <User className="w-6 h-6 text-white" />
+          </button>
+
+          {showPlannerUserMenu && createPortal(
+            <div
+              className="fixed w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl"
+              style={{ left: userMenuPos.left, top: userMenuPos.top, zIndex: 100000 }}
+              onMouseDown={(e) => e.stopPropagation()}
+            >
+              <div className="py-2">
+                <button
+                  onClick={() => {
+                    window.dispatchEvent(new CustomEvent('navigate-to-settings'));
+                    setShowPlannerUserMenu(false);
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  {t('header.settings')}
+                </button>
+                <button
+                  onClick={() => {
+                    window.dispatchEvent(new CustomEvent('open-user-guide'));
+                    setShowPlannerUserMenu(false);
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  {t('header.user_guide')}
+                </button>
+                <button
+                  onClick={() => {
+                    window.dispatchEvent(new CustomEvent('start-onboarding'));
+                    setShowPlannerUserMenu(false);
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  {t('header.onboarding_tour')}
+                </button>
+              </div>
+            </div>,
+            document.body
+          )}
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 sidebar-content py-4 px-2 overflow-y-auto">
+          <div className="space-y-2">
+            {baseNavItems.map((item, index) => {
+              const Icon = item.icon;
+              const isActive = item.active;
+              const isDropTarget = item.dropTarget;
+              const isDropActive = item.isDropActive;
+              
+              return (
+                <div key={item.id} className="relative group sidebar-nav-item">
+                  <button
+                    ref={isDropTarget ? item.dropRef : undefined}
+                    onClick={item.onClick}
+                    className={`w-full flex flex-col items-center justify-center rounded-lg text-xs font-medium sidebar-item py-3 px-1 gap-1 btn-hover smooth-transform transition-all duration-200 min-h-[60px] ${
+                      isActive
+                        ? 'bg-[var(--accent-color)] text-white active'
+                        : isMinimalDesign
+                          ? (document.documentElement.classList.contains('dark')
+                              ? 'text-gray-300 hover:bg-gray-900 hover:text-white'
+                              : 'text-gray-300 hover:bg-gray-800')
+                          : (glassEffectEnabled 
+                              ? 'text-gray-200 hover:bg-white/20' 
+                              : 'text-gray-300 hover:bg-gray-800')
+                    } ${
+                      isDropActive 
+                        ? 'transform scale-105 shadow-xl' 
+                        : ''
+                    }`}
+                    style={isDropActive ? {
+                      backgroundColor: `${state.preferences.accentColor}20`,
+                      boxShadow: `0 0 0 2px ${state.preferences.accentColor}`,
+                    } : {}}
+                  >
+                    <Icon className={`w-5 h-5 flex-shrink-0 transition-all duration-200 ${
+                      isDropActive ? 'animate-pulse' : ''
+                    }`} />
+                    <span className="text-xs leading-none text-center whitespace-nowrap">
+                      {item.label}
+                    </span>
+                    
+                    {/* Drop indicator */}
+                    {isDropActive && (
+                      <div 
+                        className="absolute inset-0 rounded-lg border-2 border-dashed animate-pulse"
+                        style={{ borderColor: state.preferences.accentColor }}
+                      />
+                    )}
+                  </button>
+                  
+                  {/* Drop zone tooltip */}
+                  {isDropActive && (
+                    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 z-50">
+                      <div 
+                        className="px-2 py-1 rounded text-xs text-white font-medium whitespace-nowrap shadow-lg"
+                        style={{ backgroundColor: state.preferences.accentColor }}
+                      >
+                        {t('actions.assign_task')}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+
+            {/* More menu entry aggregating overflow items */}
+            {overflowNavItems.length > 0 && (
+              <div className="relative group sidebar-nav-item">
+                <button
+                  ref={moreButtonRef}
+                  onClick={() => {
+                    setShowMoreMenu(prev => {
+                      const willOpen = !prev;
+                      if (willOpen && moreButtonRef.current) {
+                        const rect = moreButtonRef.current.getBoundingClientRect();
+                        setMoreMenuPos({ left: rect.left + 8, top: rect.bottom + 8 });
+                      }
+                      return willOpen;
+                    });
+                  }}
+                  className={`w-full flex flex-col items-center justify-center rounded-lg text-xs font-medium sidebar-item py-3 px-1 gap-1 btn-hover smooth-transform transition-all duration-200 min-h-[60px] ${
+                    isMinimalDesign
+                      ? (document.documentElement.classList.contains('dark')
+                          ? 'text-gray-300 hover:bg-gray-900 hover:text-white'
+                          : 'text-gray-300 hover:bg-gray-800')
+                      : (glassEffectEnabled 
+                          ? 'text-gray-200 hover:bg-white/20' 
+                          : 'text-gray-300 hover:bg-gray-800')
+                  }`}
+                >
+                  <MoreHorizontal className="w-5 h-5 flex-shrink-0" />
+                  <span className="text-xs leading-none text-center whitespace-nowrap">{t('common.more', { defaultValue: 'Mehr' })}</span>
+                </button>
+                {showMoreMenu && createPortal(
+                  <div className="fixed w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl" style={{ left: moreMenuPos.left, top: moreMenuPos.top, zIndex: 100000 }} onMouseDown={(e) => e.stopPropagation()}>
+                    <div className="py-2">
+                      {overflowNavItems.map((item) => (
+                        <button key={item.id} onClick={() => { item.onClick(); setShowMoreMenu(false); }} className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
+                          <item.icon className="w-4 h-4" />
+                          <span>{item.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>,
+                  document.body
+                )}
+              </div>
+            )}
+          </div>
+        </nav>
+
+        {/* JSON Export Button - Bottom of Sidebar */}
+        <div className="sidebar-content px-2 pb-4">
+          <button
+            onClick={handleJsonExport}
+            className={`w-full flex flex-col items-center justify-center rounded-lg text-xs font-medium sidebar-item py-3 px-1 gap-1 btn-hover smooth-transform transition-all duration-200 min-h-[60px] ${
+              isMinimalDesign
+                ? (document.documentElement.classList.contains('dark')
+                    ? 'text-gray-300 hover:bg-gray-900 hover:text-white'
+                    : 'text-gray-300 hover:bg-gray-800')
+                : (glassEffectEnabled 
+                    ? 'text-gray-200 hover:bg-white/20' 
+                    : 'text-gray-300 hover:bg-gray-800')
+            }`}
+            title="JSON-Export erstellen"
+          >
+            <Download className="w-5 h-5 flex-shrink-0 transition-all duration-200" />
+            <span className="text-xs leading-none text-center whitespace-nowrap">
+              Export
+            </span>
+          </button>
+        </div>
+
+      </div>
+
+
+
+      
+      {/* End-of-Day Modal */}
+      <EndOfDayModal 
+        isOpen={showEndOfDayModal}
+        onClose={() => setShowEndOfDayModal(false)}
+      />
+
+      {/* Planner Assignment Modal */}
+      <PlannerAssignmentModal
+        isOpen={showPlannerModal}
+        onClose={() => setShowPlannerModal(false)}
+        task={draggedTask}
+        onAssign={handleDateAssignment}
+      />
+
+      {/* Success Notification */}
+      {showSuccessNotification && (
+        <div className="fixed top-20 right-4 z-50">
+          <div 
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-4 border-l-4 assignment-success flex items-center space-x-3 min-w-[280px]"
+            style={{ borderLeftColor: state.preferences.accentColor }}
+          >
+            <div 
+              className="w-8 h-8 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: `${state.preferences.accentColor}20` }}
+            >
+              <svg 
+                className="w-5 h-5"
+                style={{ color: state.preferences.accentColor }}
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <div>
+              <p className="font-medium text-gray-900 dark:text-white text-sm">
+                {t('actions.task_assigned')}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {t('actions.task_assigned_to_planner', { title: assignedTask?.title })}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}); 

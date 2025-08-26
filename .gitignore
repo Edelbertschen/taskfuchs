@@ -1,0 +1,52 @@
+.vercel
+# Node / Vite
+node_modules/
+dist/
+dist-*/
+*.log
+*.log.*
+pnpm-lock.yaml
+
+# Electron
+dist-electron/
+*.dmg
+*.blockmap
+
+# OS/Editor
+.DS_Store
+.idea/
+.vscode/
+
+# Builds/archives
+*.zip
+*.tar.gz
+*.tgz
+*.exe
+*.AppImage
+*.deb
+*.rpm
+*.snap
+
+# Env
+.env
+.env.*
+
+# Backups & temp
+*.bak
+*.backup
+*.orig
+*.rej
+*.patch
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# iOS/Android (Capacitor)
+ios/App/Pods/
+ios/App/build/
+android/app/build/
+
+# Public demo files that don't belong in git
+public/windows.zip
+public/apple.zip

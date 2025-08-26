@@ -1,0 +1,26 @@
+@import '../../../../common';
+
+.wrapper {
+  position: relative;
+  padding: var(--s2);
+  border-radius: var(--card-border-radius);
+
+  background: var(--bg-lighter);
+}
+
+mat-form-field {
+  margin-bottom: var(--s);
+  width: 100%;
+}
+
+.row {
+  @include mq(xs) {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: var(--s);
+
+    > * {
+      width: 48%;
+    }
+  }
+}

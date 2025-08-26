@@ -1,0 +1,1130 @@
+{
+  "tasks": [
+    {
+      "id": "task-1",
+      "title": "Sprint Planning Meeting vorbereiten",
+      "description": "Agenda erstellen und User Stories priorisieren für Sprint 23",
+      "completed": false,
+      "priority": "high",
+      "estimatedTime": 45,
+      "trackedTime": 12,
+      "tags": ["meeting", "scrum", "urgent"],
+      "subtasks": [
+        {
+          "id": "subtask-1-1",
+          "title": "Agenda-Template aktualisieren",
+          "completed": true,
+          "estimatedTime": 15,
+          "trackedTime": 18,
+          "tags": [],
+          "createdAt": "2024-01-15T09:30:00.000Z",
+          "updatedAt": "2024-01-15T10:15:00.000Z"
+        },
+        {
+          "id": "subtask-1-2",
+          "title": "User Stories aus Backlog sammeln",
+          "completed": false,
+          "estimatedTime": 30,
+          "tags": ["backlog"],
+          "createdAt": "2024-01-15T09:30:00.000Z",
+          "updatedAt": "2024-01-15T11:20:00.000Z"
+        }
+      ],
+      "columnId": "project-development",
+      "projectId": "project-development",
+      "reminderDate": "2024-01-16",
+      "reminderTime": "08:30",
+      "position": 0,
+      "createdAt": "2024-01-15T09:30:00.000Z",
+      "updatedAt": "2024-01-16T08:15:00.000Z",
+      "linkedNotes": ["note-sprint-planning"],
+      "pinned": true
+    },
+    {
+      "id": "task-2",
+      "title": "Marketing-Kampagne Q1 2024 analysieren",
+      "description": "Detaillierte Analyse der Conversion-Rates und ROI der letzten Quartalskampagne. Besonders Social Media Performance und Google Ads Effektivität bewerten.",
+      "completed": false,
+      "priority": "medium",
+      "estimatedTime": 120,
+      "trackedTime": 75,
+      "tags": ["marketing", "analysis", "quarterly"],
+      "subtasks": [
+        {
+          "id": "subtask-2-1",
+          "title": "Google Analytics Daten exportieren",
+          "completed": true,
+          "estimatedTime": 20,
+          "trackedTime": 25,
+          "tags": ["analytics"],
+          "createdAt": "2024-01-14T14:00:00.000Z",
+          "updatedAt": "2024-01-15T09:45:00.000Z"
+        },
+        {
+          "id": "subtask-2-2",
+          "title": "Social Media Metriken sammeln",
+          "completed": true,
+          "estimatedTime": 30,
+          "trackedTime": 35,
+          "tags": ["social-media"],
+          "createdAt": "2024-01-14T14:00:00.000Z",
+          "updatedAt": "2024-01-15T11:20:00.000Z"
+        },
+        {
+          "id": "subtask-2-3",
+          "title": "ROI-Kalkulation erstellen",
+          "completed": false,
+          "estimatedTime": 70,
+          "tags": ["calculation", "roi"],
+          "createdAt": "2024-01-14T14:00:00.000Z",
+          "updatedAt": "2024-01-15T16:30:00.000Z"
+        }
+      ],
+      "columnId": "project-marketing",
+      "projectId": "project-marketing",
+      "reminderDate": "2024-01-16",
+      "reminderTime": "14:00",
+      "position": 1,
+      "createdAt": "2024-01-14T14:00:00.000Z",
+      "updatedAt": "2024-01-16T08:45:00.000Z",
+      "linkedNotes": ["note-marketing-analysis"],
+      "timerState": {
+        "isActive": false,
+        "isPaused": true,
+        "startTime": 1705401600000,
+        "pausedTime": 1705406100000,
+        "elapsedTime": 4500000,
+        "mode": "normal"
+      }
+    },
+    {
+      "id": "task-3",
+      "title": "Design System v2.0 dokumentieren",
+      "description": "Vollständige Dokumentation des neuen Design Systems mit Komponenten, Tokens und Guidelines",
+      "completed": false,
+      "priority": "medium",
+      "estimatedTime": 180,
+      "trackedTime": 95,
+      "tags": ["design", "documentation", "design-system"],
+      "subtasks": [
+        {
+          "id": "subtask-3-1",
+          "title": "Color Tokens definieren",
+          "completed": true,
+          "estimatedTime": 45,
+          "trackedTime": 52,
+          "tags": ["colors", "tokens"],
+          "createdAt": "2024-01-12T10:00:00.000Z",
+          "updatedAt": "2024-01-13T15:30:00.000Z"
+        },
+        {
+          "id": "subtask-3-2",
+          "title": "Typography Scale erstellen",
+          "completed": true,
+          "estimatedTime": 30,
+          "trackedTime": 28,
+          "tags": ["typography"],
+          "createdAt": "2024-01-12T10:00:00.000Z",
+          "updatedAt": "2024-01-14T11:45:00.000Z"
+        },
+        {
+          "id": "subtask-3-3",
+          "title": "Component Library dokumentieren",
+          "completed": false,
+          "estimatedTime": 105,
+          "trackedTime": 15,
+          "tags": ["components"],
+          "createdAt": "2024-01-12T10:00:00.000Z",
+          "updatedAt": "2024-01-15T14:20:00.000Z"
+        }
+      ],
+      "columnId": "project-design",
+      "projectId": "project-design",
+      "reminderDate": "2024-01-17",
+      "reminderTime": "09:00",
+      "position": 0,
+      "createdAt": "2024-01-12T10:00:00.000Z",
+      "updatedAt": "2024-01-15T14:20:00.000Z",
+      "linkedNotes": ["note-design-system"]
+    },
+    {
+      "id": "task-4",
+      "title": "Customer Support Ticket bearbeiten #4521",
+      "description": "Bug-Report bezüglich Login-Problem bei Multi-Factor-Authentication. Kunde kann sich seit Update nicht mehr einloggen.",
+      "completed": false,
+      "priority": "high",
+      "estimatedTime": 60,
+      "tags": ["support", "bug", "urgent", "auth"],
+      "subtasks": [],
+      "columnId": "date-2024-01-16",
+      "reminderDate": "2024-01-16",
+      "reminderTime": "10:00",
+      "position": 2,
+      "createdAt": "2024-01-16T07:45:00.000Z",
+      "updatedAt": "2024-01-16T07:45:00.000Z"
+    },
+    {
+      "id": "task-5",
+      "title": "Neue Mitarbeiterin Julia einarbeiten",
+      "description": "Onboarding-Prozess für Julia (Frontend Developer). Erste Woche Betreuung und Einführung in unsere Prozesse.",
+      "completed": false,
+      "priority": "medium",
+      "estimatedTime": 240,
+      "trackedTime": 85,
+      "tags": ["onboarding", "mentoring", "hr"],
+      "subtasks": [
+        {
+          "id": "subtask-5-1",
+          "title": "Arbeitsplatz vorbereiten",
+          "completed": true,
+          "estimatedTime": 30,
+          "trackedTime": 35,
+          "tags": ["setup"],
+          "createdAt": "2024-01-15T08:00:00.000Z",
+          "updatedAt": "2024-01-15T16:30:00.000Z"
+        },
+        {
+          "id": "subtask-5-2",
+          "title": "Zugänge und Accounts erstellen",
+          "completed": true,
+          "estimatedTime": 45,
+          "trackedTime": 50,
+          "tags": ["setup", "accounts"],
+          "createdAt": "2024-01-15T08:00:00.000Z",
+          "updatedAt": "2024-01-15T17:00:00.000Z"
+        },
+        {
+          "id": "subtask-5-3",
+          "title": "Code-Walkthrough planen",
+          "completed": false,
+          "estimatedTime": 90,
+          "tags": ["walkthrough"],
+          "createdAt": "2024-01-15T08:00:00.000Z",
+          "updatedAt": "2024-01-16T08:00:00.000Z"
+        },
+        {
+          "id": "subtask-5-4",
+          "title": "Erstes kleines Projekt zuweisen",
+          "completed": false,
+          "estimatedTime": 75,
+          "tags": ["project"],
+          "createdAt": "2024-01-15T08:00:00.000Z",
+          "updatedAt": "2024-01-16T08:00:00.000Z"
+        }
+      ],
+      "columnId": "project-hr",
+      "projectId": "project-hr",
+      "reminderDate": "2024-01-17",
+      "reminderTime": "09:30",
+      "position": 0,
+      "createdAt": "2024-01-15T08:00:00.000Z",
+      "updatedAt": "2024-01-16T08:30:00.000Z",
+      "linkedNotes": ["note-onboarding-julia"]
+    },
+    {
+      "id": "task-6",
+      "title": "Website Performance optimieren",
+      "description": "Core Web Vitals verbessern, besonders Largest Contentful Paint und Cumulative Layout Shift",
+      "completed": false,
+      "priority": "low",
+      "estimatedTime": 150,
+      "tags": ["performance", "web-vitals", "optimization"],
+      "subtasks": [
+        {
+          "id": "subtask-6-1",
+          "title": "Lighthouse Audit durchführen",
+          "completed": false,
+          "estimatedTime": 30,
+          "tags": ["audit"],
+          "createdAt": "2024-01-16T09:00:00.000Z",
+          "updatedAt": "2024-01-16T09:00:00.000Z"
+        },
+        {
+          "id": "subtask-6-2",
+          "title": "Bilder komprimieren und optimieren",
+          "completed": false,
+          "estimatedTime": 60,
+          "tags": ["images"],
+          "createdAt": "2024-01-16T09:00:00.000Z",
+          "updatedAt": "2024-01-16T09:00:00.000Z"
+        },
+        {
+          "id": "subtask-6-3",
+          "title": "Lazy Loading implementieren",
+          "completed": false,
+          "estimatedTime": 60,
+          "tags": ["lazy-loading"],
+          "createdAt": "2024-01-16T09:00:00.000Z",
+          "updatedAt": "2024-01-16T09:00:00.000Z"
+        }
+      ],
+      "columnId": "inbox",
+      "position": 0,
+      "createdAt": "2024-01-16T09:00:00.000Z",
+      "updatedAt": "2024-01-16T09:00:00.000Z"
+    },
+    {
+      "id": "task-7",
+      "title": "Monatsabschluss Buchhaltung",
+      "description": "Alle Belege sammeln, kategorisieren und an Steuerberaterin weiterleiten",
+      "completed": false,
+      "priority": "high",
+      "estimatedTime": 90,
+      "tags": ["accounting", "monthly", "taxes"],
+      "subtasks": [
+        {
+          "id": "subtask-7-1",
+          "title": "Eingangsrechnungen sammeln",
+          "completed": false,
+          "estimatedTime": 30,
+          "tags": ["invoices"],
+          "createdAt": "2024-01-16T10:00:00.000Z",
+          "updatedAt": "2024-01-16T10:00:00.000Z"
+        },
+        {
+          "id": "subtask-7-2",
+          "title": "Ausgangsrechnungen prüfen",
+          "completed": false,
+          "estimatedTime": 20,
+          "tags": ["invoices"],
+          "createdAt": "2024-01-16T10:00:00.000Z",
+          "updatedAt": "2024-01-16T10:00:00.000Z"
+        },
+        {
+          "id": "subtask-7-3",
+          "title": "Belege digitalisieren",
+          "completed": false,
+          "estimatedTime": 40,
+          "tags": ["digitalization"],
+          "createdAt": "2024-01-16T10:00:00.000Z",
+          "updatedAt": "2024-01-16T10:00:00.000Z"
+        }
+      ],
+      "columnId": "date-2024-01-17",
+      "reminderDate": "2024-01-31",
+      "reminderTime": "16:00",
+      "position": 0,
+      "createdAt": "2024-01-16T10:00:00.000Z",
+      "updatedAt": "2024-01-16T10:00:00.000Z"
+    },
+    {
+      "id": "task-8",
+      "title": "API Documentation überarbeiten",
+      "description": "OpenAPI Spec aktualisieren und interaktive Dokumentation mit Swagger erweitern",
+      "completed": false,
+      "priority": "medium",
+      "estimatedTime": 120,
+      "tags": ["documentation", "api", "swagger"],
+      "subtasks": [],
+      "columnId": "project-development",
+      "projectId": "project-development",
+      "position": 1,
+      "createdAt": "2024-01-14T13:00:00.000Z",
+      "updatedAt": "2024-01-16T10:30:00.000Z",
+      "linkedNotes": ["note-api-docs"]
+    },
+    {
+      "id": "task-9",
+      "title": "Team Retrospective moderieren",
+      "description": "Sprint Retrospective für das Development Team. Focus auf Prozessverbesserungen und Kommunikation.",
+      "completed": false,
+      "priority": "medium",
+      "estimatedTime": 60,
+      "tags": ["retrospective", "team", "agile"],
+      "subtasks": [],
+      "columnId": "date-2024-01-18",
+      "reminderDate": "2024-01-18",
+      "reminderTime": "15:00",
+      "position": 0,
+      "createdAt": "2024-01-16T11:00:00.000Z",
+      "updatedAt": "2024-01-16T11:00:00.000Z",
+      "linkedNotes": ["note-retrospective-prep"]
+    },
+    {
+      "id": "task-10",
+      "title": "Persönliche Weiterbildung: React Native",
+      "description": "Online-Kurs zu React Native absolvieren, um mobile App-Entwicklung zu lernen",
+      "completed": false,
+      "priority": "low",
+      "estimatedTime": 300,
+      "trackedTime": 145,
+      "tags": ["learning", "react-native", "personal"],
+      "subtasks": [
+        {
+          "id": "subtask-10-1",
+          "title": "Grundlagen-Module absolvieren",
+          "completed": true,
+          "estimatedTime": 120,
+          "trackedTime": 125,
+          "tags": ["basics"],
+          "createdAt": "2024-01-10T18:00:00.000Z",
+          "updatedAt": "2024-01-14T20:30:00.000Z"
+        },
+        {
+          "id": "subtask-10-2",
+          "title": "Navigation-Tutorial",
+          "completed": false,
+          "estimatedTime": 90,
+          "trackedTime": 20,
+          "tags": ["navigation"],
+          "createdAt": "2024-01-10T18:00:00.000Z",
+          "updatedAt": "2024-01-15T19:15:00.000Z"
+        },
+        {
+          "id": "subtask-10-3",
+          "title": "Praktisches Projekt umsetzen",
+          "completed": false,
+          "estimatedTime": 90,
+          "tags": ["project"],
+          "createdAt": "2024-01-10T18:00:00.000Z",
+          "updatedAt": "2024-01-15T19:15:00.000Z"
+        }
+      ],
+      "columnId": "inbox",
+      "position": 1,
+      "createdAt": "2024-01-10T18:00:00.000Z",
+      "updatedAt": "2024-01-15T19:15:00.000Z"
+    },
+    {
+      "id": "task-completed-1",
+      "title": "Kundenpräsentation Q4 Ergebnisse",
+      "description": "Präsentation der Quartalsergebnisse vor dem Vorstand und wichtigen Kunden",
+      "completed": true,
+      "priority": "high",
+      "estimatedTime": 90,
+      "trackedTime": 105,
+      "tags": ["presentation", "quarterly", "clients"],
+      "subtasks": [
+        {
+          "id": "subtask-completed-1-1",
+          "title": "Slides erstellen",
+          "completed": true,
+          "estimatedTime": 60,
+          "trackedTime": 75,
+          "tags": ["slides"],
+          "createdAt": "2024-01-12T09:00:00.000Z",
+          "updatedAt": "2024-01-14T17:30:00.000Z"
+        },
+        {
+          "id": "subtask-completed-1-2",
+          "title": "Präsentation proben",
+          "completed": true,
+          "estimatedTime": 30,
+          "trackedTime": 30,
+          "tags": ["practice"],
+          "createdAt": "2024-01-12T09:00:00.000Z",
+          "updatedAt": "2024-01-15T11:00:00.000Z"
+        }
+      ],
+      "columnId": "date-2024-01-15",
+      "completedAt": "2024-01-15T16:30:00.000Z",
+      "position": 99,
+      "createdAt": "2024-01-12T09:00:00.000Z",
+      "updatedAt": "2024-01-15T16:30:00.000Z",
+      "linkedNotes": ["note-quarterly-results"],
+      "actualTime": 105
+    },
+    {
+      "id": "task-completed-2",
+      "title": "Security Audit durchführen",
+      "description": "Sicherheitsüberprüfung aller kritischen Systeme und Zugänge",
+      "completed": true,
+      "priority": "high",
+      "estimatedTime": 180,
+      "trackedTime": 195,
+      "tags": ["security", "audit", "systems"],
+      "subtasks": [
+        {
+          "id": "subtask-completed-2-1",
+          "title": "Penetration Test",
+          "completed": true,
+          "estimatedTime": 120,
+          "trackedTime": 135,
+          "tags": ["pentest"],
+          "createdAt": "2024-01-11T08:00:00.000Z",
+          "updatedAt": "2024-01-13T17:00:00.000Z"
+        },
+        {
+          "id": "subtask-completed-2-2",
+          "title": "Audit-Report erstellen",
+          "completed": true,
+          "estimatedTime": 60,
+          "trackedTime": 60,
+          "tags": ["report"],
+          "createdAt": "2024-01-11T08:00:00.000Z",
+          "updatedAt": "2024-01-14T15:30:00.000Z"
+        }
+      ],
+      "columnId": "date-2024-01-14",
+      "completedAt": "2024-01-14T17:30:00.000Z",
+      "position": 99,
+      "createdAt": "2024-01-11T08:00:00.000Z",
+      "updatedAt": "2024-01-14T17:30:00.000Z",
+      "actualTime": 195
+    },
+    {
+      "id": "task-completed-3",
+      "title": "Newsletter Januar versenden",
+      "description": "Monatlichen Newsletter mit Produktupdates und Kundengeschichten erstellen und versenden",
+      "completed": true,
+      "priority": "medium",
+      "estimatedTime": 75,
+      "trackedTime": 80,
+      "tags": ["newsletter", "marketing", "monthly"],
+      "subtasks": [
+        {
+          "id": "subtask-completed-3-1",
+          "title": "Content sammeln",
+          "completed": true,
+          "estimatedTime": 30,
+          "trackedTime": 35,
+          "tags": ["content"],
+          "createdAt": "2024-01-13T10:00:00.000Z",
+          "updatedAt": "2024-01-14T12:00:00.000Z"
+        },
+        {
+          "id": "subtask-completed-3-2",
+          "title": "Design anpassen",
+          "completed": true,
+          "estimatedTime": 25,
+          "trackedTime": 25,
+          "tags": ["design"],
+          "createdAt": "2024-01-13T10:00:00.000Z",
+          "updatedAt": "2024-01-14T14:30:00.000Z"
+        },
+        {
+          "id": "subtask-completed-3-3",
+          "title": "Test-Versendung",
+          "completed": true,
+          "estimatedTime": 20,
+          "trackedTime": 20,
+          "tags": ["testing"],
+          "createdAt": "2024-01-13T10:00:00.000Z",
+          "updatedAt": "2024-01-15T09:00:00.000Z"
+        }
+      ],
+      "columnId": "date-2024-01-15",
+      "projectId": "project-marketing",
+      "completedAt": "2024-01-15T11:30:00.000Z",
+      "position": 99,
+      "createdAt": "2024-01-13T10:00:00.000Z",
+      "updatedAt": "2024-01-15T11:30:00.000Z",
+      "actualTime": 80
+    },
+    {
+      "id": "task-completed-4",
+      "title": "Code Review: Authentication System",
+      "description": "Review des neuen OAuth2-basierten Authentifizierungssystems",
+      "completed": true,
+      "priority": "high",
+      "estimatedTime": 60,
+      "trackedTime": 75,
+      "tags": ["code-review", "auth", "security"],
+      "subtasks": [],
+      "columnId": "date-2024-01-14",
+      "projectId": "project-development",
+      "completedAt": "2024-01-14T16:45:00.000Z",
+      "position": 99,
+      "createdAt": "2024-01-14T13:30:00.000Z",
+      "updatedAt": "2024-01-14T16:45:00.000Z",
+      "actualTime": 75
+    },
+    {
+      "id": "task-completed-5",
+      "title": "Team Meeting: Projektplanung Februar",
+      "description": "Planung der Entwicklungssprints für Februar mit dem gesamten Team",
+      "completed": true,
+      "priority": "medium",
+      "estimatedTime": 90,
+      "trackedTime": 85,
+      "tags": ["meeting", "planning", "team"],
+      "subtasks": [],
+      "columnId": "date-2024-01-13",
+      "completedAt": "2024-01-13T17:00:00.000Z",
+      "position": 99,
+      "createdAt": "2024-01-13T15:30:00.000Z",
+      "updatedAt": "2024-01-13T17:00:00.000Z",
+      "actualTime": 85
+    },
+    {
+      "id": "task-old-1",
+      "title": "Vergangene Aufgabe zum Testen",
+      "description": "Diese Aufgabe ist von gestern und sollte nach heute verschoben werden können",
+      "completed": false,
+      "priority": "medium",
+      "estimatedTime": 30,
+      "tags": ["test", "overdue"],
+      "subtasks": [],
+      "columnId": "date-2024-01-15",
+      "position": 0,
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "updatedAt": "2024-01-15T10:00:00.000Z"
+    },
+    {
+      "id": "task-today-1",
+      "title": "Heutige Aufgabe",
+      "description": "Eine einfache Aufgabe für heute ohne Projektzuordnung",
+      "completed": false,
+      "priority": "medium",
+      "estimatedTime": 45,
+      "tags": ["daily", "routine"],
+      "subtasks": [],
+      "columnId": "date-2024-01-16",
+      "position": 0,
+      "createdAt": "2024-01-16T08:00:00.000Z",
+      "updatedAt": "2024-01-16T08:00:00.000Z"
+    }
+  ],
+  "tags": [
+    { "id": "tag-1", "name": "urgent", "color": "#ef4444", "count": 3 },
+    { "id": "tag-2", "name": "meeting", "color": "#3b82f6", "count": 4 },
+    { "id": "tag-3", "name": "development", "color": "#10b981", "count": 6 },
+    { "id": "tag-4", "name": "marketing", "color": "#f59e0b", "count": 3 },
+    { "id": "tag-5", "name": "design", "color": "#8b5cf6", "count": 4 },
+    { "id": "tag-6", "name": "documentation", "color": "#6b7280", "count": 3 },
+    { "id": "tag-7", "name": "security", "color": "#dc2626", "count": 2 },
+    { "id": "tag-8", "name": "personal", "color": "#06b6d4", "count": 1 },
+    { "id": "tag-9", "name": "learning", "color": "#84cc16", "count": 1 },
+    { "id": "tag-10", "name": "monthly", "color": "#f97316", "count": 2 },
+    { "id": "tag-11", "name": "quarterly", "color": "#ec4899", "count": 2 },
+    { "id": "tag-12", "name": "team", "color": "#14b8a6", "count": 3 },
+    { "id": "tag-13", "name": "scrum", "color": "#a855f7", "count": 1 },
+    { "id": "tag-14", "name": "api", "color": "#059669", "count": 1 },
+    { "id": "tag-15", "name": "performance", "color": "#7c3aed", "count": 1 }
+  ],
+  "notes": [
+    {
+      "id": "note-sprint-planning",
+      "title": "Sprint Planning Notizen",
+      "content": "# Sprint 23 Planning\n\n## Ziele\n- User Authentication Feature finalisieren\n- Performance Optimierungen\n- Bug-Fixes aus letztem Sprint\n\n## User Stories\n### Hohe Priorität\n- [ ] OAuth2 Integration\n- [ ] Multi-Factor Authentication\n- [ ] Password Reset Flow\n\n### Mittlere Priorität\n- [ ] User Profile Management\n- [ ] Session Management\n\n## Teamkapazitäten\n- **Julia**: 32h (erste Woche, reduzierte Kapazität)\n- **Mike**: 40h\n- **Sarah**: 36h (Freitag frei)\n- **Alex**: 40h\n\n## Risiken\n- Externe API-Abhängigkeiten\n- Komplexität der MFA-Implementation\n\n---\n*Letzte Aktualisierung: 16.01.2024*",
+      "tags": ["sprint", "planning", "development"],
+      "linkedTasks": ["task-1"],
+      "linkedNotes": [],
+      "linkedProjects": ["project-development"],
+      "pinned": true,
+      "archived": false,
+      "createdAt": "2024-01-15T09:00:00.000Z",
+      "updatedAt": "2024-01-16T08:30:00.000Z",
+      "metadata": {
+        "wordCount": 145,
+        "readingTime": 1,
+        "linkPreviews": []
+      }
+    },
+    {
+      "id": "note-marketing-analysis",
+      "title": "Q1 Marketing Kampagne - Analyse",
+      "content": "# Marketing Kampagne Q1 2024 - Performance Analyse\n\n## Executive Summary\nDie Q1-Kampagne hat **überdurchschnittlich** performt mit einem ROI von 312%.\n\n## Key Metrics\n\n### Social Media\n- **Instagram**: 2.3M Impressions (+45% vs Q4)\n- **LinkedIn**: 890K Impressions (+23% vs Q4)\n- **Twitter**: 1.1M Impressions (+12% vs Q4)\n\n### Conversion Rates\n- **Landing Page**: 4.2% (Target: 3.5%)\n- **Email Campaign**: 2.8% (Target: 2.5%)\n- **Social Media**: 1.9% (Target: 1.5%)\n\n## Google Ads Performance\n\n| Kampagne | Impressions | Clicks | CTR | CPC | Conversions |\n|----------|-------------|--------|-----|-----|-------------|\n| Brand Keywords | 125K | 8.5K | 6.8% | €1.25 | 234 |\n| Product Features | 89K | 3.2K | 3.6% | €2.10 | 156 |\n| Competitor | 67K | 1.8K | 2.7% | €3.45 | 89 |\n\n## Recommendations für Q2\n1. **Budget Shift**: Mehr Budget für Brand Keywords\n2. **Creative Refresh**: Neue Ad Creatives für Social Media\n3. **Landing Page**: A/B Test für höhere Conversion Rate\n4. **Retargeting**: Verbesserte Audience Segmentierung\n\n---\n*Nächste Review: 15.02.2024*",
+      "tags": ["marketing", "analysis", "q1", "campaign"],
+      "linkedTasks": ["task-2"],
+      "linkedNotes": [],
+      "linkedProjects": ["project-marketing"],
+      "pinned": false,
+      "archived": false,
+      "createdAt": "2024-01-14T14:30:00.000Z",
+      "updatedAt": "2024-01-16T10:15:00.000Z",
+      "metadata": {
+        "wordCount": 285,
+        "readingTime": 2,
+        "linkPreviews": []
+      }
+    },
+    {
+      "id": "note-design-system",
+      "title": "Design System v2.0 Spezifikation",
+      "content": "# TaskFuchs Design System v2.0\n\n## Color Tokens\n\n### Primary Colors\n```css\n--color-primary-50: #eff6ff;\n--color-primary-100: #dbeafe;\n--color-primary-500: #3b82f6;\n--color-primary-600: #2563eb;\n--color-primary-900: #1e3a8a;\n```\n\n### Semantic Colors\n```css\n--color-success: #10b981;\n--color-warning: #f59e0b;\n--color-error: #ef4444;\n--color-info: #06b6d4;\n```\n\n## Typography Scale\n\n| Token | Size | Line Height | Weight |\n|-------|------|-------------|--------|\n| `text-xs` | 12px | 16px | 400 |\n| `text-sm` | 14px | 20px | 400 |\n| `text-base` | 16px | 24px | 400 |\n| `text-lg` | 18px | 28px | 400 |\n| `text-xl` | 20px | 28px | 500 |\n| `text-2xl` | 24px | 32px | 600 |\n| `text-3xl` | 30px | 36px | 700 |\n\n## Spacing System\nBasiert auf 4px Grid: `4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96`\n\n## Components\n\n### Button Variants\n- **Primary**: Hauptaktionen (CTA)\n- **Secondary**: Sekundäre Aktionen\n- **Outline**: Alternative zu Secondary\n- **Ghost**: Minimale Aktionen\n- **Danger**: Destruktive Aktionen\n\n### Card Components\n- **TaskCard**: Für Aufgaben-Display\n- **NoteCard**: Für Notizen-Preview\n- **WidgetCard**: Dashboard Widgets\n- **ProjectCard**: Projekt-Übersicht\n\n---\n*Status: In Entwicklung*\n*Review durch: Design Team + Frontend Devs*",
+      "tags": ["design-system", "tokens", "components"],
+      "linkedTasks": ["task-3"],
+      "linkedNotes": [],
+      "linkedProjects": ["project-design"],
+      "pinned": true,
+      "archived": false,
+      "createdAt": "2024-01-12T11:00:00.000Z",
+      "updatedAt": "2024-01-15T16:45:00.000Z",
+      "metadata": {
+        "wordCount": 195,
+        "readingTime": 1,
+        "linkPreviews": []
+      }
+    },
+    {
+      "id": "note-onboarding-julia",
+      "title": "Onboarding Plan - Julia Schmidt",
+      "content": "# Onboarding Julia Schmidt - Frontend Developer\n\n## Persönliche Info\n- **Start**: 15.01.2024\n- **Position**: Senior Frontend Developer\n- **Vorerfahrung**: 4 Jahre React, 2 Jahre TypeScript\n- **Mentor**: Alex (Lead Frontend)\n\n## Woche 1: Grundlagen\n### Tag 1-2\n- [ ] Arbeitsplatz Setup\n- [ ] IT-Zugänge & Accounts\n- [ ] Team Vorstellung\n- [ ] Codebase Overview\n- [ ] Development Environment Setup\n\n### Tag 3-5\n- [ ] Code Walkthrough mit Alex\n- [ ] Erste kleine Aufgabe: Bug Fix\n- [ ] Tool-Einführung (Jira, Confluence, Slack)\n- [ ] Design System kennenlernen\n\n## Woche 2: Integration\n- [ ] Erste Feature-Implementierung\n- [ ] Code Review Prozess\n- [ ] Team Meetings teilnehmen\n- [ ] Testing Practices kennenlernen\n\n## Woche 3-4: Vollständige Integration\n- [ ] Eigenständige Feature-Entwicklung\n- [ ] Peer Programming Sessions\n- [ ] Erstes Sprint Planning\n\n## Checkpoints\n- **Ende Woche 1**: Feedback Gespräch\n- **Ende Woche 2**: Team Integration Review\n- **Ende Monat 1**: Vollständiges Onboarding Review\n\n## Notizen\n- Julia ist sehr erfahren mit React\n- Hat gute Fragen zum State Management gestellt\n- Benötigt Einarbeitung in unser Testing Setup\n- Sehr motiviert und proaktiv\n\n---\n*Nächstes Check-in: 22.01.2024*",
+      "tags": ["onboarding", "hr", "frontend", "team"],
+      "linkedTasks": ["task-5"],
+      "linkedNotes": [],
+      "linkedProjects": ["project-hr"],
+      "pinned": false,
+      "archived": false,
+      "createdAt": "2024-01-15T08:30:00.000Z",
+      "updatedAt": "2024-01-16T09:15:00.000Z",
+      "metadata": {
+        "wordCount": 245,
+        "readingTime": 2,
+        "linkPreviews": []
+      }
+    },
+    {
+      "id": "note-api-docs",
+      "title": "API Documentation Überarbeitung",
+      "content": "# API Documentation v3.0 - Überarbeitung\n\n## Aktuelle Probleme\n- Veraltete Endpoints nicht dokumentiert\n- Inkonsistente Beispiele\n- Fehlende Error Response Codes\n- Keine interaktive Dokumentation\n\n## Geplante Verbesserungen\n\n### 1. OpenAPI 3.0 Specification\n- Vollständige Spec für alle Endpoints\n- Konsistente Schema Definitionen\n- Detaillierte Error Responses\n\n### 2. Interactive Documentation\n- Swagger UI Integration\n- \"Try it out\" Funktionalität\n- Code Examples in verschiedenen Sprachen\n\n### 3. SDK Documentation\n- JavaScript/TypeScript SDK\n- Python SDK Beispiele\n- cURL Examples für alle Endpoints\n\n## Endpoint Prioritäten\n\n### Phase 1 (Kritisch)\n- `/auth/*` - Authentication Endpoints\n- `/users/*` - User Management\n- `/tasks/*` - Task Operations\n\n### Phase 2 (Wichtig)\n- `/projects/*` - Project Management\n- `/notes/*` - Notes API\n- `/sync/*` - Synchronization\n\n### Phase 3 (Nice-to-have)\n- `/analytics/*` - Analytics Endpoints\n- `/webhooks/*` - Webhook Configuration\n\n## Technische Details\n```yaml\nopenapi: 3.0.3\ninfo:\n  title: TaskFuchs API\n  version: 3.0.0\n  description: Comprehensive task management API\nservers:\n  - url: https://api.taskfuchs.de/v3\n    description: Production server\n  - url: https://staging-api.taskfuchs.de/v3\n    description: Staging server\n```\n\n---\n*Ziel Completion: Ende Februar 2024*",
+      "tags": ["api", "documentation", "swagger", "openapi"],
+      "linkedTasks": ["task-8"],
+      "linkedNotes": [],
+      "linkedProjects": ["project-development"],
+      "pinned": false,
+      "archived": false,
+      "createdAt": "2024-01-14T13:30:00.000Z",
+      "updatedAt": "2024-01-16T11:00:00.000Z",
+      "metadata": {
+        "wordCount": 285,
+        "readingTime": 2,
+        "linkPreviews": []
+      }
+    },
+    {
+      "id": "note-retrospective-prep",
+      "title": "Sprint Retrospective Vorbereitung",
+      "content": "# Sprint 22 Retrospective - Vorbereitung\n\n## Agenda (60 Minuten)\n\n### 1. Check-in (5 min)\n- Kurze Stimmungsabfrage\n- Retrospektive Regeln wiederholen\n\n### 2. Datensammlung (15 min)\n**Sprint Metriken:**\n- Story Points: 42 geplant, 38 abgeschlossen\n- Bugs: 7 neue, 12 behoben\n- Velocity: Stabil bei ~40 SP\n\n### 3. What went well? (15 min)\n- Team Zusammenarbeit\n- Code Quality Verbesserungen\n- Neue Tooling (GitHub Actions)\n\n### 4. What could be improved? (15 min)\n- Communication zwischen Frontend/Backend\n- Definition of Done nicht immer eingehalten\n- Testing Coverage noch zu niedrig\n\n### 5. Action Items (10 min)\n- Konkrete Maßnahmen ableiten\n- Verantwortlichkeiten zuweisen\n- Timeline festlegen\n\n## Vorbereitung\n- [ ] Jira Board analysieren\n- [ ] Team Feedback per Slack sammeln\n- [ ] Retrospektive Board vorbereiten (Miro)\n- [ ] Meeting Room buchen\n\n## Follow-up Items aus letzter Retro\n- ✅ Daily Standup Zeit angepasst (9:00 → 9:30)\n- ✅ Code Review Guidelines erstellt\n- ⏳ Pair Programming Sessions (läuft)\n- ❌ Documentation Standards (nicht umgesetzt)\n\n## Mögliche Action Items\n1. **Communication**: Wöchentliche Frontend/Backend Sync\n2. **Testing**: Coverage Mindeststandard definieren\n3. **Documentation**: Template für Feature Specs\n4. **Automation**: Deployment Pipeline verbessern\n\n---\n*Moderator: Mike*\n*Termin: 18.01.2024, 15:00-16:00*",
+      "tags": ["retrospective", "agile", "team", "process"],
+      "linkedTasks": ["task-9"],
+      "linkedNotes": [],
+      "linkedProjects": ["project-development"],
+      "pinned": false,
+      "archived": false,
+      "createdAt": "2024-01-16T11:30:00.000Z",
+      "updatedAt": "2024-01-16T11:30:00.000Z",
+      "metadata": {
+        "wordCount": 275,
+        "readingTime": 2,
+        "linkPreviews": []
+      }
+    },
+    {
+      "id": "note-daily-2024-01-16",
+      "title": "Daily Note - 16. Januar 2024",
+      "content": "# 📅 Dienstag, 16. Januar 2024\n\n## 🎯 Tagesfocus\nSprint Planning vorbereiten und Marketing-Analyse abschließen\n\n## ✅ Erledigtes\n- ✅ Sprint Planning Agenda erstellt\n- ✅ User Stories aus Backlog priorisiert\n- ✅ Google Analytics Daten exportiert\n- ✅ Social Media Metriken zusammengestellt\n\n## 🔄 In Bearbeitung\n- 🔄 ROI-Kalkulation für Marketing-Kampagne\n- 🔄 Design System Dokumentation\n- 🔄 Julia's Onboarding Setup\n\n## 💡 Erkenntnisse\n- Marketing Kampagne performt besser als erwartet (ROI 312%!)\n- Julia ist sehr erfahren, braucht weniger Grundlagen-Training\n- Team ist motiviert für Sprint 23\n\n## 🤝 Meetings heute\n- **09:30** - Daily Standup (30 min)\n- **14:00** - Marketing Review mit Sarah (60 min)\n- **16:00** - 1:1 mit Julia (Onboarding Check) (30 min)\n\n## 📋 Morgen geplant\n- Sprint Planning Meeting moderieren\n- Marketing-Analyse finalisieren\n- Code Review für Authentication System\n- API Documentation Struktur planen\n\n## 🧠 Notizen\n- Customer Support Ticket #4521 ist critical → morgen früh bearbeiten\n- Buchhaltung deadline Ende des Monats im Blick behalten\n- Performance Optimierung kann warten, andere Prioritäten\n\n## 📊 Zeit heute\n- **Productive Time**: 6.5h\n- **Meetings**: 2h\n- **Admin/Email**: 0.5h\n\n---\n*Mood: 😊 Produktiver Tag, gute Team-Energie*",
+      "tags": ["daily-note", "reflection", "planning"],
+      "linkedTasks": [],
+      "linkedNotes": [],
+      "linkedProjects": [],
+      "pinned": true,
+      "archived": false,
+      "dailyNote": true,
+      "dailyNoteDate": "2024-01-16",
+      "createdAt": "2024-01-16T18:30:00.000Z",
+      "updatedAt": "2024-01-16T21:15:00.000Z",
+      "metadata": {
+        "wordCount": 285,
+        "readingTime": 2,
+        "linkPreviews": []
+      }
+    },
+    {
+      "id": "note-quarterly-results",
+      "title": "Q4 2023 Ergebnisse - Presentation Notes",
+      "content": "# Q4 2023 Quarterly Results - Presentation\n\n## Key Numbers\n\n### Revenue\n- **Total Revenue**: €2.4M (+18% YoY)\n- **Recurring Revenue**: €1.8M (+25% YoY)\n- **New Customer Revenue**: €600K (+12% YoY)\n\n### Product Metrics\n- **Active Users**: 45,000 (+30% YoY)\n- **Monthly Active Users**: 38,000 (+28% YoY)\n- **Customer Retention**: 94% (target: 90%)\n- **Net Promoter Score**: 68 (Industry avg: 45)\n\n### Development Progress\n- **Features Shipped**: 23 major, 87 minor\n- **Bug Fix Rate**: 96% within SLA\n- **Uptime**: 99.97% (target: 99.95%)\n- **Performance**: 15% faster page loads\n\n## Highlights\n\n### Product Launches\n1. **Mobile App**: iOS & Android (Sept 2023)\n2. **API v3**: Complete redesign (Oct 2023)\n3. **Team Collaboration**: Real-time features (Nov 2023)\n4. **Integration Hub**: 12 new integrations (Dec 2023)\n\n### Team Growth\n- **New Hires**: 8 (5 Engineering, 2 Marketing, 1 Design)\n- **Total Team Size**: 32 people\n- **Employee Satisfaction**: 4.6/5\n\n## Customer Feedback\n\n> \"TaskFuchs has revolutionized how we manage projects. The new collaboration features are game-changing.\" \n> – *Sarah Johnson, Project Manager at TechCorp*\n\n> \"Best productivity app we've ever used. The mobile app finally lets us work from anywhere.\"\n> – *Michael Brown, CEO of StartupXYZ*\n\n## Q1 2024 Outlook\n\n### Goals\n- Revenue target: €2.8M (+17% QoQ)\n- New features: AI-powered task suggestions\n- Market expansion: Launch in 3 new countries\n- Team growth: 6 additional hires\n\n### Challenges\n- Increased competition in productivity space\n- Scaling infrastructure for growth\n- Maintaining quality with rapid expansion\n\n---\n*Presentation delivered: 15.01.2024*\n*Audience: Board, Key Customers, Investors*\n*Duration: 45 minutes + Q&A*",
+      "tags": ["quarterly", "results", "presentation", "metrics"],
+      "linkedTasks": ["task-completed-1"],
+      "linkedNotes": [],
+      "linkedProjects": [],
+      "pinned": false,
+      "archived": false,
+      "createdAt": "2024-01-12T10:00:00.000Z",
+      "updatedAt": "2024-01-15T17:00:00.000Z",
+      "metadata": {
+        "wordCount": 385,
+        "readingTime": 3,
+        "linkPreviews": []
+      }
+    }
+  ],
+  "preferences": {
+    "theme": "light",
+    "language": "de",
+    "accentColor": "#3b82f6",
+    "backgroundType": "gradient",
+    "gradientFrom": "#f0f9ff",
+    "gradientTo": "#e0e7ff",
+    "gradientDirection": "135deg",
+    "greetingText": "Einen schönen guten Morgen! ☀️",
+    "backgroundEffects": {
+      "blur": false,
+      "overlay": true,
+      "overlayOpacity": 0.1
+    },
+    "notifications": {
+      "email": true,
+      "push": true,
+      "timerReminders": true,
+      "deadlineReminders": true
+    },
+    "privacy": {
+      "analytics": true,
+      "crashReports": true
+    },
+    "dateFormat": "dd.MM.yyyy",
+    "sounds": true,
+    "soundVolume": 0.7,
+    "completionSound": "chime",
+    "enableCelebration": true,
+    "celebrationText": "Großartig gemacht! 🎉",
+    "celebrationDuration": 3000,
+    "columns": {
+      "visible": 5,
+      "showProjects": true
+    },
+    "showPriorities": true,
+    "sidebar": {
+      "hiddenItems": [],
+      "itemOrder": ["dashboard", "tasks", "projects", "notes", "statistics", "settings"]
+    },
+    "enableEndOfDay": true,
+    "hasCompletedOnboarding": true,
+    "enableFocusMode": true,
+    "pomodoro": {
+      "enabled": true,
+      "workDuration": 25,
+      "shortBreakDuration": 5,
+      "longBreakDuration": 15,
+      "longBreakInterval": 4,
+      "autoStartBreaks": false,
+      "autoStartWork": false,
+      "soundEnabled": true,
+      "pomodoroSound": "bell",
+      "breakSound": "chime",
+      "taskSound": "pop",
+      "whiteNoiseEnabled": true,
+      "whiteNoiseType": "clock",
+      "whiteNoiseVolume": 0.3
+    },
+    "timer": {
+      "showOverlay": true,
+      "overlayPosition": { "x": 20, "y": 20 },
+      "overlayMinimized": false,
+      "autoOpenTaskOnStart": true,
+      "showRemainingTime": true
+    },
+    "dailyNoteTemplate": "# 📅 {{date}}\n\n## 🎯 Tagesfocus\n\n## ✅ Erledigtes\n\n## 🔄 In Bearbeitung\n\n## 💡 Erkenntnisse\n\n## 🤝 Meetings heute\n\n## 📋 Morgen geplant\n\n---\n*Mood: *"
+  },
+  "boards": [
+    {
+      "id": "board-priority",
+      "name": "Nach Priorität",
+      "description": "Aufgaben gruppiert nach Prioritätsstufen",
+      "groupingMode": "priority",
+      "columns": [
+        {
+          "id": "col-high",
+          "title": "Hoch",
+          "color": "#ef4444",
+          "order": 0,
+          "groupValue": "high"
+        },
+        {
+          "id": "col-medium",
+          "title": "Mittel",
+          "color": "#f59e0b",
+          "order": 1,
+          "groupValue": "medium"
+        },
+        {
+          "id": "col-low",
+          "title": "Niedrig",
+          "color": "#10b981",
+          "order": 2,
+          "groupValue": "low"
+        },
+        {
+          "id": "col-none",
+          "title": "Keine Priorität",
+          "color": "#6b7280",
+          "order": 3,
+          "groupValue": "none"
+        }
+      ],
+      "isDefault": false,
+      "createdAt": "2024-01-10T10:00:00.000Z",
+      "updatedAt": "2024-01-15T14:30:00.000Z"
+    },
+    {
+      "id": "board-projects",
+      "name": "Nach Projekten",
+      "description": "Aufgaben gruppiert nach zugewiesenen Projekten",
+      "groupingMode": "projects",
+      "columns": [
+        {
+          "id": "col-dev",
+          "title": "Development",
+          "color": "#10b981",
+          "order": 0,
+          "groupValue": "project-development"
+        },
+        {
+          "id": "col-marketing",
+          "title": "Marketing",
+          "color": "#f59e0b",
+          "order": 1,
+          "groupValue": "project-marketing"
+        },
+        {
+          "id": "col-design",
+          "title": "Design",
+          "color": "#8b5cf6",
+          "order": 2,
+          "groupValue": "project-design"
+        },
+        {
+          "id": "col-hr",
+          "title": "HR",
+          "color": "#06b6d4",
+          "order": 3,
+          "groupValue": "project-hr"
+        },
+        {
+          "id": "col-no-project",
+          "title": "Kein Projekt",
+          "color": "#6b7280",
+          "order": 4,
+          "groupValue": "no-project"
+        }
+      ],
+      "isDefault": false,
+      "createdAt": "2024-01-12T15:00:00.000Z",
+      "updatedAt": "2024-01-16T09:00:00.000Z"
+    }
+  ],
+  "metadata": {
+    "totalTasks": 16,
+    "totalNotes": 8,
+    "totalTags": 15,
+    "totalBoards": 2,
+    "dataSize": 25000,
+    "exportTime": 1705401600000,
+    "totalArchivedTasks": 0,
+    "totalDailyNotes": 1,
+    "totalColumns": 9,
+    "totalNoteLinks": 0,
+    "totalImages": 0,
+    "totalNotifications": 0
+  },
+  "exportDate": "2024-01-16T12:00:00.000Z",
+  "version": "2.0",
+  "columns": [
+    {
+      "id": "date-2024-01-16",
+      "title": "Heute",
+      "type": "date",
+      "date": "2024-01-16",
+      "order": 0,
+      "tasks": []
+    },
+    {
+      "id": "date-2024-01-17",
+      "title": "Morgen",
+      "type": "date", 
+      "date": "2024-01-17",
+      "order": 1,
+      "tasks": []
+    },
+    {
+      "id": "date-2024-01-18",
+      "title": "Übermorgen",
+      "type": "date",
+      "date": "2024-01-18", 
+      "order": 2,
+      "tasks": []
+    },
+    {
+      "id": "inbox",
+      "title": "Inbox",
+      "type": "date",
+      "order": 3,
+      "tasks": []
+    },
+    {
+      "id": "date-2024-01-15",
+      "title": "Gestern",
+      "type": "date",
+      "date": "2024-01-15",
+      "order": 4,
+      "tasks": []
+    },
+    {
+      "id": "date-2024-01-14",
+      "title": "Vorgestern",
+      "type": "date",
+      "date": "2024-01-14",
+      "order": 5,
+      "tasks": []
+    },
+    {
+      "id": "date-2024-01-13",
+      "title": "13. Januar",
+      "type": "date",
+      "date": "2024-01-13",
+      "order": 6,
+      "tasks": []
+    },
+    {
+      "id": "project-development",
+      "title": "🚀 Development Team",
+      "type": "project",
+      "order": 0,
+      "isPinned": true,
+      "linkedNotes": ["note-sprint-planning", "note-api-docs", "note-retrospective-prep"]
+    },
+    {
+      "id": "project-marketing",
+      "title": "📈 Marketing & Growth",
+      "type": "project", 
+      "order": 1,
+      "isPinned": true,
+      "linkedNotes": ["note-marketing-analysis"]
+    },
+    {
+      "id": "project-design",
+      "title": "🎨 Design & UX",
+      "type": "project",
+      "order": 2,
+      "isPinned": false,
+      "linkedNotes": ["note-design-system"]
+    },
+    {
+      "id": "project-hr",
+      "title": "👥 Human Resources",
+      "type": "project",
+      "order": 3,
+      "isPinned": false,
+      "linkedNotes": ["note-onboarding-julia"]
+    }
+  ],
+  "viewState": {
+    "currentMode": "columns",
+    "kanbanGrouping": "priority",
+    "taskView": "board",
+    "projectKanban": {
+      "selectedProjectId": "project-development",
+      "columns": [
+        {
+          "id": "pk-todo",
+          "title": "To Do",
+          "projectId": "project-development",
+          "color": "#6b7280",
+          "order": 0,
+          "isDefault": true
+        },
+        {
+          "id": "pk-progress",
+          "title": "In Progress", 
+          "projectId": "project-development",
+          "color": "#f59e0b",
+          "order": 1
+        },
+        {
+          "id": "pk-review",
+          "title": "Review",
+          "projectId": "project-development",
+          "color": "#8b5cf6",
+          "order": 2
+        },
+        {
+          "id": "pk-done",
+          "title": "Done",
+          "projectId": "project-development",
+          "color": "#10b981",
+          "order": 3
+        }
+      ],
+      "searchQuery": "",
+      "priorityFilters": [],
+      "tagFilters": [],
+      "showCompleted": false,
+      "viewType": "board"
+    }
+  },
+  "statistics": {
+    "totalTasks": 16,
+    "completedTasks": 5,
+    "totalTime": 645,
+    "pomodoroSessions": 12,
+    "dailyStats": [
+      {
+        "date": "2024-01-16",
+        "tasksCompleted": 0,
+        "timeTracked": 125,
+        "pomodoroSessions": 3
+      },
+      {
+        "date": "2024-01-15",
+        "tasksCompleted": 3,
+        "timeTracked": 270,
+        "pomodoroSessions": 5
+      },
+      {
+        "date": "2024-01-14",
+        "tasksCompleted": 2,
+        "timeTracked": 155,
+        "pomodoroSessions": 2
+      },
+      {
+        "date": "2024-01-13",
+        "tasksCompleted": 0,
+        "timeTracked": 85,
+        "pomodoroSessions": 2
+      },
+      {
+        "date": "2024-01-12",
+        "tasksCompleted": 0,
+        "timeTracked": 0,
+        "pomodoroSessions": 0
+      }
+    ],
+    "weeklyStats": [
+      {
+        "weekStart": "2024-01-15",
+        "tasksCompleted": 3,
+        "timeTracked": 395,
+        "pomodoroSessions": 8
+      },
+      {
+        "weekStart": "2024-01-08",
+        "tasksCompleted": 2,
+        "timeTracked": 250,
+        "pomodoroSessions": 4
+      }
+    ],
+    "monthlyStats": [
+      {
+        "month": "2024-01",
+        "tasksCompleted": 5,
+        "timeTracked": 645,
+        "pomodoroSessions": 12
+      }
+    ]
+  },
+  "focusMode": false,
+  "focusedColumnId": null,
+  "showCompletedTasks": true,
+  "notifications": [
+    {
+      "id": "notif-1",
+      "taskId": "task-1",
+      "title": "Erinnerung",
+      "message": "Sprint Planning Meeting vorbereiten",
+      "timestamp": "2024-01-16T08:30:00.000Z",
+      "type": "reminder",
+      "read": false
+    },
+    {
+      "id": "notif-2", 
+      "taskId": "task-4",
+      "title": "Urgent",
+      "message": "Customer Support Ticket bearbeiten #4521",
+      "timestamp": "2024-01-16T07:45:00.000Z",
+      "type": "deadline",
+      "read": false
+    }
+  ]
+} 
