@@ -681,7 +681,7 @@ function MainApp() {
 
   return (
     <div 
-      className={`w-full h-full flex flex-col relative ${state.isBulkMode ? 'bulk-mode-active' : ''} pb-16 md:pb-0`}
+      className={`w-full h-full flex flex-col relative ${state.isBulkMode ? 'bulk-mode-active' : ''}`}
       style={backgroundStyles}
     >
       {/* Background Image with optional Blur - Behind everything */}
@@ -753,7 +753,7 @@ function MainApp() {
         )}
         
         {/* Content area - different layout for kanban/notes/inbox vs other views */}
-        <div className="relative w-full h-full overflow-hidden">
+        <div className="relative w-full h-full overflow-hidden pb-16 md:pb-0">
           {/* Current View */}
           <div 
             className={`absolute inset-0 transition-transform duration-300 ease-out ${
