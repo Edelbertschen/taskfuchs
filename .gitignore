@@ -1,3 +1,4 @@
+\n# --- Merged from local .gitignore.local ---
 .vercel
 # Node / Vite
 node_modules/
