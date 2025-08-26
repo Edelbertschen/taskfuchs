@@ -339,7 +339,6 @@ const Settings = React.memo(() => {
   const [tempImageUrl, setTempImageUrl] = useState('');
   const [tempColorValue, setTempColorValue] = useState('#f3f4f6');
   const [showPhotoCreditsModal, setShowPhotoCreditsModal] = useState(false);
-  const [showPhotoCreditsModal, setShowPhotoCreditsModal] = useState(false);
   
   // Stock Photos modal state
   const [showStockPhotosModal, setShowStockPhotosModal] = useState(false);
