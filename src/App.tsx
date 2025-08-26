@@ -36,7 +36,7 @@ import { BulkActionsBar } from './components/Common/BulkActionsBar';
 import { ImageTest } from './components/Common/ImageTest';
 import { FloatingAddButton } from './components/Common/FloatingAddButton';
 import { LoadingSpinner } from './components/Common/LoadingSpinner';
-import { Plus } from 'lucide-react';
+import { Plus, Home, Inbox, CheckSquare, Columns, FileText, MoreHorizontal } from 'lucide-react';
 import { MaterialIcon } from './components/Common/MaterialIcon';
 import './App.css';
 import { initializeAudioOnUserInteraction } from './utils/soundUtils';
@@ -681,7 +681,7 @@ function MainApp() {
 
   return (
     <div 
-      className={`w-full h-full flex flex-col relative ${state.isBulkMode ? 'bulk-mode-active' : ''}`}
+      className={`w-full h-full flex flex-col relative ${state.isBulkMode ? 'bulk-mode-active' : ''} pb-16 md:pb-0`}
       style={backgroundStyles}
     >
       {/* Background Image with optional Blur - Behind everything */}
@@ -744,10 +744,12 @@ function MainApp() {
       <div className="flex-1 flex relative min-h-0 z-10">
         {/* Show main sidebar, hidden in fullscreen note editor and focus mode */}
         {!state.isNoteEditorFullScreen && currentView !== 'focus' && (
-          <Sidebar 
-            activeView={currentView} 
-            onViewChange={handleViewChange} 
-          />
+          <div className="hidden md:block">
+            <Sidebar 
+              activeView={currentView} 
+              onViewChange={handleViewChange} 
+            />
+          </div>
         )}
         
         {/* Content area - different layout for kanban/notes/inbox vs other views */}
@@ -966,6 +968,42 @@ function MainApp() {
 
       {/* Bulk Actions Bar */}
       <BulkActionsBar />
+
+      {/* Mobile Bottom Navigation */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-[1000]">
+        <div className="mx-auto max-w-screen-sm">
+          <div className="flex items-stretch justify-around bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-t border-gray-200/60 dark:border-gray-700/60 shadow-lg">
+            {[
+              { id: 'today', label: 'Heute', icon: Home },
+              { id: 'inbox', label: 'Inbox', icon: Inbox },
+              { id: 'tasks', label: 'Planer', icon: CheckSquare },
+              { id: 'kanban', label: 'Projekte', icon: Columns },
+              { id: 'notes', label: 'Notizen', icon: FileText },
+            ].map(({ id, label, icon: Icon }) => {
+              const active = currentView === id;
+              return (
+                <button
+                  key={id}
+                  onClick={() => handleViewChange(id)}
+                  className="flex-1 py-2.5 flex flex-col items-center justify-center text-xs font-medium"
+                  style={{ color: active ? colors.primary : (isDarkMode ? '#e5e7eb' : '#374151') }}
+                >
+                  <Icon className="w-5 h-5 mb-0.5" />
+                  <span>{label}</span>
+                </button>
+              );
+            })}
+            <button
+              onClick={() => handleViewChange('settings')}
+              className="flex-1 py-2.5 flex flex-col items-center justify-center text-xs font-medium"
+              style={{ color: currentView === 'settings' ? colors.primary : (isDarkMode ? '#e5e7eb' : '#374151') }}
+            >
+              <MoreHorizontal className="w-5 h-5 mb-0.5" />
+              <span>Mehr</span>
+            </button>
+          </div>
+        </div>
+      </div>
 
     </div>
   );
