@@ -58,16 +58,13 @@ export function PinsView() {
   const sensors = useSensors(
     useSensor(MouseSensor, {
       activationConstraint: {
-        distance: 0,
-        delay: 0,
-        tolerance: 0,
+        distance: 4,
       },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        distance: 0,
-        delay: 0,
-        tolerance: 0,
+        delay: 180,
+        tolerance: 8,
       },
     }),
   );

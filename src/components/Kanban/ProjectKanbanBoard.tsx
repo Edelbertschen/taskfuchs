@@ -48,16 +48,17 @@ export function ProjectKanbanBoard() {
   const { t, i18n } = useTranslation();
   
   // ✨ CRITICAL FIX: Precise sensors to prevent springing (same as TaskBoard)
+  // Mobile-friendly DnD activation
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
-      distance: 0, // No distance requirement - start immediately
+      distance: 4,
     },
   });
   
   const touchSensor = useSensor(TouchSensor, {
     activationConstraint: {
-      delay: 0, // No delay - start immediately
-      tolerance: 0, // No tolerance
+      delay: 180,
+      tolerance: 8,
     },
   });
   

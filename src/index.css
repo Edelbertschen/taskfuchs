@@ -47,6 +47,21 @@
     flex-direction: column;
   }
 
+  /* Improve touch target sizes on small screens */
+  @media (max-width: 640px) {
+    button, .btn, .icon-button, [role="button"] {
+      min-height: 40px;
+      min-width: 40px;
+      touch-action: manipulation;
+    }
+    input, select, textarea {
+      min-height: 40px;
+    }
+    .drag-handle, .cursor-move {
+      padding: 6px;
+    }
+  }
+
   /* =================================
      BULK-MODE: PREVENT TEXT SELECTION
      ================================= */

@@ -314,16 +314,17 @@ export function TaskBoard() {
   const { t, i18n } = useTranslation();
   
   // ✨ CRITICAL FIX: Precise sensors to prevent 100px springing on click
+  // Mobile-friendly DnD activation: avoid accidental drags on tap/scroll
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
-      distance: 0, // No distance requirement - start immediately
+      distance: 4,
     },
   });
   
   const touchSensor = useSensor(TouchSensor, {
     activationConstraint: {
-      delay: 0, // No delay - start immediately
-      tolerance: 0, // No tolerance
+      delay: 180,
+      tolerance: 8,
     },
   });
   
