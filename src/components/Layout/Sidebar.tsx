@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { EndOfDayModal } from '../Common/EndOfDayModal';
+import { PersonalCapacityModal } from '../Common/PersonalCapacityModal';
 import { PlannerAssignmentModal } from '../Common/PlannerAssignmentModal';
 import { Task } from '../../types';
 
@@ -43,6 +44,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [assignedTask, setAssignedTask] = useState<Task | null>(null);
   const [showPlannerUserMenu, setShowPlannerUserMenu] = useState(false);
+  const [showPersonalCapacity, setShowPersonalCapacity] = useState(false);
   const userButtonRef = useRef<HTMLButtonElement | null>(null);
   const [userMenuPos, setUserMenuPos] = useState<{ left: number; top: number }>({ left: 0, top: 0 });
   const [showMoreMenu, setShowMoreMenu] = useState(false);
@@ -432,6 +434,15 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
               <div className="py-2">
                 <button
                   onClick={() => {
+                    setShowPersonalCapacity(true);
+                    setShowPlannerUserMenu(false);
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  {t('capacity.personal_capacity')}
+                </button>
+                <button
+                  onClick={() => {
                     window.dispatchEvent(new CustomEvent('navigate-to-settings'));
                     setShowPlannerUserMenu(false);
                   }}
@@ -605,6 +616,12 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
       <EndOfDayModal 
         isOpen={showEndOfDayModal}
         onClose={() => setShowEndOfDayModal(false)}
+      />
+
+      {/* Personal Capacity Modal */}
+      <PersonalCapacityModal
+        isOpen={showPersonalCapacity}
+        onClose={() => setShowPersonalCapacity(false)}
       />
 
       {/* Planner Assignment Modal */}
