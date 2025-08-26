@@ -50,3 +50,4 @@ android/app/build/
 # Public demo files that don't belong in git
 public/windows.zip
 public/apple.zip
+._*
