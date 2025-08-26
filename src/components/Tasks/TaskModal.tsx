@@ -1842,7 +1842,7 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
         {/* Modal Container */}
         <div 
           ref={modalRef}
-          className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col modal-content"
+          className="bg-white dark:bg-gray-900 rounded-none sm:rounded-2xl shadow-2xl w-screen sm:w-full sm:max-w-6xl h-[100svh] sm:h-auto sm:max-h-[90vh] overflow-hidden flex flex-col modal-content"
           onClick={e => e.stopPropagation()}
           onMouseDown={(e) => e.stopPropagation()}
           onMouseMove={(e) => e.stopPropagation()}
