@@ -82,6 +82,15 @@ Weitere Ordner:
 - `docs/` begleitende Dokumente
 ```
 
+## Screenshots
+
+Einige Eindrücke (siehe `public/screenshots/`):
+
+![Dashboard](public/screenshots/dashboard.png)
+![Planer](public/screenshots/Planer.png)
+![Einstellungen](public/screenshots/settings.png)
+![Timer](public/screenshots/Timer.png)
+
 ## Geplante Features
 
 Die Entwicklung erfolgt in Phasen gemäß [TaskFuchs-Plan.md](../TaskFuchs-Plan.md):

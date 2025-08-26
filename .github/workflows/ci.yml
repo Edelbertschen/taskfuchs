@@ -27,3 +27,23 @@ jobs:
         with:
           name: web-dist
           path: dist
+
+  build-electron-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build Electron (mac dmg)
+        run: TF_TARGET=electron npm run build && npx electron-builder --mac --publish=never --config.mac.target=dmg
+      - name: Upload DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-dmg
+          path: dist-electron/*.dmg
