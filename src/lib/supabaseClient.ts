@@ -7,12 +7,8 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undef
 export const supabase = (() => {
   if (!supabaseUrl || !supabaseAnonKey) {
     console.warn('Supabase env not configured: VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY');
-    // Create a proxy that throws on any property access to avoid undefined errors
-    return new Proxy({} as any, {
-      get() {
-        throw new Error('Supabase not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY');
-      }
-    });
+    // Return nullish to allow app to run without Supabase in dev or local previews
+    return null as unknown as ReturnType<typeof createClient>;
   }
   return createClient(supabaseUrl, supabaseAnonKey, {
     auth: {

@@ -106,6 +106,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let mounted = true;
     (async () => {
       try {
+        if (!supabase) return;
         const { data: { session } } = await supabase.auth.getSession();
         if (!mounted) return;
         if (session?.user) {
@@ -127,6 +128,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     })();
 
+    if (!supabase) return () => {};
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         const user: User = {
@@ -162,6 +164,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string): Promise<boolean> => {
     dispatch({ type: 'LOGIN_START' });
     try {
+      if (!supabase) throw new Error('Supabase not configured');
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error || !data.session) {
         dispatch({ type: 'LOGIN_FAILURE', payload: error?.message || 'Login fehlgeschlagen' });
@@ -192,6 +195,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = async (email: string, password: string, name: string): Promise<boolean> => {
     dispatch({ type: 'REGISTER_START' });
     try {
+      if (!supabase) throw new Error('Supabase not configured');
       const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { name } } });
       if (error || !data.user) {
         dispatch({ type: 'REGISTER_FAILURE', payload: error?.message || 'Registrierung fehlgeschlagen' });
@@ -206,7 +210,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = () => {
-    supabase.auth.signOut().finally(() => dispatch({ type: 'LOGOUT' }));
+    if (supabase) supabase.auth.signOut().finally(() => dispatch({ type: 'LOGOUT' }));
+    else dispatch({ type: 'LOGOUT' });
   };
 
   const updateUser = (updates: Partial<User>) => {

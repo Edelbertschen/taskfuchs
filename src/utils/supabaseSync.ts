@@ -38,6 +38,7 @@ export async function uploadInitialBackupIfNeeded(userId: string): Promise<boole
   const path = `${userId}/initial-backup.json`;
 
   // Try to upload only if not exists
+  if (!supabase) return false;
   const { data: existing } = await supabase.storage.from(BUCKET).list(userId, { search: 'initial-backup.json' });
   if (existing && existing.find((f) => f.name === 'initial-backup.json')) {
     localStorage.setItem(flagKey, 'true');
