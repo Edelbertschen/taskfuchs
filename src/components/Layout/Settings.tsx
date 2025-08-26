@@ -1573,41 +1573,7 @@ const Settings = React.memo(() => {
                   </div>
                 )}
 
-                {/* Photo Credits Modal */}
-                {showPhotoCreditsModal && createPortal(
-                  <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowPhotoCreditsModal(false)} />
-                    <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-lg w-full mx-4 p-5 border border-gray-200 dark:border-gray-700">
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Photo credentials</h3>
-                        <button onClick={() => setShowPhotoCreditsModal(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white">✕</button>
-                      </div>
-                      <div className="prose prose-sm dark:prose-invert max-h-80 overflow-y-auto">
-                        <p>
-                          Foto von <a href="https://unsplash.com/de/@rayhennessy?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">Ray Hennessy</a> auf <a href="https://unsplash.com/de/fotos/brown-fox-on-snow-field-xUUZcpQlqpM?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">Unsplash</a><br/>
-                          Foto von <a href="https://unsplash.com/de/@dariojud_?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">Dario Jud</a> auf <a href="https://unsplash.com/de/fotos/neblige-baume-die-in-einen-nebligen-dunst-gehullt-sind-4EvreRzmq44?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">Unsplash</a><br/>
-                          Foto von <a href="https://pixabay.com/de/users/dehaar-8454267/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=3250275" target="_blank" rel="noreferrer">Christoph de Haar</a> auf <a href="https://pixabay.com/de//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=3250275" target="_blank" rel="noreferrer">Pixabay</a><br/>
-                          Foto von <a href="https://unsplash.com/de/@john_artifexfilm?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">John Lee</a> auf <a href="https://unsplash.com/de/fotos/landschaft-der-berge-oMneOBYhJxY?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">Unsplash</a><br/>
-                          Foto von <a href="https://unsplash.com/de/@neom?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">NEOM</a> auf <a href="https://unsplash.com/de/fotos/die-sonne-geht-uber-einer-wustenlandschaft-unter-va9218QJFAk?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">Unsplash</a><br/>
-                          Foto von <a href="https://unsplash.com/de/@luckybeanz?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">Mark Harpur</a> auf <a href="https://unsplash.com/de/fotos/brauner-holzsteg-zwischen-lavendelblumenfeld-in-der-nahe-eines-gewassers-wahrend-der-goldenen-stunde-K2s_YE031CA?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">Unsplash</a><br/>
-                          Foto von <a href="https://pixabay.com/de/users/onatee-27254887/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=8650151" target="_blank" rel="noreferrer">Abubakr Abdelatif</a> auf <a href="https://pixabay.com/de//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=8650151" target="_blank" rel="noreferrer">Pixabay</a><br/>
-                          Foto von <a href="https://pixabay.com/de/users/orcatec-2164300/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=4335571" target="_blank" rel="noreferrer">Jonathan Reichel</a> auf <a href="https://pixabay.com/de//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=4335571" target="_blank" rel="noreferrer">Pixabay</a><br/>
-                          Bild von <a href="https://pixabay.com/de/users/angi128-22878334/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=6553345" target="_blank" rel="noreferrer">Angi128</a> auf <a href="https://pixabay.com/de//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=6553345" target="_blank" rel="noreferrer">Pixabay</a><br/>
-                          Bild von <a href="https://pixabay.com/de/users/danfador-55851/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=190055" target="_blank" rel="noreferrer">Dan Fador</a> auf <a href="https://pixabay.com/de//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=190055" target="_blank" rel="noreferrer">Pixabay</a>
-                        </p>
-                      </div>
-                      <div className="mt-4 text-right">
-                        <button
-                          onClick={() => setShowPhotoCreditsModal(false)}
-                          className="px-3 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/60"
-                        >
-                          Schließen
-                        </button>
-                      </div>
-                    </div>
-                  </div>,
-                  document.body
-                )}
+                {/* Photo Credits Modal was moved to the global modal section below */}
               </div>
             </div>
 
@@ -8086,11 +8052,47 @@ const Settings = React.memo(() => {
       )}
 
       {/* Stock Photos Modal */}
-              <StockPhotosModal
+      <StockPhotosModal
           isOpen={showStockPhotosModal}
           onClose={() => setShowStockPhotosModal(false)}
           onSelectPhoto={handleSelectStockPhoto}
         />
+
+      {/* Photo Credits Modal - render at root with highest z-index */}
+      {showPhotoCreditsModal && createPortal(
+        <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowPhotoCreditsModal(false)} />
+          <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-lg w-full mx-4 p-5 border border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Photo credentials</h3>
+              <button onClick={() => setShowPhotoCreditsModal(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white">✕</button>
+            </div>
+            <div className="prose prose-sm dark:prose-invert max-h-80 overflow-y-auto">
+              <p>
+                Foto von <a href="https://unsplash.com/de/@rayhennessy?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">Ray Hennessy</a> auf <a href="https://unsplash.com/de/fotos/brown-fox-on-snow-field-xUUZcpQlqpM?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">Unsplash</a><br/>
+                Foto von <a href="https://unsplash.com/de/@dariojud_?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">Dario Jud</a> auf <a href="https://unsplash.com/de/fotos/neblige-baume-die-in-einen-nebligen-dunst-gehullt-sind-4EvreRzmq44?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">Unsplash</a><br/>
+                Foto von <a href="https://pixabay.com/de/users/dehaar-8454267/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=3250275" target="_blank" rel="noreferrer">Christoph de Haar</a> auf <a href="https://pixabay.com/de//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=3250275" target="_blank" rel="noreferrer">Pixabay</a><br/>
+                Foto von <a href="https://unsplash.com/de/@john_artifexfilm?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">John Lee</a> auf <a href="https://unsplash.com/de/fotos/landschaft-der-berge-oMneOBYhJxY?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">Unsplash</a><br/>
+                Foto von <a href="https://unsplash.com/de/@neom?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">NEOM</a> auf <a href="https://unsplash.com/de/fotos/die-sonne-geht-uber-einer-wustenlandschaft-unter-va9218QJFAk?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">Unsplash</a><br/>
+                Foto von <a href="https://unsplash.com/de/@luckybeanz?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">Mark Harpur</a> auf <a href="https://unsplash.com/de/fotos/brauner-holzsteg-zwischen-lavendelblumenfeld-in-der-nahe-eines-gewassers-wahrend-der-goldenen-stunde-K2s_YE031CA?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">Unsplash</a><br/>
+                Foto von <a href="https://pixabay.com/de/users/onatee-27254887/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=8650151" target="_blank" rel="noreferrer">Abubakr Abdelatif</a> auf <a href="https://pixabay.com/de//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=8650151" target="_blank" rel="noreferrer">Pixabay</a><br/>
+                Foto von <a href="https://pixabay.com/de/users/orcatec-2164300/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=4335571" target="_blank" rel="noreferrer">Jonathan Reichel</a> auf <a href="https://pixabay.com/de//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=4335571" target="_blank" rel="noreferrer">Pixabay</a><br/>
+                Bild von <a href="https://pixabay.com/de/users/angi128-22878334/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=6553345" target="_blank" rel="noreferrer">Angi128</a> auf <a href="https://pixabay.com/de//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=6553345" target="_blank" rel="noreferrer">Pixabay</a><br/>
+                Bild von <a href="https://pixabay.com/de/users/danfador-55851/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=190055" target="_blank" rel="noreferrer">Dan Fador</a> auf <a href="https://pixabay.com/de//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=190055" target="_blank" rel="noreferrer">Pixabay</a>
+              </p>
+            </div>
+            <div className="mt-4 text-right">
+              <button
+                onClick={() => setShowPhotoCreditsModal(false)}
+                className="px-3 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/60"
+              >
+                Schließen
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
 
       {/* Error Recovery Test Modal */}
       <TodoistErrorRecoveryTest
