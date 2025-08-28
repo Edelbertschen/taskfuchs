@@ -253,7 +253,9 @@ const Settings = React.memo(() => {
   
   // All existing state variables...
   const [isDarkMode, setIsDarkMode] = useState(
-    document.documentElement.classList.contains('dark')
+    state.preferences.theme === 'dark' || (
+      state.preferences.theme === 'system' && typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+    )
   );
   const [language, setLanguage] = useState(i18n.language);
   const [notifications, setNotifications] = useState(true);
@@ -881,16 +883,18 @@ const Settings = React.memo(() => {
 
   const handleDarkModeToggle = () => {
     const newDarkMode = !isDarkMode;
+    const newTheme = newDarkMode ? 'dark' : 'light';
     setIsDarkMode(newDarkMode);
-    
-    if (newDarkMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('darkMode', 'true');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('darkMode', 'false');
-    }
+    dispatch({ type: 'UPDATE_PREFERENCES', payload: { theme: newTheme } });
   };
+
+  // Keep local toggle in sync if theme changes elsewhere (e.g., header toggle or after Dropbox download)
+  useEffect(() => {
+    const dm = state.preferences.theme === 'dark' || (
+      state.preferences.theme === 'system' && typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+    );
+    setIsDarkMode(dm);
+  }, [state.preferences.theme]);
 
   const handleLanguageChange = (newLang: string) => {
     setLanguage(newLang);

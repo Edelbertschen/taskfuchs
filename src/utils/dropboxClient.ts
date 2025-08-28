@@ -65,16 +65,65 @@ export class DropboxClient {
     if (!popup) throw new Error('Popup blocked');
 
     const result = await new Promise<{ code?: string; state?: string; error?: string }>((resolve) => {
+      let resolved = false;
+      const cleanup = (handler: any, pollId: number, timeoutId: number) => {
+        try { window.removeEventListener('message', handler); } catch {}
+        try { clearInterval(pollId); } catch {}
+        try { clearTimeout(timeoutId); } catch {}
+      };
+
       const handler = (e: MessageEvent) => {
         if (e.origin !== window.location.origin) return;
         if (typeof e.data !== 'object' || !e.data) return;
         const { type, code, state, error } = e.data as any;
-        if (type === 'DROPBOX_AUTH_CALLBACK') {
-          window.removeEventListener('message', handler as any);
+        if (type === 'DROPBOX_AUTH_CALLBACK' && !resolved) {
+          resolved = true;
+          cleanup(handler, pollId, timeoutId);
           resolve({ code, state, error });
+          try { popup.close(); } catch {}
         }
       };
       window.addEventListener('message', handler as any);
+
+      // Fallback: poll popup location once it navigates back to our origin
+      const pollId = window.setInterval(() => {
+        try {
+          if (!popup || popup.closed) {
+            if (!resolved) {
+              resolved = true;
+              cleanup(handler, pollId, timeoutId);
+              resolve({ error: 'popup_closed' });
+            }
+            return;
+          }
+          const loc = popup.location;
+          // Only proceed when same-origin to avoid cross-origin errors while on Dropbox domain
+          if (loc.origin === window.location.origin) {
+            const params = new URLSearchParams(loc.search || loc.hash?.replace(/^#/, '') || '');
+            const code = params.get('code') || undefined;
+            const stateParam = params.get('state') || undefined;
+            const error = params.get('error') || undefined;
+            if ((code || error) && !resolved) {
+              resolved = true;
+              cleanup(handler, pollId, timeoutId);
+              resolve({ code, state: stateParam, error });
+              try { popup.close(); } catch {}
+            }
+          }
+        } catch {
+          // Ignore while on Dropbox pages (cross-origin)
+        }
+      }, 200);
+
+      // Safety timeout
+      const timeoutId = window.setTimeout(() => {
+        if (!resolved) {
+          resolved = true;
+          cleanup(handler, pollId, timeoutId);
+          resolve({ error: 'timeout' });
+          try { popup.close(); } catch {}
+        }
+      }, 120000);
     });
 
     if (result.error) throw new Error(result.error);

@@ -1,0 +1,2686 @@
+{
+  "tasks": [
+    {
+      "id": "e83aadf1-5057-43e7-899d-9d0d768ff004",
+      "title": "Screenshots der Reisekostenabrechnungsapplikation an Ashik senden",
+      "description": "",
+      "completed": false,
+      "tags": [
+        "arbeit"
+      ],
+      "subtasks": [],
+      "columnId": "project-1752561187805-9xtzj8v39",
+      "createdAt": "2025-07-14T08:17:21.222Z",
+      "updatedAt": "2025-08-25T07:48:53.763Z",
+      "position": 14,
+      "kanbanColumnId": "col-1752561188719-g4l45kms7",
+      "estimatedTime": 30,
+      "linkedNotes": [
+        "1753868924485969kvl9um"
+      ],
+      "projectId": "project-1752561187805-9xtzj8v39",
+      "reminderDate": "2025-08-26"
+    },
+    {
+      "id": "6b342c74-ae12-4cd7-8680-41cef061e562",
+      "title": "Sitzplan anpassen",
+      "description": "## Nachricht von Jonas\n- Hi Malte, ich glaube Juan Carlos fehlt in dem seating plan.\n- Und Thiago glaube ich sollte eigentlich Thibaut heißen",
+      "completed": false,
+      "estimatedTime": 25,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "project-1752561187805-9xtzj8v39",
+      "createdAt": "2025-07-14T08:18:04.110Z",
+      "updatedAt": "2025-08-25T07:49:24.064Z",
+      "position": 5,
+      "success": true,
+      "task": {
+        "title": "Sitzplan anpassen",
+        "description": "## Nachricht von Jonas - Hi Malte, ich glaube Juan Carlos fehlt in dem seating plan. - Und Thiago glaube ich sollte eigentlich Thibaut heißen",
+        "tags": []
+      },
+      "errors": [],
+      "suggestions": [
+        "Tipp: Verwenden Sie ! für niedrige, !! für mittlere oder !!! für hohe Priorität",
+        "Tipp: Verwenden Sie #tags zur Organisation (z.B. #arbeit, #privat)",
+        "Tipp: Geben Sie eine Zeitschätzung an (z.B. 30m, 1h, 90min)",
+        "Tipp: Verwenden Sie @heute, @morgen oder @inbox zur expliziten Spalten-Zuordnung"
+      ],
+      "linkedNotes": [],
+      "kanbanColumnId": "col-1752561731913-q9e4bm5aa",
+      "projectId": "project-1752561187805-9xtzj8v39",
+      "reminderDate": "2025-09-01"
+    },
+    {
+      "id": "278fac85-45da-44d7-9896-ca9abf851068",
+      "title": "Mit Ashik über Windows-Upgrades sprechen",
+      "description": "",
+      "completed": true,
+      "tags": [
+        "arbeit"
+      ],
+      "subtasks": [],
+      "columnId": "date-2025-08-01",
+      "createdAt": "2025-07-14T08:18:55.738Z",
+      "updatedAt": "2025-07-31T12:31:01.039Z",
+      "position": 9,
+      "kanbanColumnId": "col-1752561731913-q9e4bm5aa",
+      "reminderDate": "2025-08-01",
+      "estimatedTime": 10,
+      "linkedNotes": [],
+      "dueDate": "2025-08-01",
+      "projectId": "project-1752561187805-9xtzj8v39"
+    },
+    {
+      "id": "1ea479c5-b72c-4681-8d44-86e05a2f5c26",
+      "title": "Neue Visitenkarten bestellen",
+      "description": "J.\n- 100 Stück\n- en",
+      "completed": true,
+      "estimatedTime": 45,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-07-21",
+      "createdAt": "2025-07-14T08:19:02.383Z",
+      "updatedAt": "2025-07-21T10:20:59.509Z",
+      "position": 3,
+      "linkedNotes": [],
+      "reminderDate": "2025-07-21",
+      "trackedTime": 37,
+      "reminderTime": "16:27"
+    },
+    {
+      "id": "eeb79373-7f27-4887-af8e-3e88617cda86",
+      "title": "Anpassungen an Webseite Unique Wood machen",
+      "description": "## Mail von Andrea\nHallo Malte,\n\nich hoffe, es geht dir gut. Könntest du mir bitte dabei helfen, unsere öffentliche Zusammenfassung des Waldbewirtschaftungsplans 2024 von Forestal Apepu, die ich dir im Anhang schicke, auf die Website von UNIQUE Wood hochzuladen?\n\nVielen Dank im Voraus.\nViele Grüße,\n\n\n[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFQY41FgAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (9.7.2025)",
+      "completed": true,
+      "estimatedTime": 20,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-07-15",
+      "createdAt": "2025-07-14T08:19:54.644Z",
+      "updatedAt": "2025-07-15T06:45:20.766Z",
+      "position": 1752481194645,
+      "linkedNotes": [],
+      "kanbanColumnId": "col-1752561672157-g38e1xha4",
+      "reminderDate": "2025-07-15",
+      "projectId": "project-1752561187805-9xtzj8v39"
+    },
+    {
+      "id": "1e9e508d-a4e7-40d1-b510-ec75690340a1",
+      "title": "Migration Nextcloud zu Hetzner vorbereiten",
+      "description": "",
+      "completed": false,
+      "tags": [],
+      "subtasks": [
+        {
+          "id": "subtask-1753863648571-mbdphom7w",
+          "title": "Preise chekcen",
+          "description": "",
+          "completed": false,
+          "trackedTime": 0,
+          "tags": [],
+          "createdAt": "2025-07-30T08:20:48.571Z",
+          "updatedAt": "2025-07-30T08:20:48.571Z"
+        },
+        {
+          "id": "subtask-1753863654160-saz73tzxz",
+          "title": "Abstimmung mit Ashik",
+          "description": "",
+          "completed": false,
+          "trackedTime": 0,
+          "tags": [],
+          "createdAt": "2025-07-30T08:20:54.160Z",
+          "updatedAt": "2025-07-30T08:20:54.160Z"
+        },
+        {
+          "id": "subtask-1753863660888-s02hu4fsk",
+          "title": "Migrationsplan erstellen",
+          "description": "",
+          "completed": false,
+          "trackedTime": 0,
+          "tags": [],
+          "createdAt": "2025-07-30T08:21:00.888Z",
+          "updatedAt": "2025-07-30T08:21:00.888Z"
+        },
+        {
+          "id": "subtask-1753863672809-4gi1f886g",
+          "title": "",
+          "description": "",
+          "completed": false,
+          "trackedTime": 0,
+          "tags": [],
+          "createdAt": "2025-07-30T08:21:12.809Z",
+          "updatedAt": "2025-07-30T08:21:12.809Z"
+        }
+      ],
+      "columnId": "project-1752561187805-9xtzj8v39",
+      "createdAt": "2025-07-14T08:21:47.131Z",
+      "updatedAt": "2025-08-25T07:49:02.438Z",
+      "position": 2,
+      "kanbanColumnId": "col-1752561188719-g4l45kms7",
+      "estimatedTime": 50,
+      "linkedNotes": [],
+      "projectId": "project-1752561187805-9xtzj8v39",
+      "reminderDate": "2025-08-26"
+    },
+    {
+      "id": "237a19ac-be47-4e1a-9955-dd5816e1ec81",
+      "title": "Bei Michael wegen Proxmox nachhaken",
+      "description": "",
+      "completed": true,
+      "tags": [
+        "arbeit"
+      ],
+      "subtasks": [],
+      "columnId": "date-2025-08-01",
+      "createdAt": "2025-07-14T08:21:51.428Z",
+      "updatedAt": "2025-07-31T12:31:01.039Z",
+      "position": 6,
+      "kanbanColumnId": "col-1752561188719-g4l45kms7",
+      "reminderDate": "2025-08-01",
+      "estimatedTime": 10,
+      "linkedNotes": [],
+      "dueDate": "2025-07-31",
+      "pinColumnId": "pin-1753871514451-aqkam29kx",
+      "pinned": true
+    },
+    {
+      "id": "0e85297e-d620-470d-8d7c-888e48d3f742",
+      "title": "Grayson Webb auf Webseite stellen",
+      "description": "",
+      "completed": true,
+      "tags": [
+        "arbeit"
+      ],
+      "subtasks": [],
+      "columnId": "date-2025-08-01",
+      "createdAt": "2025-07-14T08:22:03.947Z",
+      "updatedAt": "2025-08-01T13:31:09.728Z",
+      "position": 5,
+      "estimatedTime": 20,
+      "reminderDate": "2025-08-01",
+      "linkedNotes": [],
+      "trackedTime": 7.583333333333312
+    },
+    {
+      "id": "b625515d-8d21-4d1d-98d4-6d84ef4704ef",
+      "title": "Intrexx-Anpassungen von Dennis planen",
+      "description": "[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFL0Ei8gAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (27.6.2025)",
+      "completed": true,
+      "estimatedTime": 30,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-27",
+      "createdAt": "2025-07-14T08:22:42.182Z",
+      "updatedAt": "2025-08-27T15:21:19.718Z",
+      "position": 3,
+      "linkedNotes": [],
+      "kanbanColumnId": "col-1752561188719-g4l45kms7",
+      "projectId": "project-1752561187805-9xtzj8v39",
+      "reminderDate": "2025-08-27",
+      "archived": true
+    },
+    {
+      "id": "e123c844-6130-469f-97c9-da6e2f3e2e42",
+      "title": "KI-Strategie überarbeiten",
+      "description": "",
+      "completed": false,
+      "estimatedTime": 0,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "project-1752481231598-z9g5g889y",
+      "projectId": "project-1752481231598-z9g5g889y",
+      "kanbanColumnId": "col-1752481233216-q0tncg668",
+      "createdAt": "2025-07-14T08:27:07.209Z",
+      "updatedAt": "2025-08-25T07:49:07.277Z",
+      "position": 1752481596960,
+      "linkedNotes": [],
+      "reminderDate": "2025-09-01"
+    },
+    {
+      "id": "76125068-4c73-4ac7-873c-94b540cf82ce",
+      "title": "Unique Wood: Server mit RustDesk",
+      "description": "",
+      "completed": true,
+      "estimatedTime": 30,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-07-15",
+      "reminderDate": "2025-07-15",
+      "createdAt": "2025-07-15T06:43:45.737Z",
+      "updatedAt": "2025-07-15T08:56:32.752Z",
+      "position": 1752481627211,
+      "trackedTime": 15.533333333333685,
+      "completedAt": "2025-07-15T08:56:32.752Z"
+    },
+    {
+      "id": "af3a91c6-cd85-4692-ba80-baab7762ab1c",
+      "title": "Vorstellungsgespräch vorbereiten",
+      "description": "",
+      "completed": true,
+      "estimatedTime": 20,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-07-15",
+      "reminderDate": "2025-07-15",
+      "createdAt": "2025-07-15T06:45:17.875Z",
+      "updatedAt": "2025-07-15T06:45:20.766Z",
+      "position": 1752481194644,
+      "trackedTime": 0
+    },
+    {
+      "id": "385010f8-610b-4e21-ae78-ab648f9d22d6",
+      "title": "Mail an MA schreiben",
+      "description": "Vielen Dank ...\nStrategie liegt im Ordner ...",
+      "completed": true,
+      "priority": "high",
+      "estimatedTime": 45,
+      "tags": [],
+      "subtasks": [
+        {
+          "id": "subtask-1753086456056-9eejylqy2",
+          "title": "Strategie in Ordner legen",
+          "description": "",
+          "completed": false,
+          "estimatedTime": 0,
+          "trackedTime": 0,
+          "tags": [],
+          "createdAt": "2025-07-21T08:27:36.056Z",
+          "updatedAt": "2025-07-21T08:27:36.056Z"
+        },
+        {
+          "id": "subtask-1753086469339-433u9n7cx",
+          "title": "Mail mit Link versenden",
+          "description": "",
+          "completed": false,
+          "estimatedTime": 0,
+          "trackedTime": 0,
+          "tags": [],
+          "createdAt": "2025-07-21T08:27:49.339Z",
+          "updatedAt": "2025-07-21T08:27:49.339Z"
+        }
+      ],
+      "columnId": "date-2025-07-21",
+      "projectId": "project-1752481231598-z9g5g889y",
+      "kanbanColumnId": "col-1752481233216-q0tncg668",
+      "dueDate": "2025-07-21",
+      "reminderDate": "2025-07-21",
+      "createdAt": "2025-07-21T08:27:27.233Z",
+      "updatedAt": "2025-07-21T09:38:59.579Z",
+      "position": 2,
+      "linkedNotes": [],
+      "trackedTime": 27
+    },
+    {
+      "id": "c15fc727-b5f7-4cde-aae5-ed45578b471b",
+      "title": "Bewerberprofile anschauen für Mittwoch",
+      "description": "",
+      "completed": true,
+      "estimatedTime": 25,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-07-23",
+      "dueDate": "2025-07-21",
+      "reminderDate": "2025-07-23",
+      "createdAt": "2025-07-21T08:28:59.536Z",
+      "updatedAt": "2025-07-23T15:32:40.802Z",
+      "position": 1,
+      "linkedNotes": [],
+      "deadline": "2025-07-22",
+      "archived": true
+    },
+    {
+      "id": "17271e2c-9bf1-45a4-93ca-8c16d3543133",
+      "title": "Intrexx-Sitzung vorbereiten",
+      "description": "",
+      "completed": true,
+      "estimatedTime": 60,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-07-23",
+      "dueDate": "2025-07-22",
+      "reminderDate": "2025-07-23",
+      "createdAt": "2025-07-21T08:29:18.594Z",
+      "updatedAt": "2025-07-23T15:32:40.802Z",
+      "position": 0,
+      "linkedNotes": [],
+      "trackedTime": 30,
+      "archived": true
+    },
+    {
+      "id": "53686ac6-47db-4fef-911d-96b2c623fdb7",
+      "title": "Rechner bestellen",
+      "description": "We need 3 PCs for Canopea:\n\nThomas Ruf: German keyboard. [UNIQUE Helpdesk](https://unique.zammad.com/#ticket/zoom/5083)",
+      "completed": true,
+      "estimatedTime": 20,
+      "tags": [
+        "canopea"
+      ],
+      "subtasks": [],
+      "columnId": "project-1753087049586-kxt00n020",
+      "projectId": "project-1753087049586-kxt00n020",
+      "kanbanColumnId": "col-1753087059503-fduqk083j",
+      "reminderDate": "2025-07-30",
+      "createdAt": "2025-07-21T08:37:51.580Z",
+      "updatedAt": "2025-07-30T09:19:47.845Z",
+      "position": 0,
+      "linkedNotes": [],
+      "dueDate": "2025-07-24"
+    },
+    {
+      "id": "7e40d444-f3c3-4243-8e2f-20124a7e21d3",
+      "title": "Mitarbeiterbefragung ausfüllen",
+      "description": "[🌐 Unique Employee Engagement 2025](https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=sBdzKcVJFEyWmfvIPOh89HCKotNAkulPuoBG8i_jb_tUREJNVlM2N0lRTlFCRDlWR05LREZWVDdWRi4u) (21.7.2025)",
+      "completed": true,
+      "estimatedTime": 30,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-07-21",
+      "dueDate": "2025-07-21",
+      "reminderDate": "2025-07-21",
+      "createdAt": "2025-07-21T08:39:39.587Z",
+      "updatedAt": "2025-07-21T08:55:34.947Z",
+      "position": 0,
+      "linkedNotes": [],
+      "trackedTime": 3.566666666666659,
+      "completedAt": "2025-07-21T08:55:34.947Z"
+    },
+    {
+      "id": "cb42c694-3339-40fa-840e-b3fee409be36",
+      "title": "Sofia in Intrexx vorstellen",
+      "description": "https://unique.zammad.com/#ticket/zoom/5084 heute",
+      "completed": true,
+      "estimatedTime": 20,
+      "tags": [
+        "ticket"
+      ],
+      "subtasks": [],
+      "columnId": "date-2025-07-23",
+      "dueDate": "2025-07-23",
+      "reminderDate": "2025-07-23",
+      "createdAt": "2025-07-23T10:00:24.503Z",
+      "updatedAt": "2025-07-23T15:32:40.802Z",
+      "position": 2,
+      "linkedNotes": [],
+      "archived": true
+    },
+    {
+      "id": "726f544b-4950-4a29-ab49-c03fe2af6c5b",
+      "title": "Field Computer Marlène",
+      "description": "[UNIQUE Helpdesk](https://unique.zammad.com/#ticket/zoom/5050)",
+      "completed": true,
+      "estimatedTime": 15,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-07-30",
+      "createdAt": "2025-07-23T10:23:49.305Z",
+      "updatedAt": "2025-07-30T14:28:50.243Z",
+      "position": 7,
+      "success": true,
+      "task": {
+        "title": "Field Computer Marlène",
+        "tags": []
+      },
+      "errors": [],
+      "suggestions": [
+        "Tipp: Verwenden Sie ! für niedrige, !! für mittlere oder !!! für hohe Priorität",
+        "Tipp: Verwenden Sie #tags zur Organisation (z.B. #arbeit, #privat)",
+        "Tipp: Geben Sie eine Zeitschätzung an (z.B. 30m, 1h, 90min)",
+        "Tipp: Verwenden Sie @heute, @morgen oder @inbox zur expliziten Spalten-Zuordnung"
+      ],
+      "linkedNotes": [],
+      "reminderDate": "2025-07-30"
+    },
+    {
+      "id": "3b97658d-177a-4a16-9870-10e4ce729ab5",
+      "title": "Abwesenheitsnachricht einstellen",
+      "description": "",
+      "completed": true,
+      "priority": "high",
+      "estimatedTime": 5,
+      "tags": [
+        "arbeit"
+      ],
+      "subtasks": [],
+      "columnId": "date-2025-08-01",
+      "reminderDate": "2025-08-01",
+      "createdAt": "2025-07-30T08:20:25.817Z",
+      "updatedAt": "2025-07-31T12:31:01.039Z",
+      "position": 3,
+      "trackedTime": 0,
+      "linkedNotes": [],
+      "projectId": "project-1752561187805-9xtzj8v39",
+      "kanbanColumnId": "col-1752561731913-q9e4bm5aa",
+      "dueDate": "2025-08-01"
+    },
+    {
+      "id": "5395ccd6-a060-4f0a-91f7-f26025ef46bd",
+      "title": "Intrexx: Erinnerungsmail an PL konfigurieren",
+      "description": "",
+      "completed": true,
+      "priority": "medium",
+      "estimatedTime": 20,
+      "tags": [
+        "arbeit"
+      ],
+      "subtasks": [],
+      "columnId": "date-2025-08-27",
+      "reminderDate": "2025-08-27",
+      "createdAt": "2025-07-30T08:22:27.510Z",
+      "updatedAt": "2025-08-27T15:21:19.718Z",
+      "position": 10,
+      "linkedNotes": [],
+      "dueDate": "2025-08-25",
+      "trackedTime": 0.6166666666666669,
+      "archived": true
+    },
+    {
+      "id": "0e8e06d5-eb94-439d-a73e-d949b9ee6bd8",
+      "title": "Mails durchgehen",
+      "description": "",
+      "completed": true,
+      "estimatedTime": 30,
+      "tags": [
+        "arbeit"
+      ],
+      "subtasks": [],
+      "columnId": "date-2025-08-01",
+      "reminderDate": "2025-08-01",
+      "createdAt": "2025-07-30T08:22:49.334Z",
+      "updatedAt": "2025-08-01T08:26:07.701Z",
+      "position": 0,
+      "trackedTime": 24.583333333333243
+    },
+    {
+      "id": "7e99c2dd-7954-4fc1-b71a-920716357fba",
+      "title": "BBL vorbereiten",
+      "description": "",
+      "completed": true,
+      "estimatedTime": 30,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-07-30",
+      "reminderDate": "2025-07-30",
+      "createdAt": "2025-07-30T08:22:57.103Z",
+      "updatedAt": "2025-07-30T14:28:50.243Z",
+      "position": 0,
+      "trackedTime": 4.899999999999988
+    },
+    {
+      "id": "7232dcbd-ba3f-4693-ac1c-15fa2504c03b",
+      "title": "Linux-Stick vorbereiten",
+      "description": "",
+      "completed": true,
+      "estimatedTime": 15,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-07-30",
+      "reminderDate": "2025-07-30",
+      "createdAt": "2025-07-30T08:54:25.970Z",
+      "updatedAt": "2025-07-30T14:28:50.243Z",
+      "position": 8
+    },
+    {
+      "id": "b81bac57-dc14-4a16-b68b-bb559d04405e",
+      "title": "Herrn Heitzmann (Sirius) antworten",
+      "description": "[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFUZfSiAAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (30.7.2025)",
+      "completed": true,
+      "tags": [
+        "arbeit"
+      ],
+      "subtasks": [],
+      "columnId": "date-2025-08-01",
+      "createdAt": "2025-07-30T09:01:29.357Z",
+      "updatedAt": "2025-08-01T13:39:45.045Z",
+      "position": 10
+    },
+    {
+      "id": "8831b74d-069d-4399-97ea-84884b9d9592",
+      "title": "Migration der DF-Postfächer checken",
+      "description": "[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFUZcHvwAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (30.7.2025)",
+      "completed": true,
+      "priority": "high",
+      "tags": [
+        "arbeit"
+      ],
+      "subtasks": [],
+      "columnId": "date-2025-08-01",
+      "createdAt": "2025-07-30T09:02:15.901Z",
+      "updatedAt": "2025-07-31T12:31:01.039Z",
+      "position": 1,
+      "kanbanColumnId": "col-1752561188719-g4l45kms7",
+      "reminderDate": "2025-08-01",
+      "estimatedTime": 20,
+      "linkedNotes": [],
+      "dueDate": "2025-08-01"
+    },
+    {
+      "id": "5e706ef2-abca-462f-97c6-d487c994ac8b",
+      "title": "OpenAI-Rechnungen weiterleiten",
+      "description": "[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFUZcDFwAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (30.7.2025)",
+      "completed": true,
+      "tags": [
+        "arbeit"
+      ],
+      "subtasks": [],
+      "columnId": "date-2025-08-01",
+      "createdAt": "2025-07-30T09:03:00.988Z",
+      "updatedAt": "2025-07-31T12:31:01.039Z",
+      "position": 11
+    },
+    {
+      "id": "32b99bb4-9d50-4308-90da-465abab5ff4a",
+      "title": "Vodafone-Vertragslaufzeiten in Wiki eintragen",
+      "description": "[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFUZZ2rQAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (30.7.2025)",
+      "completed": true,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-27",
+      "createdAt": "2025-07-30T09:23:08.309Z",
+      "updatedAt": "2025-08-27T15:21:19.718Z",
+      "position": 4,
+      "kanbanColumnId": "col-1752561188719-g4l45kms7",
+      "reminderDate": "2025-08-27",
+      "estimatedTime": 20,
+      "linkedNotes": [],
+      "dueDate": "2025-08-27",
+      "trackedTime": 9.083333333333364,
+      "archived": true
+    },
+    {
+      "id": "549d6288-b43d-4bab-afbc-1c72dda04dca",
+      "title": "Klärung von KI-Nutzung - AVV-Verträge mit Gero Wilke",
+      "description": "[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFTWJwvwAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (30.7.2025)",
+      "completed": false,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "project-1752561187805-9xtzj8v39",
+      "createdAt": "2025-07-30T09:35:17.309Z",
+      "updatedAt": "2025-08-25T07:49:16.768Z",
+      "position": 3,
+      "kanbanColumnId": "col-1752561188719-g4l45kms7",
+      "reminderDate": "2025-09-01"
+    },
+    {
+      "id": "055d7735-c239-49b9-a494-a1ab1d53767f",
+      "title": "Visitenkarten bestellen",
+      "description": "[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFTWHTSgAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (30.7.2025)",
+      "completed": true,
+      "priority": "medium",
+      "tags": [
+        "arbeit"
+      ],
+      "subtasks": [],
+      "columnId": "date-2025-08-01",
+      "kanbanColumnId": "col-1752561188719-g4l45kms7",
+      "createdAt": "2025-07-30T09:37:46.930Z",
+      "updatedAt": "2025-07-31T12:31:01.039Z",
+      "position": 4,
+      "reminderDate": "2025-08-01",
+      "estimatedTime": 20,
+      "linkedNotes": [],
+      "dueDate": "2025-08-01"
+    },
+    {
+      "id": "c85aff20-07f6-4e67-88f2-c151f6f5381c",
+      "title": "Stefanie Scherle antworten",
+      "description": "[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFTWCCyAAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (30.7.2025)",
+      "completed": true,
+      "tags": [
+        "arbeit"
+      ],
+      "subtasks": [],
+      "columnId": "date-2025-08-01",
+      "createdAt": "2025-07-30T09:39:56.500Z",
+      "updatedAt": "2025-08-01T13:56:30.349Z",
+      "position": 12
+    },
+    {
+      "id": "e1f0c14a-a5a3-4739-ad54-c4e6b085afc8",
+      "title": "Einbindung TrendMicro klären",
+      "description": "[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFTWAbOgAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (30.7.2025) morgen",
+      "completed": true,
+      "estimatedTime": 10,
+      "tags": [
+        "arbeit"
+      ],
+      "subtasks": [],
+      "columnId": "date-2025-08-01",
+      "dueDate": "2025-07-31",
+      "reminderDate": "2025-08-01",
+      "createdAt": "2025-07-30T09:40:58.866Z",
+      "updatedAt": "2025-08-01T13:36:41.830Z",
+      "position": 8,
+      "linkedNotes": [],
+      "trackedTime": 0.7833333333333341
+    },
+    {
+      "id": "b69f59d6-56b7-4e43-9ace-2b4de84fa9bf",
+      "title": "Rückmeldung an Daniel Höse / Dataciders",
+      "description": "[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFTUkHQQAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (30.7.2025)",
+      "completed": true,
+      "tags": [
+        "arbeit"
+      ],
+      "subtasks": [],
+      "columnId": "date-2025-08-01",
+      "createdAt": "2025-07-30T09:46:56.278Z",
+      "updatedAt": "2025-08-01T13:56:55.176Z",
+      "position": 13,
+      "reminderDate": "2025-08-01",
+      "linkedNotes": [],
+      "projectId": "project-1752561187805-9xtzj8v39",
+      "kanbanColumnId": "col-1752561731913-q9e4bm5aa",
+      "dueDate": "2025-08-01"
+    },
+    {
+      "id": "51092171-66e6-4532-bf3d-37cc65499fd3",
+      "title": "Bild von Diana sichern",
+      "description": "ist in Nextcloud",
+      "completed": true,
+      "priority": "high",
+      "estimatedTime": 10,
+      "tags": [
+        "arbeit"
+      ],
+      "subtasks": [],
+      "columnId": "date-2025-08-01",
+      "dueDate": "2025-08-01",
+      "reminderDate": "2025-08-01",
+      "createdAt": "2025-07-31T12:26:34.816Z",
+      "updatedAt": "2025-07-31T12:31:01.039Z",
+      "position": 2,
+      "linkedNotes": []
+    },
+    {
+      "id": "2edc4389-9fd2-4aa6-bf1f-2ceef74fea06",
+      "title": "Fahrradständer kaufen",
+      "description": "25cm Länge",
+      "completed": true,
+      "priority": "medium",
+      "tags": [
+        "privat"
+      ],
+      "subtasks": [],
+      "columnId": "date-2025-08-01",
+      "dueDate": "2025-07-31",
+      "reminderDate": "2025-08-01",
+      "createdAt": "2025-07-31T13:46:38.964Z",
+      "updatedAt": "2025-08-01T07:46:15.126Z",
+      "position": 15,
+      "linkedNotes": []
+    },
+    {
+      "id": "4e64e97d-4704-48a2-9fea-f599250f80eb",
+      "title": "Tim Nairn anlegen",
+      "description": "",
+      "completed": true,
+      "estimatedTime": 20,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-01",
+      "reminderDate": "2025-08-01",
+      "createdAt": "2025-08-01T07:46:24.108Z",
+      "updatedAt": "2025-08-01T07:46:24.108Z",
+      "position": 1754034384108
+    },
+    {
+      "id": "0c481c42-173a-4f79-a6ba-23a94ae3cd63",
+      "title": "Maribels Mail",
+      "description": "[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFU4HaMAAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (1.8.2025)",
+      "completed": true,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-25",
+      "dueDate": "2025-08-01",
+      "reminderDate": "2025-08-25",
+      "createdAt": "2025-08-01T07:47:51.226Z",
+      "updatedAt": "2025-08-25T07:59:25.646Z",
+      "position": 9
+    },
+    {
+      "id": "38b02671-82b5-49ce-9b2a-3134cea3fdc6",
+      "title": "Bei Lukas zu Angebot melden",
+      "description": "",
+      "completed": false,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "inbox",
+      "createdAt": "2025-08-01T08:25:11.836Z",
+      "updatedAt": "2025-08-01T08:25:11.836Z",
+      "position": 1754036711836
+    },
+    {
+      "id": "3918e026-785d-4192-8f8e-1bc8a6b585d3",
+      "title": "Visitenkarten Jochen und Ben bestellen",
+      "description": "",
+      "completed": true,
+      "estimatedTime": 10,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-25",
+      "dueDate": "2025-08-01",
+      "reminderDate": "2025-08-25",
+      "createdAt": "2025-08-01T11:58:34.206Z",
+      "updatedAt": "2025-08-25T07:59:25.646Z",
+      "position": 10
+    },
+    {
+      "id": "04ea6012-c5c8-457e-922e-7d0cb9751200",
+      "title": "Stunden eintragen",
+      "description": "",
+      "completed": true,
+      "priority": "high",
+      "estimatedTime": 5,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-25",
+      "dueDate": "2025-08-01",
+      "reminderDate": "2025-08-25",
+      "createdAt": "2025-08-01T12:23:44.735Z",
+      "updatedAt": "2025-08-25T07:59:25.646Z",
+      "position": 11
+    },
+    {
+      "id": "56860106-c316-49c2-9f1a-39ca670b7c51",
+      "title": "Belege prüfen",
+      "description": "",
+      "completed": true,
+      "estimatedTime": 10,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-25",
+      "dueDate": "2025-08-25",
+      "reminderDate": "2025-08-25",
+      "createdAt": "2025-08-01T12:42:14.892Z",
+      "updatedAt": "2025-08-25T09:06:08.448Z",
+      "position": 12,
+      "priority": "high",
+      "linkedNotes": []
+    },
+    {
+      "id": "9d84ea6c-70de-4933-a350-e43fc1ed66d1",
+      "title": "Mails und Tickets",
+      "description": "",
+      "completed": true,
+      "estimatedTime": 120,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-25",
+      "reminderDate": "2025-08-25",
+      "createdAt": "2025-08-25T06:16:46.387Z",
+      "updatedAt": "2025-08-25T08:50:09.631Z",
+      "position": 0,
+      "trackedTime": 94.44999999999912
+    },
+    {
+      "id": "0c437e8b-1b33-4187-a0fa-38000b315fc1",
+      "title": "Stundenexport an Carola senden",
+      "description": "",
+      "completed": true,
+      "estimatedTime": 15,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-27",
+      "reminderDate": "2025-08-27",
+      "createdAt": "2025-08-25T06:19:52.227Z",
+      "updatedAt": "2025-08-27T15:21:19.718Z",
+      "position": 5,
+      "linkedNotes": [],
+      "dueDate": "2025-08-27",
+      "trackedTime": 9.933333333333406,
+      "archived": true
+    },
+    {
+      "id": "6902c347-cd5c-432d-96ca-18d3dd2f015c",
+      "title": "Intrexx-News anpassen",
+      "description": "https://unique.zammad.com/#ticket/zoom/5113",
+      "completed": true,
+      "estimatedTime": 10,
+      "tags": [
+        "ticket"
+      ],
+      "subtasks": [],
+      "columnId": "date-2025-08-25",
+      "reminderDate": "2025-08-25",
+      "createdAt": "2025-08-25T07:27:20.032Z",
+      "updatedAt": "2025-08-25T08:54:10.360Z",
+      "position": 1,
+      "trackedTime": 2.066666666666664
+    },
+    {
+      "id": "281ace1e-3cc3-4255-a8de-10fceadbfb5e",
+      "title": "Personio-Anpassung Gwen",
+      "description": "[🎫 UNIQUE Helpdesk -  - Help with Unique Carreer webpage and Personio multi-posting](https://unique.zammad.com/#ticket/zoom/5149) (25.8.2025)",
+      "completed": true,
+      "estimatedTime": 20,
+      "tags": [
+        "505148",
+        "ticket"
+      ],
+      "subtasks": [],
+      "columnId": "date-2025-08-27",
+      "reminderDate": "2025-08-27",
+      "createdAt": "2025-08-25T07:29:10.825Z",
+      "updatedAt": "2025-08-27T15:21:19.718Z",
+      "position": 6,
+      "archived": true
+    },
+    {
+      "id": "fc837bf7-2322-4b49-8e0c-cc52f19aaa87",
+      "title": "Sara auf Intrexx stellen",
+      "description": "[🎫 UNIQUE Helpdesk -  - Photo & introduction as climate intern](https://unique.zammad.com/#ticket/zoom/5138) (25.8.2025)",
+      "completed": true,
+      "estimatedTime": 10,
+      "tags": [
+        "505137",
+        "ticket"
+      ],
+      "subtasks": [],
+      "columnId": "date-2025-08-25",
+      "reminderDate": "2025-08-25",
+      "createdAt": "2025-08-25T07:32:03.990Z",
+      "updatedAt": "2025-08-25T09:05:28.934Z",
+      "position": 3,
+      "trackedTime": 1.0833333333333344
+    },
+    {
+      "id": "fe988444-72b4-413d-9ede-d1ad6278891e",
+      "title": "Christina auf Intrexx stellen",
+      "description": "[🎫 UNIQUE Helpdesk -  - Introductory message as Climate Intern.](https://unique.zammad.com/#ticket/zoom/5132) (25.8.2025)",
+      "completed": true,
+      "estimatedTime": 10,
+      "tags": [
+        "505131",
+        "ticket"
+      ],
+      "subtasks": [],
+      "columnId": "date-2025-08-25",
+      "reminderDate": "2025-08-25",
+      "createdAt": "2025-08-25T07:33:03.517Z",
+      "updatedAt": "2025-08-25T09:10:07.534Z",
+      "position": 4,
+      "trackedTime": 1.100000000000001
+    },
+    {
+      "id": "11cc8447-3c73-4cd9-af9a-268b2faa4e09",
+      "title": "Fridah auf Intrexx stellen",
+      "description": "https://unique.zammad.com/#ticket/zoom/5131",
+      "completed": true,
+      "estimatedTime": 10,
+      "tags": [
+        "ticket"
+      ],
+      "subtasks": [],
+      "columnId": "date-2025-08-25",
+      "reminderDate": "2025-08-25",
+      "createdAt": "2025-08-25T07:33:45.554Z",
+      "updatedAt": "2025-08-25T09:02:02.432Z",
+      "position": 2,
+      "trackedTime": 3.399999999999993
+    },
+    {
+      "id": "a05de1d6-58f2-40d8-8936-829522cf3e61",
+      "title": "Paraguay VPN klären",
+      "description": "[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFY%2F6mOwAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (25.8.2025)\n\n[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFY%2F%2FA3AAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (27.8.2025)",
+      "completed": true,
+      "estimatedTime": 20,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-27",
+      "createdAt": "2025-08-25T07:39:54.966Z",
+      "updatedAt": "2025-08-27T15:21:19.718Z",
+      "position": 11,
+      "linkedNotes": [],
+      "archived": true
+    },
+    {
+      "id": "250f910b-3dfd-4ee3-bbd2-966c3eb30da8",
+      "title": "Webseitentexte von Tina und Gwen ändern",
+      "description": "[🎫 UNIQUE Helpdesk -  - Über uns - unique Wepage Änderungen / Korrektur](https://unique.zammad.com/#ticket/zoom/5148) (25.8.2025)",
+      "completed": true,
+      "estimatedTime": 30,
+      "tags": [
+        "505147",
+        "ticket"
+      ],
+      "subtasks": [],
+      "columnId": "date-2025-08-25",
+      "reminderDate": "2025-08-25",
+      "createdAt": "2025-08-25T07:41:49.956Z",
+      "updatedAt": "2025-08-25T10:00:13.823Z",
+      "position": 6,
+      "trackedTime": 8.666666666666677
+    },
+    {
+      "id": "d2810969-b8de-4906-828b-baa7a8d190f2",
+      "title": "Migration zu Remote anschauen",
+      "description": "[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFXZ07ywAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (25.8.2025)\n\n[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFY%2F%2FUMgAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (27.8.2025)\n",
+      "completed": false,
+      "estimatedTime": 30,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-28",
+      "createdAt": "2025-08-25T07:44:27.289Z",
+      "updatedAt": "2025-08-27T08:03:08.829Z",
+      "position": 1,
+      "reminderDate": "2025-08-28",
+      "linkedNotes": [],
+      "dueDate": "2025-08-28"
+    },
+    {
+      "id": "97d30855-0141-4515-9b77-e8d8ab591962",
+      "title": "Liste der Win11-rechner durchschauen",
+      "description": "[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFXZ0zzQAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (25.8.2025)",
+      "completed": true,
+      "estimatedTime": 45,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-27",
+      "createdAt": "2025-08-25T07:45:11.571Z",
+      "updatedAt": "2025-08-27T15:21:19.718Z",
+      "position": 12,
+      "trackedTime": 6.2333333333333165,
+      "archived": true
+    },
+    {
+      "id": "cbfa77d3-230a-4500-b2a5-a6991a26515e",
+      "title": "Moodle updaten",
+      "description": "",
+      "completed": false,
+      "estimatedTime": 40,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "project-1752561187805-9xtzj8v39",
+      "createdAt": "2025-08-25T07:45:50.039Z",
+      "updatedAt": "2025-08-27T06:30:13.124Z",
+      "position": 1756107950039,
+      "kanbanColumnId": "col-1752561188719-g4l45kms7"
+    },
+    {
+      "id": "40c112cd-84fc-4fe0-b282-cc01726fad81",
+      "title": "Belege prüfen",
+      "description": "",
+      "completed": true,
+      "priority": "high",
+      "estimatedTime": 20,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-25",
+      "reminderDate": "2025-08-25",
+      "createdAt": "2025-08-25T07:48:25.570Z",
+      "updatedAt": "2025-08-25T09:34:06.842Z",
+      "position": 5,
+      "trackedTime": 5.649999999999985
+    },
+    {
+      "id": "96966071-c669-4015-a8d6-e7456f220f68",
+      "title": "DeepL abrechnen",
+      "description": "[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFWlMmzwAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (25.8.2025)",
+      "completed": true,
+      "estimatedTime": 10,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-27",
+      "createdAt": "2025-08-25T08:00:19.838Z",
+      "updatedAt": "2025-08-27T15:21:19.718Z",
+      "position": 14,
+      "trackedTime": 1.2500000000000004,
+      "archived": true
+    },
+    {
+      "id": "e3d02cd6-6d38-4a74-a222-c4f40bb09be9",
+      "title": "Cursor abrechnen",
+      "description": "",
+      "completed": true,
+      "estimatedTime": 30,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-27",
+      "createdAt": "2025-08-25T08:00:50.435Z",
+      "updatedAt": "2025-08-27T15:21:19.718Z",
+      "position": 15,
+      "trackedTime": 28.266666666666342,
+      "archived": true
+    },
+    {
+      "id": "b95299a1-68dc-46a4-b33a-b45e01dc5dd9",
+      "title": "Due Dilligence MArco Kaiser",
+      "description": "[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFWlMQFwAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (25.8.2025)",
+      "completed": false,
+      "estimatedTime": 40,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-28",
+      "createdAt": "2025-08-25T08:01:43.048Z",
+      "updatedAt": "2025-08-27T07:07:29.258Z",
+      "position": 16,
+      "reminderDate": "2025-08-28"
+    },
+    {
+      "id": "abdb0e67-b07d-4309-9083-1c861715eb21",
+      "title": "CoPilot für DS",
+      "description": "[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFWlMQFwAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (25.8.2025)",
+      "completed": false,
+      "estimatedTime": 30,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-28",
+      "createdAt": "2025-08-25T08:02:09.058Z",
+      "updatedAt": "2025-08-27T07:07:29.258Z",
+      "position": 17,
+      "reminderDate": "2025-08-28"
+    },
+    {
+      "id": "642861d6-8aff-44fe-b36a-9ea18661ee8c",
+      "title": "Nathaniel aussperren",
+      "description": "",
+      "completed": false,
+      "estimatedTime": 30,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-31",
+      "dueDate": "2025-08-31",
+      "reminderDate": "2025-08-31",
+      "createdAt": "2025-08-25T08:10:38.126Z",
+      "updatedAt": "2025-08-25T08:10:38.126Z",
+      "position": 1756109438126
+    },
+    {
+      "id": "37d71109-56f5-4424-befe-28d59bed8c39",
+      "title": "Stunden von Fernando öffnen",
+      "description": "[🎫 UNIQUE Helpdesk -  - Intrexx Time](https://unique.zammad.com/#ticket/zoom/5150) (25.8.2025)",
+      "completed": true,
+      "estimatedTime": 10,
+      "tags": [
+        "505149",
+        "ticket"
+      ],
+      "subtasks": [],
+      "columnId": "date-2025-08-27",
+      "reminderDate": "2025-08-27",
+      "createdAt": "2025-08-25T08:19:47.795Z",
+      "updatedAt": "2025-08-27T15:21:19.718Z",
+      "position": 1,
+      "trackedTime": 5.816666666666651,
+      "archived": true
+    },
+    {
+      "id": "4ee32de3-4e6e-43ed-bc96-58a09ee9f163",
+      "title": "Visitenkarten Tim Nairn bestellen",
+      "description": "[🌐 Business card order](https://forms.office.com/Pages/DesignPageV2.aspx?prevorigin=shell&origin=NeoPortalPage&subpage=design&id=sBdzKcVJFEyWmfvIPOh89A9wJ5djomdLpRVIqc63T_1UMUlRWUdTV0MyUFhYSEFFN05OOEtPUFhKRS4u&analysis=true&topview=SurveyResults&qid=rcc827ac0f0bc447192446f85e9c884fb&ridx=1) (25.8.2025)",
+      "completed": true,
+      "estimatedTime": 20,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-27",
+      "reminderDate": "2025-08-27",
+      "createdAt": "2025-08-25T08:28:22.470Z",
+      "updatedAt": "2025-08-27T15:21:19.718Z",
+      "position": 2,
+      "trackedTime": 3.183333333333327,
+      "archived": true
+    },
+    {
+      "id": "d8aa32e8-c3fe-4846-9a60-105ae44fab0b",
+      "title": "Tim Nairn zu Photo schreiben",
+      "description": "",
+      "completed": true,
+      "estimatedTime": 5,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-27",
+      "reminderDate": "2025-08-27",
+      "createdAt": "2025-08-25T08:40:03.685Z",
+      "updatedAt": "2025-08-27T15:21:19.718Z",
+      "position": 7,
+      "archived": true
+    },
+    {
+      "id": "6ea3da57-adba-4953-9127-08817ba18398",
+      "title": "DF-Mails checken",
+      "description": "",
+      "completed": true,
+      "estimatedTime": 20,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-27",
+      "reminderDate": "2025-08-27",
+      "createdAt": "2025-08-25T08:42:59.761Z",
+      "updatedAt": "2025-08-27T15:21:19.718Z",
+      "position": 8,
+      "trackedTime": 5,
+      "archived": true
+    },
+    {
+      "id": "83c13060-9a10-4b33-99c6-f33575192e15",
+      "title": "Speicheraulastung SharePoint checken",
+      "description": "",
+      "completed": true,
+      "estimatedTime": 10,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-27",
+      "dueDate": "2025-08-26",
+      "reminderDate": "2025-08-27",
+      "createdAt": "2025-08-25T08:53:31.572Z",
+      "updatedAt": "2025-08-27T15:21:19.718Z",
+      "position": 9,
+      "archived": true
+    },
+    {
+      "id": "54314464-9a57-4715-b2c3-647eb66f69b4",
+      "title": "Nachfragen wegen Easygenerator Translation Tool",
+      "description": "",
+      "completed": false,
+      "estimatedTime": 10,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-28",
+      "reminderDate": "2025-08-28",
+      "createdAt": "2025-08-27T06:29:16.190Z",
+      "updatedAt": "2025-08-27T07:07:29.258Z",
+      "position": 18
+    },
+    {
+      "id": "1e9a470e-e9c7-4911-b9b3-603ce6cb5b2e",
+      "title": "bfdybg",
+      "description": "",
+      "completed": true,
+      "tags": [],
+      "subtasks": [],
+      "projectId": "project-1753087049586-kxt00n020",
+      "kanbanColumnId": "col-1753087059503-fduqk083j",
+      "createdAt": "2025-08-27T06:31:50.824Z",
+      "updatedAt": "2025-08-27T06:31:50.824Z",
+      "position": 1756276310824
+    },
+    {
+      "id": "36d25e65-1f31-47ff-bc54-80ac14373320",
+      "title": "Mails /Tickets/Personio",
+      "description": "",
+      "completed": true,
+      "estimatedTime": 30,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-27",
+      "reminderDate": "2025-08-27",
+      "createdAt": "2025-08-27T07:07:21.142Z",
+      "updatedAt": "2025-08-27T15:21:19.718Z",
+      "position": 0,
+      "trackedTime": 11.783333333333507,
+      "archived": true
+    },
+    {
+      "id": "ff2c8ef8-2014-4af4-b0fa-12e5156004dc",
+      "title": "Todoist-Aufgaben übernehmen",
+      "description": "",
+      "completed": false,
+      "estimatedTime": 20,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-28",
+      "reminderDate": "2025-08-28",
+      "createdAt": "2025-08-27T07:09:43.091Z",
+      "updatedAt": "2025-08-27T07:09:43.091Z",
+      "position": 1756278583091
+    },
+    {
+      "id": "1e4fccb0-0072-45d7-ad28-c90ca78172b5",
+      "title": "Speicherauslastung SharePoint checken",
+      "description": "",
+      "completed": false,
+      "estimatedTime": 20,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-28",
+      "reminderDate": "2025-08-28",
+      "createdAt": "2025-08-27T07:40:12.116Z",
+      "updatedAt": "2025-08-27T08:03:08.829Z",
+      "position": 2
+    },
+    {
+      "id": "ff04f4d4-284b-4e47-93cb-75eac0fc9ad4",
+      "title": "Marco zu KI-Frage antworten",
+      "description": "[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFY%2F%2FbkAAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (27.8.2025)",
+      "completed": false,
+      "estimatedTime": 30,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "inbox",
+      "createdAt": "2025-08-27T07:43:16.576Z",
+      "updatedAt": "2025-08-27T07:43:16.576Z",
+      "position": 1756280596576
+    },
+    {
+      "id": "93803830-27a7-4143-b5c9-2bb8913fa827",
+      "title": "Mit Linkedin befassen",
+      "description": "",
+      "completed": false,
+      "estimatedTime": 30,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "inbox",
+      "createdAt": "2025-08-27T07:43:56.019Z",
+      "updatedAt": "2025-08-27T07:43:56.019Z",
+      "position": 1756280636019
+    },
+    {
+      "id": "d9cf0b86-e7d4-499d-b1b1-055e68da3437",
+      "title": "Beckers Dokument fertigmachen",
+      "description": "[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFY%2F%2BVEAAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (27.8.2025)",
+      "completed": false,
+      "estimatedTime": 80,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "inbox",
+      "createdAt": "2025-08-27T07:50:31.770Z",
+      "updatedAt": "2025-08-27T07:50:31.770Z",
+      "position": 1756281031770
+    },
+    {
+      "id": "4c6d9408-0e4f-493c-883a-b7ef2b5e9c9d",
+      "title": "Abrechnung Nathaniel",
+      "description": "[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFY%2F9%2FfQAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (27.8.2025) heute 10m",
+      "completed": false,
+      "estimatedTime": 10,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-28",
+      "dueDate": "2025-08-27",
+      "reminderDate": "2025-08-28",
+      "createdAt": "2025-08-27T07:51:21.975Z",
+      "updatedAt": "2025-08-27T13:43:23.541Z",
+      "position": 1756281276774
+    },
+    {
+      "id": "afd3f11f-8068-4cd9-9c7a-a59ff9d2db35",
+      "title": "DeepL antworten",
+      "description": "[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFY%2F9m5AAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (27.8.2025) morgen",
+      "completed": false,
+      "estimatedTime": 10,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-28",
+      "dueDate": "2025-08-28",
+      "reminderDate": "2025-08-28",
+      "createdAt": "2025-08-27T07:53:59.389Z",
+      "updatedAt": "2025-08-27T08:03:08.829Z",
+      "position": 3
+    },
+    {
+      "id": "f38b0d45-9a13-4bdd-9924-95cba67b2588",
+      "title": "Chekcen warum Prapa nicht auf Homepage ist",
+      "description": "[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFY%2F9atAAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (27.8.2025)",
+      "completed": false,
+      "estimatedTime": 15,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-28",
+      "dueDate": "2025-08-27",
+      "reminderDate": "2025-08-28",
+      "createdAt": "2025-08-27T07:54:36.773Z",
+      "updatedAt": "2025-08-27T07:54:36.773Z",
+      "position": 1756281276773
+    },
+    {
+      "id": "8075daa5-a068-4ca6-8fe5-b257ef7defeb",
+      "title": "Mit Bernd klären ob für Holzmarktberichterstattung AI in Frage kommt",
+      "description": "[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0AuHAKBKJYUkC1sAYLFbt%2FygAELFsbNAAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (27.8.2025)",
+      "completed": false,
+      "estimatedTime": 20,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "inbox",
+      "createdAt": "2025-08-27T07:57:06.884Z",
+      "updatedAt": "2025-08-27T07:57:06.884Z",
+      "position": 1756281426884
+    },
+    {
+      "id": "fe018cb6-9240-4e53-9568-0ddc2ba9c5ef",
+      "title": "Stunden von Fernando F zumachen",
+      "description": "",
+      "completed": true,
+      "estimatedTime": 5,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-28",
+      "dueDate": "2025-08-28",
+      "reminderDate": "2025-08-28",
+      "createdAt": "2025-08-27T08:02:53.627Z",
+      "updatedAt": "2025-08-28T05:37:14.819Z",
+      "position": 0,
+      "trackedTime": 1.1500000000000008
+    },
+    {
+      "id": "00b11492-ba26-4797-afcc-ed79cc1dc31d",
+      "title": "Handyverträge im Wiki dokumentieren",
+      "description": "Joplin? 30m",
+      "completed": false,
+      "estimatedTime": 30,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "inbox",
+      "createdAt": "2025-08-27T09:09:07.249Z",
+      "updatedAt": "2025-08-27T09:09:07.249Z",
+      "position": 1756285747249
+    },
+    {
+      "id": "6fb7fc43-e01f-4294-aa53-f304be5d291f",
+      "title": "Klärung Vodafone: Johannes reist nach Äthiopien",
+      "description": "",
+      "completed": false,
+      "estimatedTime": 10,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "inbox",
+      "createdAt": "2025-08-27T12:21:36.385Z",
+      "updatedAt": "2025-08-27T12:21:36.385Z",
+      "position": 1756297296385
+    },
+    {
+      "id": "04be66a2-af4a-4be0-9651-48b1c1bee9c1",
+      "title": "Stunden canopea mit Carola klären",
+      "description": "",
+      "completed": false,
+      "estimatedTime": 10,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "inbox",
+      "createdAt": "2025-08-27T13:42:37.643Z",
+      "updatedAt": "2025-08-27T13:42:37.643Z",
+      "position": 1756302157643
+    },
+    {
+      "id": "c7648c37-dcfb-483b-a1df-e5d0b84bc03e",
+      "title": "Bei Daniele melden wegen Bankschließfach",
+      "description": "",
+      "completed": false,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "inbox",
+      "createdAt": "2025-08-27T14:58:21.105Z",
+      "updatedAt": "2025-08-28T07:18:41.958Z",
+      "position": 1756306701105,
+      "estimatedTime": 10,
+      "linkedNotes": []
+    },
+    {
+      "id": "7e24b069-fe0a-428d-98a0-4fd2f3fe49f0",
+      "title": "26_18 ist voll",
+      "description": "",
+      "completed": false,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-29",
+      "createdAt": "2025-08-27T14:58:30.832Z",
+      "updatedAt": "2025-08-28T07:16:54.516Z",
+      "position": 1756359530326,
+      "reminderDate": "2025-08-29"
+    },
+    {
+      "id": "2a7e546b-12ec-47e5-a504-1c672988c66d",
+      "title": "Stunden eintragen",
+      "description": "",
+      "completed": false,
+      "estimatedTime": 10,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-28",
+      "reminderDate": "2025-08-28",
+      "createdAt": "2025-08-27T15:20:43.501Z",
+      "updatedAt": "2025-08-27T15:20:43.501Z",
+      "position": 1756308043501
+    },
+    {
+      "id": "0b03bdd6-0e4a-480f-900f-530146817d8a",
+      "title": "Test",
+      "description": "",
+      "completed": true,
+      "tags": [],
+      "subtasks": [],
+      "projectId": "project-1752561187805-9xtzj8v39",
+      "kanbanColumnId": "col-1752561188719-g4l45kms7",
+      "createdAt": "2025-08-28T05:35:24.519Z",
+      "updatedAt": "2025-08-28T05:35:28.388Z",
+      "position": 1756359324519
+    },
+    {
+      "id": "f93d619b-f4f6-4b92-b4ea-75298489fae3",
+      "title": "Linkedin mit Personio verbinden",
+      "description": "",
+      "completed": false,
+      "estimatedTime": 10,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-28",
+      "reminderDate": "2025-08-28",
+      "createdAt": "2025-08-28T05:38:29.236Z",
+      "updatedAt": "2025-08-28T05:38:29.236Z",
+      "position": 1756359509236
+    },
+    {
+      "id": "b0b30b21-e833-4ab7-adf0-391fd9747cd2",
+      "title": "Photobuch Gero Becker fertigmachen",
+      "description": "",
+      "completed": false,
+      "estimatedTime": 60,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-08-29",
+      "dueDate": "2025-08-29",
+      "reminderDate": "2025-08-29",
+      "createdAt": "2025-08-28T05:38:50.325Z",
+      "updatedAt": "2025-08-28T05:39:05.129Z",
+      "position": 1756359530325,
+      "linkedNotes": []
+    }
+  ],
+  "archivedTasks": [
+    {
+      "id": "b1f09e4a-9cb8-43c6-904a-c7dcbd013a56",
+      "title": "Guthaben uwiki aufladen",
+      "description": "[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFR3EwPQAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (15.7.2025)",
+      "completed": true,
+      "priority": "high",
+      "estimatedTime": 10,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-07-22",
+      "reminderDate": "2025-07-22",
+      "createdAt": "2025-07-15T11:51:49.965Z",
+      "updatedAt": "2025-07-22T09:47:47.991Z",
+      "position": 0,
+      "linkedNotes": [],
+      "trackedTime": 4.466666666666656,
+      "completedAt": "2025-07-22T08:13:44.778Z"
+    },
+    {
+      "id": "9c56db1a-aa04-4ebb-b433-b3a52b1fe450",
+      "title": "DeepL abrechnen",
+      "description": "[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFR3EPIAAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (15.7.2025)",
+      "completed": true,
+      "estimatedTime": 10,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-07-22",
+      "reminderDate": "2025-07-22",
+      "createdAt": "2025-07-15T11:52:36.195Z",
+      "updatedAt": "2025-07-22T09:47:47.991Z",
+      "position": 2,
+      "linkedNotes": [],
+      "trackedTime": 4.4499999999999895,
+      "completedAt": "2025-07-22T08:46:48.018Z"
+    },
+    {
+      "id": "2f1351c4-84d9-4413-8ce6-84e8019f15a5",
+      "title": "Cursor abrechnen",
+      "description": "",
+      "completed": true,
+      "priority": "medium",
+      "estimatedTime": 35,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-07-22",
+      "reminderDate": "2025-07-22",
+      "createdAt": "2025-07-15T11:52:54.890Z",
+      "updatedAt": "2025-07-22T09:47:47.991Z",
+      "position": 1,
+      "trackedTime": 26.699999999999765
+    },
+    {
+      "id": "779f00f6-62cc-44de-af6c-e432d6db2772",
+      "title": "Stunden Olivier prüfen",
+      "description": "",
+      "completed": true,
+      "priority": "high",
+      "estimatedTime": 25,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-07-22",
+      "reminderDate": "2025-07-22",
+      "createdAt": "2025-07-15T11:54:27.555Z",
+      "updatedAt": "2025-07-22T09:47:47.991Z",
+      "position": 3,
+      "linkedNotes": [],
+      "reminderTime": "14:44",
+      "trackedTime": 30.699999999999537
+    },
+    {
+      "id": "a18c3930-d5b0-4519-bf38-80a1783f5fad",
+      "title": "Auf Mail von Johannes reagieren",
+      "description": "",
+      "completed": true,
+      "priority": "high",
+      "estimatedTime": 20,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-07-22",
+      "reminderDate": "2025-07-22",
+      "createdAt": "2025-07-22T08:02:00.748Z",
+      "updatedAt": "2025-07-22T09:47:47.991Z",
+      "position": 4,
+      "trackedTime": 20,
+      "completedAt": "2025-07-22T09:47:37.485Z"
+    },
+    {
+      "id": "175c62eb-9017-4c63-9738-90e7ce91256a",
+      "title": "Stundenbuchtung von Alwin öffnen",
+      "description": "🎫 UNIQUE Helpdesk - - FW: Benjamin hat eine Nachricht gesendet. (23.7.2025)\n\n🔗 https://unique.zammad.com/#ticket/zoom/5085",
+      "completed": true,
+      "priority": "medium",
+      "estimatedTime": 0,
+      "tags": [
+        "ticket"
+      ],
+      "subtasks": [],
+      "columnId": "date-2025-07-24",
+      "dueDate": "2025-07-23",
+      "reminderDate": "2025-07-24",
+      "createdAt": "2025-07-23T09:52:23.806Z",
+      "updatedAt": "2025-07-24T07:56:45.628Z",
+      "position": 0,
+      "linkedNotes": []
+    },
+    {
+      "id": "bef541c2-d919-46db-addc-21fc2f92e7b4",
+      "title": "Zeiterfassung Prapa öffnen",
+      "description": "🎫 UNIQUE Helpdesk - - Intrexx time records (23.7.2025)\n\n🔗 https://unique.zammad.com/#ticket/zoom/5069",
+      "completed": true,
+      "estimatedTime": 10,
+      "tags": [
+        "ticket"
+      ],
+      "subtasks": [],
+      "columnId": "date-2025-07-24",
+      "dueDate": "2025-07-24",
+      "reminderDate": "2025-07-24",
+      "createdAt": "2025-07-23T09:56:18.564Z",
+      "updatedAt": "2025-07-24T08:09:42.884Z",
+      "position": 2,
+      "linkedNotes": [],
+      "trackedTime": 5.099999999999987
+    },
+    {
+      "id": "2a0bc8d9-03d0-49a0-8b4b-8f6d062848c7",
+      "title": "Stundenbuchung Patricia Holter öffnen",
+      "description": "[UNIQUE Helpdesk](https://unique.zammad.com/#ticket/zoom/5070)",
+      "completed": true,
+      "estimatedTime": 5,
+      "tags": [
+        "ticket"
+      ],
+      "subtasks": [],
+      "columnId": "date-2025-07-24",
+      "dueDate": "2025-07-24",
+      "reminderDate": "2025-07-24",
+      "createdAt": "2025-07-23T10:07:11.416Z",
+      "updatedAt": "2025-07-24T08:04:17.383Z",
+      "position": 1,
+      "linkedNotes": []
+    },
+    {
+      "id": "61886515-de45-4100-a34f-cfbc49fe0bfc",
+      "title": "Stundenbuchung Janne öffnen",
+      "description": "https://unique.zammad.com/#ticket/zoom/5057 heute",
+      "completed": true,
+      "estimatedTime": 5,
+      "tags": [
+        "ticket"
+      ],
+      "subtasks": [],
+      "columnId": "date-2025-07-24",
+      "dueDate": "2025-07-23",
+      "reminderDate": "2025-07-24",
+      "createdAt": "2025-07-23T10:08:46.796Z",
+      "updatedAt": "2025-07-24T08:11:22.867Z",
+      "position": 3,
+      "linkedNotes": []
+    },
+    {
+      "id": "b5066c26-57f3-4ea4-8a61-9f4a23fa16f6",
+      "title": "Klärung Übernahme LinkedIn-Account",
+      "description": "https://unique.zammad.com/#ticket/zoom/5058",
+      "completed": true,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-07-31",
+      "createdAt": "2025-07-14T08:17:35.895Z",
+      "updatedAt": "2025-07-31T12:27:24.502Z",
+      "position": 0,
+      "kanbanColumnId": "col-1752561672157-g38e1xha4",
+      "reminderDate": "2025-07-31",
+      "estimatedTime": 10,
+      "linkedNotes": [],
+      "dueDate": "2025-07-30",
+      "projectId": "project-1752561187805-9xtzj8v39"
+    },
+    {
+      "id": "1fa7b0da-7bbc-4aed-849c-407f994eec1b",
+      "title": "Angebot von Lukas weiterleiten und Kalkulation",
+      "description": "[📧 Mail von Lukas](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFUZafcQAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (30.7.2025)\n\n[📧 Mail von Johannes](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFT7L2ngAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (30.7.2025)",
+      "completed": true,
+      "priority": "high",
+      "estimatedTime": 15,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-07-31",
+      "dueDate": "2025-07-30",
+      "reminderDate": "2025-07-31",
+      "createdAt": "2025-07-30T08:19:53.030Z",
+      "updatedAt": "2025-07-31T12:27:24.502Z",
+      "position": 1,
+      "linkedNotes": [],
+      "projectId": "project-1752561187805-9xtzj8v39",
+      "kanbanColumnId": "col-1752561672157-g38e1xha4"
+    },
+    {
+      "id": "a156b34d-6774-403f-9fd3-6f437ec9220d",
+      "title": "Folien für MM-Meeting vorbereiten",
+      "description": "[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFUZb%2BrwAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (30.7.2025)",
+      "completed": true,
+      "priority": "high",
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-07-31",
+      "reminderDate": "2025-07-31",
+      "createdAt": "2025-07-30T09:19:35.873Z",
+      "updatedAt": "2025-07-31T12:27:24.502Z",
+      "position": 2,
+      "linkedNotes": [],
+      "projectId": "project-1752561187805-9xtzj8v39",
+      "kanbanColumnId": "col-1752561672157-g38e1xha4",
+      "dueDate": "2025-07-30"
+    }
+  ],
+  "columns": [
+    {
+      "id": "date-2025-08-28",
+      "title": "28.08.2025",
+      "type": "date",
+      "date": "2025-08-28",
+      "order": 1,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-08-29",
+      "title": "29.08.2025",
+      "type": "date",
+      "date": "2025-08-29",
+      "order": 2,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-08-30",
+      "title": "30.08.2025",
+      "type": "date",
+      "date": "2025-08-30",
+      "order": 3,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-08-31",
+      "title": "31.08.2025",
+      "type": "date",
+      "date": "2025-08-31",
+      "order": 4,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-09-01",
+      "title": "01.09.2025",
+      "type": "date",
+      "date": "2025-09-01",
+      "order": 5,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-09-02",
+      "title": "02.09.2025",
+      "type": "date",
+      "date": "2025-09-02",
+      "order": 6,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-09-03",
+      "title": "03.09.2025",
+      "type": "date",
+      "date": "2025-09-03",
+      "order": 7,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-09-04",
+      "title": "04.09.2025",
+      "type": "date",
+      "date": "2025-09-04",
+      "order": 8,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-09-05",
+      "title": "05.09.2025",
+      "type": "date",
+      "date": "2025-09-05",
+      "order": 9,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-09-06",
+      "title": "06.09.2025",
+      "type": "date",
+      "date": "2025-09-06",
+      "order": 10,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-09-07",
+      "title": "07.09.2025",
+      "type": "date",
+      "date": "2025-09-07",
+      "order": 11,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-09-08",
+      "title": "08.09.2025",
+      "type": "date",
+      "date": "2025-09-08",
+      "order": 12,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-09-09",
+      "title": "09.09.2025",
+      "type": "date",
+      "date": "2025-09-09",
+      "order": 13,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-09-10",
+      "title": "10.09.2025",
+      "type": "date",
+      "date": "2025-09-10",
+      "order": 14,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-09-11",
+      "title": "11.09.2025",
+      "type": "date",
+      "date": "2025-09-11",
+      "order": 15,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-09-12",
+      "title": "12.09.2025",
+      "type": "date",
+      "date": "2025-09-12",
+      "order": 16,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-09-13",
+      "title": "13.09.2025",
+      "type": "date",
+      "date": "2025-09-13",
+      "order": 17,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-09-14",
+      "title": "14.09.2025",
+      "type": "date",
+      "date": "2025-09-14",
+      "order": 18,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-09-15",
+      "title": "15.09.2025",
+      "type": "date",
+      "date": "2025-09-15",
+      "order": 19,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-09-16",
+      "title": "16.09.2025",
+      "type": "date",
+      "date": "2025-09-16",
+      "order": 20,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-09-17",
+      "title": "17.09.2025",
+      "type": "date",
+      "date": "2025-09-17",
+      "order": 21,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-09-18",
+      "title": "18.09.2025",
+      "type": "date",
+      "date": "2025-09-18",
+      "order": 22,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-09-19",
+      "title": "19.09.2025",
+      "type": "date",
+      "date": "2025-09-19",
+      "order": 23,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-09-20",
+      "title": "20.09.2025",
+      "type": "date",
+      "date": "2025-09-20",
+      "order": 24,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-09-21",
+      "title": "21.09.2025",
+      "type": "date",
+      "date": "2025-09-21",
+      "order": 25,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-09-22",
+      "title": "22.09.2025",
+      "type": "date",
+      "date": "2025-09-22",
+      "order": 26,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-09-23",
+      "title": "23.09.2025",
+      "type": "date",
+      "date": "2025-09-23",
+      "order": 27,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-09-24",
+      "title": "24.09.2025",
+      "type": "date",
+      "date": "2025-09-24",
+      "order": 28,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-09-25",
+      "title": "25.09.2025",
+      "type": "date",
+      "date": "2025-09-25",
+      "order": 29,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-09-26",
+      "title": "26.09.2025",
+      "type": "date",
+      "date": "2025-09-26",
+      "order": 30,
+      "tasks": []
+    },
+    {
+      "id": "project-1752481231598-z9g5g889y",
+      "title": "Wissenstag",
+      "type": "project",
+      "order": 0,
+      "tasks": [],
+      "linkedNotes": [
+        "1753252738490v4xdxvdua"
+      ]
+    },
+    {
+      "id": "project-1752561187805-9xtzj8v39",
+      "title": "Aufgaben",
+      "type": "project",
+      "order": 1,
+      "tasks": []
+    },
+    {
+      "id": "project-1753087049586-kxt00n020",
+      "title": "Canopea",
+      "type": "project",
+      "order": 2,
+      "tasks": []
+    }
+  ],
+  "tags": [
+    {
+      "id": "tag-arbeit",
+      "name": "arbeit",
+      "color": "#6b7280",
+      "count": 15
+    },
+    {
+      "id": "tag-canopea",
+      "name": "canopea",
+      "color": "#6b7280",
+      "count": 1
+    },
+    {
+      "id": "tag-ticket",
+      "name": "ticket",
+      "color": "#6b7280",
+      "count": 8
+    },
+    {
+      "id": "tag-privat",
+      "name": "privat",
+      "color": "#6b7280",
+      "count": 1
+    },
+    {
+      "id": "tag-505148",
+      "name": "505148",
+      "color": "#6b7280",
+      "count": 1
+    },
+    {
+      "id": "tag-505137",
+      "name": "505137",
+      "color": "#6b7280",
+      "count": 1
+    },
+    {
+      "id": "tag-505131",
+      "name": "505131",
+      "color": "#6b7280",
+      "count": 1
+    },
+    {
+      "id": "tag-505147",
+      "name": "505147",
+      "color": "#6b7280",
+      "count": 1
+    },
+    {
+      "id": "tag-505149",
+      "name": "505149",
+      "color": "#6b7280",
+      "count": 1
+    }
+  ],
+  "kanbanBoards": [],
+  "pinColumns": [
+    {
+      "id": "default-pin",
+      "title": "Pin",
+      "color": "#64748b",
+      "order": 0,
+      "createdAt": "2025-08-25T09:06:01.139Z",
+      "updatedAt": "2025-08-25T09:06:01.139Z"
+    }
+  ],
+  "notes": [
+    {
+      "id": "1752561253685v0yk2nn82",
+      "title": "Vorstellungsgespräch Naheed",
+      "content": "- Briefly introduce myself and explain that I am the IT manager\n- Ask how they would like to be addressed\n- Ask them to briefly introduce themselves\n\n\nAmong other things, I am responsible for our internal infrastructure, IT security, data protection issues, and supporting our end devices (laptops for employees). We provide IT for our employees and also develop some solutions for specialist departments and projects. Among other things, we have started to develop applications (expert database, calculation aid for travel times, insurance management software, etc.) and develop tailor-made AI solutions for projects and project work.\n\nThere are currently two of us in our IT department. Besides me, there is Ashik, who provides first-level support and develops applications.\n \nIT security is a well-known topic for you. Banking sector and genomics\n\n\nWe work in accordance with BSI standards and ISO 27001.\n\nIf you are hired, you will work with us in various areas. Part of your working time will be spent in internal IT.\n- Linux server support and Linux desktops\n- Coordination of security risks, emergency planning, and GDPR implementation.\n\nI am particularly interested in how you work in these areas and where you see yourself – both technically and in terms of collaboration with other teams.\n\n- Which Linux distribution do you prefer for servers? In CV: redhat and Debian. Why?\n- How do you deal with distribution updates and upgrades? What do you do if security vulnerabilities are known but an update/upgrade is not currently possible?\n- Do you have experience with server virtualization via Proxmox?\n\n- Have you had any contact with data protection requirements in previous projects? Can you give an example?\n- How do you handle the storage and processing of personal data?\n- What measures would you take to ensure that data transfers are GDPR-compliant?\n- Are you familiar with the most important principles of the GDPR? (Lawfulness, processing in good faith, transparency, purpose limitation, data minimization, integrity and confidentiality, accountability\n\n- How do you assess the risk of a new application or architecture?\n- Do you have experience in creating emergency or recovery plans?\n- Are you familiar with the most important elements of a security concept?\n- How do you document security measures so that they remain traceable for others?\n- Do you have experience with backup strategies for large amounts of data (> TB range)?\n- Have you ever been involved in ISO 27001 certification?\n- How do you document technical and organizational measures (TOM)?\n- Describe a project that went wrong. What did you learn from it?\n\n- Are there any topics that would be particularly important to you if you started here?\n- Do you have any questions?\n",
+      "tags": [
+        "devops"
+      ],
+      "linkedTasks": [
+        "2ffe85b2-c104-4ecc-bdba-6208d6f29651"
+      ],
+      "linkedNotes": [],
+      "pinned": true,
+      "archived": true,
+      "createdAt": "2025-07-15T06:34:13.685Z",
+      "updatedAt": "2025-07-23T15:02:32.719Z"
+    },
+    {
+      "id": "1753252738490v4xdxvdua",
+      "title": "TaskFuchs-Entwicklung",
+      "content": "# Ideen\n- [ ] Umschaltung des Editors zu WYSIWYG\n- [ ] Pexels-Einbindung mit API.\n- [X] CalDAV-Sync: Sync-Intervall festlegen.\n- [X] Notizen bearbeiten: Button \"In Notizen öffnen\" funktioniert nicht.\n- [X] Bei Smart-Parsing: Wichtigkeit bleibt im Aufgabennamen bestehen. So steht z.B. im Aufgabennamen !!! bei sehr wichtig. Gewünschtes Verhalten: Wenn WIchtigkeit geparst ist, sollen die Ausrufezeichen aus dem Aufgabennamen verschwinden.\n- [X] Wenn Aufgabe mit Datum über Smart-Parsing hinzugefügt wurde, darf sie nicht in \"Eingang\" landen, sondern in der entsprechenden Datumsspalte in Planer. Sie muss das Datum zugewiesen bekommen.\n- [ ] Wenn eine Aufgabenbeschreibung eine URL beinhaltet, die mit [UNIQUE Helpdesk](https://unique.zammad.com/#ticket) beginnt, dann weise der Aufgabe automatisch den Tag #ticket zu.\n\n\n# Bugs\n- [X] Tag-Verwaltung: Manche Tags lassen sich nicht löschen. Alle Tags sollen löschbar sein.\n- [x] Filterliste im Header in Notizen öffnet nicht\n- [x] In NOtizen: In rechter SPalte: Keine Anzeige von \"Keine Tags\", \"Keine verknüpften Aufgaben\", \"Keine Verknüpften Projekte\" Wenn eh nichts zu sehen ist. Erst Verknüpfungen anzeigen, wenn vorhanden.\n- [ ] In MD-Editor: Aufgabenelemente schreiben sich nicht automatisch fort. Wenn ich eine Zeile, die mit - [ ] beginnt mit ENTER beende, soll die nächste Zeile mit - [ ] beginnen.\n- [X] Planer und Projekte: Tabellenspalten sind nicht scrollbar. Man kann aktuell nicht nach unten scrollen. Fixe das. Scrollbar soll nicht angezeigt werden.\n- [X] Projekte: Bei laufendem Timer lassen sich Aufgaben nicht archivieren.\n- [X] Planer: Filter nach Tag funktioniert nicht. Es werden Tags angezeigt, die gar nicht mehr vorkommen, etwa weil die Aufgabe nicht mehr vorhanden ist.\n- [ ] Checklisten lassen sich nicht abhaken\n---\n\n# Huntergrundbilder\n![pexels photo 32767147](https://images.pexels.com/photos/32767147/pexels-photo-32767147.jpeg?_gl=1*r1lq9g*_ga*Nzg4MTMzMzk4LjE3NTMyOTk2NjU.*_ga_8JE65Q40S6*czE3NTMyOTk2NjUkbzEkZzEkdDE3NTMyOTk3NjckajE5JGwwJGgw)\n\n# Notizen\n**Kalenderfreigabe**\n>https://outlook.office365.com/owa/calendar/55a7744a282c437a836eb3dad44c6709@unique-landuse.de/25a0968e13534bc195ceb38e5beddc4b1348024555792318342/S-1-8-3574032643-298043167-3273186133-1683214480/reachcalendar.ics",
+      "tags": [],
+      "linkedTasks": [],
+      "linkedNotes": [],
+      "linkedProjects": [],
+      "pinned": true,
+      "archived": false,
+      "createdAt": "2025-07-23T06:38:58.490Z",
+      "updatedAt": "2025-07-24T07:05:50.142Z"
+    },
+    {
+      "id": "1753255557504pkwrhqb79",
+      "title": "Mittwoch, 23. Juli 2025",
+      "content": "# Mittwoch, 23. Juli 2025\n\n",
+      "tags": [
+        "daily"
+      ],
+      "linkedTasks": [],
+      "linkedNotes": [],
+      "linkedProjects": [],
+      "pinned": false,
+      "archived": false,
+      "createdAt": "2025-07-23T07:25:57.504Z",
+      "updatedAt": "2025-07-23T07:25:57.504Z",
+      "dailyNote": true,
+      "dailyNoteDate": "2025-07-23"
+    },
+    {
+      "id": "1753270651558n86mkwp9g",
+      "title": "Vorstellunggespräch JittaHanumesh",
+      "content": "- Briefly introduce myself and explain that I am the IT manager\n\n## Intrduction\nAmong other things, I am responsible for our internal infrastructure, IT security, data protection issues, and supporting our end devices (laptops for employees). We provide IT for our employees and also develop some solutions for specialist departments and projects. Among other things, we have started to develop applications (expert database, calculation aid for travel times, insurance management software, etc.) and develop tailor-made AI solutions for projects and project work.\nWe work in accordance with BSI standards and ISO 27001.\n\nThere are currently two of us in our IT department. Besides me, there is Ashik, who provides first-level support and develops applications.\n \nIf you are hired, you will work with us in various areas. Part of your working time will be spent in internal IT.\n- Linux server support and Linux desktops\n- Coordination of security risks, emergency planning, and GDPR implementation.\n\nI am particularly interested in how you work in these areas and where you see yourself – both technically and in terms of collaboration with other teams.\n\n- Could you briefly describe your technuical skills concerning Windows and Linux?\n- Any experiences with Debian based systems??\n- Do you have experience with server virtualization via Proxmox? - Knows VMWare\n- How do you deal with distribution updates and upgrades? What do you do if security vulnerabilities are known but an update/upgrade is not currently possible?\n\n\n- Have you had any contact with data protection requirements in previous projects? Can you give an example?\n- Are you familiar with the most important principles of the GDPR? (Lawfulness, processing in good faith, transparency, purpose limitation, data minimization, integrity and confidentiality, accountability\n- How do you handle the storage and processing of personal data? Are you aware of the special requirements of treting sensitive data?\n- Do you have experience in creating emergency or recovery plans?\n- Are you familiar with the most important elements of a security concept?\n- How do you document security measures so that they remain traceable for others?\n- Do you have experience with backup strategies for large amounts of data (> TB range)?\n- Have you ever been involved in ISO 27001 certification?\n- How do you document technical and organizational measures (TOM)?\n- Describe a project that went wrong. What did you learn from it?\n\n- Are there any topics that would be particularly important to you if you started here?\n- Do you have any questions?\n",
+      "tags": [
+        "devops"
+      ],
+      "linkedTasks": [],
+      "linkedNotes": [],
+      "linkedProjects": [],
+      "pinned": false,
+      "archived": true,
+      "createdAt": "2025-07-23T11:37:31.558Z",
+      "updatedAt": "2025-07-23T15:02:40.017Z"
+    },
+    {
+      "id": "17533005205792t3mxf2wb",
+      "title": "Hintergrundbilder fü",
+      "content": "",
+      "tags": [],
+      "linkedTasks": [],
+      "linkedNotes": [],
+      "linkedProjects": [],
+      "pinned": false,
+      "archived": true,
+      "createdAt": "2025-07-23T19:55:20.579Z",
+      "updatedAt": "2025-07-23T19:55:29.070Z"
+    },
+    {
+      "id": "1753868924485969kvl9um",
+      "title": "Unbenannte Notiz",
+      "content": "![image.png](storage://img_1753871182879_zykbl7lei)",
+      "tags": [],
+      "linkedTasks": [
+        "e83aadf1-5057-43e7-899d-9d0d768ff004"
+      ],
+      "linkedNotes": [],
+      "linkedProjects": [],
+      "pinned": false,
+      "archived": true,
+      "createdAt": "2025-07-30T09:48:44.485Z",
+      "updatedAt": "2025-07-30T10:26:24.887Z"
+    },
+    {
+      "id": "17538712546469q5y2ou89",
+      "title": "Mittwoch, 30. Juli 2025",
+      "content": "# Mittwoch, 30. Juli 2025\n\n",
+      "tags": [
+        "daily"
+      ],
+      "linkedTasks": [],
+      "linkedNotes": [],
+      "linkedProjects": [],
+      "pinned": false,
+      "archived": false,
+      "createdAt": "2025-07-30T10:27:34.646Z",
+      "updatedAt": "2025-07-30T10:27:34.646Z",
+      "dailyNote": true,
+      "dailyNoteDate": "2025-07-30"
+    },
+    {
+      "id": "1756113203100u2u18ql5v",
+      "title": "Montag, 25. August 2025",
+      "content": "## Partnerplusbenefit\n**neues Passwort:**\n\nMV2XZrueOHj4jl9F",
+      "tags": [
+        "daily"
+      ],
+      "linkedTasks": [],
+      "linkedNotes": [],
+      "linkedProjects": [],
+      "pinned": false,
+      "archived": false,
+      "createdAt": "2025-08-25T09:13:23.100Z",
+      "updatedAt": "2025-08-25T09:15:17.134Z",
+      "dailyNote": true,
+      "dailyNoteDate": "2025-08-25"
+    }
+  ],
+  "noteLinks": [],
+  "notesViewState": {
+    "selectedNote": {
+      "id": "1753252738490v4xdxvdua",
+      "title": "TaskFuchs-Entwicklung",
+      "content": "# Ideen\n- [ ] Umschaltung des Editors zu WYSIWYG\n- [ ] Pexels-Einbindung mit API.\n- [X] CalDAV-Sync: Sync-Intervall festlegen.\n- [X] Notizen bearbeiten: Button \"In Notizen öffnen\" funktioniert nicht.\n- [X] Bei Smart-Parsing: Wichtigkeit bleibt im Aufgabennamen bestehen. So steht z.B. im Aufgabennamen !!! bei sehr wichtig. Gewünschtes Verhalten: Wenn WIchtigkeit geparst ist, sollen die Ausrufezeichen aus dem Aufgabennamen verschwinden.\n- [X] Wenn Aufgabe mit Datum über Smart-Parsing hinzugefügt wurde, darf sie nicht in \"Eingang\" landen, sondern in der entsprechenden Datumsspalte in Planer. Sie muss das Datum zugewiesen bekommen.\n- [ ] Wenn eine Aufgabenbeschreibung eine URL beinhaltet, die mit [UNIQUE Helpdesk](https://unique.zammad.com/#ticket) beginnt, dann weise der Aufgabe automatisch den Tag #ticket zu.\n\n\n# Bugs\n- [X] Tag-Verwaltung: Manche Tags lassen sich nicht löschen. Alle Tags sollen löschbar sein.\n- [x] Filterliste im Header in Notizen öffnet nicht\n- [x] In NOtizen: In rechter SPalte: Keine Anzeige von \"Keine Tags\", \"Keine verknüpften Aufgaben\", \"Keine Verknüpften Projekte\" Wenn eh nichts zu sehen ist. Erst Verknüpfungen anzeigen, wenn vorhanden.\n- [ ] In MD-Editor: Aufgabenelemente schreiben sich nicht automatisch fort. Wenn ich eine Zeile, die mit - [ ] beginnt mit ENTER beende, soll die nächste Zeile mit - [ ] beginnen.\n- [X] Planer und Projekte: Tabellenspalten sind nicht scrollbar. Man kann aktuell nicht nach unten scrollen. Fixe das. Scrollbar soll nicht angezeigt werden.\n- [X] Projekte: Bei laufendem Timer lassen sich Aufgaben nicht archivieren.\n- [X] Planer: Filter nach Tag funktioniert nicht. Es werden Tags angezeigt, die gar nicht mehr vorkommen, etwa weil die Aufgabe nicht mehr vorhanden ist.\n- [ ] Checklisten lassen sich nicht abhaken\n---\n\n# Huntergrundbilder\n![pexels photo 32767147](https://images.pexels.com/photos/32767147/pexels-photo-32767147.jpeg?_gl=1*r1lq9g*_ga*Nzg4MTMzMzk4LjE3NTMyOTk2NjU.*_ga_8JE65Q40S6*czE3NTMyOTk2NjUkbzEkZzEkdDE3NTMyOTk3NjckajE5JGwwJGgw)\n\n# Notizen\n**Kalenderfreigabe**\n>https://outlook.office365.com/owa/calendar/55a7744a282c437a836eb3dad44c6709@unique-landuse.de/25a0968e13534bc195ceb38e5beddc4b1348024555792318342/S-1-8-3574032643-298043167-3273186133-1683214480/reachcalendar.ics",
+      "tags": [],
+      "linkedTasks": [],
+      "linkedNotes": [],
+      "linkedProjects": [],
+      "pinned": true,
+      "archived": false,
+      "createdAt": "2025-07-23T06:38:58.490Z",
+      "updatedAt": "2025-07-24T07:05:50.142Z"
+    },
+    "isEditing": false,
+    "searchQuery": "",
+    "selectedTags": [],
+    "view": "grid",
+    "sortBy": "updated",
+    "sortOrder": "desc",
+    "showArchived": false,
+    "showLinkPreviews": true,
+    "editorMode": "split",
+    "dailyNotesMode": false,
+    "emailMode": false,
+    "selectedDailyNoteDate": null
+  },
+  "preferences": {
+    "theme": "dark",
+    "language": "de",
+    "accentColor": "#e06610",
+    "backgroundImage": "/backgrounds/bg2.jpg",
+    "backgroundType": "image",
+    "dateFormat": "dd.MM.yyyy",
+    "recentBackgroundImages": [
+      "/backgrounds/bg2.jpg",
+      "https://imgproxy.nanxiongnandi.com/arw77ZKXimAY7EM0ci5sBzbH2ADkctdEJCtLIJtSpwQ/w:1920/q:100/att:1/aHR0cHM6Ly9pbWcu/bmFueGlvbmduYW5k/aS5jb20vMjAyNTA3/L01vbmdvbGlhWXVy/dHMuanBn.jpg",
+      "/fox_onboarding2.jpg"
+    ],
+    "notifications": {
+      "email": true,
+      "push": true,
+      "timerReminders": true,
+      "deadlineReminders": true
+    },
+    "privacy": {
+      "analytics": false,
+      "crashReports": true
+    },
+    "sounds": true,
+    "soundVolume": 0.8,
+    "completionSound": "chime",
+    "completionSoundEnabled": true,
+    "enableCelebration": true,
+    "celebrationText": "Gut gemacht!",
+    "celebrationDuration": 3000,
+    "timerDisplayMode": "topBar",
+    "columns": {
+      "visible": 5,
+      "showProjects": true
+    },
+    "showPriorities": true,
+    "sidebar": {
+      "hiddenItems": [],
+      "itemOrder": [
+        "today",
+        "inbox",
+        "tasks",
+        "kanban",
+        "notes",
+        "tags",
+        "statistics",
+        "archive"
+      ]
+    },
+    "enableEndOfDay": true,
+    "enableFocusMode": true,
+    "pomodoro": {
+      "enabled": false,
+      "workDuration": 25,
+      "shortBreakDuration": 5,
+      "longBreakDuration": 15,
+      "longBreakInterval": 4,
+      "autoStartBreaks": false,
+      "autoStartWork": false,
+      "soundEnabled": true,
+      "pomodoroSound": "chime",
+      "breakSound": "bell",
+      "taskSound": "pop",
+      "whiteNoiseEnabled": false,
+      "whiteNoiseType": "clock",
+      "whiteNoiseVolume": 0.3
+    },
+    "toggl": {
+      "enabled": false,
+      "apiToken": "",
+      "workspaceId": "",
+      "defaultProjectId": "",
+      "autoSync": true,
+      "syncOnStart": true,
+      "syncOnPause": true,
+      "syncOnStop": true,
+      "createProjectsAutomatically": true,
+      "useTaskDescriptions": true,
+      "roundTimeToMinutes": true
+    },
+    "caldav": {
+      "enabled": false,
+      "serverUrl": "",
+      "username": "",
+      "password": "",
+      "calendarUrl": "",
+      "autoSync": true,
+      "syncInterval": 30,
+      "syncOnStart": true,
+      "syncOnTaskChange": true,
+      "syncOnlyCompleted": false,
+      "bidirectionalSync": true,
+      "conflictResolution": "manual"
+    },
+    "microsoftTodo": {
+      "enabled": false,
+      "selectedListId": "",
+      "selectedListName": "",
+      "autoSync": true,
+      "syncInterval": 30,
+      "syncOnStart": true,
+      "syncOnTaskChange": true,
+      "bidirectionalSync": true,
+      "conflictResolution": "manual"
+    },
+    "todoist": {
+      "enabled": false,
+      "apiToken": "",
+      "syncTags": [
+        "todoist"
+      ],
+      "autoSync": true,
+      "syncInterval": 30,
+      "syncOnStart": true,
+      "syncOnTaskChange": true,
+      "bidirectionalSync": true,
+      "syncCompletedTasks": false,
+      "defaultProjectId": "",
+      "conflictResolution": "manual"
+    },
+    "timer": {
+      "showOverlay": true,
+      "overlayPosition": {
+        "x": 20,
+        "y": 20
+      },
+      "overlayMinimized": false,
+      "autoOpenTaskOnStart": true,
+      "showRemainingTime": true
+    },
+    "backgroundEffects": {
+      "blur": false,
+      "overlay": true,
+      "overlayOpacity": 0.2
+    },
+    "calendars": {
+      "sources": [],
+      "showInPlanner": false,
+      "defaultDuration": 60,
+      "hiddenEvents": []
+    },
+    "hasCompletedOnboarding": true,
+    "greetingText": "Hallo Malte!",
+    "backgroundColor": "#9a244f",
+    "taskCompletionSound": {
+      "enabled": true,
+      "soundType": "chime",
+      "volume": 0.5
+    },
+    "glassEffects": {
+      "enabled": true,
+      "primarySidebar": true,
+      "secondarySidebar": true
+    },
+    "minimalDesign": false,
+    "minimalisticMode": false
+  },
+  "viewState": {
+    "currentMode": "columns",
+    "kanbanGrouping": "status",
+    "taskView": "board",
+    "projectKanban": {
+      "selectedProjectId": "project-1752481231598-z9g5g889y",
+      "columns": [
+        {
+          "id": "col-1752561188719-g4l45kms7",
+          "title": "To Do",
+          "projectId": "project-1752561187805-9xtzj8v39",
+          "order": 0,
+          "isDefault": false
+        },
+        {
+          "id": "col-1752561672157-g38e1xha4",
+          "title": "Doing",
+          "projectId": "project-1752561187805-9xtzj8v39",
+          "order": 1,
+          "isDefault": false
+        },
+        {
+          "id": "col-1752561731913-q9e4bm5aa",
+          "title": "Done",
+          "projectId": "project-1752561187805-9xtzj8v39",
+          "order": 2,
+          "isDefault": false
+        },
+        {
+          "id": "col-1752481233216-q0tncg668",
+          "title": "Spalte 1",
+          "projectId": "project-1752481231598-z9g5g889y",
+          "color": "#6b7280",
+          "order": 0,
+          "isDefault": false
+        },
+        {
+          "id": "col-1753087059503-fduqk083j",
+          "title": "Spalte 1",
+          "projectId": "project-1753087049586-kxt00n020",
+          "color": "#6b7280",
+          "order": 0,
+          "isDefault": false
+        }
+      ],
+      "searchQuery": "",
+      "priorityFilters": [],
+      "tagFilters": [],
+      "showCompleted": true,
+      "viewType": "board"
+    }
+  },
+  "projectKanbanColumns": [
+    {
+      "id": "col-1752561188719-g4l45kms7",
+      "title": "To Do",
+      "projectId": "project-1752561187805-9xtzj8v39",
+      "order": 0,
+      "isDefault": false
+    },
+    {
+      "id": "col-1752561672157-g38e1xha4",
+      "title": "Doing",
+      "projectId": "project-1752561187805-9xtzj8v39",
+      "order": 1,
+      "isDefault": false
+    },
+    {
+      "id": "col-1752561731913-q9e4bm5aa",
+      "title": "Done",
+      "projectId": "project-1752561187805-9xtzj8v39",
+      "order": 2,
+      "isDefault": false
+    },
+    {
+      "id": "col-1752481233216-q0tncg668",
+      "title": "Spalte 1",
+      "projectId": "project-1752481231598-z9g5g889y",
+      "color": "#6b7280",
+      "order": 0,
+      "isDefault": false
+    },
+    {
+      "id": "col-1753087059503-fduqk083j",
+      "title": "Spalte 1",
+      "projectId": "project-1753087049586-kxt00n020",
+      "color": "#6b7280",
+      "order": 0,
+      "isDefault": false
+    }
+  ],
+  "projectKanbanState": {
+    "selectedProjectId": "project-1752481231598-z9g5g889y",
+    "columns": [
+      {
+        "id": "col-1752561188719-g4l45kms7",
+        "title": "To Do",
+        "projectId": "project-1752561187805-9xtzj8v39",
+        "order": 0,
+        "isDefault": false
+      },
+      {
+        "id": "col-1752561672157-g38e1xha4",
+        "title": "Doing",
+        "projectId": "project-1752561187805-9xtzj8v39",
+        "order": 1,
+        "isDefault": false
+      },
+      {
+        "id": "col-1752561731913-q9e4bm5aa",
+        "title": "Done",
+        "projectId": "project-1752561187805-9xtzj8v39",
+        "order": 2,
+        "isDefault": false
+      },
+      {
+        "id": "col-1752481233216-q0tncg668",
+        "title": "Spalte 1",
+        "projectId": "project-1752481231598-z9g5g889y",
+        "color": "#6b7280",
+        "order": 0,
+        "isDefault": false
+      },
+      {
+        "id": "col-1753087059503-fduqk083j",
+        "title": "Spalte 1",
+        "projectId": "project-1753087049586-kxt00n020",
+        "color": "#6b7280",
+        "order": 0,
+        "isDefault": false
+      }
+    ],
+    "searchQuery": "",
+    "priorityFilters": [],
+    "tagFilters": [],
+    "showCompleted": true,
+    "viewType": "board"
+  },
+  "events": [
+    {
+      "id": "1756278645652-040000008200E00074C5B7101A82E00800000000FB739F439915DC0100000000000000001000000022647E90E312EC4D806706168A9EB813",
+      "calendarUrl": "https://outlook.office365.com/owa/calendar/55a7744a282c437a836eb3dad44c6709@unique-landuse.de/25a0968e13534bc195ceb38e5beddc4b1348024555792318342/S-1-8-3574032643-298043167-3273186133-1683214480/reachcalendar.ics",
+      "description": "\n",
+      "uid": "040000008200E00074C5B7101A82E00800000000FB739F439915DC0100000000000000001000000022647E90E312EC4D806706168A9EB813",
+      "title": "Heitzmann, Sirius",
+      "startTime": "2025-08-27T11:00:00.000Z",
+      "allDay": false,
+      "endTime": "2025-08-27T11:15:00.000Z",
+      "lastModified": "2025-08-27T07:09:39.000Z",
+      "status": "confirmed",
+      "location": ""
+    },
+    {
+      "id": "1756278645652-040000008200E00074C5B7101A82E008000000002F491A0DF911DC010000000000000000100000005B349033A845CA4084CCDFF2A0BC80CD",
+      "calendarUrl": "https://outlook.office365.com/owa/calendar/55a7744a282c437a836eb3dad44c6709@unique-landuse.de/25a0968e13534bc195ceb38e5beddc4b1348024555792318342/S-1-8-3574032643-298043167-3273186133-1683214480/reachcalendar.ics",
+      "description": "Hallo Malte,\nnächste Woche wird meine letzte Woche bei unique sein - ich möchte gerne am Freitag meinen PC etc. abgeben. Bist du da? Ich würde gerne ciao sagen und ihn dir geben. Falls du nicht da bist, schau ich bei Ashik im Kalender bzw. komme schon am Mittwoch.\n\nliebe Grüße,\nVincent\n\n\n________________________________________________________________________________\nMicrosoft Teams Need help?<https://aka.ms/JoinTeamsMeeting?omkt=en-US>\nJoin the meeting now<https://teams.microsoft.com/l/meetup-join/19%3ameeting_NmI4ZjJiZTItNzgwNS00OGQxLWIxMGUtYTgyZDVmNmRiNjU3%40thread.v2/0?context=%7b%22Tid%22%3a%22297317b0-49c5-4c14-9699-fbc83ce87cf4%22%2c%22Oid%22%3a%227215532c-f104-4473-ba51-a9c2c2be664f%22%7d>\nMeeting ID: 345 097 176 952 0\nPasscode: Dm6Yu3kF\n________________________________\nFor organizers: Meeting options<https://teams.microsoft.com/meetingOptions/?organizerId=7215532c-f104-4473-ba51-a9c2c2be664f&tenantId=297317b0-49c5-4c14-9699-fbc83ce87cf4&threadId=19_meeting_NmI4ZjJiZTItNzgwNS00OGQxLWIxMGUtYTgyZDVmNmRiNjU3@thread.v2&messageId=0&language=en-US>\nPrivacy and security<https://www.unique-landuse.de/datenschutzerklaerung>\n________________________________________________________________________________\n",
+      "uid": "040000008200E00074C5B7101A82E008000000002F491A0DF911DC010000000000000000100000005B349033A845CA4084CCDFF2A0BC80CD",
+      "title": "Übergabe Arbeits-PC etc.",
+      "startTime": "2025-08-29T07:30:00.000Z",
+      "allDay": false,
+      "endTime": "2025-08-29T07:45:00.000Z",
+      "lastModified": "2025-08-27T07:09:39.000Z",
+      "status": "confirmed",
+      "location": "Microsoft Teams Meeting"
+    },
+    {
+      "id": "1756278645652-040000008200E00074C5B7101A82E00800000000CDF051D16E16DC01000000000000000010000000FCA6D297A5619E47954F5EA32105126D",
+      "calendarUrl": "https://outlook.office365.com/owa/calendar/55a7744a282c437a836eb3dad44c6709@unique-landuse.de/25a0968e13534bc195ceb38e5beddc4b1348024555792318342/S-1-8-3574032643-298043167-3273186133-1683214480/reachcalendar.ics",
+      "description": "Hi Malte,\n\nHope you're well.\n\nWith the new changes on thecompany's LinkedIn account management, I thought it would be helpful to have a short call on clarifying who will be doing what. Since Paula has been managing our department account, she'll also join to give us some input / lessons learned from her experience so far.\n\nHope the suggested time suits you both.\n\nBest,\nSara\n\n________________________________________________________________________________\nMicrosoft Teams Need help?<https://aka.ms/JoinTeamsMeeting?omkt=en-US>\nJoin the meeting now<https://teams.microsoft.com/l/meetup-join/19%3ameeting_ZWIxNjcxMTctNTBmNC00YjdjLTk4NDItNWYyYzgwYzgyOGI0%40thread.v2/0?context=%7b%22Tid%22%3a%22297317b0-49c5-4c14-9699-fbc83ce87cf4%22%2c%22Oid%22%3a%2260816b31-bb4b-4aa5-b2dc-eb76301f126e%22%7d>\nMeeting ID: 340 768 760 358 5\nPasscode: r8tC9Ht7\n________________________________\nFor organizers: Meeting options<https://teams.microsoft.com/meetingOptions/?organizerId=60816b31-bb4b-4aa5-b2dc-eb76301f126e&tenantId=297317b0-49c5-4c14-9699-fbc83ce87cf4&threadId=19_meeting_ZWIxNjcxMTctNTBmNC00YjdjLTk4NDItNWYyYzgwYzgyOGI0@thread.v2&messageId=0&language=en-US>\nPrivacy and security<https://www.unique-landuse.de/datenschutzerklaerung>\n________________________________________________________________________________\n",
+      "uid": "040000008200E00074C5B7101A82E00800000000CDF051D16E16DC01000000000000000010000000FCA6D297A5619E47954F5EA32105126D",
+      "title": "Unique LinkedIn",
+      "startTime": "2025-09-03T08:00:00.000Z",
+      "allDay": false,
+      "endTime": "2025-09-03T08:30:00.000Z",
+      "lastModified": "2025-08-27T07:09:39.000Z",
+      "status": "confirmed",
+      "location": "Microsoft Teams Meeting"
+    },
+    {
+      "id": "1756278645652-040000008200E00074C5B7101A82E00800000000F0273E700F06DC0100000000000000001000000064A8371B5399794A883EBC8DC5AFD25C",
+      "calendarUrl": "https://outlook.office365.com/owa/calendar/55a7744a282c437a836eb3dad44c6709@unique-landuse.de/25a0968e13534bc195ceb38e5beddc4b1348024555792318342/S-1-8-3574032643-298043167-3273186133-1683214480/reachcalendar.ics",
+      "description": "Liebe Alle,\n\nwir würde uns gerne mal mit euch zusammensetzen, um ein gemeinsames Verständnis zu haben, wie wir die Wiki-Dokumente bearbeiten. Außerdem ist im Oktober wieder das ISO-Audit fällig, und evtl. ergeben sich dafür Fragen zur Dokumentslenkungsliste.\n\nIch habe ein Dokument erstellt, in dem die diversen Tätigkeiten und Verantwortlichkeiten zusammengefügt sind. Dies würde ich gerne mit euch besprechen:   QM-Wiki_Akteurslandschaft.docx<https://uniquelandusede149-my.sharepoint.com/:w:/g/personal/katia_obst_unique-landuse_de/EW0Na4jy8L5FjonV983IZJEBc6akzloexX2S8wVBdd97bg?e=3qYwym>\n\nLiebe Grüße,\nKatia und Alison\n\n\n\n",
+      "uid": "040000008200E00074C5B7101A82E00800000000F0273E700F06DC0100000000000000001000000064A8371B5399794A883EBC8DC5AFD25C",
+      "title": "Besprechung Unique-Wiki",
+      "startTime": "2025-09-15T09:30:00.000Z",
+      "allDay": false,
+      "endTime": "2025-09-15T10:00:00.000Z",
+      "lastModified": "2025-08-27T07:09:39.000Z",
+      "status": "confirmed",
+      "location": "5.1 Besprechungsraum"
+    },
+    {
+      "id": "1756278645652-040000008200E00074C5B7101A82E008000000008019C036F5FBDB01000000000000000010000000D9238D7A0D43A1428ADC2E638C014962",
+      "calendarUrl": "https://outlook.office365.com/owa/calendar/55a7744a282c437a836eb3dad44c6709@unique-landuse.de/25a0968e13534bc195ceb38e5beddc4b1348024555792318342/S-1-8-3574032643-298043167-3273186133-1683214480/reachcalendar.ics",
+      "description": "\n",
+      "uid": "040000008200E00074C5B7101A82E008000000008019C036F5FBDB01000000000000000010000000D9238D7A0D43A1428ADC2E638C014962",
+      "title": "Unqiue Landuse",
+      "startTime": "2025-09-17T07:00:00.000Z",
+      "allDay": false,
+      "endTime": "2025-09-17T15:00:00.000Z",
+      "lastModified": "2025-08-27T07:09:39.000Z",
+      "status": "confirmed",
+      "location": ""
+    },
+    {
+      "id": "1756278645652-040000008200E00074C5B7101A82E00800000000F09B4B4CF802DC010000000000000000100000006B861F4081513642AF161793A444EDF9",
+      "calendarUrl": "https://outlook.office365.com/owa/calendar/55a7744a282c437a836eb3dad44c6709@unique-landuse.de/25a0968e13534bc195ceb38e5beddc4b1348024555792318342/S-1-8-3574032643-298043167-3273186133-1683214480/reachcalendar.ics",
+      "description": "\n________________________________________________________________________________\nMicrosoft Teams Benötigen Sie Hilfe?<https://aka.ms/JoinTeamsMeeting?omkt=de-DE>\nJetzt an der Besprechung teilnehmen<https://teams.microsoft.com/l/meetup-join/19%3ameeting_NGJlNTczZTctNjNiZC00ZDllLWFmODEtYWU0NWI3ZDY0MmY3%40thread.v2/0?context=%7b%22Tid%22%3a%22297317b0-49c5-4c14-9699-fbc83ce87cf4%22%2c%22Oid%22%3a%229727700f-a263-4b67-a515-48a9ceb74ffd%22%7d>\nBesprechungs-ID: 357 107 979 069 5\nKennung: yB23pJ3q\n________________________________\nFür Organisatoren: Besprechungsoptionen<https://teams.microsoft.com/meetingOptions/?organizerId=9727700f-a263-4b67-a515-48a9ceb74ffd&tenantId=297317b0-49c5-4c14-9699-fbc83ce87cf4&threadId=19_meeting_NGJlNTczZTctNjNiZC00ZDllLWFmODEtYWU0NWI3ZDY0MmY3@thread.v2&messageId=0&language=de-DE>\nDatenschutz und Sicherheit<https://www.unique-landuse.de/datenschutzerklaerung>\n________________________________________________________________________________\n",
+      "uid": "040000008200E00074C5B7101A82E00800000000F09B4B4CF802DC010000000000000000100000006B861F4081513642AF161793A444EDF9",
+      "title": "Jahresgespräch Hr. Zehr, CAB",
+      "startTime": "2025-09-22T08:00:00.000Z",
+      "allDay": false,
+      "endTime": "2025-09-22T09:30:00.000Z",
+      "lastModified": "2025-08-27T07:09:39.000Z",
+      "status": "confirmed",
+      "location": "Microsoft Teams-Besprechung"
+    }
+  ],
+  "calendarSources": [
+    {
+      "id": "1756278645652",
+      "name": "Unique",
+      "url": "https://outlook.office365.com/owa/calendar/55a7744a282c437a836eb3dad44c6709@unique-landuse.de/25a0968e13534bc195ceb38e5beddc4b1348024555792318342/S-1-8-3574032643-298043167-3273186133-1683214480/reachcalendar.ics",
+      "color": "#3b82f6",
+      "enabled": true,
+      "createdAt": "2025-08-27T07:10:45.652Z",
+      "updatedAt": "2025-08-27T07:10:45.652Z",
+      "lastSync": "2025-08-27T07:10:47.282Z"
+    }
+  ],
+  "ical": {
+    "preferences": {
+      "sources": [],
+      "showInPlanner": false,
+      "defaultDuration": 60,
+      "hiddenEvents": []
+    },
+    "sources": [
+      {
+        "id": "1756278645652",
+        "name": "Unique",
+        "url": "https://outlook.office365.com/owa/calendar/55a7744a282c437a836eb3dad44c6709@unique-landuse.de/25a0968e13534bc195ceb38e5beddc4b1348024555792318342/S-1-8-3574032643-298043167-3273186133-1683214480/reachcalendar.ics",
+        "color": "#3b82f6",
+        "enabled": true,
+        "createdAt": "2025-08-27T07:10:45.652Z",
+        "updatedAt": "2025-08-27T07:10:45.652Z",
+        "lastSync": "2025-08-27T07:10:47.282Z"
+      }
+    ]
+  },
+  "imageStorage": {
+    "images": [],
+    "totalSize": 0,
+    "maxSize": 104857600,
+    "autoCleanup": true,
+    "cleanupAfterDays": 30,
+    "compressionQuality": 0.8,
+    "maxImageSize": 10485760
+  },
+  "searchQuery": "",
+  "activeTagFilters": [],
+  "activePriorityFilters": [],
+  "focusMode": false,
+  "focusedColumnId": null,
+  "showCompletedTasks": false,
+  "projectColumnOffset": 0,
+  "notifications": [
+    {
+      "id": "moved-overdue-1756276079969",
+      "title": "Aufgaben verschoben",
+      "message": "{count} überfällige Aufgaben wurden in den heutigen Tag verschoben.",
+      "timestamp": "2025-08-27T06:27:59.969Z",
+      "type": "success",
+      "read": false
+    },
+    {
+      "id": "moved-overdue-1756276079969",
+      "title": "Aufgaben verschoben",
+      "message": "{count} überfällige Aufgaben wurden in den heutigen Tag verschoben.",
+      "timestamp": "2025-08-27T06:27:59.969Z",
+      "type": "success",
+      "read": false
+    },
+    {
+      "id": "moved-overdue-1756276079969",
+      "title": "Aufgaben verschoben",
+      "message": "{count} überfällige Aufgaben wurden in den heutigen Tag verschoben.",
+      "timestamp": "2025-08-27T06:27:59.969Z",
+      "type": "success",
+      "read": false
+    },
+    {
+      "id": "moved-overdue-1756276079969",
+      "title": "Aufgaben verschoben",
+      "message": "{count} überfällige Aufgaben wurden in den heutigen Tag verschoben.",
+      "timestamp": "2025-08-27T06:27:59.969Z",
+      "type": "success",
+      "read": false
+    }
+  ],
+  "activeTimer": null,
+  "currentDate": "2025-08-28T07:16:46.030Z",
+  "isNoteEditorFullScreen": false,
+  "recurrence": {
+    "rules": [],
+    "activeRule": null,
+    "generatedTasks": [],
+    "upcomingTasks": [],
+    "completedTasks": [],
+    "skippedTasks": [],
+    "showCompleted": false,
+    "showSkipped": false,
+    "selectedTimeframe": "month",
+    "sortBy": "date",
+    "sortOrder": "asc",
+    "overallStats": {
+      "totalRules": 0,
+      "activeRules": 0,
+      "totalTasks": 0,
+      "completedTasks": 0,
+      "averageCompletionRate": 0
+    }
+  },
+  "personalCapacity": null,
+  "exportDate": "2025-08-28T07:18:44.036Z",
+  "version": "2.3",
+  "metadata": {
+    "totalTasks": 86,
+    "totalArchivedTasks": 12,
+    "totalNotes": 8,
+    "totalDailyNotes": 3,
+    "totalEmailNotes": 0,
+    "totalTags": 9,
+    "totalBoards": 0,
+    "totalColumns": 33,
+    "totalPinColumns": 1,
+    "totalNoteLinks": 0,
+    "totalImages": 0,
+    "totalNotifications": 4,
+    "totalEvents": 6,
+    "totalCalendarSources": 1,
+    "hasActiveTimer": false,
+    "hasPersonalCapacity": false,
+    "projectsWithTimebudgets": 0,
+    "appVersion": "2.3",
+    "dataSize": 100210,
+    "exportTime": 1756365524036
+  }
+}
