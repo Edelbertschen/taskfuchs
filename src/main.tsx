@@ -65,7 +65,8 @@ if (import.meta.env.PROD) {
     .then(({ registerSW }) => {
       const updateSW = registerSW({
         onNeedRefresh() {
-          showPWAUpdateBanner(() => updateSW());
+          // Show banner and force activate updated SW with immediate reload
+          showPWAUpdateBanner(() => updateSW(true));
         },
         onOfflineReady() {
           // Optionally notify offline readiness

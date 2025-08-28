@@ -257,7 +257,9 @@ const Settings = React.memo(() => {
       state.preferences.theme === 'system' && typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
     )
   );
-  const [language, setLanguage] = useState(i18n.language);
+  // Normalize i18n lang like "de-DE" → "de" for toggle alignment
+  const normalizeLang = (lng: string | undefined) => (lng || 'de').slice(0, 2);
+  const [language, setLanguage] = useState(normalizeLang(state.preferences.language || i18n.language));
   const [notifications, setNotifications] = useState(true);
   const [autoSave, setAutoSave] = useState(true);
   const [defaultPriority, setDefaultPriority] = useState<'none' | 'low' | 'medium' | 'high'>('medium');
@@ -606,10 +608,7 @@ const Settings = React.memo(() => {
             <input type="checkbox" className="mr-2" checked={dropboxAutoSync} onChange={e => { setDropboxAutoSync(e.target.checked); const prefs = state.preferences.dropbox || ({} as any); dispatch({ type: 'UPDATE_PREFERENCES', payload: { dropbox: { enabled: prefs.enabled ?? false, appKey: prefs.appKey || '', accessToken: prefs.accessToken, refreshToken: prefs.refreshToken, expiresAt: prefs.expiresAt, accountEmail: prefs.accountEmail, accountName: prefs.accountName, folderPath: prefs.folderPath || '/Apps/TaskFuchs', autoSync: e.target.checked, syncInterval: prefs.syncInterval ?? 30, lastSync: prefs.lastSync, lastSyncStatus: prefs.lastSyncStatus, lastSyncError: prefs.lastSyncError, conflictResolution: prefs.conflictResolution || 'manual', rememberPassphrase: prefs.rememberPassphrase ?? false, passphraseHint: prefs.passphraseHint } } }); }} />
             Automatisch synchronisieren
           </label>
-          <label className="mt-2 inline-flex items-center text-sm text-gray-700 dark:text-gray-300">
-            <input type="checkbox" className="mr-2" checked={state.preferences.dropbox?.pullBeforeAutoSync ?? false} onChange={e => { const prefs = state.preferences.dropbox || ({} as any); dispatch({ type: 'UPDATE_PREFERENCES', payload: { dropbox: { ...prefs, pullBeforeAutoSync: e.target.checked } } }); }} />
-            Vor Auto‑Sync zuerst herunterladen (Pull → Push)
-          </label>
+          {/* Pull-before-auto-sync option removed as per user request */}
         </div>
       </div>
       <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -650,7 +649,6 @@ const Settings = React.memo(() => {
   );
   const [connectionError, setConnectionError] = useState('');
   const [isTesting, setIsTesting] = useState(false);
-  
   // Extended sync state
   const [syncSetupStep, setSyncSetupStep] = useState(1);
   const [showSyncSetup, setShowSyncSetup] = useState(false);
@@ -897,9 +895,11 @@ const Settings = React.memo(() => {
   }, [state.preferences.theme]);
 
   const handleLanguageChange = (newLang: string) => {
-    setLanguage(newLang);
-    i18n.changeLanguage(newLang);
-    localStorage.setItem('language', newLang);
+    const lang = normalizeLang(newLang);
+    setLanguage(lang);
+    i18n.changeLanguage(lang);
+    localStorage.setItem('language', lang);
+    try { dispatch({ type: 'UPDATE_PREFERENCES', payload: { language: lang } }); } catch {}
   };
 
   const handleBackgroundImageChange = (url: string) => {
@@ -1243,7 +1243,6 @@ const Settings = React.memo(() => {
       setCaldavCalendars([]);
     }
   };
-
   const handleCalDAVSync = async () => {
     if (!caldavEnabled) {
       setCaldavConnectionMessage('CalDAV-Synchronisation ist nicht aktiviert.');
@@ -1719,7 +1718,6 @@ const Settings = React.memo(() => {
       </div>
     );
   };
-
   const renderCalDAVSection = () => {
     return (
       <div className="space-y-8">
@@ -2223,7 +2221,6 @@ const Settings = React.memo(() => {
       </div>
     );
   };
-
   const renderICalSection = () => {
     return (
       <div className="space-y-8">
@@ -2756,7 +2753,6 @@ const Settings = React.memo(() => {
   const removeTodoistSyncTag = (tagToRemove: string) => {
     setTodoistSyncTags(todoistSyncTags.filter(tag => tag !== tagToRemove));
   };
-
   const manualTodoistSync = async () => {
     if (!todoistEnabled || !todoistApiToken.trim()) {
       setTodoistSyncStatus('error');
@@ -3131,7 +3127,6 @@ const Settings = React.memo(() => {
     };
 
     const isConfigured = newTodoistSyncConfig?.enabled && newTodoistSyncConfig?.apiToken && newTodoistSyncConfig?.projectMappings.length > 0;
-
     return (
       <div className="space-y-8">
         {/* Status Header */}
@@ -3718,7 +3713,6 @@ const Settings = React.memo(() => {
   const renderMicrosoftToDoSection = () => {
     return <MicrosoftToDoSettingsSection onShowSaved={() => { setShowSaved(true); setTimeout(() => setShowSaved(false), 2000); }} />;
   };
-
   const renderSection = () => {
     switch (activeSection) {
       case 'appearance':
@@ -4299,7 +4293,6 @@ const Settings = React.memo(() => {
 
           </div>
         );
-
       case 'language':
         return (
           <div className="space-y-6">
@@ -4740,7 +4733,6 @@ const Settings = React.memo(() => {
             </div>
           </div>
         );
-      
       case 'notifications':
         return (
           <div className="space-y-8">
@@ -5136,7 +5128,6 @@ const Settings = React.memo(() => {
             </div>
           </div>
         );
-
       case 'timer':
         return (
           <div className="space-y-8">
@@ -5492,7 +5483,6 @@ const Settings = React.memo(() => {
         );
 
       // integrations removed
-
       case 'toggl':
         return (
           <div className="space-y-8">
@@ -6482,7 +6472,6 @@ const Settings = React.memo(() => {
                       )}
                     </div>
                   )}
-                  
                   {/* No calendars found */}
                   {caldavConnectionStatus === 'success' && caldavCalendars.length === 0 && !caldavCalendarsLoading && (
                     <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded border border-amber-200 dark:border-amber-800">
@@ -7112,7 +7101,6 @@ const Settings = React.memo(() => {
 
       case 'microsoft-todo':
         return <MicrosoftToDoSettingsSection onShowSaved={() => { setShowSaved(true); setTimeout(() => setShowSaved(false), 2000); }} />;
-
       case 'sync':
         return (
           <div className="space-y-6">
@@ -7732,7 +7720,6 @@ const Settings = React.memo(() => {
             )}
           </div>
         );
-
       case 'informationen':
         return (
           <div className="space-y-6">
@@ -7939,10 +7926,10 @@ const Settings = React.memo(() => {
                       <div className="text-green-700 dark:text-green-300 font-medium">Smart Input</div>
                       <div className="text-green-600 dark:text-green-400">Natürliche Sprache</div>
                     </div>
-                                         <div>
-                       <div className="text-green-700 dark:text-green-300 font-medium">Virtualisierung</div>
-                       <div className="text-green-600 dark:text-green-400">Bei &gt;100 Items</div>
-                     </div>
+                    <div>
+                      <div className="text-green-700 dark:text-green-300 font-medium">Virtualisierung</div>
+                      <div className="text-green-600 dark:text-green-400">Bei &gt;100 Items</div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -8056,7 +8043,6 @@ const Settings = React.memo(() => {
       handleTempGradientToChange(value);
     }
   };
-
   return (
     <>
       <div className="h-full flex bg-gray-50 dark:bg-gray-900">
