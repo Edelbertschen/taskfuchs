@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useCallback as useCb } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppTranslation } from '../../utils/i18nHelpers';
@@ -393,6 +394,248 @@ const Settings = React.memo(() => {
   const [caldavSyncMessage, setCaldavSyncMessage] = useState('');
   const [caldavCalendars, setCaldavCalendars] = useState<any[]>([]);
   const [caldavCalendarsLoading, setCaldavCalendarsLoading] = useState(false);
+
+  // Dropbox E2EE Sync Settings
+  const [dropboxEnabled, setDropboxEnabled] = useState(state.preferences.dropbox?.enabled ?? false);
+  const [dropboxAppKey, setDropboxAppKey] = useState(state.preferences.dropbox?.appKey ?? '');
+  const [dropboxFolder, setDropboxFolder] = useState(state.preferences.dropbox?.folderPath ?? '/Apps/TaskFuchs');
+  const [dropboxAutoSync, setDropboxAutoSync] = useState(state.preferences.dropbox?.autoSync ?? true);
+  const [dropboxSyncInterval, setDropboxSyncInterval] = useState(state.preferences.dropbox?.syncInterval ?? 30);
+  const [dropboxAccountEmail, setDropboxAccountEmail] = useState(state.preferences.dropbox?.accountEmail ?? '');
+  const [dropboxAccountName, setDropboxAccountName] = useState(state.preferences.dropbox?.accountName ?? '');
+  const [dropboxPassphrase, setDropboxPassphrase] = useState('');
+  const [dropboxRememberPassphrase, setDropboxRememberPassphrase] = useState(state.preferences.dropbox?.rememberPassphrase ?? false);
+  const [dropboxPassphraseHint, setDropboxPassphraseHint] = useState(state.preferences.dropbox?.passphraseHint ?? '');
+  const [dropboxStatus, setDropboxStatus] = useState<'idle' | 'connecting' | 'connected' | 'error' | 'syncing'>('idle');
+  const [dropboxMessage, setDropboxMessage] = useState('');
+
+  // Dropbox OAuth handler
+  const handleConnectDropbox = useCb(async () => {
+    try {
+      setDropboxStatus('connecting');
+      setDropboxMessage('Dropbox-Verbindung wird aufgebaut...');
+      const redirectUri = `${window.location.origin}/auth/dropbox.html`;
+      const { DropboxClient } = await import('../../utils/dropboxClient');
+      const client = new DropboxClient(dropboxAppKey, redirectUri);
+      const token = await client.authorizeWithPopup();
+      let profile: any = undefined;
+      try {
+        profile = await client.getCurrentAccount(token.access_token);
+      } catch (e) {
+        console.warn('get_current_account failed', e);
+      }
+      const expiresAt = token.expires_in ? Date.now() + token.expires_in * 1000 : undefined;
+
+      dispatch({ type: 'UPDATE_PREFERENCES', payload: { dropbox: {
+        enabled: true,
+        appKey: dropboxAppKey,
+        accessToken: token.access_token,
+        refreshToken: token.refresh_token,
+        expiresAt,
+        accountEmail: profile?.email || state.preferences.dropbox?.accountEmail || '',
+        accountName: profile?.name?.display_name || state.preferences.dropbox?.accountName || '',
+        folderPath: dropboxFolder,
+        autoSync: dropboxAutoSync,
+        syncInterval: dropboxSyncInterval,
+        lastSyncStatus: 'success',
+        lastSync: state.preferences.dropbox?.lastSync,
+        lastSyncError: state.preferences.dropbox?.lastSyncError,
+        conflictResolution: state.preferences.dropbox?.conflictResolution || 'manual',
+        rememberPassphrase: state.preferences.dropbox?.rememberPassphrase || false,
+        passphraseHint: state.preferences.dropbox?.passphraseHint || ''
+      } } });
+
+      setDropboxAccountEmail(profile?.email || '');
+      setDropboxAccountName(profile?.name?.display_name || '');
+      setDropboxEnabled(true);
+      setDropboxStatus('connected');
+      setDropboxMessage('Dropbox verbunden.');
+    } catch (e: any) {
+      console.error(e);
+      setDropboxStatus('error');
+      setDropboxMessage(e?.message || 'Dropbox-Verbindung fehlgeschlagen');
+    }
+  }, [dropboxAppKey, dropboxFolder, dropboxAutoSync, dropboxSyncInterval, dispatch, state.preferences.dropbox]);
+
+  const handleDropboxSyncNow = useCb(async () => {
+    try {
+      setDropboxStatus('syncing');
+      setDropboxMessage('Synchronisiere mit Dropbox...');
+      const { encryptJson } = await import('../../utils/e2ee');
+      const { DropboxClient } = await import('../../utils/dropboxClient');
+
+      const prefs = state.preferences.dropbox || {} as any;
+      const token = prefs.accessToken as string | undefined;
+      const refreshToken = prefs.refreshToken as string | undefined;
+      const appKey = prefs.appKey as string;
+      if (!token && !refreshToken) throw new Error('Nicht verbunden');
+      if (!dropboxPassphrase && !prefs.rememberPassphrase) throw new Error('Passphrase erforderlich');
+
+      const redirectUri = `${window.location.origin}/auth/dropbox.html`;
+      const client = new DropboxClient(appKey, redirectUri);
+      let accessToken = token as string;
+      if (!accessToken && refreshToken) {
+        const refreshed = await client.refreshToken(refreshToken);
+        accessToken = refreshed.access_token;
+        const expiresAt = refreshed.expires_in ? Date.now() + refreshed.expires_in * 1000 : undefined;
+        dispatch({ type: 'UPDATE_PREFERENCES', payload: { dropbox: {
+          enabled: prefs.enabled ?? true,
+          appKey: prefs.appKey || '',
+          accessToken,
+          refreshToken: prefs.refreshToken,
+          expiresAt,
+          accountEmail: prefs.accountEmail,
+          accountName: prefs.accountName,
+          folderPath: prefs.folderPath || '/Apps/TaskFuchs',
+          autoSync: prefs.autoSync ?? true,
+          syncInterval: prefs.syncInterval ?? 30,
+          lastSync: prefs.lastSync,
+          lastSyncStatus: prefs.lastSyncStatus,
+          lastSyncError: prefs.lastSyncError,
+          conflictResolution: prefs.conflictResolution || 'manual',
+          rememberPassphrase: prefs.rememberPassphrase ?? false,
+          passphraseHint: prefs.passphraseHint
+        } } });
+      }
+
+      const appState = state; // Full state snapshot
+      const encrypted = await encryptJson(appState, dropboxPassphrase || (prefs.rememberPassphrase ? localStorage.getItem('taskfuchs_dropbox_passphrase') || '' : ''));
+      const filePath = `${prefs.folderPath || '/Apps/TaskFuchs'}/state.enc`;
+
+      // Try to fetch rev for optimistic locking
+      let rev: string | undefined = undefined;
+      try {
+        const existing = await client.downloadEncrypted(accessToken, filePath);
+        if (existing) rev = existing.rev;
+      } catch {}
+
+      await client.uploadEncrypted(accessToken, filePath, encrypted.data, rev);
+
+      dispatch({ type: 'UPDATE_PREFERENCES', payload: { dropbox: {
+        enabled: prefs.enabled ?? true,
+        appKey: prefs.appKey || '',
+        accessToken: prefs.accessToken,
+        refreshToken: prefs.refreshToken,
+        expiresAt: prefs.expiresAt,
+        accountEmail: prefs.accountEmail,
+        accountName: prefs.accountName,
+        folderPath: prefs.folderPath || '/Apps/TaskFuchs',
+        autoSync: prefs.autoSync ?? true,
+        syncInterval: prefs.syncInterval ?? 30,
+        lastSync: new Date().toISOString(),
+        lastSyncStatus: 'success',
+        lastSyncError: undefined,
+        conflictResolution: prefs.conflictResolution || 'manual',
+        rememberPassphrase: prefs.rememberPassphrase ?? false,
+        passphraseHint: prefs.passphraseHint
+      } } });
+      setDropboxStatus('connected');
+      setDropboxMessage('Synchronisierung abgeschlossen.');
+    } catch (e: any) {
+      console.error('Dropbox sync error:', e);
+      setDropboxStatus('error');
+      setDropboxMessage(e?.message || 'Synchronisierung fehlgeschlagen');
+      const prefs = state.preferences.dropbox || {} as any;
+      dispatch({ type: 'UPDATE_PREFERENCES', payload: { dropbox: {
+        enabled: prefs.enabled ?? false,
+        appKey: prefs.appKey || '',
+        accessToken: prefs.accessToken,
+        refreshToken: prefs.refreshToken,
+        expiresAt: prefs.expiresAt,
+        accountEmail: prefs.accountEmail,
+        accountName: prefs.accountName,
+        folderPath: prefs.folderPath || '/Apps/TaskFuchs',
+        autoSync: prefs.autoSync ?? true,
+        syncInterval: prefs.syncInterval ?? 30,
+        lastSync: new Date().toISOString(),
+        lastSyncStatus: 'error',
+        lastSyncError: e?.message || String(e),
+        conflictResolution: prefs.conflictResolution || 'manual',
+        rememberPassphrase: prefs.rememberPassphrase ?? false,
+        passphraseHint: prefs.passphraseHint
+      } } });
+    }
+  }, [dispatch, state, dropboxPassphrase]);
+
+  useEffect(() => {
+    // Persist passphrase if requested
+    if (dropboxRememberPassphrase && dropboxPassphrase) {
+      try { localStorage.setItem('taskfuchs_dropbox_passphrase', dropboxPassphrase); } catch {}
+    }
+  }, [dropboxRememberPassphrase, dropboxPassphrase]);
+
+  // --- UI Section Renderer ---
+  const renderDropboxSection = () => (
+    <div className="mt-10 p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Dropbox Sync (E2EE)</h3>
+      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+        Sichere Synchronisation über Dropbox. Deine Daten werden vor dem Upload auf deinem Gerät mit AES‑GCM verschlüsselt.
+      </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">App‑Key</label>
+          <input value={dropboxAppKey} onChange={e => setDropboxAppKey(e.target.value)} onBlur={() => { const prefs = state.preferences.dropbox || ({} as any); dispatch({ type: 'UPDATE_PREFERENCES', payload: { dropbox: { enabled: prefs.enabled ?? false, appKey: dropboxAppKey, accessToken: prefs.accessToken, refreshToken: prefs.refreshToken, expiresAt: prefs.expiresAt, accountEmail: prefs.accountEmail, accountName: prefs.accountName, folderPath: prefs.folderPath || '/Apps/TaskFuchs', autoSync: prefs.autoSync ?? true, syncInterval: prefs.syncInterval ?? 30, lastSync: prefs.lastSync, lastSyncStatus: prefs.lastSyncStatus, lastSyncError: prefs.lastSyncError, conflictResolution: prefs.conflictResolution || 'manual', rememberPassphrase: prefs.rememberPassphrase ?? false, passphraseHint: prefs.passphraseHint } } }); }} className="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800" placeholder="z. B. a1b2c3d4e5f6g7h" />
+          <p className="text-xs text-gray-500 mt-1">
+            Den App‑Key erhältst du im Dropbox App Console. Hilfe: <a className="underline" href="https://www.dropbox.com/developers/apps" target="_blank" rel="noreferrer">Dropbox Apps</a>
+          </p>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sync‑Ordner</label>
+          <input value={dropboxFolder} onChange={e => setDropboxFolder(e.target.value)} onBlur={() => { const prefs = state.preferences.dropbox || ({} as any); dispatch({ type: 'UPDATE_PREFERENCES', payload: { dropbox: { enabled: prefs.enabled ?? true, appKey: prefs.appKey || dropboxAppKey, accessToken: prefs.accessToken, refreshToken: prefs.refreshToken, expiresAt: prefs.expiresAt, accountEmail: prefs.accountEmail, accountName: prefs.accountName, folderPath: dropboxFolder || '/Apps/TaskFuchs', autoSync: prefs.autoSync ?? true, syncInterval: prefs.syncInterval ?? 30, lastSync: prefs.lastSync, lastSyncStatus: prefs.lastSyncStatus, lastSyncError: prefs.lastSyncError, conflictResolution: prefs.conflictResolution || 'manual', rememberPassphrase: prefs.rememberPassphrase ?? false, passphraseHint: prefs.passphraseHint } } }); }} className="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800" placeholder="/Apps/TaskFuchs" />
+          <p className="text-xs text-gray-500 mt-1">Standard: /Apps/TaskFuchs</p>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Passphrase</label>
+          <input type="password" value={dropboxPassphrase} onChange={e => setDropboxPassphrase(e.target.value)} className="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800" placeholder="Geheimes Passwort für Verschlüsselung" />
+          <div className="flex items-center gap-3 mt-2">
+            <label className="inline-flex items-center text-sm text-gray-700 dark:text-gray-300">
+              <input type="checkbox" className="mr-2" checked={dropboxRememberPassphrase} onChange={e => { setDropboxRememberPassphrase(e.target.checked); const prefs = state.preferences.dropbox || ({} as any); dispatch({ type: 'UPDATE_PREFERENCES', payload: { dropbox: { enabled: prefs.enabled ?? false, appKey: prefs.appKey || '', accessToken: prefs.accessToken, refreshToken: prefs.refreshToken, expiresAt: prefs.expiresAt, accountEmail: prefs.accountEmail, accountName: prefs.accountName, folderPath: prefs.folderPath || '/Apps/TaskFuchs', autoSync: prefs.autoSync ?? true, syncInterval: prefs.syncInterval ?? 30, lastSync: prefs.lastSync, lastSyncStatus: prefs.lastSyncStatus, lastSyncError: prefs.lastSyncError, conflictResolution: prefs.conflictResolution || 'manual', rememberPassphrase: e.target.checked, passphraseHint: prefs.passphraseHint } } }); }} />
+              Passphrase auf diesem Gerät merken
+            </label>
+            <input value={dropboxPassphraseHint} onChange={e => { setDropboxPassphraseHint(e.target.value); const prefs = state.preferences.dropbox || ({} as any); dispatch({ type: 'UPDATE_PREFERENCES', payload: { dropbox: { enabled: prefs.enabled ?? false, appKey: prefs.appKey || '', accessToken: prefs.accessToken, refreshToken: prefs.refreshToken, expiresAt: prefs.expiresAt, accountEmail: prefs.accountEmail, accountName: prefs.accountName, folderPath: prefs.folderPath || '/Apps/TaskFuchs', autoSync: prefs.autoSync ?? true, syncInterval: prefs.syncInterval ?? 30, lastSync: prefs.lastSync, lastSyncStatus: prefs.lastSyncStatus, lastSyncError: prefs.lastSyncError, conflictResolution: prefs.conflictResolution || 'manual', rememberPassphrase: prefs.rememberPassphrase ?? false, passphraseHint: e.target.value } } }); }} className="flex-1 rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 text-sm" placeholder="Hinweis (optional)" />
+          </div>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Intervall</label>
+          <select value={dropboxSyncInterval} onChange={e => { const v = parseInt(e.target.value); setDropboxSyncInterval(v); const prefs = state.preferences.dropbox || ({} as any); dispatch({ type: 'UPDATE_PREFERENCES', payload: { dropbox: { enabled: prefs.enabled ?? false, appKey: prefs.appKey || '', accessToken: prefs.accessToken, refreshToken: prefs.refreshToken, expiresAt: prefs.expiresAt, accountEmail: prefs.accountEmail, accountName: prefs.accountName, folderPath: prefs.folderPath || '/Apps/TaskFuchs', autoSync: prefs.autoSync ?? true, syncInterval: v, lastSync: prefs.lastSync, lastSyncStatus: prefs.lastSyncStatus, lastSyncError: prefs.lastSyncError, conflictResolution: prefs.conflictResolution || 'manual', rememberPassphrase: prefs.rememberPassphrase ?? false, passphraseHint: prefs.passphraseHint } } }); }} className="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800">
+            {[5, 15, 30, 60, 120].map(m => <option key={m} value={m}>{m} Minuten</option>)}
+          </select>
+          <label className="mt-2 inline-flex items-center text-sm text-gray-700 dark:text-gray-300">
+            <input type="checkbox" className="mr-2" checked={dropboxAutoSync} onChange={e => { setDropboxAutoSync(e.target.checked); const prefs = state.preferences.dropbox || ({} as any); dispatch({ type: 'UPDATE_PREFERENCES', payload: { dropbox: { enabled: prefs.enabled ?? false, appKey: prefs.appKey || '', accessToken: prefs.accessToken, refreshToken: prefs.refreshToken, expiresAt: prefs.expiresAt, accountEmail: prefs.accountEmail, accountName: prefs.accountName, folderPath: prefs.folderPath || '/Apps/TaskFuchs', autoSync: e.target.checked, syncInterval: prefs.syncInterval ?? 30, lastSync: prefs.lastSync, lastSyncStatus: prefs.lastSyncStatus, lastSyncError: prefs.lastSyncError, conflictResolution: prefs.conflictResolution || 'manual', rememberPassphrase: prefs.rememberPassphrase ?? false, passphraseHint: prefs.passphraseHint } } }); }} />
+            Automatisch synchronisieren
+          </label>
+          <label className="mt-2 inline-flex items-center text-sm text-gray-700 dark:text-gray-300">
+            <input type="checkbox" className="mr-2" checked={state.preferences.dropbox?.pullBeforeAutoSync ?? false} onChange={e => { const prefs = state.preferences.dropbox || ({} as any); dispatch({ type: 'UPDATE_PREFERENCES', payload: { dropbox: { ...prefs, pullBeforeAutoSync: e.target.checked } } }); }} />
+            Vor Auto‑Sync zuerst herunterladen (Pull → Push)
+          </label>
+        </div>
+      </div>
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <button onClick={handleConnectDropbox} className="px-4 py-2 rounded-md text-white" style={{ backgroundColor: state.preferences.accentColor }}>
+          {dropboxEnabled ? 'Neu verbinden' : 'Mit Dropbox verbinden'}
+        </button>
+        <button onClick={async () => { const { dropboxUpload } = await import('../../utils/dropboxSync'); try { setDropboxStatus('syncing'); await dropboxUpload(state as any, dispatch as any, { folderPathOverride: dropboxFolder, passphraseOverride: dropboxPassphrase }); setDropboxStatus('connected'); setDropboxMessage('Upload erfolgreich.'); } catch (e: any) { setDropboxStatus('error'); setDropboxMessage(e?.message || 'Upload fehlgeschlagen'); } }} className="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-200">Jetzt hochladen</button>
+        <button onClick={async () => { const { dropboxDownload } = await import('../../utils/dropboxSync'); try { setDropboxStatus('syncing'); setDropboxMessage('Lade Daten von Dropbox...'); const ok = await dropboxDownload(state as any, dispatch as any, 'remote', { folderPathOverride: dropboxFolder, passphraseOverride: dropboxPassphrase }); if (ok) { setDropboxStatus('connected'); setDropboxMessage('Download abgeschlossen. Hinweis: Änderungen sind nach einem Neuladen sichtbar.'); } } catch (e: any) { setDropboxStatus('error'); setDropboxMessage(e?.message || 'Download fehlgeschlagen'); } }} className="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-200">Jetzt herunterladen</button>
+        <button onClick={async () => { const ok = confirm('Nur lokale Dropbox-Einstellungen zurücksetzen? Dateien in Dropbox bleiben erhalten.'); if (!ok) return; const { dropboxResetLocal } = await import('../../utils/dropboxSync'); try { dropboxResetLocal(dispatch as any); setDropboxEnabled(false); setDropboxAppKey(''); setDropboxFolder(''); setDropboxStatus('idle'); setDropboxMessage('Lokale Dropbox-Einstellungen gelöscht.'); } catch (e: any) { setDropboxStatus('error'); setDropboxMessage(e?.message || 'Zurücksetzen fehlgeschlagen'); } }} className="px-4 py-2 rounded-md border border-red-300 text-red-700 dark:border-red-700 dark:text-red-300">Dropbox‑Einstellungen zurücksetzen (nur lokal)</button>
+        {dropboxAccountEmail && (
+          <span className="text-sm text-gray-600 dark:text-gray-400">Angemeldet als {dropboxAccountName || 'Nutzer'} ({dropboxAccountEmail})</span>
+        )}
+      </div>
+      {dropboxMessage && (
+        <p className={`mt-2 text-sm ${dropboxStatus === 'error' ? 'text-red-500' : 'text-gray-600 dark:text-gray-400'}`}>{dropboxMessage}</p>
+      )}
+      <details className="mt-4">
+        <summary className="cursor-pointer text-sm text-gray-700 dark:text-gray-300">Hilfe zur Einrichtung</summary>
+        <div className="mt-2 text-sm text-gray-600 dark:text-gray-400 space-y-2">
+          <p>1. Öffne <a className="underline" href="https://www.dropbox.com/developers/apps" target="_blank" rel="noreferrer">Dropbox App Console</a> und erstelle eine neue App (Scoped Access).</p>
+          <p>2. Aktiviere Scopes: <code>files.content.write</code>, <code>files.content.read</code>, <code>files.metadata.read</code>. PKCE/Browser‑Client ist kompatibel.</p>
+          <p>3. Trage als Redirect‑URL ein: <code>{`${window.location.origin}/auth/dropbox.html`}</code>.</p>
+          <p>4. Kopiere den App‑Key hierher und klicke auf „Mit Dropbox verbinden“.</p>
+          <p>5. Lege eine Passphrase fest. Ohne Passphrase ist ein Entschlüsseln auf anderen Geräten nicht möglich.</p>
+        </div>
+      </details>
+    </div>
+  );
   const [showCaldavPassword, setShowCaldavPassword] = useState(false);
 
   const [nextcloudUsername, setNextcloudUsername] = useState(localStorage.getItem('nextcloudUsername') || '');
@@ -1130,6 +1373,7 @@ const Settings = React.memo(() => {
   // Integration tabs configuration
   const integrationTabs = [
     { id: 'simple-apis', title: 'Einfache Sync-Alternativen', icon: Zap, description: 'Export/Import - ohne komplexe OAuth' },
+    { id: 'dropbox', title: 'Dropbox (E2EE)', icon: Cloud, description: 'Sichere Synchronisation mit Ende-zu-Ende-Verschlüsselung' },
     { id: 'toggl', title: t('settings.integrations.toggl.title'), icon: Play, description: t('settings.integrations.toggl.description') }
   ];
 
@@ -1137,7 +1381,8 @@ const Settings = React.memo(() => {
 
   const renderIntegrationsSection = () => {
     return (
-      <div className="space-y-6">
+
+<div className="space-y-6">
         {/* Integration Tabs */}
         <div className="border-b border-gray-200 dark:border-gray-700">
           <nav className="-mb-px flex space-x-8" aria-label="Tabs">
@@ -1165,6 +1410,7 @@ const Settings = React.memo(() => {
         {/* Integration Content */}
         <div className="mt-6">
           {activeIntegrationTab === 'simple-apis' && renderSimpleApisSection()}
+          {activeIntegrationTab === 'dropbox' && renderDropboxSection()}
           {/* Toggl removed from Integrations; now under Timer & Pomodoro */}
           {activeIntegrationTab === 'ical' && renderICalSection()}
         </div>
@@ -1380,7 +1626,7 @@ const Settings = React.memo(() => {
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Synchronisation</h3>
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <div>
+                  <div className="mt-2">
                     <div className="font-medium text-gray-900 dark:text-white">Automatische Synchronisation</div>
                     <div className="text-sm text-gray-500 dark:text-gray-400">Zeiten automatisch an Toggl senden</div>
                   </div>
@@ -2159,7 +2405,7 @@ const Settings = React.memo(() => {
                   Konfigurierte Kalender ({icalSources.length})
                 </h4>
                 
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {icalSources.map((source, index) => (
                     <div key={source.id} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
                       <div className="flex items-center justify-between">
@@ -2215,6 +2461,25 @@ const Settings = React.memo(() => {
                               <Download className="w-4 h-4" />
                             )}
                           </button>
+                          {/* Sync Interval Selector */}
+                          <div className="flex items-center space-x-2 ml-2">
+                            <label className="text-xs text-gray-500 dark:text-gray-400">Intervall</label>
+                            <select
+                              value={source.syncInterval ?? 30}
+                              onChange={(e) => {
+                                const updated = { ...source, syncInterval: parseInt(e.target.value, 10), updatedAt: new Date().toISOString() } as any;
+                                setIcalSources(prev => prev.map(s => s.id === source.id ? updated : s));
+                                dispatch({ type: 'UPDATE_CALENDAR_SOURCE', payload: updated });
+                              }}
+                              className="text-xs px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200"
+                            >
+                              <option value={5}>5m</option>
+                              <option value={15}>15m</option>
+                              <option value={30}>30m</option>
+                              <option value={60}>60m</option>
+                              <option value={120}>120m</option>
+                            </select>
+                          </div>
                           <button
                             onClick={async () => {
                               setIcalTestingUrl(source.url);
@@ -2292,7 +2557,7 @@ const Settings = React.memo(() => {
                 
                 {/* Sync All Button */}
                 {icalSources.length > 0 && (
-                  <div className="flex justify-center">
+                  <div className="flex justify-center mt-4">
                     <button
                       onClick={async () => {
                         for (const source of icalSources.filter(s => s.enabled)) {
@@ -4754,53 +5019,62 @@ const Settings = React.memo(() => {
                     </div>
 
                     <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                      <div className="font-medium text-gray-900 dark:text-white mb-4">Erfolgsklang</div>
-                      <div className="space-y-3">
-                        {[
-                          { value: 'bell', label: 'Glocke', description: 'Klarer Glockenton' },
-                          { value: 'chime', label: 'Glockenspiel', description: 'Aufsteigende Melodie' },
-                          { value: 'pop', label: 'Pop', description: 'Kurzer, knackiger Sound' },
-                          { value: 'none', label: 'Stumm', description: 'Kein Sound' }
-                        ].map((sound) => (
-                          <div
-                            key={sound.value}
-                            className={`flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                              state.preferences.completionSound === sound.value
-                                ? 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                            }`}
-                            style={state.preferences.completionSound === sound.value ? {
-                              borderColor: state.preferences.accentColor,
-                              backgroundColor: `${state.preferences.accentColor}15`
-                            } : {}}
-                            onClick={() => dispatch({
-                              type: 'UPDATE_PREFERENCES',
-                              payload: { completionSound: sound.value as SoundType }
-                            })}
-                          >
-                            <div>
-                              <div className="font-medium text-gray-900 dark:text-white">{sound.label}</div>
-                              <div className="text-sm text-gray-500 dark:text-gray-400">{sound.description}</div>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              {state.preferences.completionSound === sound.value && (
-                                <Check className="w-5 h-5" style={{ color: state.preferences.accentColor }} />
-                              )}
-                              {sound.value !== 'none' && (
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="font-medium text-gray-900 dark:text-white">Erfolgsklang</div>
+                        <Toggle 
+                          enabled={state.preferences.completionSoundEnabled !== false}
+                          onChange={() => dispatch({
+                            type: 'UPDATE_PREFERENCES',
+                            payload: { completionSoundEnabled: !(state.preferences.completionSoundEnabled !== false) }
+                          })}
+                        />
+                      </div>
+
+                      {state.preferences.completionSoundEnabled !== false && (
+                        <div className="space-y-3">
+                          {[
+                            { value: 'bell', label: 'Glocke', description: 'Klarer Glockenton' },
+                            { value: 'chime', label: 'Glockenspiel', description: 'Aufsteigende Melodie' },
+                            { value: 'yeah', label: 'Yeah', description: 'Kurzer, knackiger Jubel' }
+                          ].map((sound) => (
+                            <div
+                              key={sound.value}
+                              className={`flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                                state.preferences.completionSound === sound.value
+                                  ? 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                              }`}
+                              style={state.preferences.completionSound === sound.value ? {
+                                borderColor: state.preferences.accentColor,
+                                backgroundColor: `${state.preferences.accentColor}15`
+                              } : {}}
+                              onClick={() => dispatch({
+                                type: 'UPDATE_PREFERENCES',
+                                payload: { completionSound: sound.value as SoundType }
+                              })}
+                            >
+                              <div>
+                                <div className="font-medium text-gray-900 dark:text-white">{sound.label}</div>
+                                <div className="text-sm text-gray-500 dark:text-gray-400">{sound.description}</div>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                {state.preferences.completionSound === sound.value && (
+                                  <Check className="w-5 h-5" style={{ color: state.preferences.accentColor }} />
+                                )}
                                 <button
                                   onClick={async (e) => {
                                     e.stopPropagation();
-                                    await handleTestSound(sound.value as 'none' | 'pop' | 'bell' | 'chime');
+                                    await handleTestSound(sound.value as 'yeah' | 'bell' | 'chime');
                                   }}
                                   className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                                 >
                                   <Play className="w-4 h-4 text-gray-600 dark:text-gray-300" />
                                 </button>
-                              )}
+                              </div>
                             </div>
-                          </div>
-                        ))}
-                      </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </>
                 )}
@@ -6851,6 +7125,7 @@ const Settings = React.memo(() => {
                 {[
                   { id: 'sync-nextcloud', title: 'Nextcloud' },
                   { id: 'sync-caldav', title: 'CalDAV' },
+                  { id: 'sync-dropbox', title: 'Dropbox (E2EE)' },
                   { id: 'sync-ical', title: 'iCal Import' },
                   { id: 'sync-todoist', title: 'Todoist' }
                 ].map((tab) => (
@@ -6872,8 +7147,11 @@ const Settings = React.memo(() => {
 
             {/* Sync Tab Content */}
             <div className="mt-6 space-y-6">
-              {(activeIntegrationTab === 'sync-nextcloud' || !['sync-caldav','sync-ical','sync-todoist'].includes(String(activeIntegrationTab))) && (
+              {(activeIntegrationTab === 'sync-nextcloud' || !['sync-caldav','sync-ical','sync-todoist','sync-dropbox'].includes(String(activeIntegrationTab))) && (
                 <NextcloudSection />
+              )}
+              {activeIntegrationTab === 'sync-dropbox' && (
+                renderDropboxSection()
               )}
               {activeIntegrationTab === 'sync-caldav' && (
                 renderCalDAVSection()
@@ -6982,6 +7260,10 @@ const Settings = React.memo(() => {
                         // Kalender-Daten (iCal-Einstellungen)
                         events: state.events,
                         calendarSources: state.calendarSources,
+                        ical: {
+                          preferences: state.preferences.calendars,
+                          sources: state.calendarSources,
+                        },
                         
                         // Bilder-Speicher
                         imageStorage: state.imageStorage,

@@ -98,9 +98,13 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
   // Focus search input when opened
   useEffect(() => {
     if (isSearchOpen && searchInputRef.current) {
+      // Always clear input on open and focus
+      setSearchQuery('');
+      setShowSearchResults(false);
+      searchInputRef.current.value = '' as any;
       searchInputRef.current.focus();
     }
-  }, [isSearchOpen]);
+  }, [isSearchOpen, setSearchQuery]);
 
   // Handle keyboard shortcuts and custom events
   useEffect(() => {
@@ -166,14 +170,19 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
 
   // Close search when clicking outside (but not filter - user controls that)
   const handleClickOutside = useCallback((event: MouseEvent) => {
-    if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+    const target = event.target as HTMLElement;
+    // Ignore clicks within the search results portal
+    if (target && target.closest('[data-search-portal="true"]')) {
+      return;
+    }
+    if (searchContainerRef.current && !searchContainerRef.current.contains(target)) {
       setIsSearchOpen(false);
       setShowSearchResults(false);
     }
-    if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+    if (notificationRef.current && !notificationRef.current.contains(target)) {
       setShowNotifications(false);
     }
-    if (moreMenuRef.current && !moreMenuRef.current.contains(event.target as Node)) {
+    if (moreMenuRef.current && !moreMenuRef.current.contains(target)) {
       setShowMoreMenu(false);
     }
 
@@ -289,13 +298,18 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
     setSearchQuery('');
     setShowSearchResults(false);
     
-    // Navigate to the task
-    if (task.kanbanColumnId) {
-      // Navigate to kanban view
-      window.dispatchEvent(new CustomEvent('navigate-to-kanban'));
-    } else {
-      // Navigate to task board view
+    try {
+      // Open TaskModal globally
+      window.dispatchEvent(new CustomEvent('open-task-modal', { detail: { taskId: task.id } }));
+      // Also set a global helper if available
+      (window as any).__taskfuchs_openTask?.(task.id);
+    } catch {
+      // Fallback: navigate to tasks and rely on global modal in App.tsx
       window.dispatchEvent(new CustomEvent('navigate-to-tasks'));
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('open-task-modal', { detail: { taskId: task.id } }));
+        (window as any).__taskfuchs_openTask?.(task.id);
+      }, 50);
     }
   }, []);
 
@@ -304,8 +318,8 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
     setSearchQuery('');
     setShowSearchResults(false);
     
-    // Navigate to notes view
-    window.dispatchEvent(new CustomEvent('navigate-to-notes'));
+    // Open Note directly via global event
+    window.dispatchEvent(new CustomEvent('open-note-modal', { detail: { noteId: note.id } }));
   }, []);
 
   // Handle keyboard shortcuts for search
@@ -788,7 +802,7 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
             <div ref={searchContainerRef} className="relative">
               {!isSearchOpen ? (
                 <button
-                  onClick={() => setIsSearchOpen(true)}
+                  onClick={() => { setIsSearchOpen(true); setSearchQuery(''); setShowSearchResults(false); }}
                   className="group p-2.5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 h-[44px] w-[44px] flex items-center justify-center"
                   title={t('header.search')}
                 >
@@ -826,6 +840,7 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
                     {/* Search Results Dropdown - Rendered as Portal */}
                     {showSearchResults && (searchResults.tasks.length > 0 || searchResults.notes.length > 0) && createPortal(
                       <div 
+                        data-search-portal="true"
                         className="absolute bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl max-h-96 overflow-hidden z-[99999] backdrop-blur-sm"
                         style={{
                           top: (searchContainerRef.current?.getBoundingClientRect().bottom || 0) + 8,
@@ -833,17 +848,19 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
                           width: Math.max(480, searchContainerRef.current?.getBoundingClientRect().width || 256),
                           position: 'fixed'
                         }}
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onClick={(e) => e.stopPropagation()}
                       >
                         {searchResults.tasks.length > 0 && (
                           <div className="p-3 border-b border-gray-200 dark:border-gray-700">
                             <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
-                              {t('header.search_results_tasks', { count: searchResults.tasks.length })}
+                              {t('header.search_results_tasks', { count: searchResults.tasks.length, defaultValue: `${searchResults.tasks.length} Aufgaben` })}
                             </h4>
                             <div className="space-y-1">
                               {searchResults.tasks.map((task) => (
                                 <div
                                   key={task.id}
-                                  onClick={() => handleTaskClick(task)}
+                                  onClick={(e) => { e.stopPropagation(); handleTaskClick(task); }}
                                   className="p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer transition-colors"
                                 >
                                   <div className="flex items-center justify-between">
@@ -892,13 +909,13 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
                         {searchResults.notes.length > 0 && (
                           <div className="p-3">
                             <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
-                              {t('header.search_results_notes', { count: searchResults.notes.length })}
+                              {t('header.search_results_notes', { count: searchResults.notes.length, defaultValue: `${searchResults.notes.length} Notizen` })}
                             </h4>
                             <div className="space-y-1">
                               {searchResults.notes.map((note) => (
                                 <div
                                   key={note.id}
-                                  onClick={() => handleNoteClick(note)}
+                                  onClick={(e) => { e.stopPropagation(); handleNoteClick(note); }}
                                   className="p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer transition-colors"
                                 >
                                   <div className="flex items-center justify-between">
@@ -1226,6 +1243,29 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
                           </>
                           ) : null;
                         })()}
+                        {/* Kanban: Toggle completed visibility */}
+                        {currentView === 'kanban' && (
+                          <>
+                            <button
+                              onClick={() => {
+                                dispatch({ type: 'SET_PROJECT_KANBAN_SHOW_COMPLETED', payload: !state.viewState.projectKanban.showCompleted });
+                                setShowMoreMenu(false);
+                              }}
+                              className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors relative"
+                              title={t('header.completed_tasks_toggle_tooltip', { show: state.viewState.projectKanban.showCompleted })}
+                            >
+                              <CheckCircle className="w-4 h-4" />
+                              <span>{state.viewState.projectKanban.showCompleted ? t('header.completed_hide') : t('header.completed_show')}</span>
+                              {state.viewState.projectKanban.showCompleted && (
+                                <span 
+                                  className="absolute right-4 w-2 h-2 rounded-full"
+                                  style={{ backgroundColor: state.preferences.accentColor }}
+                                />
+                              )}
+                            </button>
+                            <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+                          </>
+                        )}
                         
                         {/* Planer exportieren - only in tasks view */}
                         {currentView === 'tasks' && (
@@ -1495,6 +1535,29 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
                               <span>{state.isBulkMode ? 'Mehrfachauswahl beenden' : 'Mehrfachauswahl'}</span>
                               {state.selectedTaskIds.length > 0 && (
                                 <span className="absolute right-4 text-xs text-gray-500">{state.selectedTaskIds.length > 9 ? '9+' : state.selectedTaskIds.length}</span>
+                              )}
+                            </button>
+                            <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+                          </>
+                        )}
+                        {/* Kanban: Toggle completed visibility (guest) */}
+                        {currentView === 'kanban' && (
+                          <>
+                            <button
+                              onClick={() => {
+                                dispatch({ type: 'SET_PROJECT_KANBAN_SHOW_COMPLETED', payload: !state.viewState.projectKanban.showCompleted });
+                                setShowMoreMenu(false);
+                              }}
+                              className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors relative"
+                              title={t('header.completed_tasks_toggle_tooltip', { show: state.viewState.projectKanban.showCompleted })}
+                            >
+                              <CheckCircle className="w-4 h-4" />
+                              <span>{state.viewState.projectKanban.showCompleted ? t('header.completed_hide') : t('header.completed_show')}</span>
+                              {state.viewState.projectKanban.showCompleted && (
+                                <span 
+                                  className="absolute right-4 w-2 h-2 rounded-full"
+                                  style={{ backgroundColor: state.preferences.accentColor }}
+                                />
                               )}
                             </button>
                             <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>

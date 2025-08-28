@@ -42,6 +42,9 @@ export function EndOfDayModal({ isOpen, onClose }: EndOfDayModalProps) {
   const { i18n } = useTranslation();
   const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
   const [showMoveConfirm, setShowMoveConfirm] = useState(false);
+  const canDropbox = state.preferences.dropbox?.enabled;
+  const [eodUploading, setEodUploading] = useState(false);
+  const [eodUploadMsg, setEodUploadMsg] = useState('');
   
   // Sync-related state
   const [syncStatus, setSyncStatus] = useState<SyncStatus>({
@@ -59,7 +62,9 @@ export function EndOfDayModal({ isOpen, onClose }: EndOfDayModalProps) {
     
     return state.tasks.filter(task => {
       const isInTodayColumn = task.columnId === `date-${todayString}`;
-      return isInTodayColumn;
+      // Exclude already archived tasks so that the "Erledigte Aufgaben" section disappears after archiving
+      const isNotArchived = !task.archived;
+      return isInTodayColumn && isNotArchived;
     });
   }, [state.tasks]);
 
@@ -201,6 +206,22 @@ export function EndOfDayModal({ isOpen, onClose }: EndOfDayModalProps) {
     setShowMoveConfirm(false);
   };
 
+  const handleDropboxUpload = async () => {
+    if (!canDropbox || eodUploading) return;
+    if (!confirm(i18n.language === 'en' ? 'Upload backup to Dropbox now?' : 'Jetzt Sicherung zu Dropbox hochladen?')) return;
+    setEodUploading(true);
+    setEodUploadMsg('');
+    try {
+      const { dropboxUpload } = await import('../../utils/dropboxSync');
+      await dropboxUpload(state as any, dispatch as any);
+      setEodUploadMsg(i18n.language === 'en' ? 'Uploaded successfully.' : 'Upload erfolgreich.');
+    } catch (e: any) {
+      setEodUploadMsg((i18n.language === 'en' ? 'Upload failed: ' : 'Upload fehlgeschlagen: ') + (e?.message || ''));
+    } finally {
+      setEodUploading(false);
+    }
+  };
+
   const isConfigured = (() => {
     try {
       return syncManager.isConfigured();
@@ -215,7 +236,13 @@ export function EndOfDayModal({ isOpen, onClose }: EndOfDayModalProps) {
   return (
     <div 
       className="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in duration-300"
-      onClick={onClose}
+      onMouseDown={(e) => {
+        // Do not close while dragging tasks or archiving
+        const dragging = (window as any).__taskfuchs_isDraggingTasks;
+        const archiving = (window as any).__taskfuchs_isArchiving;
+        if (dragging || archiving) return;
+        if (e.target === e.currentTarget) onClose();
+      }}
     >
       <div 
         className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden animate-in slide-in-from-bottom-4 duration-500"
@@ -382,69 +409,7 @@ export function EndOfDayModal({ isOpen, onClose }: EndOfDayModalProps) {
             </div>
           </div>
 
-          {/* Sync Status & Control */}
-          {isConfigured && (
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200/50 dark:border-gray-700/50 mb-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white flex items-center">
-                  <Cloud className="w-5 h-5 mr-2" style={getAccentColorStyles().text} />
-                  Synchronisation
-                </h3>
-                <div className="flex items-center space-x-2">
-                  {isConfigured ? (
-                    <Wifi className="w-4 h-4 text-green-500" />
-                  ) : (
-                    <WifiOff className="w-4 h-4 text-red-500" />
-                  )}
-                  <span className={`text-sm font-medium ${
-                    isConfigured ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                  }`}>
-                    {isConfigured ? 'Konfiguriert' : 'Nicht konfiguriert'}
-                  </span>
-                </div>
-              </div>
-
-              {syncResult && (
-                <div className={`p-3 rounded-lg text-sm mb-4 ${
-                  syncResult.success 
-                    ? 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200 border border-green-200 dark:border-green-800' 
-                    : 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200 border border-red-200 dark:border-red-800'
-                }`}>
-                  {syncResult.message}
-                </div>
-              )}
-
-              <button
-                onClick={handleManualSync}
-                disabled={isSyncing || !isConfigured}
-                className={`w-full px-6 py-3 rounded-xl font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${
-                  !isConfigured
-                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 cursor-not-allowed'
-                    : isSyncing
-                    ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 cursor-not-allowed'
-                    : 'text-white hover:opacity-90 hover:shadow-lg'
-                }`}
-                style={isConfigured && !isSyncing ? getAccentColorStyles().bg : {}}
-              >
-                {isSyncing ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-                    <span>Synchronisiere...</span>
-                  </>
-                ) : !isConfigured ? (
-                  <>
-                    <WifiOff className="w-4 h-4" />
-                    <span>Nicht verbunden</span>
-                  </>
-                ) : (
-                  <>
-                    <Upload className="w-4 h-4" />
-                    <span>Jetzt synchronisieren</span>
-                  </>
-                )}
-              </button>
-            </div>
-          )}
+          {/* Sync Status & Control block entfernt; Dropbox-Upload wandert nach unten */}
         </div>
 
         {/* Footer Actions */}
@@ -504,6 +469,34 @@ export function EndOfDayModal({ isOpen, onClose }: EndOfDayModalProps) {
                 >
                   <ArrowRight className="w-4 h-4 mr-2 inline" />
                   {i18n.language === 'en' ? 'Move to tomorrow' : 'Auf morgen'}
+                </button>
+              </div>
+            )}
+
+            {/* Dropbox Upload small card (placed after the two task actions) */}
+            {canDropbox && (
+              <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200/50 dark:border-gray-700/50">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={getAccentColorStyles().bgLight}>
+                    <Upload className="w-4 h-4" style={getAccentColorStyles().text} />
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">
+                      {i18n.language === 'en' ? 'Upload to Dropbox' : 'Zu Dropbox hochladen'}
+                    </div>
+                    {eodUploadMsg && (
+                      <div className="text-xs" style={getAccentColorStyles().text}>{eodUploadMsg}</div>
+                    )}
+                  </div>
+                </div>
+                <button
+                  onClick={handleDropboxUpload}
+                  disabled={eodUploading}
+                  className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-all hover:opacity-90 hover:shadow-md disabled:opacity-60"
+                  style={getAccentColorStyles().bg}
+                >
+                  <Upload className="w-4 h-4 mr-2 inline" />
+                  {eodUploading ? (i18n.language === 'en' ? 'Uploading…' : 'Hochladen…') : (i18n.language === 'en' ? 'Upload' : 'Hochladen')}
                 </button>
               </div>
             )}

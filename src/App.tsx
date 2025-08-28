@@ -528,6 +528,8 @@ function MainApp() {
     };
   }, []);
 
+  // Dropbox Auto-Sync deaktiviert: kein Intervall mehr
+
   // Listen for navigation to notes events
   useEffect(() => {
     const handleNavigateToNotes = (event: CustomEvent) => {
@@ -929,19 +931,45 @@ function MainApp() {
                     placeholder={t('forms.create_task_for_inbox')}
       />
 
-      {/* Global Task Modal - Only render when not in specific views that have their own TaskModals */}
-      {selectedTaskForModal && (() => {
-        console.log('App.tsx: currentView:', currentView);
-        console.log('App.tsx: selectedTaskForModal:', selectedTaskForModal);
-        console.log('App.tsx: Should render global TaskModal:', currentView !== 'tasks' && currentView !== 'inbox' && currentView !== 'kanban');
-        return currentView !== 'tasks' && currentView !== 'inbox' && currentView !== 'kanban';
-      })() && (
+      {/* Global Task Modal - Render whenever a task is selected (e.g., from timer) */}
+      {selectedTaskForModal && (
         <TaskModal
           task={state.tasks.find(task => task.id === selectedTaskForModal) || null}
           isOpen={!!selectedTaskForModal}
           onClose={() => setSelectedTaskForModal(null)}
         />
       )}
+      {/* Global listeners to open modals from other components (e.g., search) */}
+      {(function GlobalModalListeners() {
+        React.useEffect(() => {
+          // Expose a minimal global helper for imperative opens (fallback)
+          (window as any).__taskfuchs_openTask = (id: string) => {
+            setSelectedTaskForModal(id);
+          };
+          
+          const handleOpenTaskModal = (e: any) => {
+            const id = e?.detail?.taskId;
+            if (id) {
+              setSelectedTaskForModal(id);
+            }
+          };
+          const handleOpenNoteModal = (e: any) => {
+            const id = e?.detail?.noteId;
+            if (id) {
+              handleViewChange('notes');
+              window.dispatchEvent(new CustomEvent('open-note-by-id', { detail: { noteId: id } }));
+            }
+          };
+          window.addEventListener('open-task-modal', handleOpenTaskModal as any);
+          window.addEventListener('open-note-modal', handleOpenNoteModal as any);
+          return () => {
+            window.removeEventListener('open-task-modal', handleOpenTaskModal as any);
+            window.removeEventListener('open-note-modal', handleOpenNoteModal as any);
+            try { delete (window as any).__taskfuchs_openTask; } catch {}
+          };
+        }, []);
+        return null;
+      })()}
       
       {/* Notification Manager */}
       <NotificationManager />

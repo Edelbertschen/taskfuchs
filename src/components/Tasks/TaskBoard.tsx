@@ -33,6 +33,7 @@ import { format, addDays, startOfDay, isAfter, isBefore, isToday, parseISO, isSa
 import { de } from 'date-fns/locale';
 import { getBackgroundStyles, getDarkModeBackgroundStyles, getBackgroundOverlayStyles } from '../../utils/backgroundUtils';
 import { Header } from '../Layout/Header';
+import { MobilePullToRefresh } from '../Common/MobilePullToRefresh';
 
 // Project Column Selection Modal
 function ProjectColumnSelectionModal({ 
@@ -2014,7 +2015,13 @@ export function TaskBoard() {
                       transition: 'height 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
                     }}
                   >
-                    {renderColumns(dateColumns)}
+                    {/* Mobile list fallback: stack columns vertically */}
+                    <div className="w-full flex sm:hidden flex-col gap-4">
+                      {renderColumns(dateColumns)}
+                    </div>
+                    <div className="w-full hidden sm:flex">
+                      {renderColumns(dateColumns)}
+                    </div>
                 </div>
               )}
 

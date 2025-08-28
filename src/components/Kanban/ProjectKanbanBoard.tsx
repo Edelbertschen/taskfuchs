@@ -643,7 +643,9 @@ export function ProjectKanbanBoard() {
       .filter(col => col.projectId === project.id);
       
     const projectTaskCount = state.tasks.filter(t => 
-      allProjectColumns.some(col => col.id === t.kanbanColumnId)
+      !t.completed && (
+        allProjectColumns.some(col => col.id === t.kanbanColumnId) || t.projectId === project.id
+      )
     ).length;
 
     const isEditing = editingProjectId === project.id;
@@ -894,8 +896,8 @@ export function ProjectKanbanBoard() {
       }
     }
 
-    // Apply completed tasks filter
-    if (!state.showCompletedTasks && task.completed) {
+    // Apply completed tasks filter (Projects-specific flag)
+    if (!state.viewState.projectKanban.showCompleted && task.completed) {
       return false;
     }
 
@@ -1492,7 +1494,7 @@ export function ProjectKanbanBoard() {
           activeColumn={null}
           onFocusColumn={handleFocusColumn}
           onSmartTaskAdd={handleSmartTaskAdd}
-          showCompletedTasks={state.showCompletedTasks}
+          showCompletedTasks={state.viewState.projectKanban.showCompleted}
           isProjectColumn={true}
           isEditing={editingColumnId === column.id}
           editingTitle={editingColumnTitle}

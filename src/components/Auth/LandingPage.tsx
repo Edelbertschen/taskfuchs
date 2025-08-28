@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Users } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { getFuchsImagePath } from '../../utils/imageUtils';
 
 interface LandingPageProps {
-  onLogin: () => void;
   onGuestLogin: () => void;
 }
 
-export function LandingPage({ onLogin, onGuestLogin }: LandingPageProps) {
+export function LandingPage({ onGuestLogin }: LandingPageProps) {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -50,29 +49,36 @@ export function LandingPage({ onLogin, onGuestLogin }: LandingPageProps) {
             Integration in deine bestehenden Workflows.
           </p>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            {/* Primary Button - Jetzt kostenlos starten */}
-            <button
-              onClick={onGuestLogin}
-              className="group relative bg-gradient-to-r from-orange-600 to-red-600 text-white px-8 py-4 rounded-2xl font-semibold text-lg shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300 flex items-center space-x-3 min-w-[280px] justify-center"
-            >
-              <Play className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-              <span>Jetzt kostenlos starten</span>
-              <div className="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </button>
-
-            {/* Secondary Button - Anmelden */}
-            <button
-              onClick={onLogin}
-              className="group bg-white text-orange-600 px-8 py-4 rounded-2xl font-semibold text-lg border-2 border-orange-200 hover:border-orange-300 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center space-x-3 min-w-[200px] justify-center"
-            >
-              <Users className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-              <span>Anmelden</span>
-            </button>
-          </div>
+          {/* Action Button with auto-start countdown */}
+          <LandingStartButton onStart={onGuestLogin} />
         </div>
       </div>
     </div>
   );
 } 
+
+function LandingStartButton({ onStart }: { onStart: () => void }) {
+  const [count, setCount] = useState<number>(5);
+  useEffect(() => {
+    const t = setInterval(() => setCount((c) => (c > 0 ? c - 1 : 0)), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  useEffect(() => {
+    if (count === 0) onStart();
+  }, [count, onStart]);
+
+  return (
+    <div className="flex items-center justify-center mt-6">
+      <button
+        onClick={onStart}
+        className="group relative bg-gradient-to-r from-orange-600 to-red-600 text-white px-8 py-4 rounded-2xl font-semibold text-lg shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300 flex items-center space-x-3 min-w-[240px] justify-center"
+      >
+        <Play className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+        <span>Starten</span>
+        <span className="ml-2 text-white/80 text-sm">{count}s</span>
+        <div className="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      </button>
+    </div>
+  );
+}

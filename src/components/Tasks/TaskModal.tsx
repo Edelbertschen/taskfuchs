@@ -52,6 +52,15 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
   const { actions, forms, titles, messages, taskModal, pins } = useAppTranslation();
   const { t } = useTranslation();
   
+  // Helper: preserve placement fields when updating
+  const preservePlacement = (orig: Task, patch: Partial<Task>): Task => ({
+    ...orig,
+    ...patch,
+    columnId: patch.columnId !== undefined ? patch.columnId : orig.columnId,
+    projectId: patch.projectId !== undefined ? patch.projectId : orig.projectId,
+    kanbanColumnId: patch.kanbanColumnId !== undefined ? patch.kanbanColumnId : orig.kanbanColumnId,
+  } as Task);
+  
   // Utility functions for dynamic accent colors
   const getAccentColorStyles = () => {
     const accentColor = state.preferences.accentColor;
@@ -282,11 +291,26 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
 
   // Handle modal close
   const handleClose = useCallback(() => {
-    if (hasUnsavedChanges) {
-      setShowConfirmDialog(true);
-    } else {
-      onClose();
-    }
+    // Trigger graceful close animation before unmounting
+    try {
+      const modalEl = document.querySelector('.task-modal-root') as HTMLElement | null;
+      const backdropEl = document.querySelector('.modal-backdrop') as HTMLElement | null;
+      if (modalEl) {
+        modalEl.classList.add('animate-modal-out');
+      }
+      if (backdropEl) {
+        backdropEl.classList.add('animate-backdrop-out');
+      }
+    } catch {}
+    const doClose = () => {
+      if (hasUnsavedChanges) {
+        setShowConfirmDialog(true);
+      } else {
+        onClose();
+      }
+    };
+    // Allow CSS animation to play briefly
+    setTimeout(doClose, 150);
   }, [hasUnsavedChanges, onClose]);
 
   // Handle ESC key and backdrop clicks
@@ -641,7 +665,7 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
     // Update the task with new assignment
     dispatch({
       type: 'UPDATE_TASK',
-      payload: taskData
+      payload: preservePlacement(task!, taskData)
     });
 
     console.log('💾 Task saved with flexible assignment:', {
@@ -674,7 +698,7 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
     // No need to create copies - just update the existing instance
     dispatch({
       type: 'UPDATE_TASK',
-      payload: pendingTaskData
+      payload: preservePlacement(task!, pendingTaskData)
     });
 
     setShowSeriesEditModal(false);
@@ -791,7 +815,8 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
         estimatedTime: parsed.estimatedTime || prev.estimatedTime,
         tags: parsed.tags.length > 0 ? [...new Set([...prev.tags, ...parsed.tags])] : prev.tags,
         // Also apply description and dueDate if parsed
-        description: parsed.description || prev.description
+        description: parsed.description || prev.description,
+        reminderDate: parsed.dueDate || prev.reminderDate
       }));
       
       // Clear parse result after applying
@@ -999,11 +1024,10 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
     // Update the task with new tracked time
     dispatch({
       type: 'UPDATE_TASK',
-      payload: {
-        ...task,
+      payload: preservePlacement(task!, {
         trackedTime: newTrackedTime,
         updatedAt: new Date().toISOString()
-      }
+      })
     });
 
     setIsEditingTime(false);
@@ -1023,11 +1047,10 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
           if (window.confirm(taskModal.timeTrackedResetConfirm())) {
       dispatch({
         type: 'UPDATE_TASK',
-        payload: {
-          ...task,
+        payload: preservePlacement(task!, {
           trackedTime: 0,
           updatedAt: new Date().toISOString()
-        }
+        })
       });
     }
   };
@@ -1829,20 +1852,18 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
           isolation: 'isolate',
           pointerEvents: 'auto'
         }}
-        onClick={handleBackdropClick}
-        onMouseDown={(e) => e.stopPropagation()}
-        onMouseMove={(e) => e.stopPropagation()}
-        onMouseUp={(e) => e.stopPropagation()}
-        onDragStart={(e) => e.preventDefault()}
-        onDrag={(e) => e.preventDefault()}
-        onDragEnd={(e) => e.preventDefault()}
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={(e) => e.preventDefault()}
+        onMouseDown={(e) => {
+          // Close immediately on mousedown outside the modal content
+          if (e.target === e.currentTarget) {
+            e.preventDefault();
+            handleClose();
+          }
+        }}
       >
         {/* Modal Container */}
         <div 
           ref={modalRef}
-          className="bg-white dark:bg-gray-900 rounded-none sm:rounded-2xl shadow-2xl w-screen sm:w-full sm:max-w-6xl h-[100svh] sm:h-auto sm:max-h-[90vh] overflow-hidden flex flex-col modal-content"
+          className="task-modal-root bg-white dark:bg-gray-900 rounded-none sm:rounded-2xl shadow-2xl w-screen sm:w-full sm:max-w-6xl h-[100svh] sm:h-auto sm:max-h-[90vh] overflow-hidden flex flex-col modal-content animate-modal-in"
           onClick={e => e.stopPropagation()}
           onMouseDown={(e) => e.stopPropagation()}
           onMouseMove={(e) => e.stopPropagation()}
@@ -2044,9 +2065,9 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
                   {/* Kalender Pseudo-Overlay */}
                   {showInlineCalendar && (
                     <div className="absolute -left-32 top-full mt-2 z-50 animate-in slide-in-from-top-2 duration-200">
-                      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden w-80">
+                      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden w-80">
                         {/* Header */}
-                        <div className="bg-gray-50 dark:bg-gray-750 px-3 py-2 border-b border-gray-200 dark:border-gray-700">
+                        <div className="bg-gray-50 dark:bg-gray-800 px-3 py-2 border-b border-gray-200 dark:border-gray-700">
                           <div className="flex items-center justify-between">
                             <button
                               onClick={previousMonth}
@@ -2081,7 +2102,7 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
                               t('planner.weekdays.sa'),
                               t('planner.weekdays.su')
                             ].map(day => (
-                              <div key={day} className="text-center text-xs font-medium text-gray-500 dark:text-gray-400 py-1">
+                              <div key={day} className="text-center text-xs font-medium text-gray-500 dark:text-gray-300 py-1">
                                 {day}
                               </div>
                             ))}
@@ -2111,7 +2132,7 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
                                     className={`
                                       relative h-8 w-8 rounded-md text-xs font-medium transition-all duration-150 flex items-center justify-center
                                       ${!isCurrentMonth 
-                                        ? 'text-gray-300 dark:text-gray-600 hover:bg-gray-100/50 dark:hover:bg-gray-700/50' 
+                                        ? 'text-gray-300 dark:text-gray-500 hover:bg-gray-100/50 dark:hover:bg-gray-700/50' 
                                         : isAvailable
                                           ? isToday
                                             ? 'text-white font-bold shadow-sm'
@@ -2232,10 +2253,10 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
 
                   {/* Projekt Pseudo-Overlay - Größer und nach links verschoben */}
                   {showInlineProjectSelector && (
-                    <div className="absolute right-0 top-full mt-2 z-30 animate-in slide-in-from-top-2 duration-200">
-                      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden w-[480px] h-[600px]">
+                    <div className="absolute right-0 top-full mt-2 z-50 animate-in slide-in-from-top-2 duration-200">
+                      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden w-[480px] h-[600px]">
                         {/* Header */}
-                        <div className="bg-gray-50 dark:bg-gray-750 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                        <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
                           <div className="flex items-center justify-between">
                             <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
                               {showProjectColumns ? taskModal.columnSelect() : taskModal.projectSelect()}
@@ -2283,7 +2304,7 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
                                   placeholder="Projekte suchen..."
                                   value={projectSearchQuery}
                                   onChange={(e) => setProjectSearchQuery(e.target.value)}
-                                  className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-opacity-20 focus:border-transparent"
+                                  className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-opacity-20 focus:border-transparent"
                                   style={{ 
                                     '--tw-ring-color': state.preferences.accentColor + '20'
                                   } as React.CSSProperties}
@@ -2346,7 +2367,7 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
 
                           {/* Project Columns - Slides in from right */}
                           {showProjectColumns && selectedProjectForColumns && (
-                            <div className={`absolute inset-0 bg-white dark:bg-gray-800 transition-transform duration-300 ease-in-out ${
+                            <div className={`absolute inset-0 bg-white dark:bg-gray-900 transition-transform duration-300 ease-in-out ${
                               showProjectColumns ? 'transform translate-x-0' : 'transform translate-x-full'
                             }`}>
                               {(() => {

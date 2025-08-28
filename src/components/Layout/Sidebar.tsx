@@ -19,6 +19,7 @@ import {
   RefreshCw,
   StickyNote,
   Pin,
+  Upload,
   Download,
   User,
   MoreHorizontal
@@ -61,6 +62,41 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
     onViewChange('tasks');
     dispatch({ type: 'NAVIGATE_DATE', payload: 'today' });
   }, [onViewChange, dispatch]);
+
+  // Dropbox quick actions (sidebar): separate Upload/Download with LED indicators
+  const canDropbox = state.preferences.dropbox?.enabled;
+  const [uploadLed, setUploadLed] = useState<'idle'|'syncing'|'success'|'error'>('idle');
+  const [downloadLed, setDownloadLed] = useState<'idle'|'syncing'|'success'|'error'>('idle');
+
+  const handleUpload = useCallback(async () => {
+    if (!canDropbox) return;
+    if (!confirm('Sicherung zu Dropbox hochladen?')) return;
+    setUploadLed('syncing');
+    try {
+      const { dropboxUpload } = await import('../../utils/dropboxSync');
+      await dropboxUpload(state as any, dispatch as any);
+      setUploadLed('success');
+      setTimeout(() => setUploadLed('idle'), 1500);
+    } catch (e) {
+      console.error('Sidebar upload failed', e);
+      setUploadLed('error');
+    }
+  }, [canDropbox, state, dispatch]);
+
+  const handleDownload = useCallback(async () => {
+    if (!canDropbox) return;
+    if (!confirm('Sicherung von Dropbox herunterladen und laden?')) return;
+    setDownloadLed('syncing');
+    try {
+      const { dropboxDownload } = await import('../../utils/dropboxSync');
+      await dropboxDownload(state as any, dispatch as any, 'remote');
+      setDownloadLed('success');
+      setTimeout(() => setDownloadLed('idle'), 1500);
+    } catch (e) {
+      console.error('Sidebar download failed', e);
+      setDownloadLed('error');
+    }
+  }, [canDropbox, state, dispatch]);
 
   // Drop target for planner
   const {
@@ -181,6 +217,10 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
       // Kalender-Daten (iCal-Einstellungen)
       events: state.events,
       calendarSources: state.calendarSources,
+      ical: {
+        preferences: state.preferences.calendars,
+        sources: state.calendarSources,
+      },
       
       // Bilder-Speicher
       imageStorage: state.imageStorage,
@@ -443,6 +483,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                 </button>
                 <button
                   onClick={() => {
+                    try { onViewChange('settings'); } catch {}
                     window.dispatchEvent(new CustomEvent('navigate-to-settings'));
                     setShowPlannerUserMenu(false);
                   }}
@@ -587,6 +628,19 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
 
         {/* JSON Export Button - Bottom of Sidebar */}
         <div className="sidebar-content px-2 pb-4">
+          {/* Dropbox Upload/Download with LEDs */}
+          {canDropbox && (
+            <div className="mb-2 flex items-center justify-center px-1 space-x-2">
+              <button onClick={handleUpload} className="relative w-10 h-10 rounded-full flex items-center justify-center hover:opacity-90 focus:outline-none" title="Hochladen" aria-label="Jetzt hochladen">
+                <Upload className="w-5 h-5 text-white" />
+                <span className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full pointer-events-none ${uploadLed==='success'?'bg-green-500':uploadLed==='error'?'bg-red-500':uploadLed==='syncing'?'bg-amber-400':'bg-gray-500'}`} />
+              </button>
+              <button onClick={handleDownload} className="relative w-10 h-10 rounded-full flex items-center justify-center hover:opacity-90 focus:outline-none" title="Herunterladen" aria-label="Jetzt herunterladen">
+                <Download className="w-5 h-5 text-white" />
+                <span className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full pointer-events-none ${downloadLed==='success'?'bg-green-500':downloadLed==='error'?'bg-red-500':downloadLed==='syncing'?'bg-amber-400':'bg-gray-500'}`} />
+              </button>
+            </div>
+          )}
           <button
             onClick={handleJsonExport}
             className={`w-full flex flex-col items-center justify-center rounded-lg text-xs font-medium sidebar-item py-3 px-1 gap-1 btn-hover smooth-transform transition-all duration-200 min-h-[60px] ${

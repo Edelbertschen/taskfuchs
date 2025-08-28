@@ -38,6 +38,9 @@ import { ChecklistReminderModal } from '../Common/ChecklistReminderModal';
 import { PinnedTasksWidget } from './PinnedTasksWidget';
 import { SyncStatusWidget } from './SyncStatusWidget';
 import { DeadlineWidget } from './DeadlineWidget';
+import { MobilePullToRefresh } from '../Common/MobilePullToRefresh';
+import { SwipeableTaskCard } from '../Inbox/SwipeableTaskCard';
+import { MobileSnackbar } from '../Common/MobileSnackbar';
 import { ChecklistWidget } from './ChecklistWidget';
 
 interface TodayViewProps {
@@ -315,6 +318,8 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showSmartTaskModal, setShowSmartTaskModal] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [lastArchivedTaskId, setLastArchivedTaskId] = useState<string | null>(null);
   
   // Note modal state
   const [selectedNote, setSelectedNote] = useState<any>(null);
@@ -1665,6 +1670,8 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
 
         </div>
 
+        {/* Pull to refresh for mobile */}
+        <MobilePullToRefresh onRefresh={async () => dispatch({ type: 'NO_OP' } as any)}>
         {/* Simple Widgets Grid - Heutige Aufgaben, Deadlines und Meine Checkliste */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto items-stretch">
 
@@ -1702,15 +1709,24 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
 
                 <div className={WIDGET_STYLES.spacing.itemsCompact}>
                 {todayTasks.slice(0, 6).map(task => (
-                  <TaskItem
+                  <SwipeableTaskCard
                     key={task.id}
-                    task={task}
-                    onComplete={handleCompleteTask}
-                    onClick={handleTaskClick}
-                    isMinimalDesign={isMinimalDesign}
+                    onSwipeLeft={() => {
+                      setLastArchivedTaskId(task.id);
+                      dispatch({ type: 'UPDATE_TASK', payload: { ...task, columnId: 'archive' } });
+                      setSnackbarOpen(true);
+                    }}
+                    onSwipeRight={() => handleTaskClick(task)}
+                  >
+                    <TaskItem
+                      task={task}
+                      onComplete={handleCompleteTask}
+                      onClick={handleTaskClick}
+                      isMinimalDesign={isMinimalDesign}
                       showDeadline={task.deadline ? true : false}
                       showCheckmark={false}
-                  />
+                    />
+                  </SwipeableTaskCard>
                 ))}
                 {todayTasks.length > 6 && (
                   <div className={`text-center pt-2 ${isMinimalDesign ? 'text-gray-500 dark:text-gray-400' : 'text-white/70'}`}>
@@ -1749,6 +1765,7 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
 
 
         </div>
+        </MobilePullToRefresh>
       </div>
 
 
@@ -2159,6 +2176,21 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
         isOpen={showSmartTaskModal}
         onClose={handleCloseSmartTaskModal}
         placeholder={forms.placeholderSmartTask()}
+      />
+
+      {/* Undo snackbar */}
+      <MobileSnackbar
+        open={snackbarOpen}
+        message={t('actions.archived', { defaultValue: 'Archiviert' })}
+        onAction={() => {
+          if (!lastArchivedTaskId) return;
+          const tsk = state.tasks.find(t => t.id === lastArchivedTaskId);
+          if (tsk) {
+            dispatch({ type: 'UPDATE_TASK', payload: { ...tsk, columnId: 'today' } });
+          }
+          setSnackbarOpen(false);
+        }}
+        onClose={() => setSnackbarOpen(false)}
       />
 
       {/* End-of-Day Modal */}

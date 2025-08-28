@@ -124,6 +124,18 @@ export interface ExportData {
       lastSync?: string;
       totalSyncs?: number;
     };
+    dropbox?: {
+      enabled: boolean;
+      appKey?: string;
+      accountEmail?: string;
+      accountName?: string;
+      folderPath?: string;
+      autoSync?: boolean;
+      syncInterval?: number;
+      lastSync?: string;
+      lastSyncStatus?: string;
+      passphraseHint?: string;
+    };
   };
   
   metadata?: {
@@ -328,6 +340,23 @@ function extractIntegrationSettings(preferences: any): ExportData['integrations'
     }
   } catch (error) {
     console.warn('Fehler beim Laden der Nextcloud-Konfiguration:', error);
+  }
+
+  // Dropbox E2EE Integration (stored in preferences)
+  if (preferences?.dropbox) {
+    integrations.dropbox = {
+      enabled: preferences.dropbox.enabled || false,
+      appKey: preferences.dropbox.appKey || undefined,
+      accountEmail: preferences.dropbox.accountEmail || undefined,
+      accountName: preferences.dropbox.accountName || undefined,
+      folderPath: preferences.dropbox.folderPath || undefined,
+      autoSync: preferences.dropbox.autoSync,
+      syncInterval: preferences.dropbox.syncInterval,
+      lastSync: preferences.dropbox.lastSync,
+      lastSyncStatus: preferences.dropbox.lastSyncStatus,
+      // Never export tokens or passphrase; only hint
+      passphraseHint: preferences.dropbox.passphraseHint || undefined,
+    } as any;
   }
 
   return integrations;

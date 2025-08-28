@@ -239,7 +239,8 @@ export interface UserPreferences {
   dateFormat: string;
   sounds: boolean;
   soundVolume: number;
-  completionSound: 'bell' | 'chime' | 'pop' | 'none';
+  completionSound: 'bell' | 'chime' | 'yeah' | 'none';
+  completionSoundEnabled?: boolean;
   enableCelebration: boolean; // Fuchs-Animation und Konfetti beim Abhaken
   timerDisplayMode: 'topBar' | 'floatingWidget';
   celebrationText: string; // Text der bei der Celebration angezeigt wird
@@ -272,9 +273,9 @@ export interface UserPreferences {
     autoStartBreaks: boolean;
     autoStartWork: boolean;
     soundEnabled: boolean;
-    pomodoroSound: 'bell' | 'chime' | 'pop' | 'none';
-    breakSound: 'bell' | 'chime' | 'pop' | 'none';
-    taskSound: 'bell' | 'chime' | 'pop' | 'none';
+    pomodoroSound: 'bell' | 'chime' | 'yeah' | 'none';
+    breakSound: 'bell' | 'chime' | 'yeah' | 'none';
+    taskSound: 'bell' | 'chime' | 'yeah' | 'none';
     // White noise settings
     whiteNoiseEnabled: boolean;
     whiteNoiseType: 'clock' | 'none';
@@ -311,6 +312,9 @@ export interface UserPreferences {
     useTaskDescriptions: boolean;
     roundTimeToMinutes: boolean;
   };
+  
+  // Dropbox E2EE sync settings
+  dropbox?: DropboxSettings;
   
   caldav?: {
     enabled: boolean;
@@ -445,6 +449,27 @@ export interface SyncConfig {
   lastSync?: string;
   autoSync: boolean;
   conflictResolution: 'local' | 'remote' | 'manual';
+}
+
+// ===== Dropbox E2EE Sync Types =====
+export interface DropboxSettings {
+  enabled: boolean;
+  appKey: string; // Dropbox App Key (no secret needed for PKCE)
+  accessToken?: string; // stored securely locally
+  refreshToken?: string; // long-lived refresh token
+  expiresAt?: number; // epoch ms
+  accountEmail?: string;
+  accountName?: string;
+  folderPath: string; // e.g., "/Apps/TaskFuchs"
+  autoSync: boolean;
+  syncInterval: number; // minutes
+  lastSync?: string;
+  lastSyncStatus?: 'success' | 'error' | 'pending';
+  lastSyncError?: string;
+  conflictResolution?: 'local' | 'remote' | 'manual';
+  rememberPassphrase?: boolean; // whether to persist passphrase
+  passphraseHint?: string; // optional hint for user
+  pullBeforeAutoSync?: boolean; // if true, Auto-Sync performs Pull -> Push
 }
 
 export interface SyncStatus {

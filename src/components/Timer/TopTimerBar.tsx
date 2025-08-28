@@ -33,6 +33,7 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
   
   const activeTimer = state.activeTimer;
   const isRunning = activeTimer?.isActive && !activeTimer?.isPaused;
+  const isDarkMode = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
 
   // Update Pomodoro session state regularly
   useEffect(() => {
@@ -123,6 +124,23 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
     }
   };
 
+  // Format elapsed time with seconds (mm:ss or hh:mm:ss)
+  const formatTimeWithSeconds = (minutes: number): string => {
+    try {
+      if (typeof minutes !== 'number' || isNaN(minutes)) return '0:00';
+      const totalSeconds = Math.max(0, Math.floor(minutes * 60));
+      const hours = Math.floor(totalSeconds / 3600);
+      const mins = Math.floor((totalSeconds % 3600) / 60);
+      const secs = totalSeconds % 60;
+      if (hours > 0) {
+        return `${hours}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      }
+      return `${mins}:${String(secs).padStart(2, '0')}`;
+    } catch {
+      return '0:00';
+    }
+  };
+
   const getProgressPercentage = () => {
     if (!activeTimer) return 0;
     
@@ -196,7 +214,7 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
           className="w-full timer-container border-b border-gray-200 dark:border-gray-700"
           style={{
             height: '44px',
-            backgroundColor: 'rgba(255, 255, 255, 0.98)',
+            backgroundColor: isDarkMode ? 'rgba(17, 24, 39, 0.92)' : 'rgba(255, 255, 255, 0.98)',
             backdropFilter: 'blur(16px)',
             WebkitBackdropFilter: 'blur(16px)',
           }}
@@ -219,8 +237,8 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
             <div className="flex items-center space-x-4">
               {/* Task Timer */}
               <div className="flex items-center space-x-2">
-                <span className={`text-lg font-mono font-semibold ${isOvertime ? 'text-red-500' : 'text-gray-900 dark:text-white'}`}>
-                  {formatTime(activeTimer.elapsedTime || 0)}
+                <span className={`text-lg font-mono font-semibold ${isOvertime ? 'text-red-500' : (isDarkMode ? 'text-white' : 'text-gray-900')}`}>
+                  {formatTimeWithSeconds(activeTimer.elapsedTime || 0)}
                 </span>
                 {activeTimer.estimatedTime && (
                   <span className="text-xs text-gray-400">

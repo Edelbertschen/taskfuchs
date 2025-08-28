@@ -1,3 +1,26 @@
+/* Task Modal Animations */
+.animate-modal-in {
+  animation: modal-in 150ms ease-out forwards;
+}
+.animate-modal-out {
+  animation: modal-out 150ms ease-in forwards;
+}
+.animate-backdrop-out {
+  animation: backdrop-out 150ms ease-in forwards;
+}
+
+@keyframes modal-in {
+  from { transform: translateY(8px) scale(0.98); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+@keyframes modal-out {
+  from { transform: translateY(0) scale(1); opacity: 1; }
+  to { transform: translateY(8px) scale(0.98); opacity: 0; }
+}
+@keyframes backdrop-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
 #root {
   width: 100%;
   height: 100vh;

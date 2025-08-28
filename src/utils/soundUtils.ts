@@ -1,6 +1,6 @@
 // Sound utility functions for task completion feedback
 
-export type SoundType = 'bell' | 'chime' | 'pop' | 'alarm' | 'pomodoro_alarm' | 'none';
+export type SoundType = 'bell' | 'chime' | 'yeah' | 'alarm' | 'pomodoro_alarm' | 'none';
 export type WhiteNoiseType = 'clock' | 'none';
 
 // Audio context for Web Audio API
@@ -221,47 +221,22 @@ export const isWhiteNoiseActive = () => {
 const playFallbackSound = (soundType: SoundType, volume: number = 0.5) => {
   console.log('Playing fallback sound:', soundType);
   
-  try {
-    // Create a simple beep using the Oscillator in a different way
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-    
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    
-    // Set frequency based on sound type
-    const freq = soundType === 'bell' ? 800 : 
-                 soundType === 'chime' ? 523 : 
-                 soundType === 'alarm' ? 1000 : 
-                 soundType === 'pomodoro_alarm' ? 900 : 150;
-    oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
-    oscillator.type = 'sine';
-    
-    // Set volume
-    gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-    gainNode.gain.linearRampToValueAtTime(volume * 0.8, audioContext.currentTime + 0.01);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
-    
-    // Play the sound
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.3);
-    
-    console.log('Fallback sound played successfully');
-  } catch (error) {
-    console.warn('Fallback sound also failed:', error);
-    
-    // Last resort: Try to use system beep
-    try {
-      // This won't work in most browsers, but we can try
-      const utterance = new SpeechSynthesisUtterance('');
-      utterance.volume = 0.01; // Very quiet
-      speechSynthesis.speak(utterance);
-    } catch (speechError) {
-      console.warn('Even system beep failed:', speechError);
-    }
+  const audio = new Audio();
+  audio.volume = volume;
+  switch (soundType) {
+    case 'bell':
+      audio.src = '/sounds/ding.mp3';
+      break;
+    case 'chime':
+      audio.src = '/sounds/glockenspiel.mp3';
+      break;
+    case 'yeah':
+      audio.src = '/sounds/yeah.mp3';
+      break;
+    default:
+      return;
   }
+  audio.play().catch(() => {});
 };
 
 // Generate different sound types using Web Audio API
@@ -315,27 +290,75 @@ export const playCompletionSound = async (soundType: SoundType, volume: number =
     }
     
     switch (soundType) {
-      case 'bell':
-        // Bell sound - single clear tone
-        console.log('Playing bell sound');
-        await generateTone(800, 0.3, 'sine', volume * 0.8);
-        setTimeout(() => generateTone(600, 0.2, 'sine', volume * 0.6), 50);
+      case 'bell': {
+        // Play first 2 seconds of /public/sounds/ding.mp3
+        console.log('Playing bell sound from /sounds/ding.mp3 (2s)');
+        try {
+          const response = await fetch('/sounds/ding.mp3');
+          const arrayBuffer = await response.arrayBuffer();
+          const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+          const source = ctx.createBufferSource();
+          const gain = ctx.createGain();
+          gain.gain.setValueAtTime(volume, ctx.currentTime);
+          source.buffer = audioBuffer;
+          source.connect(gain);
+          gain.connect(ctx.destination);
+          source.start(0, 0, Math.min(2, audioBuffer.duration));
+          // Stop after 2s to ensure clip
+          setTimeout(() => {
+            try { source.stop(); } catch {}
+          }, 2000);
+        } catch (err) {
+          console.warn('Falling back to generated bell tone due to error:', err);
+          await generateTone(800, 0.3, 'sine', volume * 0.8);
+          setTimeout(() => generateTone(600, 0.2, 'sine', volume * 0.6), 50);
+        }
         break;
+      }
         
-      case 'chime':
-        // Chime sound - ascending tones
-        console.log('Playing chime sound');
-        generateTone(523, 0.15, 'sine', volume * 0.7); // C5
-        setTimeout(() => generateTone(659, 0.15, 'sine', volume * 0.7), 100); // E5
-        setTimeout(() => generateTone(784, 0.2, 'sine', volume * 0.8), 200); // G5
+      case 'chime': {
+        // Glockenspiel aus Datei abspielen
+        console.log('Playing chime sound from /sounds/glockenspiel.mp3');
+        try {
+          const response = await fetch('/sounds/glockenspiel.mp3');
+          const arrayBuffer = await response.arrayBuffer();
+          const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+          const source = ctx.createBufferSource();
+          const gain = ctx.createGain();
+          gain.gain.setValueAtTime(volume, ctx.currentTime);
+          source.buffer = audioBuffer;
+          source.connect(gain);
+          gain.connect(ctx.destination);
+          source.start(0);
+        } catch (err) {
+          console.warn('Falling back to generated chime due to error:', err);
+          generateTone(523, 0.15, 'sine', volume * 0.7); // C5
+          setTimeout(() => generateTone(659, 0.15, 'sine', volume * 0.7), 100); // E5
+          setTimeout(() => generateTone(784, 0.2, 'sine', volume * 0.8), 200); // G5
+        }
         break;
-        
-      case 'pop':
-        // Pop sound - quick percussive sound
-        console.log('Playing pop sound');
-        await generateTone(150, 0.1, 'square', volume * 0.9);
-        setTimeout(() => generateTone(100, 0.05, 'square', volume * 0.7), 50);
+      }
+      case 'yeah': {
+        // Play yeah.mp3
+        console.log('Playing yeah sound from /sounds/yeah.mp3');
+        try {
+          const response = await fetch('/sounds/yeah.mp3');
+          const arrayBuffer = await response.arrayBuffer();
+          const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+          const source = ctx.createBufferSource();
+          const gain = ctx.createGain();
+          gain.gain.setValueAtTime(volume, ctx.currentTime);
+          source.buffer = audioBuffer;
+          source.connect(gain);
+          gain.connect(ctx.destination);
+          source.start(0);
+        } catch (err) {
+          console.warn('Falling back to generated pop due to error:', err);
+          await generateTone(150, 0.1, 'square', volume * 0.9);
+          setTimeout(() => generateTone(100, 0.05, 'square', volume * 0.7), 50);
+        }
         break;
+      }
         
       case 'alarm':
         // Alarm sound - VERY penetrating warning tone (enhanced)

@@ -41,6 +41,7 @@ import { de } from 'date-fns/locale';
 import { getBackgroundStyles, getDarkModeBackgroundStyles } from '../../utils/backgroundUtils';
 import { MobilePullToRefresh } from '../Common/MobilePullToRefresh';
 import { SwipeableTaskCard } from './SwipeableTaskCard';
+import { MobileSnackbar } from '../Common/MobileSnackbar';
 
 export function InboxView() {
   const { state, dispatch } = useApp();
@@ -76,6 +77,10 @@ export function InboxView() {
   const [selectedProjectForColumns, setSelectedProjectForColumns] = useState<string | null>(null);
   const [isCreatingColumn, setIsCreatingColumn] = useState(false);
   const [newColumnTitle, setNewColumnTitle] = useState('');
+
+  // Snackbar for undo archive
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [lastArchivedTask, setLastArchivedTask] = useState<Task | null>(null);
 
   // Sidebar slide-in animation with delay
   useEffect(() => {
@@ -1353,7 +1358,11 @@ export function InboxView() {
                       {group.tasks.map((task) => (
                         <SwipeableTaskCard
                           key={task.id}
-                          onSwipeLeft={() => handleTaskAssign(task, 'archive')}
+                          onSwipeLeft={() => {
+                            setLastArchivedTask(task);
+                            handleTaskAssign(task, 'archive');
+                            setSnackbarOpen(true);
+                          }}
                           onSwipeRight={() => handleTaskClick(task, undefined)}
                         >
                           <InboxTaskCard
@@ -1387,6 +1396,18 @@ export function InboxView() {
       </div>
 
       {/* Modals */}
+      <MobileSnackbar
+        open={snackbarOpen}
+        message={t('actions.archived', { defaultValue: 'Archiviert' })}
+        onAction={() => {
+          if (lastArchivedTask) {
+            // move back to inbox
+            dispatch({ type: 'UPDATE_TASK', payload: { ...lastArchivedTask, columnId: 'inbox' } });
+          }
+          setSnackbarOpen(false);
+        }}
+        onClose={() => setSnackbarOpen(false)}
+      />
       <SmartTaskModal
         isOpen={showSmartTaskModal}
         onClose={() => setShowSmartTaskModal(false)}

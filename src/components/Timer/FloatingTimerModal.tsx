@@ -143,6 +143,23 @@ export function FloatingTimerModal({ isVisible, onOpenTask, onClose }: FloatingT
     }
   };
 
+  // Format elapsed time with seconds for live display (mm:ss or hh:mm:ss)
+  const formatTimeWithSeconds = (minutes: number): string => {
+    try {
+      if (typeof minutes !== 'number' || isNaN(minutes)) return '0:00';
+      const totalSeconds = Math.max(0, Math.floor(minutes * 60));
+      const hours = Math.floor(totalSeconds / 3600);
+      const mins = Math.floor((totalSeconds % 3600) / 60);
+      const secs = totalSeconds % 60;
+      if (hours > 0) {
+        return `${hours}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      }
+      return `${mins}:${String(secs).padStart(2, '0')}`;
+    } catch {
+      return '0:00';
+    }
+  };
+
   const getProgressPercentage = () => {
     if (!activeTimer) return 0;
     
@@ -190,7 +207,7 @@ export function FloatingTimerModal({ isVisible, onOpenTask, onClose }: FloatingT
       className={`fixed z-[9999] transition-all duration-300 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'} select-none`}
       style={{
         left: position.x,
-        top: position.y,
+        top: Math.max(0, position.y - 100),
         width: isUltraMinimal ? '260px' : isExpanded ? '400px' : '280px',
         transform: isDragging ? 'rotate(2deg) scale(1.02)' : 'rotate(0deg) scale(1)',
       }}
@@ -284,7 +301,7 @@ export function FloatingTimerModal({ isVisible, onOpenTask, onClose }: FloatingT
                     ? '0 1px 4px rgba(0, 0, 0, 0.9)' 
                     : '0 1px 2px rgba(255, 255, 255, 0.8)'
                 }}>
-                  {formatTime(activeTimer.elapsedTime || 0)}
+                  {formatTimeWithSeconds(activeTimer.elapsedTime || 0)}
                 </span>
                 {isOvertime && (
                   <AlertTriangle className="w-3 h-3 text-red-500" />
@@ -410,7 +427,7 @@ export function FloatingTimerModal({ isVisible, onOpenTask, onClose }: FloatingT
                   ? 'drop-shadow(0 0 12px rgba(255, 255, 255, 0.3))' 
                   : 'none'
               }}>
-                {formatTime(activeTimer.elapsedTime || 0)}
+                {formatTimeWithSeconds(activeTimer.elapsedTime || 0)}
               </span>
               {isOvertime && (
                 <AlertTriangle className="w-4 h-4 text-red-500" />
