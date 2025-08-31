@@ -1271,8 +1271,10 @@ export function ProjectKanbanBoard() {
   };
 
   const handleTaskEdit = (task: Task) => {
-    setSelectedTask(task);
-    setIsTaskModalOpen(true);
+    // Use global TaskModal at app root for robustness (avoids local unmounts)
+    try {
+      window.dispatchEvent(new CustomEvent('open-task-modal', { detail: { taskId: task.id } }));
+    } catch {}
   };
 
   const handleTaskPlay = (task: Task) => {
@@ -2297,16 +2299,7 @@ export function ProjectKanbanBoard() {
         </DragOverlay>
 
         {/* Modals */}
-        {isTaskModalOpen && selectedTask && (
-          <TaskModal
-            task={selectedTask}
-            isOpen={isTaskModalOpen}
-            onClose={() => {
-              setIsTaskModalOpen(false);
-              setSelectedTask(null);
-            }}
-          />
-        )}
+        {/* Task modal is opened globally via the 'open-task-modal' event */}
 
         {showSmartTaskModal && (
           <SmartTaskModal
