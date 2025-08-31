@@ -1915,13 +1915,13 @@ export function ProjectKanbanBoard() {
           <>
             {/* Backdrop */}
             <div 
-              className="fixed inset-0 bg-black bg-opacity-25"
+              className="fixed inset-0 z-40 bg-black/40 dark:bg-black/60 backdrop-blur-[1px]"
               onClick={() => setShowNotesSlider(false)}
             ></div>
             
             {/* Slider Panel */}
             <div 
-              className={`fixed top-0 bg-white dark:bg-gray-800 shadow-xl transition-all duration-300 ease-out rounded-b-lg ${
+              className={`fixed top-0 z-50 bg-white dark:bg-gray-800 shadow-xl transition-all duration-300 ease-out rounded-b-lg ${
                 showNotesSlider ? 'translate-y-0' : '-translate-y-full'
               }`}
               style={{
@@ -1930,6 +1930,9 @@ export function ProjectKanbanBoard() {
                 width: '380px',
                 maxWidth: '90vw'
               }}
+              role="dialog"
+              aria-modal="true"
+              onClick={(e) => e.stopPropagation()}
             >
               {/* Slider Header */}
               <div className="flex items-center justify-between p-3 border-b border-gray-200 dark:border-gray-600">

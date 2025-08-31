@@ -4,6 +4,7 @@ import { AppProvider, useApp } from './context/AppContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { WelcomeScreen } from './components/Auth/WelcomeScreen';
 import { Sidebar } from './components/Layout/Sidebar';
+import { MobileShell } from './components/Layout/MobileShell';
 import { Header } from './components/Layout/Header';
 import { TaskBoard } from './components/Tasks/TaskBoard';
 import { InboxView } from './components/Inbox/InboxView';
@@ -40,6 +41,7 @@ import { Plus, Home, Inbox, CheckSquare, Columns, FileText, MoreHorizontal } fro
 import { MaterialIcon } from './components/Common/MaterialIcon';
 import './App.css';
 import { initializeAudioOnUserInteraction } from './utils/soundUtils';
+import { isMobilePWAEnvironment } from './utils/device';
 import { getBackgroundStyles, getDarkModeBackgroundStyles } from './utils/backgroundUtils';
 import { format } from 'date-fns';
 import PerformanceMonitor from './components/Common/PerformanceMonitor';
@@ -206,6 +208,16 @@ function MainApp() {
   const { state, dispatch } = useApp();
   const { t } = useTranslation();
 
+  // Redirect to MobileShell for mobile/standalone PWA
+  if (isMobilePWAEnvironment()) {
+    return (
+      <div className="w-full h-full">
+        <MobileShell />
+        <TaskModal task={state.tasks.find(t => t.id === (state as any).selectedTaskId) || null} isOpen={!!(state as any).selectedTaskId} onClose={() => {}} />
+      </div>
+    );
+  }
+
   // View order for navigation direction
   const viewOrder = ['today', 'inbox', 'tasks', 'kanban', 'notes', 'tags', 'archive', 'statistics', 'settings', 'focus', 'review'];
 
@@ -233,6 +245,30 @@ function MainApp() {
       }, 300);
     }, 50);
   }, [currentView, isTransitioning, viewOrder]);
+
+  // Timer catch-up on visibility change (ensures elapsed time reflects background time)
+  React.useEffect(() => {
+    const onVisibility = () => {
+      try {
+        // Force UI update from timerService when we return to foreground
+        const { timerService } = require('./utils/timerService');
+        const active = timerService.getActiveTimer();
+        if (active) {
+          // Trigger a synthetic tick to refresh UI
+          const context = timerService.getActiveTimer();
+          if (context) {
+            dispatch({ type: 'UPDATE_TIMER_CONTEXT', payload: context });
+          }
+        }
+      } catch {}
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('focus', onVisibility);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('focus', onVisibility);
+    };
+  }, [dispatch]);
 
   // Auto-focus mode functionality
   const checkIsTopTaskOfToday = (taskId: string): boolean => {
@@ -412,8 +448,10 @@ function MainApp() {
       // 🚀 New: Timer Controls (Space)
       if (e.key === ' ') {
         e.preventDefault();
-        // Toggle timer pause/resume for active timer
-        if (state.activeTimer?.isActive) {
+        // Toggle timer pause/resume for active timer only when tab is visible and app has focus
+        const isVisible = typeof document !== 'undefined' && !document.hidden;
+        const hasFocus = typeof document !== 'undefined' && document.hasFocus && document.hasFocus();
+        if (state.activeTimer?.isActive && isVisible && hasFocus) {
           if (state.activeTimer.isPaused) {
             dispatch({ type: 'RESUME_TIMER' });
           } else {

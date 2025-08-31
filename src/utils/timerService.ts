@@ -404,8 +404,38 @@ class TimerService {
   // Private methods for task timer
   private startTaskInterval() {
     this.stopTaskInterval();
+    const startWallClock = Date.now();
+    let lastTickWallClock = startWallClock;
     this.intervalId = window.setInterval(() => {
-      this.tickTask();
+      const now = Date.now();
+      const deltaMs = now - lastTickWallClock;
+      lastTickWallClock = now;
+      // Compensate if browser throttled the interval (background/tab inactive)
+      if (deltaMs > 1500 && this.activeTimer && !this.activeTimer.isPaused) {
+        const deltaMinutes = deltaMs / 60000;
+        // Apply missed time in one go
+        this.activeTimer.elapsedTime += deltaMinutes;
+        this.activeTimer.remainingTime = this.activeTimer.estimatedTime - this.activeTimer.elapsedTime;
+        // Handle overtime notifications and end logic as in tick
+        if (!this.warningNotificationSent && this.activeTimer.remainingTime <= 5 && this.activeTimer.remainingTime > 0) {
+          this.warningNotificationSent = true;
+          notificationService.showTimerWarning(
+            this.activeTimer.taskTitle,
+            Math.ceil(this.activeTimer.remainingTime),
+            () => window.focus()
+          );
+        }
+        if (this.activeTimer.remainingTime <= 0 && this.activeTimer.elapsedTime >= this.activeTimer.estimatedTime) {
+          if (!this.activeTimer.isOvertime) {
+            this.activeTimer.isOvertime = true;
+            this.handleTaskTimeEnd();
+          }
+        }
+        this.activeTimer.pomodoroSession = this.getPomodoroSessionForTimer();
+        this.callbacks.onTick?.(this.activeTimer);
+      } else {
+        this.tickTask();
+      }
     }, 1000);
   }
 

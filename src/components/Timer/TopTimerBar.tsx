@@ -76,8 +76,9 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
     }
   }, [activeTimer, isRunning, state.tasks, pomodoroSession, lastWarningTime, state.preferences.soundVolume]);
 
-  // Don't render if no active timer
-  if (!activeTimer) {
+  const hasPomodoro = !!pomodoroSession && pomodoroSession.isActive;
+  // Don't render if neither task timer nor pomodoro is present
+  if (!activeTimer && !hasPomodoro) {
     return null;
   }
 
@@ -193,8 +194,8 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
   };
 
   const task = state.tasks.find(t => t.id === activeTimer?.taskId);
-  const progressPercentage = getProgressPercentage();
-  const isOvertime = task?.estimatedTime && activeTimer.elapsedTime > task.estimatedTime;
+  const progressPercentage = activeTimer ? getProgressPercentage() : 0;
+  const isOvertime = !!activeTimer && task?.estimatedTime && activeTimer.elapsedTime > task.estimatedTime;
 
   return (
     <>
@@ -221,37 +222,52 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
         >
           <div className="h-full flex items-center justify-center">
             <div className="max-w-4xl w-full flex items-center justify-between px-6">
-            {/* Left: Task Info */}
+            {/* Left: Task Info or Pomodoro */}
             <div className="flex items-center space-x-3 flex-1 min-w-0">
-              <Target className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
-              <button
-                onClick={handleOpenTask}
-                className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:opacity-80 transition-opacity truncate"
-                style={{ color: state.preferences.accentColor }}
-              >
-                {task?.title || 'Unbekannte Aufgabe'}
-              </button>
+              {activeTimer ? (
+                <>
+                  <Target className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                  <button
+                    onClick={handleOpenTask}
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:opacity-80 transition-opacity truncate"
+                    style={{ color: state.preferences.accentColor }}
+                  >
+                    {task?.title || 'Unbekannte Aufgabe'}
+                  </button>
+                </>
+              ) : (
+                hasPomodoro && (
+                  <div className="flex items-center space-x-2">
+                    <Coffee className="w-3.5 h-3.5 text-red-500" />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Pomodoro</span>
+                  </div>
+                )
+              )}
             </div>
 
             {/* Center: Timer Display */}
             <div className="flex items-center space-x-4">
-              {/* Task Timer */}
-              <div className="flex items-center space-x-2">
-                <span className={`text-lg font-mono font-semibold ${isOvertime ? 'text-red-500' : (isDarkMode ? 'text-white' : 'text-gray-900')}`}>
-                  {formatTimeWithSeconds(activeTimer.elapsedTime || 0)}
-                </span>
-                {activeTimer.estimatedTime && (
-                  <span className="text-xs text-gray-400">
-                    / {formatTimeShort(activeTimer.estimatedTime)}
+              {/* Task Timer (if present) */}
+              {activeTimer ? (
+                <div className="flex items-center space-x-2">
+                  <span className={`text-lg font-mono font-semibold ${isOvertime ? 'text-red-500' : (isDarkMode ? 'text-white' : 'text-gray-900')}`}>
+                    {formatTimeWithSeconds(activeTimer.elapsedTime || 0)}
                   </span>
-                )}
-                {isOvertime && (
-                  <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
-                )}
-              </div>
+                  {activeTimer.estimatedTime && (
+                    <span className="text-xs text-gray-400">
+                      / {formatTimeShort(activeTimer.estimatedTime)}
+                    </span>
+                  )}
+                  {isOvertime && (
+                    <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
+                  )}
+                </div>
+              ) : (
+                <div />
+              )}
 
-              {/* Pomodoro Timer */}
-              {activeTimer.mode === 'pomodoro' && pomodoroSession && (
+              {/* Pomodoro Timer (always when session exists) */}
+              {pomodoroSession && (
                 <>
                   <div className="w-px h-6 bg-gray-300 dark:bg-gray-600" />
                   <div className="flex items-center space-x-2">
@@ -269,6 +285,32 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
 
             {/* Right: Controls */}
             <div className="flex items-center space-x-2 flex-1 justify-end">
+              {/* Task controls */}
+              {activeTimer && (
+                <>
+                  <button onClick={handlePlayPause} className="w-7 h-7 rounded-full flex items-center justify-center transition-all duration-200 hover:opacity-80 text-white shadow-sm" style={{ backgroundColor: isRunning ? '#f59e0b' : state.preferences.accentColor }}>
+                    {isRunning ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+                  </button>
+                  <button onClick={handleStop} className="w-7 h-7 rounded-full bg-gray-400 hover:bg-gray-500 text-white flex items-center justify-center transition-all duration-200 hover:opacity-80 shadow-sm">
+                    <Square className="w-3 h-3" />
+                  </button>
+                </>
+              )}
+              {/* Pomodoro independent controls */}
+              {pomodoroSession ? (
+                <>
+                  <button onClick={() => (pomodoroSession.isPaused ? timerService.resumePomodoroSession() : timerService.pausePomodoroSession())} className="w-7 h-7 rounded-full flex items-center justify-center transition-all duration-200 hover:opacity-80 text-white shadow-sm" style={{ backgroundColor: pomodoroSession.isPaused ? state.preferences.accentColor : '#f59e0b' }} title={pomodoroSession.isPaused ? 'Fortsetzen' : 'Pausieren'}>
+                    {pomodoroSession.isPaused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
+                  </button>
+                  <button onClick={() => timerService.stopPomodoroSession()} className="w-7 h-7 rounded-full bg-gray-400 hover:bg-gray-500 text-white flex items-center justify-center transition-all duration-200 hover:opacity-80 shadow-sm" title={'Pomodoro beenden'}>
+                    <Square className="w-3 h-3" />
+                  </button>
+                </>
+              ) : (
+                <button onClick={() => timerService.startPomodoroSession()} className="w-7 h-7 rounded-full flex items-center justify-center transition-all duration-200 hover:opacity-80 text-white shadow-sm" style={{ backgroundColor: state.preferences.accentColor }} title={'Pomodoro starten'}>
+                  <Play className="w-3.5 h-3.5" />
+                </button>
+              )}
               {/* Focus Mode Button */}
               <button
                 onClick={handleEnterFocusMode}
@@ -278,21 +320,6 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
               >
                 <Target className="w-3.5 h-3.5" />
                 <span>Fokus</span>
-              </button>
-
-              <button
-                onClick={handlePlayPause}
-                className="w-7 h-7 rounded-full flex items-center justify-center transition-all duration-200 hover:opacity-80 text-white shadow-sm"
-                style={{ backgroundColor: isRunning ? '#f59e0b' : state.preferences.accentColor }}
-              >
-                {isRunning ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-              </button>
-              
-              <button
-                onClick={handleStop}
-                className="w-7 h-7 rounded-full bg-gray-400 hover:bg-gray-500 text-white flex items-center justify-center transition-all duration-200 hover:opacity-80 shadow-sm"
-              >
-                <Square className="w-3 h-3" />
               </button>
             </div>
             </div>
@@ -307,7 +334,7 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
           onClose={() => setShowWarningModal(false)}
           taskTitle={task.title}
           taskId={task.id}
-          timeExceeded={Math.max(0, activeTimer.elapsedTime - (task.estimatedTime || 0))}
+          timeExceeded={Math.max(0, activeTimer!.elapsedTime - (task.estimatedTime || 0))}
           type={warningType}
         />
       )}

@@ -349,6 +349,9 @@ export function TaskBoard() {
   });
   const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
+  // Swipe detection for sidebar open/close
+  const touchStartXRef = useRef<number | null>(null);
+  const touchActiveRef = useRef<boolean>(false);
 
   const [showFilters, setShowFilters] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -378,6 +381,33 @@ export function TaskBoard() {
     const id = requestAnimationFrame(() => setMounted(true));
     return () => cancelAnimationFrame(id);
   }, []);
+
+  // Edge swipe handlers (open/close task sidebar)
+  const onTouchStart = (e: React.TouchEvent) => {
+    if (!e.touches || e.touches.length === 0) return;
+    const x = e.touches[0].clientX;
+    const edgeZone = 24; // px from left edge
+    if (x <= edgeZone || sidebarVisible) {
+      touchStartXRef.current = x;
+      touchActiveRef.current = true;
+    }
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (!touchActiveRef.current || touchStartXRef.current == null) return;
+    const dx = e.changedTouches[0].clientX - touchStartXRef.current;
+    touchStartXRef.current = null;
+    touchActiveRef.current = false;
+    const threshold = 40;
+    if (dx > threshold && !sidebarVisible) {
+      setSidebarVisible(true);
+      window.dispatchEvent(new CustomEvent('task-sidebar-state-changed', { detail: { minimized: false } }));
+      try { localStorage.setItem('taskfuchs-task-sidebar-visible', 'true'); } catch {}
+    } else if (dx < -threshold && sidebarVisible) {
+      setSidebarVisible(false);
+      window.dispatchEvent(new CustomEvent('task-sidebar-state-changed', { detail: { minimized: true } }));
+      try { localStorage.setItem('taskfuchs-task-sidebar-visible', 'false'); } catch {}
+    }
+  };
 
   // Handle sidebar toggle events
   useEffect(() => {
@@ -1331,6 +1361,8 @@ export function TaskBoard() {
 
   const renderColumns = (columns: (typeof dateColumns[0] | null)[]) => {
     const elements: JSX.Element[] = [];
+    const visibleCount = columns.filter(Boolean).length;
+    const isSingle = visibleCount === 1 && state.preferences.columns.visible === 1;
     
     columns.forEach((column, index) => {
       // Handle empty placeholder columns
@@ -1408,8 +1440,8 @@ export function TaskBoard() {
         }
       }
       
-      // Add column
-      elements.push(
+      // Build column node
+      const columnNode = (
         <SortableContext
           key={column.id}
           items={columnTasks.map(task => task.id)}
@@ -1431,6 +1463,17 @@ export function TaskBoard() {
           />
         </SortableContext>
       );
+
+      if (isSingle) {
+        // In single-column view keep the column at a reasonable width like in multi-column layout
+        elements.push(
+          <div key={`single-wrap-${column.id}`} style={{ flex: '0 0 420px', maxWidth: 420, width: 420, margin: '0 auto' }}>
+            {columnNode}
+          </div>
+        );
+      } else {
+        elements.push(columnNode);
+      }
       
       // Add divider after column (except for the last column) in minimal design
       if (isMinimalDesign && index < columns.length - 1) {
@@ -1463,7 +1506,7 @@ export function TaskBoard() {
       isMinimalDesign
         ? 'bg-white dark:bg-[#111827]'
         : 'bg-transparent'
-    }`}>
+    }`} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
       {/* Focus Mode Overlay */}
       {state.focusMode && (
         <div 

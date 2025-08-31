@@ -1847,7 +1847,7 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
     <>
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[99999999] modal-backdrop"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-[99999999] modal-backdrop"
         style={{ 
           isolation: 'isolate',
           pointerEvents: 'auto'
@@ -1863,7 +1863,7 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
         {/* Modal Container */}
         <div 
           ref={modalRef}
-          className="task-modal-root bg-white dark:bg-gray-900 rounded-none sm:rounded-2xl shadow-2xl w-screen sm:w-full sm:max-w-6xl h-[100svh] sm:h-auto sm:max-h-[90vh] overflow-hidden flex flex-col modal-content animate-modal-in"
+          className="task-modal-root bg-white dark:bg-gray-900 rounded-none sm:rounded-2xl shadow-2xl w-screen sm:w-full sm:max-w-6xl h-[100svh] sm:h-[90vh] overflow-hidden flex flex-col modal-content animate-modal-in"
           onClick={e => e.stopPropagation()}
           onMouseDown={(e) => e.stopPropagation()}
           onMouseMove={(e) => e.stopPropagation()}
@@ -1894,7 +1894,7 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
           )}
 
           {/* Header with editable title, date, and project */}
-          <div className="relative p-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="relative p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700">
             {/* Close button */}
             <div className="absolute top-4 right-4 z-10">
               <button
@@ -2020,7 +2020,7 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
                 onBlur={handleTitleBlur}
                 onKeyDown={handleTitleKeyDown}
                 placeholder="Aufgabentitel eingeben..."
-                className={`text-2xl font-bold bg-transparent border-none p-0 flex-1 min-w-0 focus:outline-none focus:ring-0 placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200 ${
+                className={`text-xl sm:text-2xl font-bold bg-transparent border-none p-0 flex-1 min-w-0 focus:outline-none focus:ring-0 placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200 ${
                   task?.completed
                     ? 'text-gray-400 dark:text-gray-500 line-through'
                     : 'text-gray-900 dark:text-white'
@@ -3652,9 +3652,9 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
           </div>
 
           {/* Footer */}
-          <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+          <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 sticky bottom-0">
             {/* Action Buttons */}
-            <div className="flex items-center justify-between p-6">
+            <div className="flex items-center justify-between p-3 sm:p-6">
               {/* Delete Button - Left Side */}
               <button
                 onClick={() => {
@@ -3681,7 +3681,7 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
               {/* Completion Button - Center */}
               <button
                 onClick={task?.completed ? handleToggleComplete : handleCompleteAndClose}
-                className="flex items-center space-x-2 px-6 py-3 text-sm font-medium text-white rounded-lg transition-all duration-200 hover:scale-105 shadow-lg hover:opacity-90"
+                className="flex items-center space-x-2 px-5 py-3 text-sm font-medium text-white rounded-xl transition-all duration-200 hover:scale-105 shadow-lg hover:opacity-90"
                 style={{ backgroundColor: state.preferences.accentColor }}
                 title={task?.completed ? 'Als nicht erledigt markieren' : 'Aufgabe abhaken und schließen'}
               >
@@ -3692,17 +3692,17 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
               </button>
 
               {/* Save/Cancel - Right Side */}
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2 sm:space-x-3">
                 <button
                   onClick={handleClose}
-                  className="px-6 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  className="px-5 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
                   Abbrechen
                 </button>
                 <button
                   onClick={handleSave}
                   disabled={!hasUnsavedChanges}
-                  className="flex items-center space-x-2 px-6 py-2 disabled:bg-gray-400 text-white rounded-lg transition-colors disabled:cursor-not-allowed hover:opacity-90"
+                  className="flex items-center space-x-2 px-5 py-2 disabled:bg-gray-400 text-white rounded-lg transition-colors disabled:cursor-not-allowed hover:opacity-90"
                   style={hasUnsavedChanges ? getAccentColorStyles().bg : {}}
                 >
                   <Save className="w-4 h-4" />
