@@ -56,8 +56,8 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
     if (task.estimatedTime && activeTimer.elapsedTime >= task.estimatedTime) {
       const warningKey = `${activeTimer.taskId}-estimated-${Math.floor(activeTimer.elapsedTime)}`;
       if (!lastWarningTime.estimated || activeTimer.elapsedTime - lastWarningTime.estimated >= 5) {
-        // Play penetrating alarm sound
-        playCompletionSound('alarm', state.preferences.soundVolume);
+        // Play notice sound for planned time overrun
+        playCompletionSound('notice', state.preferences.soundVolume);
         setWarningType('estimated');
         setShowWarningModal(true);
         setLastWarningTime(prev => ({ ...prev, estimated: activeTimer.elapsedTime }));

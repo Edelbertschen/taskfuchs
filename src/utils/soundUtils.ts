@@ -1,6 +1,6 @@
 // Sound utility functions for task completion feedback
 
-export type SoundType = 'bell' | 'chime' | 'yeah' | 'alarm' | 'pomodoro_alarm' | 'none';
+export type SoundType = 'bell' | 'chime' | 'yeah' | 'alarm' | 'pomodoro_alarm' | 'notice' | 'none';
 export type WhiteNoiseType = 'clock' | 'none';
 
 // Audio context for Web Audio API
@@ -233,6 +233,9 @@ const playFallbackSound = (soundType: SoundType, volume: number = 0.5) => {
     case 'yeah':
       audio.src = '/sounds/yeah.mp3';
       break;
+    case 'notice':
+      audio.src = '/sounds/notice.mp3';
+      break;
     default:
       return;
   }
@@ -418,6 +421,27 @@ export const playCompletionSound = async (soundType: SoundType, volume: number =
           }
         }, 5500);
         break;
+
+      case 'notice': {
+        // Play short notice sound from file
+        console.log('Playing notice sound from /sounds/notice.mp3');
+        try {
+          const response = await fetch('/sounds/notice.mp3');
+          const arrayBuffer = await response.arrayBuffer();
+          const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+          const source = ctx.createBufferSource();
+          const gain = ctx.createGain();
+          gain.gain.setValueAtTime(volume, ctx.currentTime);
+          source.buffer = audioBuffer;
+          source.connect(gain);
+          gain.connect(ctx.destination);
+          source.start(0);
+        } catch (err) {
+          console.warn('Falling back to simple tone for notice due to error:', err);
+          await generateTone(880, 0.15, 'sine', volume * 0.8);
+        }
+        break;
+      }
     }
     console.log('Sound playback completed');
   } catch (error) {

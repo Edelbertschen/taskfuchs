@@ -33,3 +33,4 @@ export function MobileSnackbar({ open, message, actionLabel = 'Rückgängig', on
 }
 
 
+
