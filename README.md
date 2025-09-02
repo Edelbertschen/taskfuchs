@@ -118,6 +118,15 @@ Pull Requests willkommen. Bitte vorab Issues anlegen, wenn größere Änderungen
 - Client-seitig sind nur `VITE_`-Variablen sichtbar – als quasi öffentlich behandeln.
 - Beispieldatei: `.env.example` (lokal zu `.env` kopieren und Werte setzen).
 
+## Web App
+
+- Live: [`https://app.taskfuchs.de`](https://app.taskfuchs.de)
+- Lokal installieren/speichern (PWA):
+  - Desktop (Chrome/Edge): In der Adressleiste auf „Installieren“/„App installieren“ klicken (Pfeil‑oder+‑Icon) oder im Menü „App installieren“ wählen.
+  - iOS (Safari): Teilen‑Menü → „Zum Home‑Bildschirm“. Danach startet TaskFuchs wie eine native App.
+  - Android (Chrome): Drei‑Punkte‑Menü → „App installieren“ bzw. „Zum Startbildschirm hinzufügen“.
+  - Updates: Die App aktualisiert sich selbst. Bei neuer Version erscheint ein Update‑Hinweis – antippen/klicken, um sofort neu zu laden.
+
 ---
 
 **TaskFuchs** 🦊 - Deine smarte Aufgabenverwaltung
