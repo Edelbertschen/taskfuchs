@@ -1,133 +1,104 @@
 # TaskFuchs
 
-Moderne Aufgaben- und Zeitverwaltung als Web‑App und Desktop‑App (Electron). Minimalistische UI, Dark Mode, i18n und optionale Sync‑Anbindungen.
+Modern task and time management – available as a Web App and Desktop App (Electron). Minimal UI, Dark Mode, i18n, and optional sync integrations.
 
 ![Dashboard](Website/assets/screenshots/planer.png)
-## Features
 
-### ✅ Grundfunktionalität
-- **Spalten-Layout**: Tagesbasierte Spalten und Projekt-Spalten
-- **Drag & Drop**: Aufgaben zwischen Spalten verschieben
-- **Responsive Design**: Funktioniert auf Desktop und Mobile
-- **Dark/Light Mode**: Automatische Theme-Erkennung
-- **Internationalisierung**: Deutsch und Englisch
-- **Moderne UI**: Minimalistisches Design mit Tailwind CSS
+**Web page: [www.taskfuchs.de](https://www.taskfuchs.de)
 
-### ✅ Aufgabenverwaltung
-- **Task Cards**: Übersichtliche Darstellung mit Prioritäten
-- **Unteraufgaben**: Support für Subtasks mit Progress-Anzeige
-- **Markdown**: Rich Text Beschreibungen mit Markdown-Support
-- **Zeitschätzungen**: Geplante und aufgewendete Zeit
-- **Tags**: Kategorisierung und Filterung
-- **Suche**: Volltext-Suche durch alle Aufgaben
+## Features (Phase 1 & 2 – currently implemented)
 
-### ✅ Timer & Zeitmanagement
-- **Timer Integration**: Play/Pause Buttons in Task Cards
-- **Zeiterfassung**: Getrackte vs. geschätzte Zeit
-- **Pomodoro Ready**: Vorbereitung für Pomodoro-Technik
+### ✅ Core functionality
+- **Column layout**: Day‑based columns and project columns
+- **Drag & drop**: Move tasks between columns
+- **Responsive design**: Works on desktop and mobile
+- **Dark/Light mode**: Automatic theme detection
+- **Internationalization**: German and English
+- **Modern UI**: Minimal design powered by Tailwind CSS
+
+### ✅ Task management
+- **Task cards**: Clear presentation with priorities
+- **Subtasks**: Support with progress indicator
+- **Markdown**: Rich text descriptions with Markdown support
+- **Time estimates**: Planned vs. spent time
+- **Tags**: Categorization and filtering
+- **Search**: Full‑text search across tasks
+
+### ✅ Timer & time management
+- **Timer integration**: Play/Pause from task cards
+- **Time tracking**: Tracked vs. estimated time
+- **Pomodoro ready**: Prepared for Pomodoro technique
 
 ## Tech Stack
 
 - **Frontend**: React 18 + TypeScript
-- **Build Tool**: Vite
+- **Build tool**: Vite
 - **Styling**: Tailwind CSS
 - **Icons**: Lucide React
-- **Drag & Drop**: @dnd-kit
-- **Internationalization**: react-i18next
-- **Date Handling**: date-fns
-- **Markdown**: react-markdown
+- **Drag & drop**: @dnd-kit
+- **Internationalization**: react‑i18next
+- **Date handling**: date‑fns
+- **Markdown**: react‑markdown
 
-## Installation & Entwicklung (Web)
+## Installation & development (Web)
 
 ```bash
-# Dependencies installieren
+# Install dependencies
 npm install
 
-# Development Server starten
+# Start development server
 npm run dev
 
-# Build für Production
+# Build for production
 npm run build:web
 
-# Preview der Production Build
+# Preview the production build
 npm run preview
+```
 
 ## Desktop (Electron)
 
-Build lokal (macOS als Beispiel):
+Build locally (macOS example):
 
 ```bash
 npm run dist:mac-dmg
 ```
 
-Siehe `DESKTOP-APP-README.md` für Details (Signierung, White‑Window‑Fix, `vite.config.ts` base‑Pfad, etc.).
-```
-
-## Projektstruktur
-
-```
-src/
-├── components/          # React Komponenten
-│   ├── Layout/         # Sidebar, Header
-│   └── Tasks/          # TaskBoard, TaskColumn, TaskCard
-├── context/            # React Context für State Management
-├── i18n/              # Internationalisierung
-│   └── locales/       # Deutsch/Englisch Übersetzungen
-├── types/             # TypeScript Interfaces
-└── utils/             # Utilities und Services
-
-Weitere Ordner:
-- `public/` statische Assets (Icons, Manifest, Electron-Entry)
-- `dist/` Build-Ausgabe (gitignored)
-- `dist-electron/` Electron-Builds (gitignored)
-- `docs/` begleitende Dokumente
-```
+See `DESKTOP-APP-README.md` for details (code signing, white‑window fix, `vite.config.ts` base path, etc.).
 
 ## Screenshots
 
-Einige Eindrücke (siehe `public/screenshots/`):
-
 ![Dashboard](Website/assets/screenshots/planer.png)
-![Planer](public/screenshots/Planer.png)
-![Einstellungen](public/screenshots/settings.png)
-![Timer](public/screenshots/Timer.png)
+![Dashboard](Website/assets/screenshots/dashboard.png)
+![Focusmode](Website/assets/screenshots/focusmode.png)
+![Themes](Website/assets/screenshots/themes.png)
 
-## Geplante Features
+## Design system
 
-Die Entwicklung erfolgt in Phasen gemäß [TaskFuchs-Plan.md](../TaskFuchs-Plan.md):
+- **Primary color**: App accent color (configurable in settings)
+- **Fox branding**: Orange (#f97316) for the logo, Green (#22c55e) for success
+- **Typography**: Inter font family
+- **Responsive**: Mobile‑first design
 
-- **Phase 3**: Timer-Funktionalität, Pomodoro-Integration
-- **Phase 4**: UI-Verbesserungen, Sound-Warnungen
-- **Phase 5**: Wiederholungen, Kalenderansicht
-- **Phase 6**: Tags & Suche (erweitert)
-- **Phase 7**: Kanban-Board
-- **Phase 8**: Benutzerkonten & Synchronisation
+## Contributing & license
 
-## Design-System
+Pull requests are welcome. Please open an issue first for major changes. See `LICENSE` for licensing details.
 
-- **Primary Color**: Anpassbare Akzentfarbe (Standard: #0ea5e9)
-- **Fox Branding**: Orange (#f97316) für das Logo, Grün (#22c55e) für Erfolg
-- **Typography**: Inter Font Family
-- **Responsive**: Mobile-First Design
-
-## Beiträge & Lizenz
-
-Pull Requests willkommen. Bitte vorab Issues anlegen, wenn größere Änderungen geplant sind. Lizenz siehe `LICENSE`.
-
-## Sicherheit & Secrets
-- Keine echten Zugangsdaten committen; nutze `.env` lokal und GitHub Secrets im CI.
-- Client-seitig sind nur `VITE_`-Variablen sichtbar – als quasi öffentlich behandeln.
-- Beispieldatei: `.env.example` (lokal zu `.env` kopieren und Werte setzen).
+## Security & secrets
+- Never commit real credentials; use `.env.local` for local dev and GitHub Secrets in CI.
+- Only variables prefixed with `VITE_` are exposed to the client – treat them as public.
+- Example file: `.env.example` (copy to `.env.local` and fill in values).
 
 ## Web App
 
 - Live: [`https://app.taskfuchs.de`](https://app.taskfuchs.de)
-- Lokal installieren/speichern (PWA):
-  - Desktop (Chrome/Edge): In der Adressleiste auf „Installieren“/„App installieren“ klicken (Pfeil‑oder+‑Icon) oder im Menü „App installieren“ wählen.
-  - iOS (Safari): Teilen‑Menü → „Zum Home‑Bildschirm“. Danach startet TaskFuchs wie eine native App.
-  - Android (Chrome): Drei‑Punkte‑Menü → „App installieren“ bzw. „Zum Startbildschirm hinzufügen“.
-  - Updates: Die App aktualisiert sich selbst. Bei neuer Version erscheint ein Update‑Hinweis – antippen/klicken, um sofort neu zu laden.
+- Install as PWA:
+  - Desktop (Chrome/Edge): Address bar “Install app” button or menu → “Install app”.
+  - iOS (Safari): Share → “Add to Home Screen”. Afterwards it launches like a native app.
+  - Android (Chrome): Three‑dot menu → “Install app” / “Add to Home screen”.
+  - Updates: The app auto‑updates. When a new version is available an in‑app banner appears – click to reload instantly.
 
 ---
 
-**TaskFuchs** 🦊 - Deine smarte Aufgabenverwaltung
+**TaskFuchs** 🦊 – Your smart task manager
+
