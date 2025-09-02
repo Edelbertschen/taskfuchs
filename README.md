@@ -1,8 +1,8 @@
 # TaskFuchs
 
 Moderne Aufgaben- und Zeitverwaltung als Web‑App und Desktop‑App (Electron). Minimalistische UI, Dark Mode, i18n und optionale Sync‑Anbindungen.
-
-## Features (Phase 1 & 2 - Aktuell implementiert)
+![Dashboard](Website/assets/screenshots/planer.png)
+## Features
 
 ### ✅ Grundfunktionalität
 - **Spalten-Layout**: Tagesbasierte Spalten und Projekt-Spalten
