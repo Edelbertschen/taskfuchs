@@ -1317,6 +1317,12 @@
                 <p>Verfügbar für alle deine Geräte - bald auch als native App</p>
             </div>
             <div class="download-buttons">
+                <a class="download-btn" href="https://app.taskfuchs.de" target="_blank" rel="noopener">
+                    <div class="download-btn-content">
+                        <div class="download-btn-title">Web App</div>
+                        <div class="download-btn-subtitle">Im Browser nutzen</div>
+                    </div>
+                </a>
                 <div class="download-btn" onclick="openDownloadModal('macos')">
                     <div class="download-btn-content">
                         <div class="download-btn-title">macOS</div>
@@ -1335,12 +1341,6 @@
                         <div class="download-btn-subtitle">Für alle Distributionen</div>
                     </div>
                 </div>
-                <a class="download-btn" href="https://app.taskfuchs.de" target="_blank" rel="noopener">
-                    <div class="download-btn-content">
-                        <div class="download-btn-title">Web App</div>
-                        <div class="download-btn-subtitle">Im Browser nutzen</div>
-                    </div>
-                </a>
             </div>
             <div class="webapp-info" style="margin-top:16px">
                 <p><strong>Web App:</strong> <a href="https://app.taskfuchs.de" target="_blank" rel="noopener">app.taskfuchs.de</a></p>
