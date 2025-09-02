@@ -1335,6 +1335,20 @@
                         <div class="download-btn-subtitle">Für alle Distributionen</div>
                     </div>
                 </div>
+                <a class="download-btn" href="https://app.taskfuchs.de" target="_blank" rel="noopener">
+                    <div class="download-btn-content">
+                        <div class="download-btn-title">Web App</div>
+                        <div class="download-btn-subtitle">Im Browser nutzen</div>
+                    </div>
+                </a>
+            </div>
+            <div class="webapp-info" style="margin-top:16px">
+                <p><strong>Web App:</strong> <a href="https://app.taskfuchs.de" target="_blank" rel="noopener">app.taskfuchs.de</a></p>
+                <ul style="margin-top:8px; line-height:1.6">
+                    <li>Desktop (Chrome/Edge): Menü „App installieren“/„Installieren“.</li>
+                    <li>iOS (Safari): Teilen → „Zum Home‑Bildschirm“.</li>
+                    <li>Android (Chrome): Drei‑Punkte‑Menü → „App installieren“.</li>
+                </ul>
             </div>
         </div>
     </section>
