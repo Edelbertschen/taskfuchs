@@ -352,6 +352,7 @@ export function TaskBoard() {
   // Swipe detection for sidebar open/close
   const touchStartXRef = useRef<number | null>(null);
   const touchActiveRef = useRef<boolean>(false);
+  const sidebarTouchStartXRef = useRef<number | null>(null);
 
   const [showFilters, setShowFilters] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -403,6 +404,23 @@ export function TaskBoard() {
       window.dispatchEvent(new CustomEvent('task-sidebar-state-changed', { detail: { minimized: false } }));
       try { localStorage.setItem('taskfuchs-task-sidebar-visible', 'true'); } catch {}
     } else if (dx < -threshold && sidebarVisible) {
+      setSidebarVisible(false);
+      window.dispatchEvent(new CustomEvent('task-sidebar-state-changed', { detail: { minimized: true } }));
+      try { localStorage.setItem('taskfuchs-task-sidebar-visible', 'false'); } catch {}
+    }
+  };
+
+  // Sidebar swipe close (within sidebar)
+  const onSidebarTouchStart = (e: React.TouchEvent) => {
+    if (!e.touches || e.touches.length === 0) return;
+    sidebarTouchStartXRef.current = e.touches[0].clientX;
+  };
+  const onSidebarTouchEnd = (e: React.TouchEvent) => {
+    if (sidebarTouchStartXRef.current == null) return;
+    const dx = e.changedTouches[0].clientX - sidebarTouchStartXRef.current;
+    sidebarTouchStartXRef.current = null;
+    const threshold = -40;
+    if (dx < threshold) {
       setSidebarVisible(false);
       window.dispatchEvent(new CustomEvent('task-sidebar-state-changed', { detail: { minimized: true } }));
       try { localStorage.setItem('taskfuchs-task-sidebar-visible', 'false'); } catch {}
@@ -1683,10 +1701,17 @@ export function TaskBoard() {
           sensors={sensors}
         >
         <div className="h-full w-full relative overflow-hidden">
+          {/* Mobile overlay when sidebar is open */}
+          {sidebarVisible && (
+            <div 
+              className="fixed inset-0 bg-black/50 z-10 sm:hidden"
+              onClick={() => setSidebarVisible(false)}
+            />
+          )}
           {/* Project Tasks Sidebar */}
           {sidebarVisible && (
           <div 
-            className={`absolute top-0 left-0 bottom-0 w-80 z-20 flex flex-col overflow-hidden min-w-0 ${
+            className={`absolute top-0 left-0 bottom-0 w-full sm:w-80 z-20 flex flex-col overflow-hidden min-w-0 ${
               isMinimalDesign
                 ? 'border-r border-gray-200 dark:border-gray-800'
                 : 'backdrop-blur-xl bg-black/50 border-r border-white/15'
@@ -1703,8 +1728,10 @@ export function TaskBoard() {
               transform: sidebarVisible ? 'translateX(0)' : 'translateX(-100%)',
               transition: mounted ? 'transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none',
               visibility: !mounted && !sidebarVisible ? 'hidden' : 'visible',
-              maxWidth: '320px',
+              maxWidth: '100%',
             }}
+            onTouchStart={onSidebarTouchStart}
+            onTouchEnd={onSidebarTouchEnd}
           >
             {/* Sidebar Header */}
             <div 
@@ -2027,6 +2054,7 @@ export function TaskBoard() {
                 height: '100%'
               }}
             >
+              <MobilePullToRefresh onRefresh={async () => dispatch({ type: 'NO_OP' } as any)}>
               <div className="flex-1 flex flex-col relative z-10 px-4 pb-4 pt-2">
 
             {/* Board Content */}
@@ -2136,6 +2164,7 @@ export function TaskBoard() {
             </style>
 
               </div>
+              </MobilePullToRefresh>
             </div>
           </div>
         </div>
