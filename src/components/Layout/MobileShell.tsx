@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Inbox, CalendarDays, Upload, Download, Plus, Menu } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { InboxView } from '../Inbox/InboxView';
+import { MobileSettingsModal } from './MobileSettingsModal';
 import { TaskColumn } from '../Tasks/TaskColumn';
 import type { Column, Task } from '../../types';
 import { format, addDays, isToday } from 'date-fns';
@@ -18,6 +19,7 @@ export function MobileShell() {
   const touchStartX = useRef<number | null>(null);
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [menuOpen, setMenuOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const edgeStartRef = useRef<boolean>(false);
   const menuTouchStartX = useRef<number | null>(null);
 
@@ -142,6 +144,9 @@ export function MobileShell() {
           <button aria-label="Download" onClick={handleDownload} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ backgroundColor: accent }}>
             <Download className="w-5 h-5 text-white" />
           </button>
+          <button aria-label="Einstellungen" onClick={() => setSettingsOpen(true)} className="w-9 h-9 rounded-full flex items-center justify-center border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300">
+            ⚙️
+          </button>
         </div>
       </div>
 
@@ -225,14 +230,19 @@ export function MobileShell() {
                 Geplant
               </button>
             </nav>
-            <div className="px-4 pb-6 pt-2 flex justify-center">
+            <div className="px-4 pb-6 pt-2 flex justify-center gap-3">
               <button onClick={() => { try { window.dispatchEvent(new CustomEvent('navigate-to-settings')); } catch {} setMenuOpen(false); }} className="px-5 py-2 rounded-full text-white" style={{ backgroundColor: accent }}>
-                Einstellungen
+                Einstellungen (voll)
+              </button>
+              <button onClick={() => { setSettingsOpen(true); setMenuOpen(false); }} className="px-5 py-2 rounded-full text-white" style={{ backgroundColor: accent }}>
+                Dropbox
               </button>
             </div>
           </div>
         </div>
       )}
+      {/* Minimal mobile settings (Dropbox) */}
+      <MobileSettingsModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </div>
   );
 }
