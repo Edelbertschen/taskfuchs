@@ -86,7 +86,7 @@ Weitere Ordner:
 
 Einige Eindrücke (siehe `public/screenshots/`):
 
-![Dashboard](public/screenshots/dashboard.png)
+![Dashboard](Website/assets/screenshots/planer.png)
 ![Planer](public/screenshots/Planer.png)
 ![Einstellungen](public/screenshots/settings.png)
 ![Timer](public/screenshots/Timer.png)
