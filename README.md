@@ -4,7 +4,8 @@ Modern task and time management – available as a Web App and Desktop App (Elec
 
 ![Dashboard](Website/assets/screenshots/planer.png)
 
-**Web page: [www.taskfuchs.de](https://www.taskfuchs.de)
+**Web page:**
+[www.taskfuchs.de](https://www.taskfuchs.de)
 
 ## Features (Phase 1 & 2 – currently implemented)
 
