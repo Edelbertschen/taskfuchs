@@ -223,8 +223,15 @@ export function FocusView({ onExit }: FocusViewProps) {
     setIsAnimating(true);
     
     if (timerInfo.isActive) {
+      // Stop only the task timer; keep Pomodoro running
       dispatch({ type: 'STOP_TIMER' });
       await new Promise(resolve => setTimeout(resolve, 100));
+      try {
+        // Ensure Pomodoro session remains active
+        if (state.preferences?.pomodoro?.enabled && timerService.isPomodoroActive()) {
+          timerService.resumePomodoroSession();
+        }
+      } catch {}
     }
 
     // Mark current task as completed

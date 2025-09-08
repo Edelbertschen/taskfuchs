@@ -571,10 +571,9 @@ class TimerService {
     
     console.log('Handling Pomodoro session end for:', session.type, session.sessionNumber);
     
-    // Play ENHANCED Pomodoro completion sound - always use the penetrating alarm
+    // Play notice sound for Pomodoro completion
     if (this.preferences.pomodoro.soundEnabled) {
-      // Always use the enhanced pomodoro_alarm sound for maximum attention
-      playCompletionSound('pomodoro_alarm', this.preferences.soundVolume).catch(console.warn);
+      playCompletionSound('notice', this.preferences.soundVolume).catch(console.warn);
     }
 
     // Notify about session end BEFORE any transitions
@@ -600,9 +599,9 @@ class TimerService {
 
     console.log('Handling task time end for:', this.activeTimer.taskTitle);
 
-    // Play ENHANCED alarm sound for task deadline
+    // Play notice sound for task deadline
     if (this.preferences?.pomodoro.soundEnabled) {
-      playCompletionSound('alarm', this.preferences.soundVolume).catch(console.warn);
+      playCompletionSound('notice', this.preferences.soundVolume).catch(console.warn);
     }
 
     // Create callback function for adding time

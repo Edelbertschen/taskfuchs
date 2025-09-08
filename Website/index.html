@@ -2263,12 +2263,11 @@
         }
 
         .download-buttons {
-            display: flex;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
             gap: 1rem;
-            max-width: 600px;
+            max-width: 920px;
             margin: 0 auto;
-            flex-wrap: wrap;
         }
 
         .download-btn {
@@ -2283,14 +2282,45 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             display: flex;
             align-items: center;
-            min-width: 180px;
             justify-content: center;
+            width: 100%;
+            position: relative;
         }
 
         .download-btn:hover {
             border-color: var(--primary-color);
             box-shadow: 0 4px 12px rgba(224, 102, 16, 0.15);
             transform: translateY(-1px);
+        }
+
+        .badge-soon {
+            position: absolute;
+            top: -6px; /* sit a bit above the card so it doesn't touch text */
+            right: 8px;
+            background: var(--primary-color);
+            color: #fff;
+            font-size: 10px;
+            line-height: 1;
+            padding: 4px 6px;
+            border-radius: 9999px;
+            box-shadow: 0 2px 6px rgba(224,102,16,.25);
+            letter-spacing: .2px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        @media (max-width: 992px) {
+            .download-buttons {
+                grid-template-columns: repeat(2, 1fr);
+                max-width: 640px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .download-buttons {
+                grid-template-columns: 1fr;
+                max-width: 320px;
+            }
         }
 
         .download-btn-icon {
@@ -2322,6 +2352,7 @@
             display: flex;
             flex-direction: column;
             align-items: flex-start;
+            text-align: left;
         }
 
         .download-btn-title {
@@ -2917,9 +2948,8 @@
                 <span class="hamburger-line"></span>
             </button>
             <ul class="nav-links" id="navLinks">
-                <li><a href="#features" data-i18n="nav-features">Funktionen</a></li>
-                <li><a href="#demo" data-i18n="nav-demo">Demo</a></li>
                 <li><a href="#gallery" data-i18n="nav-gallery">Screenshots</a></li>
+                <li><a href="#features" data-i18n="nav-features">Funktionen</a></li>
                 <li><a href="#zielgruppen" data-i18n="nav-groups">Zielgruppen</a></li>
                 <li><a href="#download" class="download-btn-header" data-i18n="nav-download">Download</a></li>
                 <li>
@@ -3013,7 +3043,7 @@
                     deine Ziele effizienter denn je.
                 </p>
                 <a href="#download" class="cta-button" data-i18n="hero-cta">
-                    Demnächst verfügbar
+                    Jetzt loslegen
                 </a>
             </div>
             <div class="hero-visual parallax-element">
@@ -3022,6 +3052,7 @@
                     Lass uns deine Produktivität revolutionieren
                 </div>
             </div>
+            
         </div>
     </section>
 
@@ -3514,7 +3545,15 @@
                 <p data-i18n="download-subtitle">Verfügbar für alle deine Geräte - bald auch als native App</p>
             </div>
             <div class="download-buttons">
+                <div class="download-btn" onclick="openWebAppModal()">
+                    <img src="assets/images/icon-512.png" alt="Web App Icon" class="download-icon">
+                    <div class="download-btn-content">
+                        <div class="download-btn-title" data-i18n="download-webapp">Web App</div>
+                        <div class="download-btn-subtitle" data-i18n="download-webapp-desc">Im Browser nutzen</div>
+                    </div>
+                </div>
                 <div class="download-btn" onclick="openDownloadModal('macos')">
+                    <span class="badge-soon" data-i18n="badge-soon">Demnächst</span>
                     <img src="assets/images/apple.svg" alt="Apple Logo" class="download-icon">
                     <div class="download-btn-content">
                         <div class="download-btn-title" data-i18n="download-macos">macOS</div>
@@ -3522,6 +3561,7 @@
                     </div>
                 </div>
                 <div class="download-btn" onclick="openDownloadModal('windows')">
+                    <span class="badge-soon" data-i18n="badge-soon">Demnächst</span>
                     <img src="assets/images/windows.svg" alt="Windows Logo" class="download-icon">
                     <div class="download-btn-content">
                         <div class="download-btn-title" data-i18n="download-windows">Windows</div>
@@ -3529,12 +3569,19 @@
                     </div>
                 </div>
                 <div class="download-btn" onclick="openDownloadModal('linux')">
+                    <span class="badge-soon" data-i18n="badge-soon">Demnächst</span>
                     <img src="assets/images/linux.svg" alt="Linux Logo" class="download-icon">
                     <div class="download-btn-content">
                         <div class="download-btn-title" data-i18n="download-linux">Linux</div>
                         <div class="download-btn-subtitle" data-i18n="download-linux-desc">Für alle Distributionen</div>
                     </div>
                 </div>
+            </div>
+            <div class="github-link" style="text-align:center; margin-top:12px;">
+                <a href="https://github.com/Edelbertschen/taskfuchs" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:.5rem; color: #9aa0a6; text-decoration: none; font-weight: 600;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M12 .5a12 12 0 0 0-3.79 23.39c.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.35-1.76-1.35-1.76-1.1-.75.08-.74.08-.74 1.22.09 1.86 1.26 1.86 1.26 1.08 1.85 2.83 1.32 3.52 1.01.11-.78.42-1.32.76-1.62-2.66-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.16 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.64.24 2.86.12 3.16.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.62-5.49 5.92.43.37.82 1.1.82 2.22v3.29c0 .32.21.69.83.57A12 12 0 0 0 12 .5z"/></svg>
+                    GitHub
+                </a>
             </div>
         </div>
     </section>
@@ -3557,6 +3604,27 @@
                     <strong>Möchtest du benachrichtigt werden?</strong><br>
                     Folge uns oder trage dich in unseren Newsletter ein, um als Erste:r informiert zu werden!
                 </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Web App Info Modal -->
+    <div id="webappModal" class="download-modal" onclick="closeWebAppModal()">
+        <div class="download-modal-content" onclick="event.stopPropagation()">
+            <button class="download-modal-close" onclick="closeWebAppModal()">&times;</button>
+            <div class="download-modal-inner">
+                <div class="modal-header" style="justify-content:flex-start; gap:.75rem;">
+                    <img src="assets/images/icon-512.png" alt="Web App" class="modal-icon">
+                    <h3 style="margin:0;" data-i18n="webapp-modal-title">Web App</h3>
+                </div>
+                <ul style="margin: .5rem 0 1.25rem 1.25rem; line-height: 1.7; color: var(--text-light); text-align:left;">
+                    <li data-i18n="webapp-modal-list-desktop">Desktop (Chrome/Edge): Menü „App installieren“/„Installieren“.</li>
+                    <li data-i18n="webapp-modal-list-ios">iOS (Safari): Teilen → „Zum Home‑Bildschirm“.</li>
+                    <li data-i18n="webapp-modal-list-android">Android (Chrome): Drei‑Punkte‑Menü → „App installieren“.</li>
+                </ul>
+                <div style="display:flex; gap:.5rem; justify-content:center;">
+                    <a href="https://app.taskfuchs.de" target="_blank" rel="noopener" class="cta-button" style="text-decoration:none;" data-i18n="webapp-modal-button">app.taskfuchs.de</a>
+                </div>
             </div>
         </div>
     </div>
@@ -4372,7 +4440,7 @@
                 'hero-title': 'Produktivität war noch nie so smart',
                 'hero-subtitle': 'Die intelligente App, die deine Aufgaben versteht',
                 'hero-description': 'TaskFuchs ist dein persönlicher Produktivitäts-Assistent. Mit smarter Aufgabeneingabe, intelligentem Projektmanagement und einem charmanten Fuchs an deiner Seite erreichst du deine Ziele effizienter denn je.',
-                'hero-cta': 'Demnächst verfügbar',
+                'hero-cta': 'Jetzt loslegen',
                 'hero-speech': 'Lass uns Deine Produktivität revolutionieren',
                 'features-title': 'Funktionen, die begeistern',
                 'features-subtitle': 'TaskFuchs bietet alles, was du für maximale Produktivität brauchst',
@@ -4517,10 +4585,18 @@
                 'download-windows-desc': 'Für PC & Laptop',
                 'download-linux': 'Linux',
                 'download-linux-desc': 'Für alle Distributionen',
+                'download-webapp': 'Web App',
+                'download-webapp-desc': 'Im Browser nutzen',
+                'badge-soon': 'Demnächst',
                 'download-coming-soon': 'Bald verfügbar',
                 'download-modal-title': 'TaskFuchs für [OS]',
                 'download-modal-text': 'Wir arbeiten hart daran, TaskFuchs für alle Plattformen verfügbar zu machen. Die native App wird bald veröffentlicht und bietet noch bessere Performance und Integration.',
-                'download-modal-notify': 'Möchtest du benachrichtigt werden? Folge uns oder trage dich in unseren Newsletter ein, um als Erste:r informiert zu werden!'
+                'download-modal-notify': 'Möchtest du benachrichtigt werden? Folge uns oder trage dich in unseren Newsletter ein, um als Erste:r informiert zu werden!',
+                'webapp-modal-title': 'Web App',
+                'webapp-modal-list-desktop': 'Desktop (Chrome/Edge): Menü „App installieren“/„Installieren“.',
+                'webapp-modal-list-ios': 'iOS (Safari): Teilen → „Zum Home‑Bildschirm“.',
+                'webapp-modal-list-android': 'Android (Chrome): Drei‑Punkte‑Menü → „App installieren“.',
+                'webapp-modal-button': 'app.taskfuchs.de'
             },
             en: {
                 'nav-features': 'Features',
@@ -4533,6 +4609,10 @@
                 'hero-subtitle': 'The intelligent app that understands your tasks',
                 'hero-description': 'TaskFuchs is your personal productivity assistant. With smart task input, intelligent project management, and a charming fox by your side, you reach your goals more efficiently than ever.',
                 'hero-cta': 'Coming Soon',
+                'download-webapp': 'Web App',
+                'download-webapp-desc': 'Use in browser',
+                'badge-soon': 'Coming soon',
+                'download-linux-desc': 'For all distributions',
                 'hero-speech': 'Let\'s revolutionize your productivity',
                 'features-title': 'Features that inspire',
                 'features-subtitle': 'TaskFuchs offers everything you need for maximum productivity',
@@ -4685,7 +4765,12 @@
                 'download-coming-soon': 'Coming Soon',
                 'download-modal-title': 'TaskFuchs for [OS]',
                 'download-modal-text': 'We are working hard to make TaskFuchs available for all platforms. The native app will be released soon and offers even better performance and integration.',
-                'download-modal-notify': 'Want to be notified? Follow us or sign up for our newsletter to be the first to know!'
+                'download-modal-notify': 'Want to be notified? Follow us or sign up for our newsletter to be the first to know!',
+                'webapp-modal-title': 'Web App',
+                'webapp-modal-list-desktop': 'Desktop (Chrome/Edge): Menu “Install app”/“Install”.',
+                'webapp-modal-list-ios': 'iOS (Safari): Share → “Add to Home Screen”.',
+                'webapp-modal-list-android': 'Android (Chrome): Three‑dot menu → “Install app”.',
+                'webapp-modal-button': 'app.taskfuchs.de'
             }
         };
 
@@ -5120,6 +5205,23 @@
         function closeDownloadModal() {
             const modal = document.getElementById('downloadModal');
             
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+            }, 300);
+        }
+
+        // Web App Modal functions
+        function openWebAppModal() {
+            const modal = document.getElementById('webappModal');
+            modal.style.display = 'block';
+            setTimeout(() => modal.classList.add('show'), 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeWebAppModal() {
+            const modal = document.getElementById('webappModal');
             modal.classList.remove('show');
             setTimeout(() => {
                 modal.style.display = 'none';

@@ -13,6 +13,7 @@ export async function dropboxUpload(
   const appKey: string = prefs.appKey || '';
   const refreshToken: string | undefined = prefs.refreshToken;
   let accessToken: string | undefined = prefs.accessToken;
+  let expiresAt: number | undefined = prefs.expiresAt;
   let passphrase = opts?.passphraseOverride || '';
   if (!passphrase) {
     passphrase = prefs.rememberPassphrase ? (localStorage.getItem('taskfuchs_dropbox_passphrase') || '') : '';
@@ -20,13 +21,22 @@ export async function dropboxUpload(
   if (!passphrase) throw new Error('Passphrase erforderlich');
 
   const client = new DropboxClient(appKey, `${window.location.origin}/auth/dropbox.html`);
-  if (!accessToken && refreshToken) {
-    const t = await client.refreshToken(refreshToken);
-    accessToken = t.access_token;
-    const expiresAt = t.expires_in ? Date.now() + t.expires_in * 1000 : undefined;
-    dispatch({ type: 'UPDATE_PREFERENCES', payload: { dropbox: { ...prefs, accessToken, expiresAt } } });
-  }
-  if (!accessToken) throw new Error('Nicht verbunden');
+
+  // Ensure a valid access token (refresh if missing or expired/near expiry)
+  const ensureValidToken = async (): Promise<string> => {
+    let token = accessToken;
+    const needsRefresh = !token || (expiresAt && Date.now() > (expiresAt - 60_000));
+    if (needsRefresh) {
+      if (!refreshToken) throw new Error('Nicht verbunden');
+      const t = await client.refreshToken(refreshToken);
+      token = t.access_token;
+      expiresAt = t.expires_in ? Date.now() + t.expires_in * 1000 : undefined;
+      accessToken = token;
+      dispatch({ type: 'UPDATE_PREFERENCES', payload: { dropbox: { ...prefs, accessToken: token, expiresAt } } });
+    }
+    return token as string;
+  };
+  accessToken = await ensureValidToken();
 
   // Build full export payload (same scope as JSON-Export)
   const exportPayload = {
@@ -69,10 +79,28 @@ export async function dropboxUpload(
   try {
     const existing = await client.downloadEncrypted(accessToken, filePath);
     if (existing) rev = existing.rev;
-  } catch {}
+  } catch {
+    // If access was denied, try one refresh and retry
+    try {
+      accessToken = await ensureValidToken();
+      const existingRetry = await client.downloadEncrypted(accessToken, filePath);
+      if (existingRetry) rev = existingRetry.rev;
+    } catch {}
+  }
 
   // If a different remote exists (rev mismatch on update), caller should handle. Here we just try update or add.
-  await client.uploadEncrypted(accessToken, filePath, encrypted.data, rev);
+  try {
+    await client.uploadEncrypted(accessToken, filePath, encrypted.data, rev);
+  } catch (e: any) {
+    // Retry once on token problems
+    const msg = String(e?.message || '');
+    if (/401|invalid_access_token|expired/i.test(msg)) {
+      accessToken = await ensureValidToken();
+      await client.uploadEncrypted(accessToken, filePath, encrypted.data, rev);
+    } else {
+      throw e;
+    }
+  }
 
   if (opts?.passphraseOverride && prefs.rememberPassphrase) {
     try { localStorage.setItem('taskfuchs_dropbox_passphrase', opts.passphraseOverride); } catch {}
@@ -99,6 +127,7 @@ export async function dropboxDownload(
   const appKey: string = prefs.appKey || '';
   const refreshToken: string | undefined = prefs.refreshToken;
   let accessToken: string | undefined = prefs.accessToken;
+  let expiresAt: number | undefined = prefs.expiresAt;
   let passphrase = opts?.passphraseOverride || '';
   if (!passphrase) {
     passphrase = prefs.rememberPassphrase ? (localStorage.getItem('taskfuchs_dropbox_passphrase') || '') : '';
@@ -106,17 +135,36 @@ export async function dropboxDownload(
   if (!passphrase) throw new Error('Passphrase erforderlich');
 
   const client = new DropboxClient(appKey, `${window.location.origin}/auth/dropbox.html`);
-  if (!accessToken && refreshToken) {
-    const t = await client.refreshToken(refreshToken);
-    accessToken = t.access_token;
-    const expiresAt = t.expires_in ? Date.now() + t.expires_in * 1000 : undefined;
-    dispatch({ type: 'UPDATE_PREFERENCES', payload: { dropbox: { ...prefs, accessToken, expiresAt } } });
-  }
-  if (!accessToken) throw new Error('Nicht verbunden');
+
+  const ensureValidToken = async (): Promise<string> => {
+    let token = accessToken;
+    const needsRefresh = !token || (expiresAt && Date.now() > (expiresAt - 60_000));
+    if (needsRefresh) {
+      if (!refreshToken) throw new Error('Nicht verbunden');
+      const t = await client.refreshToken(refreshToken);
+      token = t.access_token;
+      expiresAt = t.expires_in ? Date.now() + t.expires_in * 1000 : undefined;
+      accessToken = token;
+      dispatch({ type: 'UPDATE_PREFERENCES', payload: { dropbox: { ...prefs, accessToken: token, expiresAt } } });
+    }
+    return token as string;
+  };
+  accessToken = await ensureValidToken();
 
   const folder = opts?.folderPathOverride || prefs.folderPath || '/Apps/TaskFuchs';
   const filePath = `${folder}/state.enc`;
-  const existing = await client.downloadEncrypted(accessToken, filePath);
+  let existing = null as any;
+  try {
+    existing = await client.downloadEncrypted(accessToken, filePath);
+  } catch (e: any) {
+    const msg = String(e?.message || '');
+    if (/401|invalid_access_token|expired/i.test(msg)) {
+      accessToken = await ensureValidToken();
+      existing = await client.downloadEncrypted(accessToken, filePath);
+    } else {
+      throw e;
+    }
+  }
   if (!existing) throw new Error(`Keine Sicherung gefunden in "${folder}"`);
 
   let remoteState: any;

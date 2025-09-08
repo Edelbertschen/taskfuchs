@@ -1485,7 +1485,7 @@ export function TaskBoard() {
       if (isSingle) {
         // In single-column view keep the column at a reasonable width like in multi-column layout
         elements.push(
-          <div key={`single-wrap-${column.id}`} style={{ flex: '0 0 420px', maxWidth: 420, width: 420, margin: '0 auto' }}>
+          <div key={`single-wrap-${column.id}`} style={{ flex: '0 0 702px', maxWidth: 702, width: 702, margin: '0 auto' }}>
             {columnNode}
           </div>
         );

@@ -12,7 +12,8 @@ import {
   ExternalLink,
   Check,
   X,
-  Loader
+  Loader,
+  SkipForward
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { timerService } from '../../utils/timerService';
@@ -34,6 +35,11 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
   const activeTimer = state.activeTimer;
   const isRunning = activeTimer?.isActive && !activeTimer?.isPaused;
   const isDarkMode = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+  const [focusMinutesToday, setFocusMinutesToday] = useState<number>(0);
+  const [focusStreakDays, setFocusStreakDays] = useState<number>(0);
+  const [showQuickAdd, setShowQuickAdd] = useState<boolean>(false);
+  const [quickAddValue, setQuickAddValue] = useState<string>('');
+  const [showSyncDetail, setShowSyncDetail] = useState<boolean>(false);
 
   // Update Pomodoro session state regularly
   useEffect(() => {
@@ -44,6 +50,51 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
     
     return () => clearInterval(interval);
   }, []);
+
+  // Track focus minutes (micro-motivation) – increments every 60s while a timer is running
+  useEffect(() => {
+    const storageKeyFor = (d: Date) => `taskfuchs-focus-minutes-${d.toISOString().slice(0,10)}`;
+    const readToday = () => {
+      try { return parseInt(localStorage.getItem(storageKeyFor(new Date())) || '0') || 0; } catch { return 0; }
+    };
+    const writeToday = (v: number) => { try { localStorage.setItem(storageKeyFor(new Date()), String(v)); } catch {} };
+    setFocusMinutesToday(readToday());
+    // compute streak (consecutive days with minutes > 0)
+    const computeStreak = () => {
+      let streak = 0; const d = new Date();
+      while (true) {
+        const key = `taskfuchs-focus-minutes-${d.toISOString().slice(0,10)}`;
+        const v = parseInt((() => { try { return localStorage.getItem(key) || '0'; } catch { return '0'; } })());
+        if (v > 0) { streak += 1; d.setDate(d.getDate() - 1); } else { break; }
+      }
+      setFocusStreakDays(streak);
+    };
+    computeStreak();
+    if (!isRunning) return;
+    const id = setInterval(() => {
+      const current = readToday() + 1; // add 1 minute
+      writeToday(current);
+      setFocusMinutesToday(current);
+      computeStreak();
+    }, 60000);
+    return () => clearInterval(id);
+  }, [isRunning]);
+
+  // Global key handler for Quick Add (q)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const isInput = ['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName || '') || (e.target as HTMLElement)?.getAttribute('contenteditable') === 'true';
+      if (!isInput && e.key.toLowerCase() === 'q') {
+        e.preventDefault();
+        setShowQuickAdd(true);
+        setQuickAddValue('');
+      } else if (e.key === 'Escape' && showQuickAdd) {
+        setShowQuickAdd(false);
+      }
+    };
+    window.addEventListener('keydown', onKey, true);
+    return () => window.removeEventListener('keydown', onKey, true);
+  }, [showQuickAdd]);
 
   // Monitor timer warnings - AKTIVIERT für Modal-Anzeige
   useEffect(() => {
@@ -67,8 +118,8 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
     // Check for Pomodoro session end
     if (activeTimer.mode === 'pomodoro' && pomodoroSession && pomodoroSession.sessionRemainingTime <= 0) {
       if (!lastWarningTime.pomodoro || Date.now() - lastWarningTime.pomodoro >= 60000) {
-        // Play ENHANCED Pomodoro completion sound
-        playCompletionSound('pomodoro_alarm', state.preferences.soundVolume);
+        // Play notice sound for Pomodoro session end
+        playCompletionSound('notice', state.preferences.soundVolume);
         setWarningType('pomodoro');
         setShowWarningModal(true);
         setLastWarningTime(prev => ({ ...prev, pomodoro: Date.now() }));
@@ -153,16 +204,95 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
     return Math.min((elapsedTime / totalTime) * 100, 100);
   };
 
-  const handlePlayPause = () => {
-    if (isRunning) {
-      dispatch({ type: 'PAUSE_TIMER' });
-    } else {
-      dispatch({ type: 'RESUME_TIMER' });
+  // Helpers for tooltips
+  const getPomodoroPhaseLabel = () => {
+    if (!pomodoroSession) return '';
+    switch (pomodoroSession.type) {
+      case 'work': return 'Arbeitsphase';
+      case 'shortBreak': return 'Kurze Pause';
+      case 'longBreak': return 'Lange Pause';
+      default: return 'Pomodoro';
     }
   };
 
-  const handleStop = () => {
-    dispatch({ type: 'STOP_TIMER' });
+  const getPomodoroTooltip = () => {
+    if (!pomodoroSession) return '';
+    return `${getPomodoroPhaseLabel()} ${formatTime(Math.max(0, pomodoroSession.sessionRemainingTime || 0))} übrig`;
+  };
+
+  // Quick Add handler
+  const handleQuickAddSubmit = () => {
+    const raw = quickAddValue.trim();
+    if (!raw) { setShowQuickAdd(false); return; }
+    // Parse tags (#tag) and priority (!h/!m/!l) and time (e.g., 30m, 1h)
+    const tags = Array.from(new Set((raw.match(/#[\w-]+/g) || []).map(t => t.replace(/^#/, ''))));
+    let priority: 'high'|'medium'|'low'|'none' = 'none';
+    if (/!h\b/i.test(raw)) priority = 'high'; else if (/!m\b/i.test(raw)) priority = 'medium'; else if (/!l\b/i.test(raw)) priority = 'low';
+    let estimatedTime = 0;
+    const timeMatch = raw.match(/(\d+)(h|m)\b/i);
+    if (timeMatch) {
+      const val = parseInt(timeMatch[1]);
+      estimatedTime = timeMatch[2].toLowerCase() === 'h' ? val * 60 : val;
+    }
+    const title = raw
+      .replace(/#[\w-]+/g, '')
+      .replace(/!([hml])\b/gi, '')
+      .replace(/(\d+)(h|m)\b/i, '')
+      .trim() || 'Neue Aufgabe';
+    const newTask = {
+      id: `task-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
+      title,
+      description: '',
+      priority,
+      estimatedTime: estimatedTime || undefined,
+      tags,
+      completed: false,
+      archived: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      columnId: 'inbox',
+      position: 0,
+      subtasks: [],
+    } as any;
+    dispatch({ type: 'ADD_TASK', payload: newTask });
+    setShowQuickAdd(false);
+  };
+
+  // Unified controls for Task + Pomodoro to avoid duplicate buttons
+  const handleUnifiedPlayPause = () => {
+    // If task timer exists, toggle it
+    if (activeTimer) {
+      if (isRunning) {
+        dispatch({ type: 'PAUSE_TIMER' });
+        if (pomodoroSession && !pomodoroSession.isPaused) {
+          timerService.pausePomodoroSession();
+        }
+      } else {
+        dispatch({ type: 'RESUME_TIMER' });
+        if (pomodoroSession && pomodoroSession.isPaused) {
+          timerService.resumePomodoroSession();
+        }
+      }
+      return;
+    }
+    // If no task timer, control Pomodoro only
+    if (pomodoroSession) {
+      if (pomodoroSession.isPaused) {
+        timerService.resumePomodoroSession();
+      } else {
+        timerService.pausePomodoroSession();
+      }
+    }
+  };
+
+  const handleUnifiedStop = () => {
+    if (activeTimer) {
+      dispatch({ type: 'STOP_TIMER' });
+      return;
+    }
+    if (pomodoroSession) {
+      timerService.stopPomodoroSession();
+    }
   };
 
   const handleOpenTask = () => {
@@ -171,16 +301,11 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
     }
   };
 
-  const handleSkipPomodoroPhase = () => {
-    if (pomodoroSession) {
-      // Skip to next phase
+  const handlePomodoroSkipOrEnd = () => {
+    if (!pomodoroSession) return;
+    if (pomodoroSession.type === 'work') {
       timerService.skipPomodoroPhase();
-    }
-  };
-
-  const handleEndPomodoroBreak = () => {
-    if (pomodoroSession && (pomodoroSession.type === 'shortBreak' || pomodoroSession.type === 'longBreak')) {
-      // End break and start new work session
+    } else {
       timerService.endPomodoroBreak();
     }
   };
@@ -270,7 +395,7 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
               {pomodoroSession && (
                 <>
                   <div className="w-px h-6 bg-gray-300 dark:bg-gray-600" />
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2" title={getPomodoroTooltip()}>
                     <Coffee className="w-3.5 h-3.5 text-red-500" />
                     <span className="text-lg font-mono font-semibold text-red-500">
                       {formatTime(pomodoroSession.sessionRemainingTime || 0)}
@@ -278,6 +403,18 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
                     <span className="text-xs text-gray-400">
                       #{pomodoroSession.sessionNumber}
                     </span>
+                    {/* Contextual Pomodoro action: Skip work or End break */}
+                    <button
+                      onClick={handlePomodoroSkipOrEnd}
+                      className="ml-1 px-2 py-0.5 rounded-md text-xs font-medium transition-all duration-200 hover:opacity-90 border"
+                      style={{ backgroundColor: 'transparent', color: state.preferences.accentColor, borderColor: state.preferences.accentColor }}
+                      title={pomodoroSession.type === 'work' ? 'Phase überspringen' : 'Pause beenden'}
+                    >
+                      <div className="flex items-center space-x-1">
+                        <SkipForward className="w-3 h-3" />
+                        <span>{pomodoroSession.type === 'work' ? 'Skip' : 'Ende'}</span>
+                      </div>
+                    </button>
                   </div>
                 </>
               )}
@@ -285,32 +422,66 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
 
             {/* Right: Controls */}
             <div className="flex items-center space-x-2 flex-1 justify-end">
-              {/* Task controls */}
-              {activeTimer && (
+              {/* Unified controls (Task + Pomodoro) */}
+              {(activeTimer || pomodoroSession) && (
                 <>
-                  <button onClick={handlePlayPause} className="w-7 h-7 rounded-full flex items-center justify-center transition-all duration-200 hover:opacity-80 text-white shadow-sm" style={{ backgroundColor: isRunning ? '#f59e0b' : state.preferences.accentColor }}>
-                    {isRunning ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+                  <button
+                    onClick={handleUnifiedPlayPause}
+                    className="w-7 h-7 rounded-full flex items-center justify-center transition-all duration-200 hover:opacity-80 text-white shadow-sm"
+                    style={{ backgroundColor: state.preferences.accentColor }}
+                    title={(activeTimer ? isRunning : !(pomodoroSession && pomodoroSession.isPaused)) ? 'Pausieren' : 'Fortsetzen'}
+                  >
+                    {(activeTimer ? isRunning : !(pomodoroSession && pomodoroSession.isPaused)) ? (
+                      <Pause className="w-3.5 h-3.5" />
+                    ) : (
+                      <Play className="w-3.5 h-3.5" />
+                    )}
                   </button>
-                  <button onClick={handleStop} className="w-7 h-7 rounded-full bg-gray-400 hover:bg-gray-500 text-white flex items-center justify-center transition-all duration-200 hover:opacity-80 shadow-sm">
+                  <button
+                    onClick={handleUnifiedStop}
+                    className="w-7 h-7 rounded-full bg-gray-400 hover:bg-gray-500 text-white flex items-center justify-center transition-all duration-200 hover:opacity-80 shadow-sm"
+                    title={activeTimer ? 'Timer stoppen' : 'Pomodoro beenden'}
+                  >
                     <Square className="w-3 h-3" />
                   </button>
                 </>
               )}
-              {/* Pomodoro independent controls */}
-              {pomodoroSession ? (
-                <>
-                  <button onClick={() => (pomodoroSession.isPaused ? timerService.resumePomodoroSession() : timerService.pausePomodoroSession())} className="w-7 h-7 rounded-full flex items-center justify-center transition-all duration-200 hover:opacity-80 text-white shadow-sm" style={{ backgroundColor: pomodoroSession.isPaused ? state.preferences.accentColor : '#f59e0b' }} title={pomodoroSession.isPaused ? 'Fortsetzen' : 'Pausieren'}>
-                    {pomodoroSession.isPaused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
-                  </button>
-                  <button onClick={() => timerService.stopPomodoroSession()} className="w-7 h-7 rounded-full bg-gray-400 hover:bg-gray-500 text-white flex items-center justify-center transition-all duration-200 hover:opacity-80 shadow-sm" title={'Pomodoro beenden'}>
-                    <Square className="w-3 h-3" />
-                  </button>
-                </>
-              ) : (
-                <button onClick={() => timerService.startPomodoroSession()} className="w-7 h-7 rounded-full flex items-center justify-center transition-all duration-200 hover:opacity-80 text-white shadow-sm" style={{ backgroundColor: state.preferences.accentColor }} title={'Pomodoro starten'}>
-                  <Play className="w-3.5 h-3.5" />
-                </button>
+              {/* Sync badge */}
+              {state.preferences?.dropbox?.enabled && (
+                <div className="relative">
+                  {(() => {
+                    const st = state.preferences.dropbox;
+                    const status = st.lastSyncStatus || 'idle';
+                    const color = status === 'success' ? '#10b981' : status === 'error' ? '#ef4444' : '#f59e0b';
+                    const last = st.lastSync ? new Date(st.lastSync) : null;
+                    const timeStr = last ? last.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '–';
+                    return (
+                      <button
+                        onClick={() => setShowSyncDetail(v => !v)}
+                        className="flex items-center gap-1 px-2 py-1 rounded-md text-xs border transition-all"
+                        style={{ borderColor: color, color }}
+                        title={`Sync: ${status} · ${timeStr}`}
+                      >
+                        <span className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
+                        <span>{timeStr}</span>
+                      </button>
+                    );
+                  })()}
+                  {showSyncDetail && (
+                    <div className="absolute right-0 mt-1 min-w-[200px] p-2 rounded-md shadow-lg text-xs border bg-white dark:bg-gray-800 dark:text-white" onMouseLeave={() => setShowSyncDetail(false)}>
+                      <div className="font-semibold mb-1">Dropbox Sync</div>
+                      <div>Status: {state.preferences.dropbox.lastSyncStatus || 'idle'}</div>
+                      <div>Letzter Sync: {state.preferences.dropbox.lastSync ? new Date(state.preferences.dropbox.lastSync).toLocaleString() : '–'}</div>
+                      {state.preferences.dropbox.lastSyncError && (<div className="text-red-500 mt-1">Fehler: {state.preferences.dropbox.lastSyncError}</div>)}
+                    </div>
+                  )}
+                </div>
               )}
+              {/* Micro-motivation */}
+              <div className="hidden sm:flex items-center gap-2 ml-2 text-xs text-gray-600 dark:text-gray-300" title={`Heute fokussiert: ${focusMinutesToday}m · Streak: ${focusStreakDays} Tage`}>
+                <span className="px-2 py-0.5 rounded-md border" style={{ borderColor: isDarkMode ? '#374151' : '#e5e7eb' }}>Heute {focusMinutesToday}m</span>
+                <span className="px-2 py-0.5 rounded-md border" style={{ borderColor: isDarkMode ? '#374151' : '#e5e7eb' }}>Streak {focusStreakDays}d</span>
+              </div>
               {/* Focus Mode Button */}
               <button
                 onClick={handleEnterFocusMode}
@@ -326,6 +497,25 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
           </div>
         </div>
       </div>
+
+      {/* Quick Add overlay */}
+      {showQuickAdd && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-16" onClick={() => setShowQuickAdd(false)}>
+          <div className="rounded-lg shadow-lg border bg-white dark:bg-gray-900 dark:text-white w-full max-w-xl mx-4" onClick={(e) => e.stopPropagation()}>
+            <div className="px-4 py-3 flex items-center gap-2">
+              <input
+                autoFocus
+                value={quickAddValue}
+                onChange={e => setQuickAddValue(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleQuickAddSubmit(); if (e.key === 'Escape') setShowQuickAdd(false); }}
+                placeholder="Blitz‑Task: Titel #tag 30m !h/!m/!l"
+                className="flex-1 bg-transparent outline-none text-sm"
+              />
+              <button className="px-3 py-1 rounded-md text-white text-sm" style={{ backgroundColor: state.preferences.accentColor }} onClick={handleQuickAddSubmit}>Anlegen</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Timer Warning Modal */}
       {showWarningModal && task && (

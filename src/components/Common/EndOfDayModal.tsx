@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
 import { syncManager, SyncLogEntry, SyncStats } from '../../utils/syncUtils';
 import type { Task, SyncStatus } from '../../types';
-import { format, addDays } from 'date-fns';
+import { format, nextMonday } from 'date-fns';
 import { de } from 'date-fns/locale';
 
 interface EndOfDayModalProps {
@@ -191,15 +191,19 @@ export function EndOfDayModal({ isOpen, onClose }: EndOfDayModalProps) {
   };
 
   const handleMoveIncomplete = () => {
-    const tomorrow = addDays(new Date(), 1);
-    const tomorrowString = format(tomorrow, 'yyyy-MM-dd');
-    
+    // Move to the upcoming Monday
+    const target = nextMonday(new Date());
+    const targetStr = format(target, 'yyyy-MM-dd');
+
+    // Ensure the date column exists before moving
+    dispatch({ type: 'ENSURE_DATE_COLUMN', payload: targetStr });
+
     incompleteTasks.forEach(task => {
       dispatch({
         type: 'MOVE_TASK',
         payload: {
           taskId: task.id,
-          columnId: `date-${tomorrowString}`
+          columnId: `date-${targetStr}`,
         }
       });
     });
@@ -468,7 +472,7 @@ export function EndOfDayModal({ isOpen, onClose }: EndOfDayModalProps) {
                   style={getAccentColorStyles().bg}
                 >
                   <ArrowRight className="w-4 h-4 mr-2 inline" />
-                  {i18n.language === 'en' ? 'Move to tomorrow' : 'Auf morgen'}
+                  {i18n.language === 'en' ? 'Move to next Monday' : 'Auf kommenden Montag'}
                 </button>
               </div>
             )}
@@ -554,8 +558,8 @@ export function EndOfDayModal({ isOpen, onClose }: EndOfDayModalProps) {
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
               {i18n.language === 'en' 
-                ? `Do you want to move all ${incompleteTasks.length} open tasks to tomorrow?`
-                : `Möchten Sie alle ${incompleteTasks.length} offenen Aufgaben in den morgigen Tag verschieben?`}
+                ? `Do you want to move all ${incompleteTasks.length} open tasks to next Monday?`
+                : `Möchten Sie alle ${incompleteTasks.length} offenen Aufgaben auf den kommenden Montag verschieben?`}
             </p>
             <div className="flex space-x-3">
               <button

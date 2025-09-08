@@ -522,11 +522,17 @@ function appReducer(state: AppState, action: AppAction): AppState {
         task.id === updatedTask.id ? updatedTask : task
       );
     
-      // Stop timer automatically when task is completed
+      // Stop task timer automatically when task is completed, but keep Pomodoro running
       let newActiveTimer = state.activeTimer;
       if (updatedTask.completed && state.activeTimer?.taskId === updatedTask.id) {
         try {
           timerService.stopTimer('completed');
+          // Ensure Pomodoro session (if enabled) continues running
+          try {
+            if (state.preferences?.pomodoro?.enabled && timerService.isPomodoroActive()) {
+              timerService.resumePomodoroSession();
+            }
+          } catch {}
           newActiveTimer = null;
         } catch (error) {
           console.error('Error stopping timer on task completion:', error);
