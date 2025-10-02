@@ -171,6 +171,8 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
 
   // Track modal position to place side navigation elegantly beside it
   const modalRef = useRef<HTMLDivElement | null>(null);
+  // Track if the backdrop received the original mousedown to avoid immediate close
+  const backdropMouseDownRef = useRef<boolean>(false);
   const updateNavPositions = useCallback(() => {
     if (!modalRef.current) return;
     const rect = modalRef.current.getBoundingClientRect();
@@ -1897,15 +1899,23 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
           pointerEvents: 'auto'
         }}
         onMouseDown={(e) => {
-          // Do not autoclose on mousedown; require explicit click release
+          // Register only if the press started on the backdrop itself
           if (e.target === e.currentTarget) {
+            backdropMouseDownRef.current = true;
             e.preventDefault();
+          } else {
+            backdropMouseDownRef.current = false;
           }
         }}
+        onMouseUp={() => {
+          // Reset on release
+          backdropMouseDownRef.current = false;
+        }}
         onClick={(e) => {
-          // Close only on explicit backdrop click (not when dragging)
-          if (e.target === e.currentTarget) {
+          // Close only if the interaction both started and ended on the backdrop
+          if (e.target === e.currentTarget && backdropMouseDownRef.current) {
             e.preventDefault();
+            backdropMouseDownRef.current = false;
             handleClose();
           }
         }}

@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { timerService } from '../../utils/timerService';
+import { formatTimeWithSecondsExact } from '../../utils/timeUtils';
 import { TimerWarningModal } from './TimerWarningModal';
 import { playCompletionSound } from '../../utils/soundUtils';
 
@@ -168,26 +169,8 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
     }
   };
 
-  // Format elapsed time with seconds (hh:mm:ss or mm:ss)
-  const formatTimeWithSeconds = (minutes: number): string => {
-    try {
-      if (typeof minutes !== 'number' || isNaN(minutes)) return '0:00';
-      // Avoid rounding artifacts and normalize strictly to HH:MM:SS / MM:SS
-      const negative = minutes < 0;
-      let totalSeconds = Math.floor(Math.abs(minutes) * 60 + 1e-6); // tiny epsilon
-      const hours = Math.floor(totalSeconds / 3600);
-      totalSeconds = totalSeconds % 3600;
-      const mins = Math.floor(totalSeconds / 60);
-      const secs = totalSeconds % 60;
-      const sign = negative ? '-' : '';
-      if (hours > 0) {
-        return `${sign}${hours}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-      }
-      return `${sign}${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-    } catch {
-      return '0:00';
-    }
-  };
+  // Format elapsed time with seconds (hh:mm:ss or mm:ss) using shared util
+  const formatTimeWithSeconds = (minutes: number): string => formatTimeWithSecondsExact(minutes);
 
   const getProgressPercentage = () => {
     if (!activeTimer) return 0;
@@ -380,7 +363,7 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
               {activeTimer ? (
                 <div className="flex items-center space-x-2">
                   <span className={`text-lg font-mono font-semibold ${isOvertime ? 'text-red-500' : (isDarkMode ? 'text-white' : 'text-gray-900')}`}>
-                    {formatTimeWithSeconds(activeTimer.elapsedTime || 0)}
+                    {formatTimeWithSecondsExact(activeTimer.elapsedTime || 0)}
                   </span>
                   {activeTimer.estimatedTime && (
                     <span className="text-xs text-gray-400">
@@ -406,7 +389,7 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
                       <Coffee className="w-3.5 h-3.5 text-red-500" />
                     )}
                     <span className="text-lg font-mono font-semibold text-red-500">
-                      {formatTimeWithSeconds(Math.max(0, pomodoroSession.sessionRemainingTime || 0))}
+                      {formatTimeWithSecondsExact(Math.max(0, pomodoroSession.sessionRemainingTime || 0))}
                     </span>
                     <span className="text-xs text-gray-400">
                       #{pomodoroSession.sessionNumber}
