@@ -511,15 +511,17 @@ export function NoteEditor({ onFullScreenToggle, emailViewModal, setEmailViewMod
                 <Archive className="w-4 h-4" />
               </button>
               
+              {/* Export menu: only show trigger if there are items to show */}
               <div className="relative">
-                <button
-                  onClick={() => setShowExportMenu(!showExportMenu)}
-                  className="p-2 rounded-lg bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600 transition-all"
-                  title={i18n.language === 'en' ? 'Export' : 'Exportieren'}
-                >
-                  <Download className="w-4 h-4" />
-                </button>
-                
+                {true && (
+                  <button
+                    onClick={() => setShowExportMenu(!showExportMenu)}
+                    className="p-2 rounded-lg bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600 transition-all"
+                    title={i18n.language === 'en' ? 'Export' : 'Exportieren'}
+                  >
+                    <Download className="w-4 h-4" />
+                  </button>
+                )}
                 {showExportMenu && (
                   <div className="absolute top-full left-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-[9999] py-2 min-w-[140px]" data-export-menu>
                     <button

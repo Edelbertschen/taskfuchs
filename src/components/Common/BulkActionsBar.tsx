@@ -10,7 +10,8 @@ import {
   Star,
   ArrowRight,
   MoreHorizontal,
-  Plus
+  Plus,
+  Pin as PinIcon
 } from 'lucide-react';
 import type { TaskPriority } from '../../types';
 import { format, parseISO } from 'date-fns';
@@ -22,6 +23,7 @@ interface BulkActionsBarProps {
 
 export function BulkActionsBar({ className = '' }: BulkActionsBarProps) {
   const { state, dispatch } = useApp();
+  const [showPinMenu, setShowPinMenu] = useState(false);
   const [showPriorityMenu, setShowPriorityMenu] = useState(false);
   const [showTagMenu, setShowTagMenu] = useState(false);
   const [showMoveMenu, setShowMoveMenu] = useState(false);
@@ -39,6 +41,7 @@ export function BulkActionsBar({ className = '' }: BulkActionsBarProps) {
 
   // Close only dropdown menus (keep bulk mode active)
   const closeAllMenus = useCallback(() => {
+    setShowPinMenu(false);
     setShowPriorityMenu(false);
     setShowTagMenu(false);
     setShowMoveMenu(false);
@@ -47,8 +50,9 @@ export function BulkActionsBar({ className = '' }: BulkActionsBarProps) {
   }, []);
 
   // Open only one menu at a time - atomic state update
-  const openMenuExclusively = useCallback((menuType: 'priority' | 'tag' | 'move' | 'more') => {
+  const openMenuExclusively = useCallback((menuType: 'priority' | 'tag' | 'move' | 'more' | 'pin') => {
     // Set all menu states atomically - only the selected one to true, all others to false
+    setShowPinMenu(menuType === 'pin');
     setShowPriorityMenu(menuType === 'priority');
     setShowTagMenu(menuType === 'tag');
     setShowMoveMenu(menuType === 'move');
@@ -176,6 +180,15 @@ export function BulkActionsBar({ className = '' }: BulkActionsBarProps) {
       }
     });
     closeAllMenus(); // Only close menus, keep bulk mode active
+  };
+
+  const handleAssignToPin = (pinColumnId: string) => {
+    if (!pinColumnId) return;
+    const selected = state.selectedTaskIds || [];
+    for (const taskId of selected) {
+      dispatch({ type: 'ASSIGN_TASK_TO_PIN', payload: { taskId, pinColumnId } });
+    }
+    closeAllMenus();
   };
 
   // Helper function to format column titles with weekday
@@ -468,6 +481,45 @@ export function BulkActionsBar({ className = '' }: BulkActionsBarProps) {
               </div>
             )}
           </div>
+
+          {/* Pin Menu */}
+          {state.pinColumns && state.pinColumns.length > 0 && (
+            <div className="relative">
+              <button
+                onClick={() => openMenuExclusively('pin')}
+                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 transition-colors"
+                title="An Pin-Spalte anheften"
+              >
+                <PinIcon className="w-5 h-5" />
+              </button>
+              {showPinMenu && (
+                <div className="absolute bottom-full mb-2 left-0 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-2 min-w-44 max-h-56 overflow-y-auto">
+                  {state.pinColumns.map((pinCol) => {
+                    const count = (state.tasks || []).filter(t => t.pinColumnId === pinCol.id).length;
+                    return (
+                      <button
+                        key={pinCol.id}
+                        onClick={() => handleAssignToPin(pinCol.id)}
+                        className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2"
+                      >
+                        <PinIcon className="w-4 h-4" />
+                        <span className="flex-1">{pinCol.title}</span>
+                        <span
+                          className="ml-2 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full text-xs font-medium"
+                          style={{ backgroundColor: state.preferences.accentColor + '26', color: state.preferences.accentColor }}
+                        >
+                          {count}
+                        </span>
+                      </button>
+                    );
+                  })}
+                  {state.pinColumns.length === 0 && (
+                    <div className="px-4 py-2 text-sm text-gray-500">Keine Pin-Spalten vorhanden</div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* More Actions */}
           <div className="relative">

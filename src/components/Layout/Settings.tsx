@@ -315,7 +315,11 @@ const Settings = React.memo(() => {
   // Background image gallery state
   const [backgroundImageGallery, setBackgroundImageGallery] = useState(() => {
     // Use local bundled backgrounds from public/backgrounds
-    const desiredDefaults = Array.from({ length: 12 }, (_, i) => `/backgrounds/bg${i + 1}.jpg`);
+    const desiredDefaults = [
+      '/backgrounds/bg12.png',
+      '/backgrounds/bg13.png',
+      ...Array.from({ length: 11 }, (_, i) => `/backgrounds/bg${i + 1}.jpg`),
+    ];
     const savedGallery = localStorage.getItem('backgroundImageGallery');
     
     if (savedGallery) {
@@ -664,11 +668,10 @@ const Settings = React.memo(() => {
     errors: 0
   });
   const [syncStatus, setSyncStatus] = useState<SyncStatus>({
-    connected: false,
     isActive: false,
     lastSync: '',
     status: 'idle'
-  });
+  } as any);
   const [isSyncing, setIsSyncing] = useState(false);
   const [showSyncLog, setShowSyncLog] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -733,27 +736,20 @@ const Settings = React.memo(() => {
 
   // Load saved theme colors on component mount
   useEffect(() => {
-    const savedAccentColor = localStorage.getItem('customAccentColor') || '#e06610';
+    const savedAccentColor = state?.preferences?.accentColor || '#e06610';
     const savedSecondaryColor = localStorage.getItem('customSecondaryColor') || '#22c55e';
     const savedSuccessColor = localStorage.getItem('customSuccessColor') || '#10b981';
     const savedWarningColor = localStorage.getItem('customWarningColor') || '#f59e0b';
     const savedDangerColor = localStorage.getItem('customDangerColor') || '#ef4444';
-    
+
     setCustomAccentColor(savedAccentColor);
     setCustomSecondaryColor(savedSecondaryColor);
     setCustomSuccessColor(savedSuccessColor);
     setCustomWarningColor(savedWarningColor);
     setCustomDangerColor(savedDangerColor);
     setHexInput(savedAccentColor);
-    
-    // Apply colors to CSS custom properties
+
     applyThemeColors(savedAccentColor, savedSecondaryColor, savedSuccessColor, savedWarningColor, savedDangerColor);
-    
-    // Update global state with saved accent color
-    dispatch({
-      type: 'UPDATE_PREFERENCES',
-      payload: { accentColor: savedAccentColor }
-    });
   }, [dispatch]);
 
   // Add search event listener
@@ -777,7 +773,7 @@ const Settings = React.memo(() => {
       // Setup status updates
       const handleStatusUpdate = (status: SyncStatus) => {
         setSyncStatus(status);
-        setConnectionStatus(status.connected ? 'connected' : 'disconnected');
+        setConnectionStatus((status as any).connected ? 'connected' : 'disconnected');
         if (status.lastSync) {
           setLastSync(new Date(status.lastSync).toLocaleString('de-DE'));
         }
@@ -805,7 +801,7 @@ const Settings = React.memo(() => {
 
   // Set new default image as background if no image is currently set
   useEffect(() => {
-    const defaultImage = 'https://pixabay.com/get/g130a7d6d61e42bcb9827277b30f578d67e48f415fa0f6c37170495993bb099b60661dc2f5c32879d0888ef0c577a2f24.jpg';
+    const defaultImage = '/backgrounds/bg12.png';
     if (!state.preferences.backgroundImage && backgroundImageGallery.includes(defaultImage)) {
       dispatch({
         type: 'UPDATE_PREFERENCES',
@@ -845,11 +841,11 @@ const Settings = React.memo(() => {
       case 'accent':
         setCustomAccentColor(color);
         setHexInput(color);
-        localStorage.setItem('customAccentColor', color);
         dispatch({
           type: 'UPDATE_PREFERENCES',
           payload: { accentColor: color }
         });
+        try { localStorage.setItem('taskfuchs-preferences', JSON.stringify({ ...state.preferences, accentColor: color })); } catch {}
         break;
       case 'secondary':
         setCustomSecondaryColor(color);
@@ -894,8 +890,8 @@ const Settings = React.memo(() => {
     setIsDarkMode(dm);
   }, [state.preferences.theme]);
 
-  const handleLanguageChange = (newLang: string) => {
-    const lang = normalizeLang(newLang);
+  const handleLanguageChange = (newLang: 'en' | 'de' | string) => {
+    const lang = normalizeLang(newLang) as 'en' | 'de';
     setLanguage(lang);
     i18n.changeLanguage(lang);
     localStorage.setItem('language', lang);
@@ -986,8 +982,8 @@ const Settings = React.memo(() => {
 
   // Sidebar customization handlers
   const handleSidebarItemVisibilityToggle = (itemId: string) => {
-    // Don't allow hiding essential items
-    const essentialItems = ['today', 'inbox', 'tasks'];
+    // Allow hiding today via settings as requested; keep 'tasks' essential
+    const essentialItems = ['tasks'];
     if (essentialItems.includes(itemId)) return;
     
     const updatedItems = sidebarItems.map(item =>
@@ -1425,7 +1421,7 @@ const Settings = React.memo(() => {
     return (
       <div className="space-y-8">
         {/* Toggl Status Header */}
-        <div className="p-6 rounded-lg border" style={{ 
+        <div className="settings-card p-6 border" style={{ 
           background: `linear-gradient(135deg, ${state.preferences.accentColor}15, ${state.preferences.accentColor}05)`,
           borderColor: `${state.preferences.accentColor}40`
         }}>
@@ -1722,7 +1718,7 @@ const Settings = React.memo(() => {
     return (
       <div className="space-y-8">
         {/* CalDAV Status Header */}
-        <div className="p-6 rounded-lg border" style={{ 
+        <div className="settings-card p-6 border" style={{ 
           background: `linear-gradient(135deg, ${state.preferences.accentColor}15, ${state.preferences.accentColor}05)`,
           borderColor: `${state.preferences.accentColor}40`
         }}>
@@ -1748,6 +1744,7 @@ const Settings = React.memo(() => {
                 </p>
               </div>
             </div>
+            {/* Primary actions top-right + accent live preview */}
             <div className="flex items-center space-x-2">
               <Toggle 
                 enabled={caldavEnabled} 
@@ -3074,25 +3071,10 @@ const Settings = React.memo(() => {
               });
             }
             
-            // Update local columns if needed
+            // NOTE: Preserve local project kanban columns when syncing manually.
+            // Skip applying remote renames/deletions to avoid losing local titles.
             if (result.localColumnsUpdated.length > 0 || result.localColumnsDeleted.length > 0) {
-              // Handle column updates
-              result.localColumnsUpdated.forEach(column => {
-                console.log(`📝 Updating TaskFuchs column: ${column.id} to "${column.title}" (renamed in Todoist)`);
-                dispatch({ 
-                  type: 'UPDATE_PROJECT_KANBAN_COLUMN', 
-                  payload: { 
-                    columnId: column.id, 
-                    title: column.title || 'Untitled'
-                  } 
-                });
-              });
-              
-              // Handle column deletions
-              result.localColumnsDeleted.forEach(columnId => {
-                console.log(`🗑️ Deleting TaskFuchs column: ${columnId} (deleted in Todoist)`);
-                dispatch({ type: 'DELETE_PROJECT_KANBAN_COLUMN', payload: columnId });
-              });
+              console.log(`ℹ️ Manual sync: Skipping ${result.localColumnsUpdated.length} column rename(s) and ${result.localColumnsDeleted.length} deletion(s) to protect local project columns.`);
             }
           
           // Note: Automatic date column creation is disabled
@@ -3125,7 +3107,6 @@ const Settings = React.memo(() => {
       setNewTodoistSyncMessage('');
       setNewTodoistSyncResult(null);
     };
-
     const isConfigured = newTodoistSyncConfig?.enabled && newTodoistSyncConfig?.apiToken && newTodoistSyncConfig?.projectMappings.length > 0;
     return (
       <div className="space-y-8">
@@ -3193,11 +3174,12 @@ const Settings = React.memo(() => {
               )}
                               <Toggle 
                   enabled={newTodoistSyncConfig?.enabled || false} 
-                  onChange={(enabled) => {
-                    if (enabled && !isConfigured) {
+                  onChange={() => {
+                    const newEnabled = !(newTodoistSyncConfig?.enabled || false);
+                    if (newEnabled && !isConfigured) {
                       setTodoistSetupDialogOpen(true);
                     } else {
-                      todoistSyncManager.updateConfig({ enabled });
+                      todoistSyncManager.updateConfig({ enabled: newEnabled });
                       setNewTodoistSyncConfig(todoistSyncManager.getConfig());
                     }
                   }} 
@@ -3211,7 +3193,7 @@ const Settings = React.memo(() => {
           <div className="text-center py-12">
             <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
                  style={{ backgroundColor: state.preferences.accentColor + '20' }}>
-              <Settings className="w-8 h-8" style={{ color: state.preferences.accentColor }} />
+              <SettingsIcon className="w-8 h-8" style={{ color: state.preferences.accentColor }} />
             </div>
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
               Todoist-Synchronisation einrichten
@@ -3781,8 +3763,10 @@ const Settings = React.memo(() => {
               </div>
             </div>
 
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Farben</h3>
+            <div className="settings-card p-6 border">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Farben</h3>
+              </div>
               <div className="space-y-4">
                 <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <div className="flex items-center justify-between mb-4">
@@ -3870,15 +3854,13 @@ const Settings = React.memo(() => {
 
             {/* Glasoptik-Effekte section removed: glass is auto-enabled when not in minimal design */}
 
-            <div className={state.preferences.minimalDesign ? 'opacity-50 pointer-events-none' : ''}>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                Hintergrund-Effekte
-                {state.preferences.minimalDesign && (
-                  <span className="text-sm font-normal text-gray-500 dark:text-gray-400 ml-2">
-                    (Im minimalistischen Design nicht verfügbar)
-                  </span>
-                )}
-              </h3>
+            <div className={`settings-card p-6 border ${state.preferences.minimalDesign ? 'opacity-50 pointer-events-none' : ''}`}>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Hintergrund-Effekte</h3>
+              </div>
+              {state.preferences.minimalDesign && (
+                <div className="text-sm font-normal text-gray-500 dark:text-gray-400 mb-4">(Im minimalistischen Design nicht verfügbar)</div>
+              )}
               <div className="space-y-4">
                 <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <div className="flex items-center justify-between mb-4">
@@ -3969,15 +3951,13 @@ const Settings = React.memo(() => {
 
             
 
-            <div className={state.preferences.minimalDesign ? 'opacity-50 pointer-events-none' : ''}>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                Hintergrund
-                {state.preferences.minimalDesign && (
-                  <span className="text-sm font-normal text-gray-500 dark:text-gray-400 ml-2">
-                    (Im minimalistischen Design nicht verfügbar)
-                  </span>
-                )}
-              </h3>
+            <div className={`settings-card p-6 border ${state.preferences.minimalDesign ? 'opacity-50 pointer-events-none' : ''}`}>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Hintergrund</h3>
+              </div>
+              {state.preferences.minimalDesign && (
+                <div className="text-sm font-normal text-gray-500 dark:text-gray-400 mb-4">(Im minimalistischen Design nicht verfügbar)</div>
+              )}
               <div className="space-y-6">
                 {/* Background Type Selector */}
                 <div>
@@ -4111,7 +4091,11 @@ const Settings = React.memo(() => {
                       {/* Restore default images */}
                       <button
                         onClick={() => {
-                          const defaults = Array.from({ length: 12 }, (_, i) => `/backgrounds/bg${i + 1}.jpg`);
+                          const defaults = [
+                            '/backgrounds/bg12.png',
+                            '/backgrounds/bg13.png',
+                            ...Array.from({ length: 11 }, (_, i) => `/backgrounds/bg${i + 1}.jpg`),
+                          ];
                           setBackgroundImageGallery(defaults);
                           localStorage.setItem('backgroundImageGallery', JSON.stringify(defaults));
                         }}
@@ -4690,7 +4674,7 @@ const Settings = React.memo(() => {
                           <MoreHorizontal className="w-4 h-4" />
                           <span>{t('common.more', { defaultValue: 'Mehr' })}</span>
                         </button>
-                        {['today', 'inbox', 'tasks'].includes(item.id) ? (
+                        {['inbox', 'tasks'].includes(item.id) ? (
                           <div 
                             className="p-1 text-gray-300 dark:text-gray-600 cursor-not-allowed"
                             title="Dieser Menüpunkt kann nicht ausgeblendet werden"
@@ -4725,7 +4709,7 @@ const Settings = React.memo(() => {
                   <div>
                     <h4 className="text-sm font-medium" style={{ color: state.preferences.accentColor }}>Hinweis</h4>
                     <p className="text-sm opacity-75 mt-1" style={{ color: state.preferences.accentColor }}>
-                      Die Punkte "Heute", "Inbox" und "Tagesplaner" können nicht ausgeblendet werden, da sie für die Grundfunktion der App erforderlich sind.
+                      Die Punkte "Inbox" und "Tagesplaner" können nicht ausgeblendet werden, da sie für die Grundfunktion der App erforderlich sind.
                     </p>
                   </div>
                 </div>
@@ -5046,7 +5030,7 @@ const Settings = React.memo(() => {
                               } : {}}
                               onClick={() => dispatch({
                                 type: 'UPDATE_PREFERENCES',
-                                payload: { completionSound: sound.value as SoundType }
+                                payload: { completionSound: (sound.value as 'yeah' | 'bell' | 'chime' | 'none') }
                               })}
                             >
                               <div>
@@ -5139,8 +5123,10 @@ const Settings = React.memo(() => {
                 Stelle die Timer-Anzeige ein, konfiguriere Pomodoro-Intervalle und verbinde optionale Zeit-Integrationen.
               </p>
             </div>
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Timer-Anzeige</h3>
+            <div className="settings-card p-6 border">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Timer-Anzeige</h3>
+              </div>
               <div className="space-y-4">
                 {/* Timer Display Mode Selection */}
                 <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
@@ -5196,8 +5182,10 @@ const Settings = React.memo(() => {
               </div>
             </div>
 
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Pomodoro-Technik</h3>
+            <div className="settings-card p-6 border">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Pomodoro-Technik</h3>
+              </div>
               <div className="space-y-6">
                 <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <div>
@@ -5349,7 +5337,7 @@ const Settings = React.memo(() => {
 
             {/* White Noise Settings - only show when Pomodoro enabled */}
             {state.preferences.pomodoro.enabled && (
-            <div>
+            <div className="settings-card p-6 border">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">White Noise</h3>
               <div className="space-y-6">
                 <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
@@ -5457,7 +5445,7 @@ const Settings = React.memo(() => {
             </div>
             )}
 
-            <div>
+            <div className="settings-card p-6 border">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Fokusmodus</h3>
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
@@ -5481,7 +5469,6 @@ const Settings = React.memo(() => {
             {renderTogglSection()}
           </div>
         );
-
       // integrations removed
       case 'toggl':
         return (
@@ -5775,10 +5762,10 @@ const Settings = React.memo(() => {
             </div>
 
             {/* Last Sync Info */}
-            {state.preferences.toggl?.lastSync && (
+            {(state.preferences.toggl as any)?.lastSync && (
               <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                 <div className="text-sm text-gray-600 dark:text-gray-400">
-                  Letzte Synchronisation: {new Date(state.preferences.toggl.lastSync).toLocaleString('de-DE')}
+                  Letzte Synchronisation: {new Date((state.preferences.toggl as any).lastSync).toLocaleString('de-DE')}
                 </div>
               </div>
             )}
@@ -6903,6 +6890,7 @@ const Settings = React.memo(() => {
                           if (!newIcalName.trim() || !newIcalUrl.trim()) return;
                           
                           const colors = ICalService.getDefaultColors();
+                          const nowIso = new Date().toISOString();
                           const newSource: CalendarSource = {
                             id: Date.now().toString(),
                             name: newIcalName.trim(),
@@ -6910,6 +6898,8 @@ const Settings = React.memo(() => {
                             color: colors[icalSources.length % colors.length],
                             enabled: true,
                             syncInterval: 60, // 1 hour
+                            createdAt: nowIso,
+                            updatedAt: nowIso,
                           };
                           
                           const updatedSources = [...icalSources, newSource];
@@ -7023,8 +7013,9 @@ const Settings = React.memo(() => {
                               
                               <Toggle 
                                 enabled={source.enabled} 
-                                onChange={(enabled) => {
-                                  const updatedSource = { ...source, enabled };
+                                onChange={() => {
+                                  const newEnabled = !source.enabled;
+                                  const updatedSource = { ...source, enabled: newEnabled };
                                   setIcalSources(prev => prev.map(s => s.id === source.id ? updatedSource : s));
                                   dispatch({ type: 'UPDATE_CALENDAR_SOURCE', payload: updatedSource });
                                 }} 

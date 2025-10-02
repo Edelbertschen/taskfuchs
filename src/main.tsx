@@ -11,69 +11,47 @@ try {
   document.body.setAttribute('data-has-js', 'true');
 } catch {}
 
-// PWA Update Banner using vite-plugin-pwa registerSW
-function showPWAUpdateBanner(onUpdate: () => void) {
-  if (document.getElementById('pwa-update-banner')) return;
-  const bar = document.createElement('div');
-  bar.id = 'pwa-update-banner';
-  bar.style.position = 'fixed';
-  bar.style.left = '0';
-  bar.style.right = '0';
-  bar.style.bottom = '0';
-  bar.style.zIndex = '99999';
-  bar.style.display = 'flex';
-  bar.style.gap = '12px';
-  bar.style.justifyContent = 'center';
-  bar.style.alignItems = 'center';
-  bar.style.padding = '12px 16px';
-  bar.style.background = 'rgba(17, 24, 39, 0.9)';
-  bar.style.color = '#fff';
-  bar.style.backdropFilter = 'saturate(180%) blur(8px)';
+// PWA-Update-Banner wird ausschließlich in App.tsx via useRegisterSW gehandhabt
 
-  const text = document.createElement('span');
-  text.textContent = 'Neue Version verfügbar';
-  text.style.fontWeight = '600';
+// Ensure PWA updates activate on manual reload and focus (no UI)
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  // @ts-ignore
+  import('virtual:pwa-register').then(({ registerSW }) => {
+    const updateSW = registerSW({
+      immediate: false,
+      onNeedRefresh() {
+        try { (window as any).__taskfuchs_applyUpdate = () => updateSW(true); } catch {}
+        window.dispatchEvent(new CustomEvent('pwa-update-available'));
+      },
+      onOfflineReady() {
+        window.dispatchEvent(new CustomEvent('pwa-offline-ready'));
+      },
+    });
 
-  const refreshBtn = document.createElement('button');
-  refreshBtn.textContent = 'Aktualisieren';
-  refreshBtn.style.background = 'var(--accent-color)';
-  refreshBtn.style.color = '#fff';
-  refreshBtn.style.border = '0';
-  refreshBtn.style.borderRadius = '9999px';
-  refreshBtn.style.padding = '8px 14px';
-  refreshBtn.style.fontWeight = '600';
-  refreshBtn.style.cursor = 'pointer';
-  refreshBtn.onclick = () => onUpdate();
+    // Reload when a new controller takes over
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      try { localStorage.setItem('tf_asset_v', String(Date.now())); } catch {}
+      try { window.location.reload(); } catch {}
+    });
 
-  const laterBtn = document.createElement('button');
-  laterBtn.textContent = 'Später';
-  laterBtn.style.background = 'transparent';
-  laterBtn.style.color = '#fff';
-  laterBtn.style.border = '1px solid rgba(255,255,255,0.3)';
-  laterBtn.style.borderRadius = '9999px';
-  laterBtn.style.padding = '8px 12px';
-  laterBtn.style.cursor = 'pointer';
-  laterBtn.onclick = () => bar.remove();
+    const forceActivate = async () => {
+      try {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        for (const reg of regs) {
+          try { await reg.update(); } catch {}
+          if (reg.waiting) {
+            reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+          }
+        }
+        // Also trigger plugin helper
+        try { updateSW(true); } catch {}
+      } catch {}
+    };
 
-  bar.append(text, refreshBtn, laterBtn);
-  document.body.appendChild(bar);
-}
-
-if (import.meta.env.PROD) {
-  // Use dynamic import to avoid dev errors if plugin is not active
-  import('virtual:pwa-register')
-    .then(({ registerSW }) => {
-      const updateSW = registerSW({
-        onNeedRefresh() {
-          // Show banner and force activate updated SW with immediate reload
-          showPWAUpdateBanner(() => updateSW(true));
-        },
-        onOfflineReady() {
-          // Optionally notify offline readiness
-        },
-      });
-    })
-    .catch((err) => console.warn('PWA register failed', err));
+    // Run once after load and on focus
+    setTimeout(forceActivate, 500);
+    window.addEventListener('focus', forceActivate);
+  }).catch(() => {});
 }
 
 createRoot(document.getElementById('root')!).render(

@@ -246,7 +246,10 @@ export interface UserPreferences {
   celebrationText: string; // Text der bei der Celebration angezeigt wird
   celebrationDuration: number; // Dauer der Animation in Millisekunden
   columns: {
-    visible: number; // 3, 5, or 7
+    visible: number; // default fallback
+    plannerVisible?: number; // Task planner columns
+    projectsVisible?: number; // Project Kanban columns
+    pinsVisible?: number; // Pins view columns
     showProjects: boolean;
     dateColumnOrder?: string[]; // Array of date column IDs in custom order
   };
@@ -287,6 +290,7 @@ export interface UserPreferences {
     overlayMinimized: boolean;
     autoOpenTaskOnStart: boolean;
     showRemainingTime: boolean;
+    dimControlsWhenNoTask: boolean;
   };
   // Daily Notes template
   dailyNoteTemplate?: string; // Template content for new daily notes
@@ -335,6 +339,8 @@ export interface UserPreferences {
   
   calendars?: {
     showInPlanner: boolean;
+    hiddenEvents?: string[];
+    collapsedEvents?: string[];
   };
   
   todoist?: {
@@ -663,6 +669,13 @@ export interface RecurrenceRule {
   exceptions?: string[]; // Dates (ISO format) to skip
   createdAt: string;
   updatedAt: string;
+  // Optional runtime flags/stats used by reducer/UI
+  isActive?: boolean;
+  stats?: {
+    totalGenerated: number;
+    lastGenerated?: string;
+    completionRate?: number;
+  };
 }
 
 export interface RecurrencePattern {
@@ -677,9 +690,30 @@ export interface RecurrenceEnd {
 
 export type WeekDay = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
 
+export interface RecurringTask extends Task {
+  scheduledDate?: string;
+  rescheduledFrom?: string;
+}
+
 export interface RecurrenceState {
   rules: RecurrenceRule[];
-  generatedInstances: TaskInstance[];
+  activeRule: RecurrenceRule | null;
+  generatedTasks: RecurringTask[];
+  upcomingTasks: RecurringTask[];
+  completedTasks: RecurringTask[];
+  skippedTasks: RecurringTask[];
+  showCompleted: boolean;
+  showSkipped: boolean;
+  selectedTimeframe: 'week' | 'month' | '3months' | 'year';
+  sortBy: 'date' | 'name' | 'completion_rate' | 'created';
+  sortOrder: 'asc' | 'desc';
+  overallStats: {
+    totalRules: number;
+    activeRules: number;
+    totalTasks: number;
+    completedTasks: number;
+    averageCompletionRate: number;
+  };
 }
 
 export interface TaskInstance {
@@ -727,6 +761,7 @@ export interface CalendarEvent {
   created?: string;
   recurrence?: string;
   calendarUrl: string;
+  uid?: string;
 } 
 
 // CalDAV integration types

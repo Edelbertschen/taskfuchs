@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { EndOfDayModal } from '../Common/EndOfDayModal';
+import { getAssetVersion } from '../../utils/imageUtils';
 import { PersonalCapacityModal } from '../Common/PersonalCapacityModal';
 import { PlannerAssignmentModal } from '../Common/PlannerAssignmentModal';
 import { Task } from '../../types';
@@ -55,8 +56,10 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
   // Detect if running in Electron
   const isElectron = !!(window as any).require;
   
-  // Use correct logo path for Electron vs Web
-  const logoPath = isElectron ? 'foxiconsb.svg' : '/foxiconsb.svg';
+  // Use correct logo path for Electron vs Web (versioned to bust caches in PWA)
+  const baseLogoPath = isElectron ? 'foxiconsb.svg' : '/foxiconsb.svg';
+  const assetVersion = getAssetVersion();
+  const logoPath = isElectron ? baseLogoPath : `${baseLogoPath}${assetVersion ? `?v=${assetVersion}` : ''}`;
 
   const handleTasksClick = useCallback(() => {
     onViewChange('tasks');
@@ -555,6 +558,15 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                     <span className="text-xs leading-none text-center whitespace-nowrap">
                       {item.label}
                     </span>
+                    {/* Inbox count badge */}
+                    {item.id === 'inbox' && (() => {
+                      const inboxCount = (state.tasks || []).filter(t => t.columnId === 'inbox').length;
+                      return inboxCount > 0 ? (
+                        <span className="absolute top-[5px] right-[5px] text-[10px] min-w-[16px] h-[16px] px-1 rounded-full flex items-center justify-center bg-red-500 text-white shadow">
+                          {inboxCount}
+                        </span>
+                      ) : null;
+                    })()}
                     
                     {/* Drop indicator */}
                     {isDropActive && (
@@ -626,7 +638,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
           </div>
         </nav>
 
-        {/* JSON Export Button - Bottom of Sidebar */}
+        {/* Bottom section (Dropbox quick actions only) */}
         <div className="sidebar-content px-2 pb-4">
           {/* Dropbox Upload/Download with LEDs */}
           {canDropbox && (
@@ -641,24 +653,6 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
               </button>
             </div>
           )}
-          <button
-            onClick={handleJsonExport}
-            className={`w-full flex flex-col items-center justify-center rounded-lg text-xs font-medium sidebar-item py-3 px-1 gap-1 btn-hover smooth-transform transition-all duration-200 min-h-[60px] ${
-              isMinimalDesign
-                ? (document.documentElement.classList.contains('dark')
-                    ? 'text-gray-300 hover:bg-gray-900 hover:text-white'
-                    : 'text-gray-300 hover:bg-gray-800')
-                : (glassEffectEnabled 
-                    ? 'text-gray-200 hover:bg-white/20' 
-                    : 'text-gray-300 hover:bg-gray-800')
-            }`}
-            title="JSON-Export erstellen"
-          >
-            <Download className="w-5 h-5 flex-shrink-0 transition-all duration-200" />
-            <span className="text-xs leading-none text-center whitespace-nowrap">
-              Export
-            </span>
-          </button>
         </div>
 
       </div>

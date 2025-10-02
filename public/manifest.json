@@ -29,6 +29,12 @@
   ],
   "icons": [
     {
+      "src": "/3d_fox.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
       "src": "/android/mipmap-hdpi/ic_launcher.png",
       "sizes": "72x72",
       "type": "image/png",
@@ -63,6 +69,12 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "/3d_fox.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/foxicon-1024.png", 

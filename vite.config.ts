@@ -12,8 +12,11 @@ export default defineConfig({
       jsxRuntime: 'automatic'
     }),
     VitePWA({
+      // Auto updating SW; manual page reload will activate latest SW immediately
       registerType: 'autoUpdate',
       workbox: {
+        skipWaiting: true,
+        clientsClaim: true,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json,woff2}'],
         globIgnores: ['**/screenshots/**', '**/node_modules/**'],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
@@ -148,11 +151,11 @@ export default defineConfig({
         target: 'https://api.track.toggl.com',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/toggl/, ''),
-        configure: (proxy, options) => {
-          proxy.on('error', (err, req, res) => {
+        configure: (proxy) => {
+          proxy.on('error', (err) => {
             console.log('Proxy error:', err);
           });
-          proxy.on('proxyReq', (proxyReq, req, res) => {
+          proxy.on('proxyReq', (proxyReq) => {
             proxyReq.setHeader('User-Agent', 'TaskFuchs/1.0');
           });
         }

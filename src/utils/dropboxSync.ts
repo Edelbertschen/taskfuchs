@@ -109,7 +109,7 @@ export async function dropboxUpload(
   dispatch({ type: 'UPDATE_PREFERENCES', payload: { dropbox: {
     ...prefs,
     folderPath: folder,
-    lastSync: new Date().toISOString(),
+    lastSync: new Date().toISOString(), // keep as "last upload" timestamp used by UI
     lastSyncStatus: 'success',
     lastSyncError: undefined,
   } } });
@@ -181,8 +181,18 @@ export async function dropboxDownload(
     if (Array.isArray(remoteState.columns)) dispatch({ type: 'SET_COLUMNS', payload: remoteState.columns });
     if (Array.isArray(remoteState.tags)) dispatch({ type: 'SET_TAGS', payload: remoteState.tags });
     if (Array.isArray(remoteState.kanbanBoards)) dispatch({ type: 'SET_KANBAN_BOARDS', payload: remoteState.kanbanBoards });
+    if (Array.isArray(remoteState.pinColumns)) dispatch({ type: 'SET_PIN_COLUMNS', payload: remoteState.pinColumns });
     if (remoteState.notes && Array.isArray(remoteState.notes)) dispatch({ type: 'SET_NOTES', payload: remoteState.notes });
-    if (remoteState.viewState) dispatch({ type: 'SET_VIEW_STATE', payload: remoteState.viewState });
+    // Apply Project Kanban Columns immediately so project column titles are preserved across devices
+    const incomingProjectKanbanColumns = remoteState.projectKanbanColumns 
+      || remoteState.viewState?.projectKanban?.columns;
+    if (Array.isArray(incomingProjectKanbanColumns)) {
+      dispatch({ type: 'SET_PROJECT_KANBAN_COLUMNS', payload: incomingProjectKanbanColumns });
+    }
+    // Merge selected parts of viewState if present (without relying on a dedicated reducer action)
+    if (remoteState.viewState?.projectKanban?.selectedProjectId) {
+      dispatch({ type: 'SET_SELECTED_PROJECT', payload: remoteState.viewState.projectKanban.selectedProjectId });
+    }
     if (remoteState.calendarSources) dispatch({ type: 'SET_CALENDAR_SOURCES', payload: remoteState.calendarSources });
     if (remoteState.preferences) {
       const prefsPayload = { ...remoteState.preferences };
@@ -211,6 +221,7 @@ export async function dropboxDownload(
     ['taskfuchs-columns', remoteState.columns],
     ['taskfuchs-tags', remoteState.tags],
     ['taskfuchs-boards', remoteState.kanbanBoards],
+    ['taskfuchs-pin-columns', remoteState.pinColumns],
     ['taskfuchs-notes', remoteState.notes?.notes || remoteState.notes],
     ['taskfuchs-note-links', remoteState.noteLinks],
     ['taskfuchs-preferences', remoteState.preferences],
@@ -224,10 +235,10 @@ export async function dropboxDownload(
     } catch {}
   }
 
+  // Do NOT update lastSync here – UI should reflect last UPLOAD time only
   dispatch({ type: 'UPDATE_PREFERENCES', payload: { dropbox: {
     ...prefs,
     folderPath: folder,
-    lastSync: new Date().toISOString(),
     lastSyncStatus: 'success',
     lastSyncError: undefined,
   } } });

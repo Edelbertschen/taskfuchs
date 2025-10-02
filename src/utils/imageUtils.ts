@@ -26,10 +26,31 @@ export const getImagePath = (imagePath: string): string => {
 };
 
 /**
+ * Read current asset version used to bust caches after SW updates
+ */
+export const getAssetVersion = (): string => {
+  try {
+    return localStorage.getItem('tf_asset_v') || '';
+  } catch {
+    return '';
+  }
+};
+
+/**
+ * Get a versioned image path (adds ?v=timestamp if available) for web
+ */
+export const getVersionedImagePath = (imagePath: string): string => {
+  const base = getImagePath(imagePath);
+  if (isElectron()) return base;
+  const v = getAssetVersion();
+  return v ? `${base}?v=${v}` : base;
+};
+
+/**
  * Get the TaskFuchs logo path
  */
 export const getFuchsImagePath = (): string => {
-  return getImagePath('Fuchs.svg');
+  return getVersionedImagePath('3d_fox.png');
 };
 
 /**

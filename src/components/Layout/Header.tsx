@@ -483,9 +483,14 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
   const moveOverdueTasksToToday = () => {
     const today = format(new Date(), 'yyyy-MM-dd');
     const todayDate = new Date(today + 'T00:00:00');
-    const todayColumn = state.columns.find(col => col.type === 'date' && col.date === today);
+    let todayColumn = state.columns.find(col => col.type === 'date' && col.date === today);
     
-    if (!todayColumn) return;
+    // Ensure today's column exists (important after day change / app restart)
+    if (!todayColumn) {
+      dispatch({ type: 'ENSURE_DATE_COLUMN', payload: today });
+      // Use the predictable ID immediately; reducer will create the column
+      todayColumn = { id: `date-${today}`, type: 'date' } as any;
+    }
 
     // Find ALL incomplete tasks from past dates (same logic as getOverdueTaskCount)
     const overdueTasks = state.tasks.filter(task => {
@@ -534,7 +539,8 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
 
     // Calculate new positions for tasks in today's column
     const todayTasks = state.tasks.filter(task => task.columnId === todayColumn.id);
-    const maxPosition = todayTasks.length > 0 ? Math.max(...todayTasks.map(t => t.position)) : -1;
+    const safePositions = todayTasks.map(t => (typeof t.position === 'number' && !isNaN(t.position) ? t.position : 0));
+    const maxPosition = safePositions.length > 0 ? Math.max(...safePositions) : -1;
 
     // Move all overdue tasks to today
     overdueTasks.forEach((task, index) => {

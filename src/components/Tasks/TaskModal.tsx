@@ -30,6 +30,15 @@ interface TaskModalProps {
   task: Task | null;
   isOpen: boolean;
   onClose: () => void;
+  // Optional: called after a successful save with the updated task
+  onSaved?: (updatedTask: Task) => void;
+  // Optional: show navigation controls and invoke when user clicks arrows
+  onNavigatePrev?: () => void;
+  onNavigateNext?: () => void;
+  // Optional: control whether modal closes after save (default: true)
+  shouldCloseOnSave?: boolean;
+  // Optional: hint for in-modal content transition when switching tasks
+  navDirection?: 'prev' | 'next' | null;
 }
 
 interface FormData {
@@ -47,10 +56,11 @@ interface FormData {
   kanbanColumnId?: string; // Kanban column assignment for project tasks
 }
 
-export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
+export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNavigateNext, shouldCloseOnSave = true, navDirection = null }: TaskModalProps) {
   const { state, dispatch } = useApp();
   const { actions, forms, titles, messages, taskModal, pins } = useAppTranslation();
   const { t } = useTranslation();
+  const [navPos, setNavPos] = useState<{ top: number; leftX: number; rightX: number } | null>(null);
   
   // Helper: preserve placement fields when updating
   const preservePlacement = (orig: Task, patch: Partial<Task>): Task => ({
@@ -159,6 +169,34 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
     }
   }, [isOpen]);
 
+  // Track modal position to place side navigation elegantly beside it
+  const modalRef = useRef<HTMLDivElement | null>(null);
+  const updateNavPositions = useCallback(() => {
+    if (!modalRef.current) return;
+    const rect = modalRef.current.getBoundingClientRect();
+    setNavPos({
+      top: Math.round(rect.top + rect.height / 2),
+      leftX: Math.round(rect.left + 4),
+      rightX: Math.round(rect.right - 4),
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    updateNavPositions();
+    const onResize = () => updateNavPositions();
+    const onScroll = () => updateNavPositions();
+    window.addEventListener('resize', onResize);
+    window.addEventListener('scroll', onScroll, true);
+    const obs = new ResizeObserver(updateNavPositions);
+    if (modalRef.current) obs.observe(modalRef.current);
+    return () => {
+      window.removeEventListener('resize', onResize);
+      window.removeEventListener('scroll', onScroll, true);
+      try { obs.disconnect(); } catch {}
+    };
+  }, [isOpen, updateNavPositions]);
+
   const [showProjectPicker, setShowProjectPicker] = useState(false);
   const [showTagSelector, setShowTagSelector] = useState(false);
   const [tagInput, setTagInput] = useState('');
@@ -204,7 +242,7 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
   const [showPinDropdown, setShowPinDropdown] = useState(false);
 
 
-  const modalRef = useRef<HTMLDivElement>(null);
+  // merged with modalRef above
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const tagInputRef = useRef<HTMLInputElement>(null);
@@ -515,17 +553,17 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
       title: formData.title,
       description: formData.description,
       priority: formData.priority,
-      estimatedTime: formData.estimatedTime && formData.estimatedTime > 0 ? formData.estimatedTime : undefined,
+      estimatedTime: formData.estimatedTime || 0,
       tags: formData.tags,
       subtasks: formData.subtasks,
+      linkedNotes: formData.linkedNotes,
       reminderDate: formData.reminderDate,
       reminderTime: formData.reminderTime,
       deadline: formData.deadline,
-      linkedNotes: formData.linkedNotes,
-      projectId: formData.projectId, // Flexible project assignment
-      kanbanColumnId: formData.kanbanColumnId, // Kanban column assignment
+      projectId: formData.projectId,
+      kanbanColumnId: formData.kanbanColumnId,
       updatedAt: new Date().toISOString(),
-    };
+    } as Task;
 
     // Handle recurrence rule if provided
     if (recurrenceRule) {
@@ -677,8 +715,14 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
     });
 
     setHasUnsavedChanges(false);
-    onClose();
-  }, [task, formData, dispatch, onClose, recurrenceRule]);
+    // Notify parent before closing to allow navigation/auto-advance flows
+    try {
+      onSaved && onSaved(taskData);
+    } catch {}
+    if (shouldCloseOnSave) {
+      onClose();
+    }
+  }, [task, formData, dispatch, onClose, onSaved, shouldCloseOnSave, recurrenceRule]);
 
   // Helper function to determine task visibility from task data
   const getTaskVisibilityFromData = (taskData: Task) => {
@@ -1853,7 +1897,13 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
           pointerEvents: 'auto'
         }}
         onMouseDown={(e) => {
-          // Close immediately on mousedown outside the modal content
+          // Do not autoclose on mousedown; require explicit click release
+          if (e.target === e.currentTarget) {
+            e.preventDefault();
+          }
+        }}
+        onClick={(e) => {
+          // Close only on explicit backdrop click (not when dragging)
           if (e.target === e.currentTarget) {
             e.preventDefault();
             handleClose();
@@ -1863,7 +1913,7 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
         {/* Modal Container */}
         <div 
           ref={modalRef}
-          className="task-modal-root bg-white dark:bg-gray-900 rounded-none sm:rounded-2xl shadow-2xl w-screen sm:w-full sm:max-w-6xl h-[100svh] sm:h-[90vh] overflow-hidden flex flex-col modal-content animate-modal-in"
+          className="task-modal-root relative bg-white dark:bg-gray-900 rounded-none sm:rounded-2xl shadow-2xl w-screen sm:w-full sm:max-w-6xl h-[100svh] sm:h-[90vh] overflow-hidden flex flex-col modal-content animate-modal-in"
           onClick={e => e.stopPropagation()}
           onMouseDown={(e) => e.stopPropagation()}
           onMouseMove={(e) => e.stopPropagation()}
@@ -1873,7 +1923,11 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
           onDragEnd={(e) => e.preventDefault()}
           onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => e.preventDefault()}
-          style={{ pointerEvents: 'auto' }}
+          style={{ 
+            pointerEvents: 'auto',
+            transform: navDirection === 'next' ? 'translateX(8px)' : navDirection === 'prev' ? 'translateX(-8px)' : 'translateX(0)',
+            transition: 'transform 200ms ease'
+          }}
         >
           {/* Progress Line at Top */}
           {formData.estimatedTime > 0 && (
@@ -2727,11 +2781,21 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
                     <div 
                       className={`text-gray-900 dark:text-white text-sm leading-relaxed min-h-[200px] overflow-y-auto p-3 rounded-lg bg-white dark:bg-gray-800 custom-scrollbar wysiwyg-content transition-all duration-300 ${
                         isDescriptionExpanded ? 'h-[calc(100vh-300px)]' : 'max-h-[300px]'
-                      }`}
+                      } ${!formData.description?.trim() ? 'cursor-text' : ''}`}
                       style={{
                         scrollBehavior: 'smooth',
                         transition: 'all 0.2s ease-in-out'
                       }}
+                      onClick={(e) => {
+                        // Allow direct click to edit when empty or when clicking the background
+                        const isEmpty = !formData.description || formData.description.trim() === '';
+                        const clickedBackground = e.currentTarget === e.target;
+                        if (isEmpty || clickedBackground) {
+                          setIsDescriptionPreviewMode(false);
+                          setIsDescriptionExpanded(true);
+                        }
+                      }}
+                      title={!formData.description?.trim() ? 'Klicken zum Bearbeiten' : undefined}
                     >
                        <MarkdownRenderer 
                          content={formData.description}
@@ -3424,64 +3488,79 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <div className="grid grid-cols-2 gap-2">
-                        <input
-                          type="date"
-                          value={task?.reminderDate || ''}
-                          onChange={(e) => {
-                            const updatedTask = {
-                              ...task!,
-                              reminderDate: e.target.value || undefined,
-                              updatedAt: new Date().toISOString()
-                            };
-                            dispatch({ type: 'UPDATE_TASK', payload: updatedTask });
-                            setHasUnsavedChanges(true);
+                      {/* When not editing and no reminder exists, show only a + button */}
+                      {!isEditingReminder && !(task?.reminderDate && task?.reminderTime) && (
+                        <button
+                          onClick={() => {
+                            setIsEditingReminder(true);
+                            setReminderTimeInput(formData.reminderTime || '');
                           }}
-                          className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                          placeholder="Datum auswählen"
-                        />
-                        <input
-                          type="time"
-                          value={task?.reminderTime || ''}
-                          onChange={(e) => {
-                            const updatedTask = {
-                              ...task!,
-                              reminderTime: e.target.value || undefined,
-                              updatedAt: new Date().toISOString()
-                            };
-                            dispatch({ type: 'UPDATE_TASK', payload: updatedTask });
-                            setHasUnsavedChanges(true);
-                          }}
-                          className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                          placeholder="Zeit auswählen"
-                        />
-                      </div>
-                      {/* Action buttons in edit mode */}
-                      {isEditingReminder && (task?.reminderDate || task?.reminderTime) && (
-                        <div className="flex items-center justify-end space-x-2">
-                          <button
-                            onClick={() => setIsEditingReminder(false)}
-                            className="px-3 py-1 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
-                          >
-                            Fertig
-                          </button>
-                          <button
-                            onClick={() => {
+                          className="w-6 h-6 flex items-center justify-center text-sm rounded hover:opacity-80"
+                          style={getAccentColorStyles().text}
+                          title="Erinnerung hinzufügen"
+                        >
+                          +
+                        </button>
+                      )}
+                      {isEditingReminder && (
+                        <div className="grid grid-cols-2 gap-2">
+                          <input
+                            type="date"
+                            value={task?.reminderDate || ''}
+                            onChange={(e) => {
                               const updatedTask = {
                                 ...task!,
-                                reminderDate: undefined,
-                                reminderTime: undefined,
+                                reminderDate: e.target.value || undefined,
                                 updatedAt: new Date().toISOString()
                               };
                               dispatch({ type: 'UPDATE_TASK', payload: updatedTask });
                               setHasUnsavedChanges(true);
-                              setIsEditingReminder(false);
                             }}
-                            className="flex items-center space-x-1 px-3 py-1 text-xs text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
-                          >
-                            <X className="w-3 h-3" />
-                            <span>Entfernen</span>
-                          </button>
+                            className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            placeholder="Datum auswählen"
+                          />
+                          <input
+                            type="time"
+                            value={task?.reminderTime || ''}
+                            onChange={(e) => {
+                              const updatedTask = {
+                                ...task!,
+                                reminderTime: e.target.value || undefined,
+                                updatedAt: new Date().toISOString()
+                              };
+                              dispatch({ type: 'UPDATE_TASK', payload: updatedTask });
+                              setHasUnsavedChanges(true);
+                            }}
+                            className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            placeholder="Zeit auswählen"
+                          />
+                          <div className="col-span-2 flex items-center justify-end space-x-2">
+                            <button
+                              onClick={() => setIsEditingReminder(false)}
+                              className="px-3 py-1 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+                            >
+                              Fertig
+                            </button>
+                            {(task?.reminderDate || task?.reminderTime) && (
+                              <button
+                                onClick={() => {
+                                  const updatedTask = {
+                                    ...task!,
+                                    reminderDate: undefined,
+                                    reminderTime: undefined,
+                                    updatedAt: new Date().toISOString()
+                                  };
+                                  dispatch({ type: 'UPDATE_TASK', payload: updatedTask });
+                                  setHasUnsavedChanges(true);
+                                  setIsEditingReminder(false);
+                                }}
+                                className="flex items-center space-x-1 px-3 py-1 text-xs text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
+                              >
+                                <X className="w-3 h-3" />
+                                <span>Entfernen</span>
+                              </button>
+                            )}
+                          </div>
                         </div>
                       )}
                     </div>
@@ -3712,6 +3791,41 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
             </div>
           </div>
         </div>
+        {/* Elegant side navigation fixed next to modal edges */}
+        {navPos && onNavigatePrev && (
+          <button
+            onClick={onNavigatePrev}
+            className="fixed hidden sm:flex items-center justify-center w-10 h-10 rounded-full shadow-xl transition-transform hover:scale-110"
+            style={{
+              left: `${navPos.leftX}px`,
+              top: `${navPos.top}px`,
+              transform: 'translate(-70%, -50%)',
+              backgroundColor: state.preferences.accentColor,
+              boxShadow: `0 6px 20px rgba(0,0,0,0.25), 0 0 0 3px ${state.preferences.accentColor}33`,
+              zIndex: 100000001,
+            }}
+            title={"Vorherige Aufgabe"}
+          >
+            <ChevronLeft className="w-5 h-5 text-white" />
+          </button>
+        )}
+        {navPos && onNavigateNext && (
+          <button
+            onClick={onNavigateNext}
+            className="fixed hidden sm:flex items-center justify-center w-10 h-10 rounded-full shadow-xl transition-transform hover:scale-110"
+            style={{
+              left: `${navPos.rightX}px`,
+              top: `${navPos.top}px`,
+              transform: 'translate(-30%, -50%)',
+              backgroundColor: state.preferences.accentColor,
+              boxShadow: `0 6px 20px rgba(0,0,0,0.25), 0 0 0 3px ${state.preferences.accentColor}33`,
+              zIndex: 100000001,
+            }}
+            title={"Nächste Aufgabe"}
+          >
+            <ChevronRight className="w-5 h-5 text-white" />
+          </button>
+        )}
       </div>
 
       {/* Confirmation Dialog */}

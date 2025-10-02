@@ -44,8 +44,8 @@ import { de } from 'date-fns/locale';
 
 export function ProjectKanbanBoard() {
   const { state, dispatch } = useApp();
-  const { actions, forms, titles, messages, kanban, pins, projects: projectsTranslations } = useAppTranslation();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const { actions, forms, titles, messages, kanban } = useAppTranslation();
   
   // ✨ CRITICAL FIX: Precise sensors to prevent springing (same as TaskBoard)
   // Mobile-friendly DnD activation
@@ -165,9 +165,10 @@ export function ProjectKanbanBoard() {
 
   // Toggle sidebar visibility
   const toggleSidebar = () => {
+    // Ensure the sidebar system is considered visible and just toggle minimized
+    setSidebarVisible(true);
     setSidebarMinimized(prev => {
       const newState = !prev;
-      // Persist and notify
       try { localStorage.setItem('taskfuchs-project-sidebar-minimized', JSON.stringify(newState)); } catch {}
       window.dispatchEvent(new CustomEvent('project-sidebar-state-changed', {
         detail: { minimized: newState }
@@ -176,9 +177,33 @@ export function ProjectKanbanBoard() {
     });
   };
 
-  // ESC key listener for focus mode and modal
+  // ESC key listener for focus mode and modal + sidebar shortcut
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented) return;
+
+      const activeEl = document.activeElement as HTMLElement | null;
+      const targetEl = event.target as HTMLElement | null;
+      const isTypingElement = (el: HTMLElement | null) => !!el && (
+        el.tagName === 'INPUT' ||
+        el.tagName === 'TEXTAREA' ||
+        el.tagName === 'SELECT' ||
+        el.isContentEditable ||
+        el.getAttribute('contenteditable') === 'true' ||
+        el.closest('[contenteditable="true"]') !== null ||
+        ['textbox','combobox','searchbox'].includes(el.getAttribute('role') || '')
+      );
+      const isTypingTarget = isTypingElement(activeEl) || isTypingElement(targetEl);
+
+      // Toggle secondary sidebar with Alt+S (and not when typing)
+      if ((event.key === 's' || event.key === 'S') && event.altKey && !event.ctrlKey && !event.metaKey) {
+        if (isTypingTarget) {
+          return; // do not handle shortcut while typing
+        }
+        event.preventDefault();
+        toggleSidebar();
+        return;
+      }
       if (event.key === 'Escape') {
         if (showNotesSlider) {
           setShowNotesSlider(false);
@@ -268,62 +293,69 @@ export function ProjectKanbanBoard() {
     }
   }, [selectedProject]);
 
-  // Horizontal scroll functionality with SHIFT + Mouse wheel and Arrow keys
+  // Horizontal scrolling & navigation:
+  // - Mouse/trackpad wheel scrolls horizontally across columns
+  // - SHIFT + wheel navigates projects (prev/next)
+  // - Arrow keys scroll horizontally across columns
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
-      if (!scrollContainerRef.current) return;
-      
-      // Only handle horizontal scrolling when SHIFT is pressed
+      const container = scrollContainerRef.current;
+      if (!container) return;
+
+      // Determine dominant axis (support both classic mice and trackpads)
+      const absX = Math.abs(e.deltaX || 0);
+      const absY = Math.abs(e.deltaY || 0);
+      const raw = absX > absY ? (e.deltaX || 0) : (e.deltaY || 0);
+
       if (e.shiftKey) {
+        // Keep legacy behavior: SHIFT + wheel navigates projects
         e.preventDefault();
         e.stopPropagation();
-        
-        const container = scrollContainerRef.current;
-        const scrollAmount = e.deltaY > 0 ? 200 : -200;
-        container.scrollTo({
-          left: container.scrollLeft + scrollAmount,
-          behavior: 'smooth'
-        });
+        const direction = raw > 0 ? 'next' : 'prev';
+        dispatch({ type: 'NAVIGATE_PROJECTS', payload: direction });
+        return;
       }
-      // Let normal vertical scrolling pass through without interference
+
+      // Default: scroll horizontally by the dominant delta
+      e.preventDefault();
+      e.stopPropagation();
+      container.scrollLeft += raw;
     };
 
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.addEventListener('wheel', handleWheel, { passive: false });
+    }
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!scrollContainerRef.current) return;
-      
-      const container = scrollContainerRef.current;
-      
-      // Check if we're focused on the board area (not input fields or modals)
-      const activeElement = document.activeElement;
-      const isInputFocused = activeElement && (
-        activeElement.tagName === 'INPUT' || 
+      // Check if we're focused on inputs or modals
+      const activeElement = document.activeElement as HTMLElement | null;
+      const isInputFocused = !!activeElement && (
+        activeElement.tagName === 'INPUT' ||
         activeElement.tagName === 'TEXTAREA' ||
         activeElement.getAttribute('contenteditable') === 'true' ||
-        activeElement.closest('[role="dialog"]') ||
-        activeElement.closest('.modal')
+        !!activeElement.closest('[role="dialog"]') ||
+        !!activeElement.closest('.modal')
       );
 
       if (!isInputFocused && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+        const container = scrollContainerRef.current;
+        if (!container) return;
         e.preventDefault();
-        const scrollAmount = e.key === 'ArrowLeft' ? -200 : 200;
-        container.scrollTo({
-          left: container.scrollLeft + scrollAmount,
-          behavior: 'smooth'
-        });
+        const step = 120; // pixels per key press
+        container.scrollLeft += (e.key === 'ArrowLeft' ? -step : step);
       }
     };
-    
-    // Event-Listener: wheel am document (nicht am Container) 
-    // um das normale vertikale Scrollen in Spalten nicht zu blockieren
-    document.addEventListener('wheel', handleWheel, { passive: false });
-    
+
     document.addEventListener('keydown', handleKeyDown);
-    
+
     return () => {
-      document.removeEventListener('wheel', handleWheel);
-      document.removeEventListener('keydown', handleKeyDown);
+      if (container) {
+        container.removeEventListener('wheel', handleWheel as EventListener);
+      }
+      document.removeEventListener('keydown', handleKeyDown as EventListener);
     };
-  }, []);
+  }, [dispatch]);
 
   // Get project-specific custom columns, sorted by order
   const projectColumns = state.viewState.projectKanban.columns
@@ -470,7 +502,7 @@ export function ProjectKanbanBoard() {
     }));
 
     // Apply column offset and limit based on user preference
-    const visibleColumnCount = state.preferences.columns.visible;
+    const visibleColumnCount = state.preferences.columns.projectsVisible ?? state.preferences.columns.visible;
     const startIndex = state.projectColumnOffset;
     const result: (Column | null)[] = [];
     
@@ -493,7 +525,7 @@ export function ProjectKanbanBoard() {
     }
 
     return result;
-  }, [selectedProject, projectColumns, state.preferences.columns.visible, state.projectColumnOffset]);
+  }, [selectedProject, projectColumns, state.preferences.columns.projectsVisible, state.preferences.columns.visible, state.projectColumnOffset]);
 
   // Auto-edit newly created columns
   useEffect(() => {
@@ -1535,7 +1567,7 @@ export function ProjectKanbanBoard() {
                 ? 'bg-gray-50 hover:bg-gray-100 border-2 border-dashed border-gray-300 hover:border-gray-400'
                 : 'bg-gray-100 bg-opacity-20 hover:bg-opacity-35 dark:bg-gray-700 dark:bg-opacity-20 dark:hover:bg-opacity-35 border border-dashed border-gray-300 border-opacity-40 dark:border-gray-600 dark:border-opacity-40'
             }`}
-            title={i18n.language === 'en' ? 'Add New Column' : 'Neue Spalte hinzufügen'}
+            title={t('add_new_column')}
           >
             <Plus className={`w-6 h-6 mb-1 transition-colors ${
               isMinimalDesign
@@ -1547,7 +1579,7 @@ export function ProjectKanbanBoard() {
                 ? 'text-gray-600 group-hover:text-gray-800'
                 : 'text-white group-hover:text-white'
             }`}>
-              {i18n.language === 'en' ? 'Add Column' : 'Spalte hinzufügen'}
+              {t('add_column')}
             </span>
           </button>
           </div>
@@ -1750,7 +1782,10 @@ export function ProjectKanbanBoard() {
                     }
                   : {}),
               boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-            display: (sidebarVisible && !sidebarMinimized) ? 'flex' : 'none',
+            // Always render; slide in/out for smooth animation
+            transform: sidebarMinimized ? 'translateX(-100%)' : 'translateX(0)',
+            transition: 'transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+            pointerEvents: sidebarMinimized ? 'none' : 'auto',
             }}
           >
                 {/* Header */}
@@ -1785,9 +1820,10 @@ export function ProjectKanbanBoard() {
                                 : 'text-black')
                             : 'text-white'
                         }`}>
-                  <Columns className="w-5 h-5" style={getAccentColorStyles().text} />
-                        <span>{i18n.language === 'en' ? 'Projects' : 'Projekte'}</span>
-                    </h1>
+                          <Columns className="w-5 h-5" style={getAccentColorStyles().text} />
+                          <span>{t('projects.title')}</span>
+                        </h1>
+                        {/* Removed redundant subtitle below main title */}
                         <button
                           onClick={handleOpenNewProjectModal}
                           className={`p-2 rounded-md transition-colors duration-200 ${
@@ -1808,7 +1844,7 @@ export function ProjectKanbanBoard() {
                               e.currentTarget.style.backgroundColor = getAccentColorStyles().bg.backgroundColor;
                             }
                           }}
-                          title={projectsTranslations.createNewProject()}
+                          title={t('projects.create_new_project')}
                         >
                           <Plus className="w-4 h-4" />
                         </button>
@@ -1818,7 +1854,7 @@ export function ProjectKanbanBoard() {
                         isMinimalDesign ? 'text-black' : 'text-white'
                       }`}>
                         <Columns className="w-5 h-5" style={getAccentColorStyles().text} />
-                        <span>{i18n.language === 'en' ? 'Projects' : 'Projekte'}</span>
+                        <span>{t('projects.title')}</span>
                       </h1>
                     )}
                   </div>
@@ -1841,7 +1877,7 @@ export function ProjectKanbanBoard() {
                             : 'text-gray-700')
                         : 'text-gray-300'
                     }`}>
-                      {selectedProject ? (i18n.language === 'en' ? `${filteredTasks.length} tasks` : `${filteredTasks.length} Aufgaben`) : (i18n.language === 'en' ? 'No project selected' : 'Kein Projekt ausgewählt')}
+                      {selectedProject ? (t('tasks.title') + `: ${filteredTasks.length}`) : (t('projects.no_project_selected'))}
                     </span>
                     <span className={`text-sm font-medium ${
                       isMinimalDesign 
@@ -1850,7 +1886,7 @@ export function ProjectKanbanBoard() {
                             : 'text-gray-700')
                         : 'text-gray-300'
                     }`}>
-                      {i18n.language === 'en' ? `${projects.length} Projects` : `${projects.length} Projekte`}
+                      {t('projects.title') + `: ${projects.length}`}
                     </span>
                   </div>
                 </div>
@@ -1959,7 +1995,7 @@ export function ProjectKanbanBoard() {
                     style={{ backgroundColor: state.preferences.accentColor }}
                   >
                     <Plus className="w-3 h-3" />
-                    <span>Hinzufügen</span>
+                    <span>{t('add_note')}</span>
                   </button>
                   <button
                     onClick={() => setShowNotesSlider(false)}
@@ -2008,14 +2044,14 @@ export function ProjectKanbanBoard() {
                             <button
                               onClick={() => isPinned ? handleUnpinNote(note.id) : handlePinNote(note.id)}
                               className="p-1 text-gray-400 hover:text-yellow-500 transition-all duration-200 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 rounded"
-                              title={isPinned ? pins.removePinning() : pins.pinToProject()}
+                              title={isPinned ? t('remove_pin') : t('pin_to_project')}
                             >
                               <Pin className="w-3 h-3" />
                             </button>
                             <button
                               onClick={() => handleUnlinkNote(note.id)}
                               className="p-1 text-gray-400 hover:text-red-500 transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
-                              title="Verknüpfung entfernen"
+                              title={t('remove_link')}
                             >
                               <X className="w-3 h-3" />
                             </button>
@@ -2027,8 +2063,8 @@ export function ProjectKanbanBoard() {
                 ) : (
                   <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                     <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm font-medium mb-1">Keine verknüpften Notizen</p>
-                    <p className="text-xs">Klicken Sie auf "Hinzufügen", um Notizen zu verknüpfen</p>
+                    <p className="text-sm font-medium mb-1">{t('no_linked_notes')}</p>
+                    <p className="text-xs">{t('click_to_add_notes')}</p>
                   </div>
                 )}
               </div>
@@ -2083,14 +2119,14 @@ export function ProjectKanbanBoard() {
                               className="flex items-center space-x-1 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 px-2 py-1 rounded-lg"
                             >
                               <X className="w-3 h-3" />
-                              <span>Alle löschen</span>
+                              <span>{t('clear_all_filters')}</span>
                             </button>
                           )}
                           
                           <button
                             onClick={() => setShowFilterDropdown(false)}
                             className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200"
-                            title="Filter schließen"
+                            title={t('close_filter')}
                           >
                             <X className="w-4 h-4" />
                           </button>
@@ -2166,7 +2202,7 @@ export function ProjectKanbanBoard() {
                                 })
                               ) : (
                                 <span className="text-sm text-gray-500 dark:text-gray-400">
-                                  Keine Tags vorhanden
+                                  {t('no_tags_available')}
                                 </span>
                               );
                             })()}
@@ -2187,7 +2223,7 @@ export function ProjectKanbanBoard() {
                       display: 'flex', 
                       flexDirection: 'column', 
                         height: '100%', 
-                        gap: '12px',
+                        gap: '17px',
                         padding: '0',
                         alignItems: 'stretch',
                         width: '100%'
@@ -2196,14 +2232,7 @@ export function ProjectKanbanBoard() {
                           <div 
                             ref={scrollContainerRef}
                             tabIndex={0}
-                            onKeyDown={(e) => {
-                              if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-                                e.preventDefault();
-                                const direction = e.key === 'ArrowLeft' ? 'prev' : 'next';
-                                dispatch({ type: 'NAVIGATE_PROJECTS', payload: direction });
-                              }
-                            }}
-
+                            
                             style={{ 
                               flex: 1,
                               width: '100%',
@@ -2226,7 +2255,7 @@ export function ProjectKanbanBoard() {
                             >
                               <div style={{ 
                                 display: 'flex', 
-                                gap: isMinimalDesign ? '0px' : '4px',
+                                gap: isMinimalDesign ? '5px' : '9px',
                                 alignItems: 'stretch',
                                 height: '100%',
                                 minWidth: 'fit-content' // Ensure container is wide enough for all content
@@ -2308,7 +2337,7 @@ export function ProjectKanbanBoard() {
               setShowSmartTaskModal(false);
             }}
             targetColumn={smartTaskTargetColumn}
-                                  placeholder={i18n.language === 'en' ? `Create task for ${smartTaskTargetColumn?.title || 'Project'}...` : `Aufgabe für ${smartTaskTargetColumn?.title || 'Projekt'} erstellen...`}
+                                  placeholder={t('create_task_for', { project: smartTaskTargetColumn?.title || 'Project' })}
             projectId={selectedProject?.id}
             kanbanColumnId={smartTaskTargetColumn?.kanbanColumnId || smartTaskTargetColumn?.id}
           />
@@ -2377,12 +2406,12 @@ export function ProjectKanbanBoard() {
               onClick={(e) => e.stopPropagation()}
             >
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                {projectsTranslations.createNewProject()}
+                {t('projects.create_new_project')}
               </h2>
               
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {projectsTranslations.projectName()}
+                  {t('projects.project_name')}
                 </label>
                 <input
                   type="text"
@@ -2394,7 +2423,7 @@ export function ProjectKanbanBoard() {
                     focusRingColor: state.preferences.accentColor,
                     '--tw-ring-color': state.preferences.accentColor
                   } as React.CSSProperties}
-                  placeholder={projectsTranslations.projectNamePlaceholder()}
+                  placeholder={t('projects.project_name_placeholder')}
                   autoFocus
                 />
               </div>
@@ -2404,7 +2433,7 @@ export function ProjectKanbanBoard() {
                   onClick={handleCancelNewProject}
                   className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                 >
-                  {projectsTranslations.cancel()}
+                  {t('projects.cancel')}
                 </button>
                 <button
                   onClick={handleCreateNewProject}
@@ -2426,7 +2455,7 @@ export function ProjectKanbanBoard() {
                     }
                   }}
                 >
-                  {projectsTranslations.create()}
+                  {t('projects.create')}
                 </button>
               </div>
             </div>
@@ -2452,7 +2481,7 @@ export function ProjectKanbanBoard() {
                       focusRingColor: state.preferences.accentColor,
                       '--tw-ring-color': state.preferences.accentColor
                     } as React.CSSProperties}
-                    placeholder="Notiz suchen..."
+                    placeholder={t('search_notes')}
                     autoFocus
                   />
                 </div>
@@ -2481,7 +2510,7 @@ export function ProjectKanbanBoard() {
                 ))}
                 {availableNotes.length === 0 && (
                   <div className="p-4 text-center text-gray-500 dark:text-gray-400">
-                    {noteSearchQuery ? 'Keine Notizen gefunden' : 'Alle Notizen sind bereits verknüpft'}
+                    {noteSearchQuery ? t('no_notes_found') : t('all_notes_linked')}
                   </div>
                 )}
               </div>
@@ -2528,13 +2557,11 @@ export function ProjectKanbanBoard() {
               </div>
               
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white text-center mb-3">
-                {i18n.language === 'en' ? 'Archive Tasks' : 'Aufgaben archivieren'}
+                {t('archive_tasks')}
               </h3>
               
               <p className="text-gray-600 dark:text-gray-400 text-center mb-6 leading-relaxed">
-                {i18n.language === 'en' 
-                ? `Do you want to move all ${archiveModalData.completedCount} completed tasks from "${archiveModalData.columnTitle}" to the archive?`
-                : `Möchten Sie alle ${archiveModalData.completedCount} abgehakten Aufgaben aus "${archiveModalData.columnTitle}" ins Archiv verschieben?`}
+                {t('archive_confirmation', { count: archiveModalData.completedCount, column: archiveModalData.columnTitle })}
               </p>
               
               <div className="flex space-x-3">
@@ -2545,7 +2572,7 @@ export function ProjectKanbanBoard() {
                   }}
                   className="flex-1 px-4 py-3 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all font-medium"
                 >
-                  Cancel
+                  {t('cancel')}
                 </button>
                 <button
                   onClick={handleConfirmArchive}
@@ -2555,7 +2582,7 @@ export function ProjectKanbanBoard() {
                     boxShadow: `0 4px 12px ${state.preferences.accentColor}40`
                   }}
                 >
-                  OK
+                  {t('ok')}
                 </button>
               </div>
             </div>

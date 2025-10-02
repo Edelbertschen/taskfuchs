@@ -80,6 +80,7 @@ export function PersonalCapacityModal({ isOpen, onClose }: PersonalCapacityModal
   
   const accentColor = state.preferences.accentColor;
   const isMinimalDesign = state.preferences.minimalDesign;
+  const isDarkMode = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
   
   // Initialize form data when modal opens
   React.useEffect(() => {
@@ -229,10 +230,10 @@ export function PersonalCapacityModal({ isOpen, onClose }: PersonalCapacityModal
               <User className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold" style={{ color: accentColor }}>
+              <h2 className="text-lg font-semibold" style={{ color: isDarkMode ? 'white' : accentColor }}>
                 {t('capacity.personal_capacity_planning')}
               </h2>
-              <p className="text-xs opacity-70" style={{ color: accentColor }}>
+              <p className="text-xs opacity-70" style={{ color: isDarkMode ? 'rgba(255,255,255,0.75)' : accentColor }}>
                 {t('capacity.plan_working_hours')}
               </p>
             </div>
@@ -251,7 +252,7 @@ export function PersonalCapacityModal({ isOpen, onClose }: PersonalCapacityModal
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex-1 overflow-y-auto p-4 text-gray-900 dark:text-gray-100">
           <div className="space-y-4">
             {/* Year Selection */}
             <div className="flex items-center justify-center space-x-4">
@@ -260,7 +261,7 @@ export function PersonalCapacityModal({ isOpen, onClose }: PersonalCapacityModal
                 className="p-1.5 rounded-lg transition-all hover:scale-105"
                 style={{ 
                   backgroundColor: `${accentColor}15`,
-                  color: accentColor
+                  color: isDarkMode ? 'white' : accentColor
                 }}
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -281,7 +282,7 @@ export function PersonalCapacityModal({ isOpen, onClose }: PersonalCapacityModal
                 className="p-1.5 rounded-lg transition-all hover:scale-105"
                 style={{ 
                   backgroundColor: `${accentColor}15`,
-                  color: accentColor
+                  color: isDarkMode ? 'white' : accentColor
                 }}
               >
                 <ChevronRight className="w-4 h-4" />
@@ -297,7 +298,7 @@ export function PersonalCapacityModal({ isOpen, onClose }: PersonalCapacityModal
                 }`}
                 style={{
                   backgroundColor: distributionMode === 'manual' ? accentColor : `${accentColor}20`,
-                  color: distributionMode === 'manual' ? 'white' : accentColor
+                  color: isDarkMode ? 'white' : (distributionMode === 'manual' ? 'white' : accentColor)
                 }}
               >
                 Manual
@@ -309,7 +310,7 @@ export function PersonalCapacityModal({ isOpen, onClose }: PersonalCapacityModal
                 }`}
                 style={{
                   backgroundColor: distributionMode === 'equal' ? accentColor : `${accentColor}20`,
-                  color: distributionMode === 'equal' ? 'white' : accentColor
+                  color: isDarkMode ? 'white' : (distributionMode === 'equal' ? 'white' : accentColor)
                 }}
               >
                 Equal
@@ -323,11 +324,11 @@ export function PersonalCapacityModal({ isOpen, onClose }: PersonalCapacityModal
                 value={totalYearlyHours}
                 onChange={(e) => handleYearlyHoursChange(e.target.value)}
                 placeholder="Total Yearly Hours"
-                className="w-full px-3 py-2 rounded-lg text-center font-medium focus:outline-none transition-all"
+                className="w-full px-3 py-2 rounded-lg text-center font-medium focus:outline-none transition-all placeholder-gray-500 dark:placeholder-gray-300"
                 style={{ 
-                  backgroundColor: `${accentColor}10`,
-                  color: accentColor,
-                  border: `2px solid ${accentColor}30`
+                  backgroundColor: 'rgba(255,255,255,0.06)',
+                  color: isDarkMode ? 'white' : 'inherit',
+                  border: `1px solid rgba(255,255,255,0.18)`
                 }}
               />
             )}
@@ -337,8 +338,8 @@ export function PersonalCapacityModal({ isOpen, onClose }: PersonalCapacityModal
               <div 
                 className="text-center text-sm font-medium mb-3 py-1 rounded-lg"
                 style={{ 
-                  backgroundColor: `${accentColor}10`,
-                  color: accentColor
+                  backgroundColor: 'rgba(255,255,255,0.08)',
+                  color: isDarkMode ? 'white' : 'inherit'
                 }}
               >
                 Total: {calculatedTotal.toFixed(0)}h
@@ -355,7 +356,7 @@ export function PersonalCapacityModal({ isOpen, onClose }: PersonalCapacityModal
                       <div 
                         className={`text-xs font-medium mb-1 ${isCurrentMonth ? 'font-bold' : ''}`}
                         style={{ 
-                          color: isCurrentMonth ? accentColor : `${accentColor}80`
+                          color: isDarkMode ? 'white' : (isCurrentMonth ? accentColor : 'inherit')
                         }}
                       >
                         {shortMonthNames[index]}
@@ -368,13 +369,13 @@ export function PersonalCapacityModal({ isOpen, onClose }: PersonalCapacityModal
                         value={monthlyHours[month] || '0'}
                         onChange={(e) => handleMonthlyHoursChange(month, e.target.value)}
                         disabled={distributionMode === 'equal'}
-                        className={`w-full px-2 py-1.5 text-xs text-center rounded-lg focus:outline-none transition-all ${
+                        className={`w-full px-2 py-1.5 text-xs text-center rounded-lg focus:outline-none transition-all placeholder-gray-500 dark:placeholder-gray-300 ${
                           isCurrentMonth ? 'font-bold current-month-input' : ''
                         }`}
                         style={{ 
-                          backgroundColor: isCurrentMonth ? accentColor : `${accentColor}15`,
-                          color: isCurrentMonth ? 'white !important' : accentColor,
-                          border: `1px solid ${accentColor}30`,
+                          backgroundColor: isCurrentMonth ? accentColor : 'rgba(255,255,255,0.06)',
+                          color: isCurrentMonth ? 'white !important' : (isDarkMode ? 'white' : 'inherit'),
+                          border: `1px solid rgba(255,255,255,0.18)`,
                           ...(isCurrentMonth ? {
                             WebkitTextFillColor: 'white !important',
                             MozTextFillColor: 'white !important',

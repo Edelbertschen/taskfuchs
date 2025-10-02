@@ -39,7 +39,7 @@
     "dist:mac": "npm run build && electron-builder --mac --publish=never",
     "dist:mac-dmg": "TF_TARGET=electron npm run build && electron-builder --mac --publish=never --config.mac.target=dmg",
     "dist:mac-universal": "npm run build && electron-builder --mac --universal --publish=never",
-    "deploy:pwa": "npm run build && rsync -azvh --delete --exclude='.htaccess' --exclude='._*' --exclude='.DS_Store' --no-perms --no-owner --no-group -e 'ssh -o StrictHostKeyChecking=accept-new' dist/ tfuchs@antila.uberspace.de:/var/www/virtual/tfuchs/html/"
+    "deploy:pwa": "npm run build && rsync -azvh --delete --exclude='.htaccess' --exclude='._*' --exclude='.DS_Store' --no-perms --no-owner --no-group -e 'ssh -o StrictHostKeyChecking=accept-new' dist/ tfuchs@antila.uberspace.de:/var/www/virtual/tfuchs/html/ && ssh -o StrictHostKeyChecking=accept-new tfuchs@antila.uberspace.de 'find /var/www/virtual/tfuchs/html -type d -exec chmod 755 {} \\; && find /var/www/virtual/tfuchs/html -type f -exec chmod 644 {} \\; && [ -f /var/www/virtual/tfuchs/html/.htaccess ] && chmod 644 /var/www/virtual/tfuchs/html/.htaccess || true'"
   },
   "dependencies": {
     "@capacitor/cli": "^7.4.2",

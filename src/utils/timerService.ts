@@ -26,6 +26,9 @@ interface GlobalPomodoroSession {
   type: 'work' | 'shortBreak' | 'longBreak';
   sessionNumber: number;
   sessionStartTime: number;
+  // Wall-clock anchored accounting
+  accumulatedPauseMs: number;
+  pausedAt?: number | null;
   sessionElapsedTime: number;
   sessionRemainingTime: number;
   isActive: boolean;
@@ -38,6 +41,7 @@ class TimerService {
   private globalPomodoro: GlobalPomodoroSession | null = null;
   private intervalId: number | null = null;
   private pomodoroIntervalId: number | null = null;
+  private pomodoroLastTickWallClock: number | null = null;
   private callbacks: TimerEventCallbacks = {};
   private preferences: UserPreferences | null = null;
   private warningNotificationSent: boolean = false;
@@ -94,7 +98,7 @@ class TimerService {
         pomodoroSession: this.getPomodoroSessionForTimer() // Reference to global session
       };
 
-      // Always start Pomodoro if enabled and not already running
+      // Always start Pomodoro if enabled; if already running keep it running
       if (this.preferences?.pomodoro?.enabled && !this.globalPomodoro) {
         this.startPomodoroSession();
       }
@@ -124,6 +128,8 @@ class TimerService {
       type: 'work',
       sessionNumber: 1,
       sessionStartTime: now,
+      accumulatedPauseMs: 0,
+      pausedAt: null,
       sessionElapsedTime: 0,
       sessionRemainingTime: this.preferences.pomodoro.workDuration || 25,
       isActive: true,
@@ -159,6 +165,7 @@ class TimerService {
   pausePomodoroSession(): void {
     if (this.globalPomodoro && !this.globalPomodoro.isPaused) {
       this.globalPomodoro.isPaused = true;
+      this.globalPomodoro.pausedAt = Date.now();
       this.stopPomodoroInterval();
       
       // Stop white noise when paused
@@ -169,6 +176,10 @@ class TimerService {
   resumePomodoroSession(): void {
     if (this.globalPomodoro && this.globalPomodoro.isPaused) {
       this.globalPomodoro.isPaused = false;
+      if (this.globalPomodoro.pausedAt) {
+        this.globalPomodoro.accumulatedPauseMs += Date.now() - this.globalPomodoro.pausedAt;
+        this.globalPomodoro.pausedAt = null;
+      }
       this.startPomodoroInterval();
       
       // Resume white noise if enabled
@@ -178,37 +189,18 @@ class TimerService {
     }
   }
 
-  // Skip current Pomodoro phase to next one
+  // Skip current Pomodoro phase to the next and keep timer running
   skipPomodoroPhase(): void {
     if (!this.globalPomodoro || !this.preferences?.pomodoro?.enabled) return;
 
-    const session = this.globalPomodoro;
-    
-    // Force session end by setting remaining time to 0
-    session.sessionRemainingTime = 0;
-    
-    // Reset the session end flag so it can be handled again
-    session.sessionEndHandled = false;
-    
-    // Handle the phase transition
-    this.handlePomodoroSessionEnd();
-    
-    // If transitioning to a break phase, pause both timers
-    if (session.type === 'shortBreak' || session.type === 'longBreak') {
-      // Pause the task timer
-      if (this.activeTimer && !this.activeTimer.isPaused) {
-        this.activeTimer.isPaused = true;
-        this.stopTaskInterval();
-        
-        // Trigger pause callback for UI updates
-        this.callbacks.onPause?.(this.activeTimer);
-      }
-      
-      // Pause the Pomodoro timer
-      if (!session.isPaused) {
-        this.pausePomodoroSession();
-      }
+    // If currently in work, start a break immediately (keeps running)
+    if (this.globalPomodoro.type === 'work') {
+      this.startManualBreak();
+      return;
     }
+
+    // If currently in a break, end break and start a work session (keeps running)
+    this.endPomodoroBreak();
   }
 
   // End current Pomodoro break and start work session
@@ -224,6 +216,8 @@ class TimerService {
       session.type = 'work';
       session.sessionNumber += 1;
       session.sessionStartTime = Date.now();
+      session.accumulatedPauseMs = 0;
+      session.pausedAt = null;
       session.sessionElapsedTime = 0;
       session.sessionRemainingTime = this.getSessionDuration('work');
       session.sessionEndHandled = false; // Reset flag for new session
@@ -258,6 +252,8 @@ class TimerService {
       // Transition to break
       session.type = breakType;
       session.sessionStartTime = Date.now();
+      session.accumulatedPauseMs = 0;
+      session.pausedAt = null;
       session.sessionElapsedTime = 0;
       session.sessionRemainingTime = this.getSessionDuration(breakType);
       session.sessionEndHandled = false; // Reset flag for new session
@@ -276,11 +272,6 @@ class TimerService {
     this.activeTimer.isPaused = true;
     this.stopTaskInterval();
     
-    // Also pause the Pomodoro timer when task timer is paused
-    if (this.globalPomodoro && !this.globalPomodoro.isPaused) {
-      this.pausePomodoroSession();
-    }
-    
     // Sync with Toggl
     this.syncTogglPause();
     
@@ -294,11 +285,6 @@ class TimerService {
 
     this.activeTimer.isPaused = false;
     this.startTaskInterval();
-    
-    // Also resume the Pomodoro timer when task timer is resumed
-    if (this.globalPomodoro && this.globalPomodoro.isPaused) {
-      this.resumePomodoroSession();
-    }
     
     // Update Pomodoro reference
     this.activeTimer.pomodoroSession = this.getPomodoroSessionForTimer();
@@ -415,21 +401,27 @@ class TimerService {
         const deltaMinutes = deltaMs / 60000;
         // Apply missed time in one go
         this.activeTimer.elapsedTime += deltaMinutes;
-        this.activeTimer.remainingTime = this.activeTimer.estimatedTime - this.activeTimer.elapsedTime;
-        // Handle overtime notifications and end logic as in tick
-        if (!this.warningNotificationSent && this.activeTimer.remainingTime <= 5 && this.activeTimer.remainingTime > 0) {
-          this.warningNotificationSent = true;
-          notificationService.showTimerWarning(
-            this.activeTimer.taskTitle,
-            Math.ceil(this.activeTimer.remainingTime),
-            () => window.focus()
-          );
-        }
-        if (this.activeTimer.remainingTime <= 0 && this.activeTimer.elapsedTime >= this.activeTimer.estimatedTime) {
-          if (!this.activeTimer.isOvertime) {
-            this.activeTimer.isOvertime = true;
-            this.handleTaskTimeEnd();
+        if (this.activeTimer.estimatedTime > 0) {
+          this.activeTimer.remainingTime = this.activeTimer.estimatedTime - this.activeTimer.elapsedTime;
+          // Handle overtime notifications and end logic as in tick
+          if (!this.warningNotificationSent && this.activeTimer.remainingTime <= 5 && this.activeTimer.remainingTime > 0) {
+            this.warningNotificationSent = true;
+            notificationService.showTimerWarning(
+              this.activeTimer.taskTitle,
+              Math.ceil(this.activeTimer.remainingTime),
+              () => window.focus()
+            );
           }
+          if (this.activeTimer.remainingTime <= 0 && this.activeTimer.elapsedTime >= this.activeTimer.estimatedTime) {
+            if (!this.activeTimer.isOvertime) {
+              this.activeTimer.isOvertime = true;
+              this.handleTaskTimeEnd();
+            }
+          }
+        } else {
+          // No estimate → no remaining time or warnings
+          this.activeTimer.remainingTime = 0;
+          this.activeTimer.isOvertime = false;
         }
         this.activeTimer.pomodoroSession = this.getPomodoroSessionForTimer();
         this.callbacks.onTick?.(this.activeTimer);
@@ -449,8 +441,15 @@ class TimerService {
   // Private methods for Pomodoro timer
   private startPomodoroInterval() {
     this.stopPomodoroInterval();
+    this.pomodoroLastTickWallClock = Date.now();
     this.pomodoroIntervalId = window.setInterval(() => {
-      this.tickPomodoro();
+      const now = Date.now();
+      const last = this.pomodoroLastTickWallClock || now;
+      const deltaMs = now - last;
+      this.pomodoroLastTickWallClock = now;
+      // Always tick; internal logic uses wall clock for accuracy
+      const stepMinutes = deltaMs > 1500 ? deltaMs / 60000 : 1 / 60;
+      this.tickPomodoro(stepMinutes);
     }, 1000);
   }
 
@@ -459,6 +458,7 @@ class TimerService {
       clearInterval(this.pomodoroIntervalId);
       this.pomodoroIntervalId = null;
     }
+    this.pomodoroLastTickWallClock = null;
   }
 
   // Separate tick for task timer
@@ -476,42 +476,48 @@ class TimerService {
       // Add 1/60 minute (1 second) to elapsed time
       this.activeTimer.elapsedTime += 1/60;
       
-      // Calculate remaining time (can be negative for overtime)
-      this.activeTimer.remainingTime = this.activeTimer.estimatedTime - this.activeTimer.elapsedTime;
+      if (this.activeTimer.estimatedTime > 0) {
+        // Calculate remaining time (can be negative for overtime)
+        this.activeTimer.remainingTime = this.activeTimer.estimatedTime - this.activeTimer.elapsedTime;
 
-      // Send warning notification 5 minutes before estimated time (only once)
-      if (!this.warningNotificationSent && this.activeTimer.remainingTime <= 5 && this.activeTimer.remainingTime > 0) {
-        this.warningNotificationSent = true;
-        notificationService.showTimerWarning(
-          this.activeTimer.taskTitle, 
-          Math.ceil(this.activeTimer.remainingTime), 
-          () => window.focus()
-        );
-      }
-
-      // Check if task time is completed (but timer continues in overtime)
-      if (this.activeTimer.remainingTime <= 0 && this.activeTimer.elapsedTime >= this.activeTimer.estimatedTime) {
-        // Only trigger the end callback once when transitioning to overtime
-        if (!this.activeTimer.isOvertime) {
-          this.activeTimer.isOvertime = true;
-          this.handleTaskTimeEnd();
-        }
-        
-        // Send overtime notifications every 10 minutes
-        const overtimeMinutes = Math.floor(Math.abs(this.activeTimer.remainingTime));
-        if (overtimeMinutes > 0 && overtimeMinutes % 10 === 0 && !this.overtimeNotificationSent) {
-          this.overtimeNotificationSent = true;
-          notificationService.showTimerOvertime(
-            this.activeTimer.taskTitle,
-            overtimeMinutes,
+        // Send warning notification 5 minutes before estimated time (only once)
+        if (!this.warningNotificationSent && this.activeTimer.remainingTime <= 5 && this.activeTimer.remainingTime > 0) {
+          this.warningNotificationSent = true;
+          notificationService.showTimerWarning(
+            this.activeTimer.taskTitle, 
+            Math.ceil(this.activeTimer.remainingTime), 
             () => window.focus()
           );
-          
-          // Reset overtime notification flag after 1 minute to allow next notification
-          setTimeout(() => {
-            this.overtimeNotificationSent = false;
-          }, 60000);
         }
+
+        // Check if task time is completed (but timer continues in overtime)
+        if (this.activeTimer.remainingTime <= 0 && this.activeTimer.elapsedTime >= this.activeTimer.estimatedTime) {
+          // Only trigger the end callback once when transitioning to overtime
+          if (!this.activeTimer.isOvertime) {
+            this.activeTimer.isOvertime = true;
+            this.handleTaskTimeEnd();
+          }
+          
+          // Send overtime notifications every 10 minutes
+          const overtimeMinutes = Math.floor(Math.abs(this.activeTimer.remainingTime));
+          if (overtimeMinutes > 0 && overtimeMinutes % 10 === 0 && !this.overtimeNotificationSent) {
+            this.overtimeNotificationSent = true;
+            notificationService.showTimerOvertime(
+              this.activeTimer.taskTitle,
+              overtimeMinutes,
+              () => window.focus()
+            );
+            
+            // Reset overtime notification flag after 1 minute to allow next notification
+            setTimeout(() => {
+              this.overtimeNotificationSent = false;
+            }, 60000);
+          }
+        }
+      } else {
+        // No estimate → keep remaining at 0, never warn/overrun
+        this.activeTimer.remainingTime = 0;
+        this.activeTimer.isOvertime = false;
       }
 
       // Update Pomodoro reference for display
@@ -525,15 +531,19 @@ class TimerService {
   }
 
   // Separate tick for Pomodoro timer (runs independently)
-  private tickPomodoro() {
+  private tickPomodoro(deltaMinutes: number = 1/60) {
     try {
       if (!this.globalPomodoro || this.globalPomodoro.isPaused) return;
 
-      // Add 1/60 minute (1 second) to elapsed time
-      this.globalPomodoro.sessionElapsedTime += 1/60;
-      
+      // Recompute elapsed from wall clock for robustness
+      const now = Date.now();
+      const pausedMs = this.globalPomodoro.pausedAt ? (now - this.globalPomodoro.pausedAt) : 0;
+      const wallElapsedMs = now - this.globalPomodoro.sessionStartTime - this.globalPomodoro.accumulatedPauseMs - pausedMs;
+      const elapsedMinutes = wallElapsedMs / 60000;
+      this.globalPomodoro.sessionElapsedTime = Math.max(0, elapsedMinutes);
+
       const sessionDuration = this.getSessionDuration(this.globalPomodoro.type);
-      // Allow negative time for overtime (don't use Math.max)
+      // Allow negative time for overtime (don't clamp below zero here)
       this.globalPomodoro.sessionRemainingTime = sessionDuration - this.globalPomodoro.sessionElapsedTime;
 
       // Check if Pomodoro session is completed (only handle once when reaching 0)
@@ -570,11 +580,6 @@ class TimerService {
     }
     
     console.log('Handling Pomodoro session end for:', session.type, session.sessionNumber);
-    
-    // Play notice sound for Pomodoro completion
-    if (this.preferences.pomodoro.soundEnabled) {
-      playCompletionSound('notice', this.preferences.soundVolume).catch(console.warn);
-    }
 
     // Notify about session end BEFORE any transitions
     this.callbacks.onPomodoroSessionEnd?.(session.type, session.sessionNumber);
@@ -582,8 +587,11 @@ class TimerService {
     // Only handle work session ends automatically
     // Break sessions should NEVER auto-end - they continue until manually ended
     if (session.type === 'work') {
-      // Stop white noise when work session ends
+      // Stop white noise when work session ends, then play distinctive Pomodoro alarm
       stopWhiteNoise();
+      if (this.preferences.pomodoro.soundEnabled) {
+        playCompletionSound('pomodoro_alarm', this.preferences.soundVolume).catch(console.warn);
+      }
       
       // Work session completed - pause and wait for manual break start
       // Timer goes into overtime mode (negative time) until user takes a break
@@ -670,14 +678,13 @@ class TimerService {
   formatTime(minutes: number): string {
     // Return empty string for 0 minutes to prevent showing "0:00"
     if (minutes === 0) return '';
-    
-    const absMinutes = Math.abs(minutes);
-    const hours = Math.floor(absMinutes / 60);
-    const mins = Math.floor(absMinutes % 60);
-    const secs = Math.floor((absMinutes % 1) * 60);
-    
+    // Round to seconds to avoid artifacts like 1:070
     const sign = minutes < 0 ? '-' : '';
-    
+    let totalSeconds = Math.round(Math.abs(minutes) * 60);
+    const hours = Math.floor(totalSeconds / 3600);
+    totalSeconds = totalSeconds % 3600;
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
     if (hours > 0) {
       return `${sign}${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }

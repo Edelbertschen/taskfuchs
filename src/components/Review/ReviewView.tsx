@@ -61,6 +61,10 @@ export function ReviewView({}: ReviewViewProps) {
       if (task.completed || task.archived || task.columnId === 'inbox') {
         return false;
       }
+      // Exclude pinned tasks from Review
+      if (task.pinColumnId) {
+        return false;
+      }
       
       // Exclude tasks that are already assigned to a specific date
       if (task.columnId && task.columnId.startsWith('date-')) {
@@ -103,6 +107,7 @@ export function ReviewView({}: ReviewViewProps) {
   const [editTimeValue, setEditTimeValue] = useState(0);
   const [showCalendar, setShowCalendar] = useState(false);
   const [showNextReviewModal, setShowNextReviewModal] = useState(false);
+  const [showPinPicker, setShowPinPicker] = useState(false);
 
   // Current task
   const currentTask = reviewableTasks[currentTaskIndex] || null;
@@ -297,6 +302,11 @@ export function ReviewView({}: ReviewViewProps) {
     if (!currentTask) return;
     setEditingTaskId(currentTask.id);
     setShowTaskModal(true);
+  };
+
+  const handlePinAssign = () => {
+    if (!currentTask) return;
+    setShowPinPicker(true);
   };
 
   const handleTimeUpdate = (minutes: number) => {
@@ -651,7 +661,7 @@ export function ReviewView({}: ReviewViewProps) {
               )}
 
               {/* Action Buttons */}
-              <div className="grid grid-cols-3 gap-3 mb-4">
+              <div className="grid grid-cols-4 gap-3 mb-4">
                 <button
                   onClick={handleCalendar}
                   className={`flex flex-col items-center gap-2 p-3 rounded-lg border transition-colors ${
@@ -671,6 +681,27 @@ export function ReviewView({}: ReviewViewProps) {
                   <span className={`text-xs ${
                     isMinimalDesign ? 'text-gray-500 dark:text-gray-400' : 'text-white/50'
                   }`}>C</span>
+                </button>
+                
+                <button
+                  onClick={handlePinAssign}
+                  className={`flex flex-col items-center gap-2 p-3 rounded-lg border transition-colors ${
+                    isMinimalDesign
+                      ? 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                      : 'border-white/10 hover:border-white/20 hover:bg-white/5 backdrop-blur-sm'
+                  }`}
+                >
+                  <Star className={`w-5 h-5 ${
+                    isMinimalDesign ? 'text-gray-600 dark:text-gray-400' : 'text-white/70'
+                  }`} />
+                  <span className={`text-sm font-medium ${
+                    isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : 'text-white'
+                  }`}>
+                    {i18n.language === 'en' ? 'Pin' : 'An Pin heften'}
+                  </span>
+                  <span className={`text-xs ${
+                    isMinimalDesign ? 'text-gray-500 dark:text-gray-400' : 'text-white/50'
+                  }`}>P</span>
                 </button>
                 
                 <button
@@ -1063,6 +1094,58 @@ export function ReviewView({}: ReviewViewProps) {
                 }`}
               >
                 Abbrechen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Pin Picker Modal */}
+      {showPinPicker && currentTask && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowPinPicker(false)}>
+          <div 
+            className={`rounded-2xl p-6 max-w-md w-full shadow-2xl ${
+              isMinimalDesign 
+                ? 'bg-white dark:bg-gray-900'
+                : 'glass-effect backdrop-blur-xl border border-white/10'
+            }`} onClick={(e) => e.stopPropagation()}>
+            <h3 className={`text-lg font-semibold mb-4 text-center ${
+              isMinimalDesign ? 'text-gray-900 dark:text-white' : 'text-white'
+            }`} style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.6)' }}>
+              {i18n.language === 'en' ? 'Choose pin column' : 'Pin-Spalte wählen'}
+            </h3>
+            <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
+              {state.pinColumns.map(col => (
+                <button
+                  key={col.id}
+                  onClick={() => {
+                    dispatch({ type: 'ASSIGN_TASK_TO_PIN', payload: { taskId: currentTask.id, pinColumnId: col.id } });
+                    setShowPinPicker(false);
+                  }}
+                  className={`w-full flex items-center justify-between p-3 rounded-lg border transition-colors ${
+                    isMinimalDesign
+                      ? 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
+                      : 'border-white/10 hover:bg-white/5'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="w-3 h-3 rounded-full" style={{ backgroundColor: col.color || state.preferences.accentColor }} />
+                    <span className={isMinimalDesign ? 'text-gray-900 dark:text-white' : 'text-white'}>{col.title}</span>
+                  </div>
+                  <Star className={isMinimalDesign ? 'text-gray-500' : 'text-white/70'} />
+                </button>
+              ))}
+              {state.pinColumns.length === 0 && (
+                <div className={isMinimalDesign ? 'text-gray-500' : 'text-white/70'}>
+                  {i18n.language === 'en' ? 'No pin columns yet' : 'Keine Pin-Spalten vorhanden'}
+                </div>
+              )}
+            </div>
+            <div className="mt-4 text-right">
+              <button onClick={() => setShowPinPicker(false)} className={`px-4 py-2 rounded-md transition-colors ${
+                isMinimalDesign ? 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200' : 'text-white/70 hover:text-white'
+              }`}>
+                {i18n.language === 'en' ? 'Close' : 'Schließen'}
               </button>
             </div>
           </div>

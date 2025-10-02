@@ -7,6 +7,7 @@ import { MaterialIcon } from '../Common/MaterialIcon';
 import { useTranslation } from 'react-i18next';
 import { useAppTranslation } from '../../utils/i18nHelpers';
 import { useDebounce } from '../../utils/performance';
+import { getFuchsImagePath, getImagePath } from '../../utils/imageUtils';
 
 // DnD Kit imports
 import {
@@ -288,23 +289,37 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
   // Checklist state
   const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>([]);
   
-  // Load checklistItems from localStorage on component mount
+  // Load checklist items: prefer global state; fallback to stored keys
   useEffect(() => {
-    const savedItems = localStorage.getItem('checklistItems');
-    if (savedItems) {
-      try {
-        const parsedItems = JSON.parse(savedItems);
-        setChecklistItems(parsedItems);
-      } catch (error) {
-        console.error('Error loading checklist items:', error);
+    try {
+      if (Array.isArray(state.checklistItems) && state.checklistItems.length > 0) {
+        setChecklistItems(state.checklistItems as any);
+        return;
       }
+      const savedUnified = localStorage.getItem('taskfuchs-checklist-items') || localStorage.getItem('checklistItems');
+      if (savedUnified) {
+        const parsed = JSON.parse(savedUnified);
+        if (Array.isArray(parsed)) {
+          setChecklistItems(parsed);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading checklist items:', error);
     }
   }, []);
   
-  // Save checklistItems to localStorage whenever they change
+  // Keep local state in sync if global changes elsewhere (e.g., ChecklistWidget)
   useEffect(() => {
-    localStorage.setItem('checklistItems', JSON.stringify(checklistItems));
-  }, [checklistItems]);
+    try {
+      const a = JSON.stringify(state.checklistItems || []);
+      const b = JSON.stringify(checklistItems || []);
+      if (a !== b) {
+        setChecklistItems(state.checklistItems as any);
+      }
+    } catch {}
+  }, [state.checklistItems]);
+  
+  // Do not write from here; AppContext persists global checklistItems.
   
   const [newItemText, setNewItemText] = useState('');
   const [isAdding, setIsAdding] = useState(false);
@@ -1550,9 +1565,10 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
             </div>
             <div className="flex items-center justify-center space-x-4 mb-4">
               <img 
-                src="./Fuchs.svg" 
+                src={getFuchsImagePath()} 
                 alt="Fuchs Logo" 
                 className="w-12 h-12 object-contain"
+                onError={(e) => { (e.currentTarget as HTMLImageElement).src = getImagePath('Fuchs.svg'); }}
               />
               <p className={`text-4xl font-medium tracking-wide ${
                 isMinimalDesign 
@@ -1716,7 +1732,7 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
                       dispatch({ type: 'UPDATE_TASK', payload: { ...task, columnId: 'archive' } });
                       setSnackbarOpen(true);
                     }}
-                    onSwipeRight={() => handleTaskClick(task)}
+                    onSwipeRight={() => handleTaskClick(task.id)}
                   >
                     <TaskItem
                       task={task}

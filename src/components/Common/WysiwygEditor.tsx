@@ -82,6 +82,11 @@ export function WysiwygEditor({
     };
   };
 
+  // Prevent toolbar buttons from stealing focus from the textarea
+  const preventMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+  };
+
   // Auto-convert image URLs to markdown image syntax
   const autoConvertImageUrls = (text: string): string => {
     // Split text into lines to process each line separately
@@ -566,17 +571,19 @@ export function WysiwygEditor({
 
   const insertList = (ordered: boolean = false) => {
     if (!textareaRef.current) return;
-    
     const textarea = textareaRef.current;
     const start = textarea.selectionStart;
     const lines = value.split('\n');
     const currentLineIndex = value.substring(0, start).split('\n').length - 1;
-    
     const prefix = ordered ? '1. ' : '- ';
     lines[currentLineIndex] = prefix + (lines[currentLineIndex] || '');
-    
     const newText = lines.join('\n');
     onChange(newText);
+    // Restore focus and place caret where it was, shifted by prefix length
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + prefix.length, start + prefix.length);
+    }, 0);
   };
 
   const insertHeading = (level: number) => {
@@ -1025,21 +1032,21 @@ export function WysiwygEditor({
             {!isPreviewMode && (
               <>
                 {/* Text Formatting */}
-                <button
+                <button onMouseDown={preventMouseDown}
                   onClick={() => insertFormatting('**', '**')}
                   className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
                   title="Fett"
                 >
                   <Bold className="w-4 h-4" />
                 </button>
-                <button
+                <button onMouseDown={preventMouseDown}
                   onClick={() => insertFormatting('*', '*')}
                   className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
                   title="Kursiv"
                 >
                   <Italic className="w-4 h-4" />
                 </button>
-                <button
+                <button onMouseDown={preventMouseDown}
                   onClick={() => insertFormatting('`', '`')}
                   className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
                   title="Code"
@@ -1050,21 +1057,21 @@ export function WysiwygEditor({
                 <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"></div>
 
                 {/* Headings */}
-                <button
+                <button onMouseDown={preventMouseDown}
                   onClick={() => insertHeading(1)}
                   className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors text-xs font-bold"
                   title="Überschrift 1"
                 >
                   H1
                 </button>
-                <button
+                <button onMouseDown={preventMouseDown}
                   onClick={() => insertHeading(2)}
                   className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors text-xs font-bold"
                   title="Überschrift 2"
                 >
                   H2
                 </button>
-                <button
+                <button onMouseDown={preventMouseDown}
                   onClick={() => insertHeading(3)}
                   className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors text-xs font-bold"
                   title="Überschrift 3"
@@ -1075,21 +1082,21 @@ export function WysiwygEditor({
                 <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"></div>
 
                 {/* Lists */}
-                <button
+                <button onMouseDown={preventMouseDown}
                   onClick={() => insertList(false)}
                   className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
                   title="Liste"
                 >
                   <List className="w-4 h-4" />
                 </button>
-                <button
+                <button onMouseDown={preventMouseDown}
                   onClick={() => insertList(true)}
                   className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
                   title="Nummerierte Liste"
                 >
                   <ListOrdered className="w-4 h-4" />
                 </button>
-                <button
+                <button onMouseDown={preventMouseDown}
                   onClick={insertCheckbox}
                   className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
                   title="Checkbox"
@@ -1100,21 +1107,21 @@ export function WysiwygEditor({
                 <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"></div>
 
                 {/* Other */}
-                <button
+                <button onMouseDown={preventMouseDown}
                   onClick={insertBlockquote}
                   className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
                   title="Zitat"
                 >
                   <Quote className="w-4 h-4" />
                 </button>
-                <button
+                <button onMouseDown={preventMouseDown}
                   onClick={insertLink}
                   className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
                   title="Link"
                 >
                   <Link className="w-4 h-4" />
                 </button>
-                <button
+                <button onMouseDown={preventMouseDown}
                   onClick={insertImage}
                   className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
                   title="Bild"
@@ -1122,7 +1129,7 @@ export function WysiwygEditor({
                   <Image className="w-4 h-4" />
                 </button>
                 
-                <button
+                <button onMouseDown={preventMouseDown}
                   onClick={insertHorizontalRule}
                   className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
                   title="Horizontale Linie"

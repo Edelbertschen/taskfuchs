@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
-import type { Task, Column, Tag, UserPreferences, TimerState, KanbanBoard, ViewState, KanbanGroupingMode, Note, NotesState, NoteLink, ActiveTimerContext, Notification, ProjectKanbanColumn, ProjectKanbanState, TaskPriority, ImageStorageState, StoredImage, RecurrenceState, RecurrenceRule, CalendarEvent, CalendarSource, PinColumn, ChecklistItem, PersonalCapacity } from '../types';
+import type { Task, Column, Tag, UserPreferences, TimerState, KanbanBoard, ViewState, KanbanGroupingMode, Note, NotesState, NoteLink, ActiveTimerContext, Notification, ProjectKanbanColumn, ProjectKanbanState, TaskPriority, ImageStorageState, StoredImage, RecurrenceState, RecurrenceRule, CalendarEvent, CalendarSource, PinColumn, ChecklistItem, PersonalCapacity, RecurringTask } from '../types';
 import { format, addDays, startOfDay } from 'date-fns';
 import { sampleTasks } from '../utils/sampleData';
 import { timerService } from '../utils/timerService';
@@ -277,8 +277,8 @@ const initialState: AppState = {
   preferences: {
     theme: 'system',
     language: 'de',
-    accentColor: localStorage.getItem('customAccentColor') || '#f97316',
-    backgroundImage: '/backgrounds/bg1.jpg',
+    accentColor: '#f97316',
+    backgroundImage: '/backgrounds/bg12.png',
     backgroundType: 'image',
     dateFormat: 'dd.MM.yyyy',
     recentBackgroundImages: [],
@@ -302,6 +302,9 @@ const initialState: AppState = {
     timerDisplayMode: 'topBar',
     columns: {
       visible: 5,
+      plannerVisible: 5,
+      projectsVisible: 5,
+      pinsVisible: 5,
       showProjects: true,
     },
     showPriorities: true,
@@ -356,7 +359,6 @@ const initialState: AppState = {
       syncInterval: 30,
       syncOnStart: true,
       syncOnTaskChange: true,
-      syncOnlyCompleted: false,
       bidirectionalSync: true,
       lastSync: undefined,
       lastSyncStatus: undefined,
@@ -377,6 +379,8 @@ const initialState: AppState = {
       lastSync: undefined,
       lastSyncStatus: undefined,
       lastSyncError: undefined,
+      projectMappings: [],
+      useSectionMapping: false,
     },
     // Todoist integration settings
     todoist: {
@@ -420,6 +424,7 @@ const initialState: AppState = {
       overlayMinimized: false,
       autoOpenTaskOnStart: true,
       showRemainingTime: true,
+      dimControlsWhenNoTask: true,
     },
     // Background effects
     backgroundEffects: {
@@ -730,19 +735,15 @@ function appReducer(state: AppState, action: AppAction): AppState {
           return { ...state, error: 'Aufgabe nicht gefunden' };
         }
         
-        if (!task.estimatedTime || task.estimatedTime <= 0) {
-          console.warn('Cannot start timer: no estimated time set', task);
-          return { ...state, error: 'Keine geschätzte Zeit für diese Aufgabe festgelegt' };
-        }
-
         // Create timer context immediately for instant UI response
         const trackedTime = task.trackedTime || 0;
+        const effectiveEstimated = Math.max(0, task.estimatedTime || 0);
         const immediateTimerContext = {
           taskId: task.id,
           taskTitle: task.title,
-          estimatedTime: task.estimatedTime,
+          estimatedTime: effectiveEstimated,
           elapsedTime: trackedTime,
-          remainingTime: task.estimatedTime - trackedTime,
+          remainingTime: effectiveEstimated > 0 ? (effectiveEstimated - trackedTime) : 0,
           isActive: true,
           isPaused: false,
           mode: action.payload.mode || 'normal',
@@ -754,7 +755,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
           timerService.startTimer(
             task.id,
             task.title,
-            task.estimatedTime,
+            effectiveEstimated,
             action.payload.mode || 'normal',
             undefined,
             trackedTime
@@ -1105,9 +1106,12 @@ function appReducer(state: AppState, action: AppAction): AppState {
           }
         }
         
-        // Stop any active timers
-        if (timerService && typeof timerService.stop === 'function') {
-          timerService.stop();
+        // Stop any active task timer
+        if (timerService) {
+          try {
+            // stopTimer only affects the task timer and preserves Pomodoro session
+            timerService.stopTimer('stopped');
+          } catch {}
         }
         
         console.log('All TaskFuchs data cleared - factory reset complete');
@@ -1463,14 +1467,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
     
 
     
-    case 'SET_DAILY_NOTE_DATE':
-      return {
-        ...state,
-        notes: {
-          ...state.notes,
-          dailyNoteDate: action.payload
-        }
-      };
+    // Deprecated: SET_DAILY_NOTE_DATE (replaced by SET_SELECTED_DAILY_NOTE_DATE)
     
     // Note linking cases
     case 'ADD_NOTE_LINK':
@@ -2411,18 +2408,17 @@ function appReducer(state: AppState, action: AppAction): AppState {
       const { events: newEvents, sourceId } = action.payload;
       
       // Remove existing events from this source
+      const sourceUrl = state.calendarSources.find(s => s.id === sourceId)?.url;
       const filteredEvents = state.events.filter(event => 
-        event.calendarUrl !== state.calendarSources.find(s => s.id === sourceId)?.url
+        event.calendarUrl !== sourceUrl
       );
       
       // Add new events, but check for duplicates by UID or ID within the same source
       const uniqueNewEvents = newEvents.filter((newEvent, index, arr) => {
-        // For events with UID, check if this is the first occurrence of this UID
         if (newEvent.uid) {
           const firstUidIndex = arr.findIndex(e => e.uid === newEvent.uid);
           return index === firstUidIndex;
         }
-        // For events without UID, check by ID (fallback)
         const firstIdIndex = arr.findIndex(e => e.id === newEvent.id);
         return index === firstIdIndex;
       });
@@ -3045,6 +3041,43 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     console.log('✅ Orphaned kanban references repair completed');
   };
 
+  // Repair missing Pin columns referenced by tasks
+  const repairOrphanedPinColumns = (currentState: AppState) => {
+    try {
+      const existingPinIds = new Set(currentState.pinColumns.map(c => c.id));
+      const referencedPinIds = new Set(
+        currentState.tasks
+          .filter(t => !!t.pinColumnId)
+          .map(t => t.pinColumnId as string)
+      );
+
+      const missing: string[] = [];
+      referencedPinIds.forEach(id => {
+        if (!existingPinIds.has(id)) missing.push(id);
+      });
+
+      if (missing.length === 0) return;
+
+      let order = currentState.pinColumns.length > 0
+        ? Math.max(...currentState.pinColumns.map(c => c.order)) + 1
+        : 0;
+
+      missing.forEach((id) => {
+        const newCol = {
+          id,
+          title: 'Pin',
+          color: currentState.preferences.accentColor,
+          order: order++,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        } as PinColumn;
+        dispatch({ type: 'ADD_PIN_COLUMN', payload: newCol });
+      });
+    } catch (e) {
+      console.warn('Error repairing orphaned pin columns', e);
+    }
+  };
+
   // Load data from localStorage on initialization and setup columns
   useEffect(() => {
     let loadedColumns: Column[] = [];
@@ -3063,6 +3096,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const savedViewState = localStorage.getItem('taskfuchs-view-state');
       const savedEvents = localStorage.getItem('taskfuchs-events');
       const savedCalendarSources = localStorage.getItem('taskfuchs-calendar-sources');
+      const savedPinColumns = localStorage.getItem('taskfuchs-pin-columns');
+      const savedChecklistItems = localStorage.getItem('taskfuchs-checklist-items');
 
       // Check if this is a new user (no saved data at all)
       isNewUser = !savedColumns && !savedTasks && !savedBoards;
@@ -3089,7 +3124,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
       if (savedPreferences) {
         const preferences = JSON.parse(savedPreferences);
-
+        
         // Migration: replace legacy remote background URLs with local default
         let migratedPreferences = { ...preferences };
         if (
@@ -3097,7 +3132,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           migratedPreferences.backgroundImage &&
           !migratedPreferences.backgroundImage.startsWith('/')
         ) {
-          migratedPreferences.backgroundImage = '/backgrounds/bg1.jpg';
+          migratedPreferences.backgroundImage = '/backgrounds/bg12.png';
         }
 
         // Sanitize gallery in localStorage: keep only local paths and ensure defaults are present
@@ -3172,6 +3207,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         const calendarSources = JSON.parse(savedCalendarSources);
         dispatch({ type: 'SET_CALENDAR_SOURCES', payload: calendarSources });
       }
+      if (savedPinColumns) {
+        const pinColumns = JSON.parse(savedPinColumns);
+        dispatch({ type: 'SET_PIN_COLUMNS', payload: pinColumns });
+      }
+      if (savedChecklistItems) {
+        const checklistItems = JSON.parse(savedChecklistItems);
+        dispatch({ type: 'SET_CHECKLIST_ITEMS', payload: checklistItems });
+      }
+
     } catch (error) {
       console.error('Error loading data from localStorage:', error);
     }
@@ -3193,11 +3237,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       });
     }
 
+    // Merge saved titles for date columns (so renamed planner column titles persist across sync/devices)
+    const savedDateColumnsMap = new Map<string, Column>();
+    try {
+      (loadedColumns || [])
+        .filter((c) => c && c.type === 'date' && typeof c.id === 'string')
+        .forEach((c) => savedDateColumnsMap.set(c.id, c));
+    } catch {}
+
+    const mergedDateColumns: Column[] = dateColumns.map((dc) => {
+      const saved = savedDateColumnsMap.get(dc.id);
+      if (!saved) return dc;
+      // Preserve custom title (and future custom props) from saved state
+      return { ...dc, title: saved.title || dc.title };
+    });
+
     let finalColumns: Column[] = [];
 
     if (isNewUser) {
       // For new users: NO DEFAULT PROJECTS - start with empty project list
-      finalColumns = [...dateColumns];
+      finalColumns = [...mergedDateColumns];
       
       // Set sample tasks for new users
       if (state.tasks.length === 0) {
@@ -3224,7 +3283,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     } else {
       // For existing users, preserve saved project columns and update date columns
       const existingProjectColumns = loadedColumns.filter(col => col.type === 'project');
-      finalColumns = [...dateColumns, ...existingProjectColumns];
+      finalColumns = [...mergedDateColumns, ...existingProjectColumns];
     }
 
     dispatch({ type: 'SET_COLUMNS', payload: finalColumns });
@@ -3315,6 +3374,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   }, [state.columns]);
 
+  // Persist pin columns separately to avoid loss of names/order
+  useEffect(() => {
+    try {
+      localStorage.setItem('taskfuchs-pin-columns', JSON.stringify(state.pinColumns));
+    } catch (error) {
+      console.error('Error saving pin columns to localStorage:', error);
+    }
+  }, [state.pinColumns]);
+
   useEffect(() => {
     try {
       localStorage.setItem('taskfuchs-view-state', JSON.stringify(state.viewState));
@@ -3338,6 +3406,75 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       console.error('Error saving calendar sources to localStorage:', error);
     }
   }, [state.calendarSources]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('taskfuchs-checklist-items', JSON.stringify(state.checklistItems));
+    } catch (error) {
+      console.error('Error saving checklist items to localStorage:', error);
+    }
+  }, [state.checklistItems]);
+
+  // Auto-sync iCal calendar sources periodically and on focus
+  useEffect(() => {
+    let isDisposed = false;
+    const inProgress = new Set<string>();
+
+    const syncDueSources = async () => {
+      if (isDisposed) return;
+      if (!state?.preferences?.calendars?.showInPlanner) return;
+
+      const enabledSources = (state.calendarSources || []).filter(s => s.enabled !== false);
+      if (enabledSources.length === 0) return;
+
+      try {
+        const { ICalService } = await import('../utils/icalService');
+        const service = ICalService.getInstance();
+
+        const now = Date.now();
+        for (const source of enabledSources) {
+          if (isDisposed) break;
+          const intervalMin = typeof source.syncInterval === 'number' ? source.syncInterval : 30;
+          const last = source.lastSync ? new Date(source.lastSync).getTime() : 0;
+          const due = now - last >= intervalMin * 60_000;
+          if (!due) continue;
+          if (inProgress.has(source.id)) continue;
+
+          inProgress.add(source.id);
+          service.fetchCalendar(source)
+            .then((events) => {
+              if (isDisposed) return;
+              dispatch({ type: 'SYNC_EVENTS', payload: { events, sourceId: source.id } });
+              const updatedSource = { ...source, lastSync: new Date().toISOString() } as any;
+              dispatch({ type: 'UPDATE_CALENDAR_SOURCE', payload: updatedSource });
+            })
+            .catch((e) => {
+              console.warn('iCal auto-sync failed for source', source.name || source.id, e);
+            })
+            .finally(() => {
+              inProgress.delete(source.id);
+            });
+        }
+      } catch (e) {
+        console.warn('iCal auto-sync setup error:', e);
+      }
+    };
+
+    // Run once shortly after mount/changes, and on window focus
+    const initialTimer = window.setTimeout(syncDueSources, 1500);
+    const onFocus = () => syncDueSources();
+    window.addEventListener('focus', onFocus);
+
+    // Periodic check (every minute)
+    const intervalId = window.setInterval(syncDueSources, 60_000);
+
+    return () => {
+      isDisposed = true;
+      window.clearTimeout(initialTimer);
+      window.clearInterval(intervalId);
+      window.removeEventListener('focus', onFocus);
+    };
+  }, [state.calendarSources, state.preferences?.calendars?.showInPlanner, dispatch]);
 
   // Initialize timer service ONCE
   useEffect(() => {
@@ -3588,6 +3725,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   }, [state.tasks, state.columns, state.viewState.projectKanban.columns]);
 
+  // After loading initial data and on task/pin changes, ensure referenced pin columns exist
+  useEffect(() => {
+    repairOrphanedPinColumns(state);
+  }, [state.tasks.length, state.pinColumns.length]);
+
   // Update date columns when currentDate changes (preserve project columns)
   useEffect(() => {
     // Skip if columns haven't been initialized yet
@@ -3795,6 +3937,69 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     root.style.setProperty('--accent-color', state.preferences.accentColor);
   }, []);
 
+  // Heartbeat: ensure UI updates even if browser throttles intervals or loses focus
+  useEffect(() => {
+    const forceRefresh = () => {
+      try {
+        const active = timerService.getActiveTimer();
+        if (active) {
+          dispatch({ type: 'UPDATE_TIMER_CONTEXT', payload: active });
+        }
+        // Also push a Pomodoro-only context update if no active task is running
+        if (!active && timerService.isPomodoroActive()) {
+          // Create a minimal synthetic context for UI components reading timer from context
+          const session = timerService.getGlobalPomodoroSession();
+          if (session) {
+            dispatch({
+              type: 'UPDATE_TIMER_CONTEXT',
+              payload: {
+                taskId: '__pomodoro__',
+                taskTitle: 'Pomodoro',
+                estimatedTime: timerService.getSessionDuration(session.type),
+                elapsedTime: session.sessionElapsedTime,
+                remainingTime: session.sessionRemainingTime,
+                isActive: true,
+                isPaused: false,
+                mode: 'pomodoro',
+                pomodoroSession: {
+                  type: session.type,
+                  sessionNumber: session.sessionNumber,
+                  totalSessions: 0,
+                  sessionStartTime: session.sessionStartTime,
+                  sessionElapsedTime: session.sessionElapsedTime,
+                  sessionRemainingTime: session.sessionRemainingTime,
+                }
+              }
+            } as any);
+          }
+        }
+      } catch {}
+    };
+
+    const onVisibility = () => {
+      if (!document.hidden) {
+        forceRefresh();
+      }
+    };
+
+    const interval = window.setInterval(() => {
+      // If we haven't pushed a UI update for a while but a timer is active, push a fresh context
+      const now = Date.now();
+      if (timerService.isTimerActive() && (!timerService.lastUIUpdate || now - timerService.lastUIUpdate > 1500)) {
+        forceRefresh();
+        timerService.lastUIUpdate = now;
+      }
+    }, 1000);
+
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('focus', forceRefresh);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('focus', forceRefresh);
+    };
+  }, [dispatch]);
+
   // Apply theme
   useEffect(() => {
     const root = document.documentElement;
@@ -3870,25 +4075,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
               dispatch({ type: 'DELETE_TASK', payload: taskFuchsTaskId });
             });
             
-            // Update local columns if needed
+            // NOTE: Do not overwrite or delete local project kanban columns during auto-sync
+            // This avoids unintentional title changes or removals "ohne Zutun".
             if (result.localColumnsUpdated.length > 0 || result.localColumnsDeleted.length > 0) {
-              // Handle column updates
-              result.localColumnsUpdated.forEach(column => {
-                console.log(`📝 Auto-sync: Updating TaskFuchs column: ${column.id} to "${column.title}" (renamed in Todoist)`);
-                dispatch({ 
-                  type: 'UPDATE_PROJECT_KANBAN_COLUMN', 
-                  payload: { 
-                    columnId: column.id, 
-                    title: column.title || 'Untitled'
-                  } 
-                });
-              });
-              
-              // Handle column deletions
-              result.localColumnsDeleted.forEach(columnId => {
-                console.log(`🗑️ Auto-sync: Deleting TaskFuchs column: ${columnId} (deleted in Todoist)`);
-                dispatch({ type: 'DELETE_PROJECT_KANBAN_COLUMN', payload: columnId });
-              });
+              console.log(`ℹ️ Auto-sync: Skipping ${result.localColumnsUpdated.length} column rename(s) and ${result.localColumnsDeleted.length} deletion(s) to preserve local project columns.`);
             }
           
           // Note: Automatic date column creation is disabled

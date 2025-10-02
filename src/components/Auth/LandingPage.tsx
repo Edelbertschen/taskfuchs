@@ -1,84 +1,82 @@
 import React, { useState, useEffect } from 'react';
-import { Play } from 'lucide-react';
-import { getFuchsImagePath } from '../../utils/imageUtils';
+import { getFuchsImagePath, getImagePath } from '../../utils/imageUtils';
 
 interface LandingPageProps {
   onGuestLogin: () => void;
 }
 
 export function LandingPage({ onGuestLogin }: LandingPageProps) {
-  const [isVisible, setIsVisible] = useState(false);
+  const [accentColor, setAccentColor] = useState<string>('#ef4444');
+  const [showClaim, setShowClaim] = useState<boolean>(true);
 
+  // Resolve accent color from storage or CSS var
   useEffect(() => {
-    setIsVisible(true);
+    const getAccent = () => {
+      try {
+        if (typeof window !== 'undefined') {
+          const stored = localStorage.getItem('accentColor');
+          if (stored) return stored;
+          const cssVar = getComputedStyle(document.documentElement).getPropertyValue('--accent-color')?.trim();
+          if (cssVar) return cssVar;
+        }
+      } catch {}
+      return '#ef4444';
+    };
+    setAccentColor(getAccent());
   }, []);
 
+  // Fade out claim after 3s, then continue to app shortly after
+  useEffect(() => {
+    const t1 = setTimeout(() => setShowClaim(false), 3000);
+    const t2 = setTimeout(() => onGuestLogin(), 3600);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [onGuestLogin]);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-orange-50 flex items-center justify-center">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-br from-orange-400/20 to-red-400/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-60 right-20 w-96 h-96 bg-gradient-to-br from-orange-300/15 to-yellow-300/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute bottom-40 left-1/3 w-64 h-64 bg-gradient-to-br from-red-400/20 to-orange-400/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }}></div>
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
+      {/* Subtle background with elegant vignette */}
+      <div className="absolute inset-0" aria-hidden="true">
+        <div className="w-full h-full bg-white dark:bg-gray-950" />
+        <div
+          className="absolute inset-0 opacity-[0.05]"
+          style={{
+            background: `radial-gradient(60rem 60rem at 50% 35%, ${accentColor}, transparent 60%)`,
+          }}
+        />
       </div>
 
-      {/* Central Hero Section */}
-      <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
-        <div className={`transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
-          {/* Logo */}
-          <div className="flex justify-center mb-12">
-            <img
-              src={getFuchsImagePath()}
-              alt="TaskFuchs Logo"
-              className="w-24 h-24"
-            />
-          </div>
+      {/* Centered mark */}
+      <div className="relative z-10 text-center px-8">
+        <div className="mx-auto mb-8 w-28 h-28 rounded-full flex items-center justify-center" style={{ boxShadow: '0 1px 0 rgba(0,0,0,0.02)' }}>
+          <img
+            src={getFuchsImagePath()}
+            alt="TaskFuchs"
+            className="w-24 h-24 object-contain select-none"
+            draggable={false}
+            onError={(e) => { (e.currentTarget as HTMLImageElement).src = getImagePath('Fuchs.svg'); }}
+          />
+        </div>
 
-          {/* Main Headline */}
-          <h1 className="text-6xl md:text-7xl font-bold mb-6 leading-tight">
-            <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent font-black">
-              TaskFuchs
-            </span>
-            <br />
-            <span className="text-gray-900">Zähme das Chaos.</span>
-          </h1>
+        <div className="mb-3">
+          <span
+            className="text-[clamp(44px,7vw,96px)] font-semibold tracking-tight leading-none"
+            style={{ color: 'inherit' }}
+          >
+            TaskFuchs
+          </span>
+        </div>
+        <div className="mx-auto mb-8 h-[3px] w-[180px] rounded-full" style={{ backgroundColor: accentColor }} />
 
-          {/* Subtitle */}
-          <p className="text-xl md:text-2xl text-gray-600 mb-12 leading-relaxed max-w-3xl mx-auto">
-            Die ultimative Aufgabenverwaltung mit Pomodoro-Timer und nahtloser 
-            Integration in deine bestehenden Workflows.
-          </p>
-
-          {/* Action Button with auto-start countdown */}
-          <LandingStartButton onStart={onGuestLogin} />
+        <div
+          className={`text-[clamp(16px,2.2vw,22px)] text-gray-500 dark:text-gray-300 transition-opacity duration-700 ease-out`}
+          style={{ opacity: showClaim ? 1 : 0 }}
+        >
+          Dein Tag, dein Revier.
         </div>
       </div>
-    </div>
-  );
-} 
-
-function LandingStartButton({ onStart }: { onStart: () => void }) {
-  const [count, setCount] = useState<number>(5);
-  useEffect(() => {
-    const t = setInterval(() => setCount((c) => (c > 0 ? c - 1 : 0)), 1000);
-    return () => clearInterval(t);
-  }, []);
-
-  useEffect(() => {
-    if (count === 0) onStart();
-  }, [count, onStart]);
-
-  return (
-    <div className="flex items-center justify-center mt-6">
-      <button
-        onClick={onStart}
-        className="group relative bg-gradient-to-r from-orange-600 to-red-600 text-white px-8 py-4 rounded-2xl font-semibold text-lg shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300 flex items-center space-x-3 min-w-[240px] justify-center"
-      >
-        <Play className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-        <span>Starten</span>
-        <span className="ml-2 text-white/80 text-sm">{count}s</span>
-        <div className="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-      </button>
     </div>
   );
 }

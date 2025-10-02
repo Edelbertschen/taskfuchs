@@ -69,24 +69,71 @@ export function PinsView() {
     }),
   );
 
+  // Horizontal scroll container ref (for wheel/arrow navigation like Planner/Projects)
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [pinOffset, setPinOffset] = useState(0);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+
+    const handleWheel = (e: WheelEvent) => {
+      // Support both vertical and horizontal trackpad gestures
+      // Choose the dominant axis to determine direction
+      const absX = Math.abs(e.deltaX || 0);
+      const absY = Math.abs(e.deltaY || 0);
+      const raw = absX > absY ? e.deltaX : e.deltaY;
+      if (raw === 0) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const visible = (state.preferences.columns.pinsVisible ?? state.preferences.columns.visible) || 3;
+      const step = Math.sign(raw);
+      const maxOffset = Math.max(0, state.pinColumns.length - visible);
+      setPinOffset((prev) => Math.min(maxOffset, Math.max(0, prev + step)));
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const activeEl = document.activeElement as HTMLElement | null;
+      const isInputFocused = !!activeEl && (
+        activeEl.tagName === 'INPUT' ||
+        activeEl.tagName === 'TEXTAREA' ||
+        activeEl.getAttribute('contenteditable') === 'true'
+      );
+      if (isInputFocused) return;
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        if (!scrollContainerRef.current) return;
+        e.preventDefault();
+        const visible = (state.preferences.columns.pinsVisible ?? state.preferences.columns.visible) || 3;
+        const maxOffset = Math.max(0, state.pinColumns.length - visible);
+        const step = e.key === 'ArrowRight' ? 1 : -1;
+        setPinOffset((prev) => Math.min(maxOffset, Math.max(0, prev + step)));
+      }
+    };
+
+    if (container) {
+      container.addEventListener('wheel', handleWheel, { passive: false });
+    }
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      if (container) {
+        container.removeEventListener('wheel', handleWheel as EventListener);
+      }
+      document.removeEventListener('keydown', handleKeyDown as EventListener);
+    };
+  }, [state.pinColumns.length, state.preferences.columns.visible, state.preferences.columns.pinsVisible]);
+
   // Get visible pin columns with offset like ProjectKanbanBoard
   const displayColumns = useMemo(() => {
     const allColumns = [...state.pinColumns].sort((a, b) => a.order - b.order);
-    const visibleColumnCount = state.preferences.columns.visible;
-    const result: (PinColumnType | null | undefined)[] = [];
-    
-    for (let i = 0; i < visibleColumnCount; i++) {
-      if (i < allColumns.length) {
-        result.push(allColumns[i]);
-      } else if (i === allColumns.length) {
-        result.push(null); // Add column button
-      } else {
-        result.push(undefined); // Empty slot
-      }
+    const visibleColumnCount = state.preferences.columns.pinsVisible ?? state.preferences.columns.visible;
+    const sliced = allColumns.slice(pinOffset, pinOffset + (visibleColumnCount || allColumns.length));
+    const result: (PinColumnType | null | undefined)[] = [...sliced];
+    if ((visibleColumnCount || 0) > 0 && sliced.length < (visibleColumnCount || 0)) {
+      result.push(null);
+      while (result.length < (visibleColumnCount || 0)) result.push(undefined);
     }
-
     return result;
-  }, [state.pinColumns, state.preferences.columns.visible]);
+  }, [state.pinColumns, state.preferences.columns.visible, state.preferences.columns.pinsVisible, pinOffset]);
 
   // Tasks grouped by pin column
   const tasksByPinColumn = useMemo(() => {
@@ -321,7 +368,7 @@ export function PinsView() {
       payload: { 
         columns: { 
           ...state.preferences.columns, 
-          visible: count 
+          pinsVisible: count 
         } 
       } 
     });
@@ -405,6 +452,8 @@ export function PinsView() {
   // Render columns
   const renderColumns = (columns: (PinColumnType | null | undefined)[]) => {
     const result = [];
+    const realColumnsCount = columns.filter(c => c && c !== null && c !== undefined).length;
+    const isSingle = realColumnsCount === 1 && (state.preferences.columns.pinsVisible ?? state.preferences.columns.visible) === 1;
     
     for (let index = 0; index < columns.length; index++) {
       const column = columns[index];
@@ -446,13 +495,22 @@ export function PinsView() {
       } else {
         // Regular column
         const tasks = tasksByPinColumn[column.id] || [];
-        result.push(
+        const node = (
           <SortablePinColumn
             key={column.id}
             column={column}
             tasks={tasks}
           />
         );
+        if (isSingle) {
+          result.push(
+            <div key={`single-wrap-${column.id}`} style={{ flex: '0 0 702px', maxWidth: 702, width: 702, margin: '0 auto' }}>
+              {node}
+            </div>
+          );
+        } else {
+          result.push(node);
+        }
       }
     }
     
@@ -512,9 +570,10 @@ export function PinsView() {
               }}>
                 {displayColumns.length > 0 && (
                   <div 
+                    ref={scrollContainerRef}
                     style={{ 
                       display: 'flex', 
-                      gap: '4px',
+                      gap: isMinimalDesign ? '5px' : '9px',
                       flex: 1,
                       alignItems: 'flex-start',
                       width: '100%',
@@ -529,7 +588,7 @@ export function PinsView() {
                     }}
                   >
                     <SortableContext
-                      items={state.pinColumns.map(col => col.id)}
+                      items={displayColumns.filter((c): c is PinColumnType => !!c).map((c) => c.id)}
                       strategy={horizontalListSortingStrategy}
                     >
                       {renderColumns(displayColumns)}
@@ -561,11 +620,11 @@ export function PinsView() {
                     key={count}
                     onClick={() => handleColumnCountChange(count)}
                     className={`px-2 py-1 text-xs font-medium rounded-full transition-all duration-200 ${
-                      state.preferences.columns.visible === count
+                      (state.preferences.columns.pinsVisible ?? state.preferences.columns.visible) === count
                         ? 'text-white shadow-sm'
                         : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
                     }`}
-                    style={state.preferences.columns.visible === count ? { backgroundColor: state.preferences.accentColor } : {}}
+                    style={(state.preferences.columns.pinsVisible ?? state.preferences.columns.visible) === count ? { backgroundColor: state.preferences.accentColor } : {}}
                   >
                     {count}
                   </button>
@@ -596,7 +655,8 @@ export function PinsView() {
         {/* Task Modal */}
         {isTaskModalOpen && selectedTask && (
           <TaskModal
-            task={selectedTask}
+            // Always use freshest task instance from store (important during timer updates)
+            task={state.tasks.find(t => t.id === selectedTask.id) || selectedTask}
             isOpen={isTaskModalOpen}
             onClose={handleCloseTaskModal}
           />

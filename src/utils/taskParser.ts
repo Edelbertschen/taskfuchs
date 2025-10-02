@@ -58,8 +58,8 @@ export function parseTaskInput(input: string): ParseResult {
       title = title.replace(descMatch[0], '').trim();
     }
 
-    // Extract time
-    const timeMatches = [...input.matchAll(PATTERNS.time)];
+    // Extract time (match against current title to keep removal consistent)
+    const timeMatches = [...title.matchAll(PATTERNS.time)];
     if (timeMatches.length > 0) {
       const timeMatch = timeMatches[0];
       const amount = parseFloat(timeMatch[1]);
@@ -76,12 +76,12 @@ export function parseTaskInput(input: string): ParseResult {
         estimatedTime = undefined;
       }
       
-      // Remove time from title
+      // Remove time from title using the exact matched slice from current title
       title = title.replace(timeMatch[0], '').trim();
     }
 
-    // Extract priority
-    const priorityMatches = [...input.matchAll(PATTERNS.priority)];
+    // Extract priority (match against current title)
+    const priorityMatches = [...title.matchAll(PATTERNS.priority)];
     if (priorityMatches.length > 0) {
       const priorityMatch = priorityMatches[0][2].toLowerCase(); // Changed from [1] to [2] since [1] is now the prefix
       
@@ -98,12 +98,12 @@ export function parseTaskInput(input: string): ParseResult {
       const prefix = priorityMatches[0][1];
       const priorityPart = priorityMatches[0][2];
       
-      // Replace the full match but preserve space if it was a space prefix
+      // Replace the full match in current title; preserve space if it was a space prefix
       title = title.replace(fullMatch, prefix === ' ' ? ' ' : '').trim();
     }
 
-    // Extract date - ONLY set dueDate, NEVER automatically set columnId
-    const dateMatches = [...input.matchAll(PATTERNS.date)];
+    // Extract date - ONLY set dueDate, match against current title
+    const dateMatches = [...title.matchAll(PATTERNS.date)];
     if (dateMatches.length > 0) {
       const dateMatch = dateMatches[0];
       const dateStr = dateMatch[1].toLowerCase();
@@ -141,12 +141,12 @@ export function parseTaskInput(input: string): ParseResult {
         // NO automatic columnId assignment - task stays in target column
       }
       
-      // Remove date from title
+      // Remove date from title using current match
       title = title.replace(dateMatch[0], '').trim();
     }
 
-    // Extract column - ONLY explicit @column assignments set columnId
-    const columnMatches = [...input.matchAll(PATTERNS.column)];
+    // Extract column - ONLY explicit @column assignments set columnId (match against current title)
+    const columnMatches = [...title.matchAll(PATTERNS.column)];
     if (columnMatches.length > 0) {
       const columnMatch = columnMatches[0][1].toLowerCase();
       
@@ -264,11 +264,9 @@ export function getParsingExamples(): string[] {
     'Projekt Review 2h30m !!! 15.05.2024 #work',
     'Zahnarzttermin @morgen 45min #gesundheit',
     'Backup erstellen 30min ! n Server-Backup durchführen #it',
-    '[🎫 UNIQUE Helpdesk - Ticket #505050](https://unique.zammad.com/#ticket/zoom/5051) !! #support n Auto-Tag #ticket',
     '**Wichtige Aufgabe** erledigen 30m ! #wichtig',
     '*Präsentation* vorbereiten 2h !! n Folien ~~überprüfen~~ und `Code` einbauen #meeting',
-    'E-Mail#1234 prüfen 15m (nur Text #tag wird als Tag erkannt)',
-    'Ticket https://unique.zammad.com/ticket/123 bearbeiten n Automatisch #ticket Tag'
+    // intentionally compact: no external ticket/mail examples
   ];
 }
 

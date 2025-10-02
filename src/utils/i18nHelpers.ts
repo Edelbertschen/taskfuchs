@@ -21,7 +21,7 @@ export const useAppTranslation = () => {
   };
 
   // Wrapper-Funktionen für die alten Namespaces
-  const createNamespaceWrapper = (namespace: string) => {
+  const createNamespaceWrapper = (namespace: string): any => {
     return new Proxy({}, {
       get: (target, prop) => {
         if (typeof prop === 'string') {
@@ -51,7 +51,7 @@ export const useAppTranslation = () => {
   };
 
   // Helper for nested objects like emptyState.title
-  const createNestedWrapper = (namespace: string, parentKey: string) => {
+  const createNestedWrapper = (namespace: string, parentKey: string): any => {
     return new Proxy({}, {
       get: (target, prop) => {
         if (typeof prop === 'string') {

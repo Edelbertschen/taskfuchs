@@ -18,13 +18,14 @@ import {
   X,
   FolderOpen,
   Hash,
-  Edit2,
+  
   Inbox,
   Plus,
   Filter,
   List,
   Search,
-  CheckSquare
+  CheckSquare,
+  Pin as PinIcon
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { SmartTaskModal } from '../Tasks/SmartTaskModal';
@@ -55,6 +56,71 @@ export function InboxView() {
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [selectedTaskForModal, setSelectedTaskForModal] = useState<Task | null>(null);
+  // Modal navigation state for sequencing inbox tasks
+  const [modalTaskIndex, setModalTaskIndex] = useState<number>(-1);
+  const [modalNavDirection, setModalNavDirection] = useState<'prev' | 'next' | null>(null);
+
+  const openInboxTaskAt = (idx: number) => {
+    const flat = inboxTasks; // already sorted newest first
+    if (idx < 0 || idx >= flat.length) return;
+    setSelectedTaskForModal(flat[idx]);
+    setModalTaskIndex(idx);
+    setShowTaskModal(true);
+  };
+
+  const openFirstInboxTask = () => {
+    if (inboxTasks.length > 0) {
+      setModalNavDirection(null);
+      openInboxTaskAt(0);
+    }
+  };
+
+  const navigatePrevTask = () => {
+    if (modalTaskIndex > 0) {
+      const nextIdx = modalTaskIndex - 1;
+      setModalNavDirection('prev');
+      openInboxTaskAt(nextIdx);
+    }
+  };
+
+  const navigateNextTask = () => {
+    const flat = inboxTasks;
+    if (modalTaskIndex >= 0 && modalTaskIndex < flat.length - 1) {
+      const nextIdx = modalTaskIndex + 1;
+      setModalNavDirection('next');
+      openInboxTaskAt(nextIdx);
+    }
+  };
+
+  // Auto-advance after save
+  const handleTaskSaved = (updated: Task) => {
+    // If task moved out of inbox, recompute current index against updated list
+    const flat = state.tasks
+      .filter(t => t.columnId === 'inbox')
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    if (flat.length === 0) {
+      setShowTaskModal(false);
+      setSelectedTaskForModal(null);
+      setModalTaskIndex(-1);
+      return;
+    }
+    // Determine next index based on current direction or default forward
+    const currentId = updated.id;
+    const currentIdx = flat.findIndex(t => t.id === currentId);
+    const baseNext = currentIdx >= 0 ? currentIdx + 1 : modalTaskIndex + 1;
+    const nextIdx = Math.min(baseNext, flat.length - 1);
+    // Advance if there is another task; else close
+    if (nextIdx > (currentIdx >= 0 ? currentIdx : modalTaskIndex) && nextIdx < flat.length) {
+      setModalNavDirection('next');
+      setSelectedTaskForModal(flat[nextIdx]);
+      setModalTaskIndex(nextIdx);
+      // keep modal open
+    } else {
+      setShowTaskModal(false);
+      setSelectedTaskForModal(null);
+      setModalTaskIndex(-1);
+    }
+  };
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedTaskForDate, setSelectedTaskForDate] = useState<Task | null>(null);
   const [showProjectModal, setShowProjectModal] = useState(false);
@@ -218,6 +284,10 @@ export function InboxView() {
   const dateColumns = availableColumns.filter(col => col.type === 'date');
   const projectColumns = availableColumns.filter(col => col.type === 'project');
   const availableTags = state.tags;
+  // Count for header badge
+  const inboxCount = selectedDateFilter
+    ? filteredGroups.reduce((acc, group) => acc + group.tasks.length, 0)
+    : inboxTasks.length;
 
   const handleTaskSelect = (taskId: string, selected: boolean) => {
     const newSelected = new Set(selectedTasks);
@@ -252,10 +322,16 @@ export function InboxView() {
       return;
     }
     
-    // Regular click - open task modal if not in multi-select mode
-    if (!multiSelectMode) {
-      handleEditTask(task);
+    // Regular click behavior depends on selection mode
+    if (multiSelectMode) {
+      // In selection mode: single click toggles selection
+      const isSelected = selectedTasks.has(task.id);
+      handleTaskSelect(task.id, !isSelected);
+      return;
     }
+
+    // Not in selection mode: open task modal directly
+    handleEditTask(task);
   };
 
   const handleSelectAll = () => {
@@ -463,6 +539,10 @@ export function InboxView() {
   };
 
   const handleEditTask = (task: Task) => {
+    // Ensure modal navigation knows the current index so arrows render
+    const idx = inboxTasks.findIndex(t => t.id === task.id);
+    setModalTaskIndex(idx);
+    setModalNavDirection(null);
     setSelectedTaskForModal(task);
     setShowTaskModal(true);
   };
@@ -513,11 +593,35 @@ export function InboxView() {
     }
   };
 
-  // Get background styles using standard utilities
+  const handleAssignTaskToPin = (task: Task, pinColumnId: string) => {
+    if (!pinColumnId) return;
+    dispatch({ type: 'ASSIGN_TASK_TO_PIN', payload: { taskId: task.id, pinColumnId } });
+  };
+
+  // Get background styles: rely on global App background for custom image to ensure consistency
   const isDarkMode = document.documentElement.classList.contains('dark');
-  const backgroundStyles = isMinimalDesign 
+  const useGlobalBackground = !isMinimalDesign && state.preferences.backgroundImage && state.preferences.backgroundType === 'image';
+  const backgroundStyles = isMinimalDesign
     ? { backgroundColor: isDarkMode ? '#111827' : '#ffffff' }
-    : (isDarkMode ? getDarkModeBackgroundStyles(state.preferences) : getBackgroundStyles(state.preferences));
+    : useGlobalBackground
+      ? {}
+      : (isDarkMode ? getDarkModeBackgroundStyles(state.preferences) : getBackgroundStyles(state.preferences));
+
+  // Keyboard navigation within modal
+  useEffect(() => {
+    if (!showTaskModal) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        navigatePrevTask();
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        navigateNextTask();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [showTaskModal, modalTaskIndex, inboxTasks.length]);
 
   return (
     <div 
@@ -591,30 +695,65 @@ export function InboxView() {
                 style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.6)', lineHeight: '1.5' }}>
               <Inbox className="w-5 h-5" style={{ color: accentColor }} />
               <span>{inboxView.title()}</span>
+              {inboxCount > 0 && (
+                <span
+                  className={`${isMinimalDesign ? 'text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600' : 'text-white/90 bg-white/10 border-white/20'} inline-flex items-center justify-center text-xs px-2 py-0.5 rounded-full border`}
+                  style={{ lineHeight: '1' }}
+                >
+                  {inboxCount}
+                </span>
+              )}
             </h1>
-            <button
-              onClick={() => setShowSmartTaskModal(true)}
-              className={`p-2 rounded-md transition-colors duration-200 text-white shadow-sm ${
-                isMinimalDesign 
-                  ? 'border border-gray-200 dark:border-gray-600' 
-                  : 'backdrop-blur-xl border border-white/20'
-              }`}
-              style={{ 
-                backgroundColor: `${accentColor}E6`,
-                boxShadow: isMinimalDesign 
-                  ? '0 1px 3px rgba(0, 0, 0, 0.1)' 
-                  : '0 2px 8px rgba(0, 0, 0, 0.15)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = accentColor;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = `${accentColor}E6`;
-              }}
-              title={inboxView.newTaskTooltip()}
-            >
-              <Plus className="w-4 h-4" />
-            </button>
+            <div className="flex items-center gap-2">
+              {/* Open top inbox task */}
+              <button
+                onClick={openFirstInboxTask}
+                className={`px-3 py-2 rounded-md transition-all duration-200 text-white shadow-sm ${
+                  isMinimalDesign 
+                    ? 'border border-gray-200 dark:border-gray-600' 
+                    : 'backdrop-blur-xl border border-white/20'
+                }`}
+                style={{ 
+                  backgroundColor: `${accentColor}E6`,
+                  boxShadow: isMinimalDesign 
+                    ? '0 1px 3px rgba(0, 0, 0, 0.1)' 
+                    : '0 2px 8px rgba(0, 0, 0, 0.15)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = accentColor;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = `${accentColor}E6`;
+                }}
+                title={t('inbox_view.open_first_task', { defaultValue: 'Oberste Aufgabe öffnen' })}
+              >
+                <FolderOpen className="w-4 h-4" />
+              </button>
+              {/* Create new task */}
+              <button
+                onClick={() => setShowSmartTaskModal(true)}
+                className={`p-2 rounded-md transition-colors duration-200 text-white shadow-sm ${
+                  isMinimalDesign 
+                    ? 'border border-gray-200 dark:border-gray-600' 
+                    : 'backdrop-blur-xl border border-white/20'
+                }`}
+                style={{ 
+                  backgroundColor: `${accentColor}E6`,
+                  boxShadow: isMinimalDesign 
+                    ? '0 1px 3px rgba(0, 0, 0, 0.1)' 
+                    : '0 2px 8px rgba(0, 0, 0, 0.15)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = accentColor;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = `${accentColor}E6`;
+                }}
+                title={inboxView.newTaskTooltip()}
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
 
@@ -754,28 +893,8 @@ export function InboxView() {
         {/* Content Area - main task list */}
         <MobilePullToRefresh onRefresh={async () => dispatch({ type: 'NO_OP' } as any)}>
         <div className="p-6">
-          {/* Task Count Info in Modern Container */}
-          <div className="mb-6 flex items-center justify-between">
-            <div className={`px-4 py-3 rounded-xl border ${
-              isMinimalDesign
-                ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm'
-                : 'bg-white/10 border-white/20 backdrop-blur-xl shadow-lg'
-            }`}>
-              <p className={`text-sm font-medium ${isMinimalDesign ? 'text-gray-800 dark:text-gray-200' : 'text-white'}`}
-                 style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.5)', lineHeight: '1.5' }}>
-                {selectedDateFilter 
-                  ? (() => {
-                      const count = filteredGroups.reduce((acc, group) => acc + group.tasks.length, 0);
-                      return count === 1 ? `${count} Aufgabe an diesem Tag` : `${count} Aufgaben an diesem Tag`;
-                    })()
-                  : inboxTasks.length === 1 ? 
-                    `${inboxTasks.length} Aufgabe zum Verarbeiten` : 
-                    `${inboxTasks.length} Aufgaben zum Verarbeiten`
-                }
-              </p>
-            </div>
-            
-            {/* Add Button - Top Right */}
+          {/* Top Right Add Button */}
+          <div className="mb-6 flex items-center justify-end">
             <button
               onClick={() => setShowSmartTaskModal(true)}
               className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200 hover:shadow-lg active:scale-95 ${isMinimalDesign ? 'text-white' : 'text-white backdrop-blur-xl border border-white/20'}`}
@@ -1354,7 +1473,7 @@ export function InboxView() {
                     </div>
                     
                     {/* Tasks for this date */}
-                    <div className="space-y-4">
+                    <div className="space-y-[5px]">
                       {group.tasks.map((task) => (
                         <SwipeableTaskCard
                           key={task.id}
@@ -1420,8 +1539,16 @@ export function InboxView() {
           onClose={() => {
             setShowTaskModal(false);
             setSelectedTaskForModal(null);
+            setModalTaskIndex(-1);
+            setModalNavDirection(null);
           }}
-          task={selectedTaskForModal}
+          // Always pass the freshest task instance from global state (so pinning updates instantly)
+          task={(state.tasks.find(t => t.id === selectedTaskForModal.id) as any) || selectedTaskForModal}
+          onSaved={handleTaskSaved}
+          onNavigatePrev={modalTaskIndex > 0 ? navigatePrevTask : undefined}
+          onNavigateNext={modalTaskIndex >= 0 && modalTaskIndex < inboxTasks.length - 1 ? navigateNextTask : undefined}
+          shouldCloseOnSave={false}
+          navDirection={modalNavDirection}
         />
       )}
 
@@ -1575,11 +1702,13 @@ function InboxTaskCard({
       className="group rounded-xl border transition-all duration-200 cursor-pointer backdrop-blur-2xl hover:scale-[1.02]"
       style={{
         // Dark mode: use much darker glass so text is readable over backgrounds
-        background: (document.documentElement.classList.contains('dark'))
-          ? (isSelected ? 'rgba(17, 24, 39, 0.85)' : 'rgba(17, 24, 39, 0.75)')
-          : (isSelected ? 'rgba(255, 255, 255, 0.25)' : 'rgba(255, 255, 255, 0.15)'),
+        background: isSelected
+          ? `${accentColor}26`
+          : (document.documentElement.classList.contains('dark')
+              ? 'rgba(17, 24, 39, 0.75)'
+              : 'rgba(255, 255, 255, 0.15)'),
         borderColor: isSelected
-          ? `${accentColor}99`
+          ? `${accentColor}66`
           : (document.documentElement.classList.contains('dark') ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.2)'),
         boxShadow: isSelected
           ? (document.documentElement.classList.contains('dark') ? '0 10px 36px rgba(0, 0, 0, 0.5)' : '0 8px 32px rgba(0, 0, 0, 0.2)')
@@ -1591,27 +1720,11 @@ function InboxTaskCard({
     >
       <div className="px-4 py-3">
         <div className="flex items-center space-x-3">
-          {/* Checkbox - show in multi-select mode, on hover, or when selected */}
-          {(multiSelectMode || isHovered || isSelected) && (
-            <input
-              type="checkbox"
-              checked={isSelected}
-              onChange={(e) => onSelect(e.target.checked)}
-              onClick={(e) => e.stopPropagation()}
-              className={`w-5 h-5 rounded border-white/30 focus:ring-2 backdrop-blur-xl transition-opacity duration-200 ${
-                (multiSelectMode || isSelected) ? 'opacity-100' : 'opacity-75 group-hover:opacity-100'
-              }`}
-              style={{
-                accentColor: accentColor,
-                backgroundColor: isSelected ? `${accentColor}99` : 'rgba(255, 255, 255, 0.1)',
-                '--tw-ring-color': `${accentColor}66`
-              } as React.CSSProperties}
-            />
-          )}
+          {/* Selection indicator removed; selection is now highlighted by background color like Things3 */}
 
           {/* Task Content */}
           <div className="flex-1 min-w-0">
-            {editingTaskId === task.id ? (
+            {false && editingTaskId === task.id ? (
               <input
                 type="text"
                 value={editTitle}
@@ -1636,10 +1749,7 @@ function InboxTaskCard({
                       : isMinimalDesign ? 'text-black dark:text-white' : (document.documentElement.classList.contains('dark') ? 'text-white' : 'text-white')
                   }`}
                   style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.6)' }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleStartEdit();
-                  }}
+                  
                 >
                   {task.title}
                 </span>
@@ -1682,17 +1792,6 @@ function InboxTaskCard({
 
           {/* Actions */}
           <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit();
-              }}
-              className="p-2 text-white/70 hover:text-white rounded-lg backdrop-blur-xl border border-white/20 transition-all duration-200 hover:scale-110"
-              style={{ background: 'rgba(255, 255, 255, 0.1)' }}
-              title="Bearbeiten"
-            >
-              <Edit2 className="w-4 h-4" />
-            </button>
             <button
               onClick={(e) => {
                 e.stopPropagation();

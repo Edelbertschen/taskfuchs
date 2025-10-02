@@ -192,6 +192,7 @@
     "description_collapse": "Collapse description", 
     "description_edit": "Edit description",
     "description_preview": "Show preview",
+    "descriptionPlaceholder": "Description (optional)...",
     "date_select": "Select date",
     "project_select": "Select project",
     "visibility": {

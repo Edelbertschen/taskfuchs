@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { WelcomeScreen } from './components/Auth/WelcomeScreen';
 import { Sidebar } from './components/Layout/Sidebar';
 import { MobileShell } from './components/Layout/MobileShell';
+import { MobileComingSoon } from './components/Common/MobileComingSoon';
 import { Header } from './components/Layout/Header';
 import { TaskBoard } from './components/Tasks/TaskBoard';
 import { InboxView } from './components/Inbox/InboxView';
@@ -41,6 +42,8 @@ import { Plus, Home, Inbox, CheckSquare, Columns, FileText, MoreHorizontal } fro
 import { MaterialIcon } from './components/Common/MaterialIcon';
 import './App.css';
 import { initializeAudioOnUserInteraction } from './utils/soundUtils';
+// PWA update hook (provided by vite-plugin-pwa)
+// @ts-ignore
 import { isMobilePWAEnvironment } from './utils/device';
 import { getBackgroundStyles, getDarkModeBackgroundStyles } from './utils/backgroundUtils';
 import { format } from 'date-fns';
@@ -193,6 +196,8 @@ function ColumnSwitcher({
 // Main App Component (authenticated users)
 function MainApp() {
   const [currentView, setCurrentView] = React.useState('today');
+  const [showSplash, setShowSplash] = React.useState(true);
+  const [splashOpacity, setSplashOpacity] = React.useState(1);
   const [previousView, setPreviousView] = React.useState<string | null>(null);
   const [isTransitioning, setIsTransitioning] = React.useState(false);
   const [transitionDirection, setTransitionDirection] = React.useState<'left' | 'right'>('right');
@@ -202,20 +207,23 @@ function MainApp() {
   const [selectedTaskForModal, setSelectedTaskForModal] = React.useState<string | null>(null);
   const [showLanguageSelection, setShowLanguageSelection] = React.useState(false);
   const [showOnboarding, setShowOnboarding] = React.useState(false);
+  const [pwaUpdateAvailable, setPwaUpdateAvailable] = React.useState(false);
   const [userExitedFocus, setUserExitedFocus] = React.useState(false); // Track if user manually exited focus mode
   const [showFocusPrompt, setShowFocusPrompt] = React.useState<{visible: boolean; taskId?: string}>({ visible: false });
   
   const { state, dispatch } = useApp();
   const { t } = useTranslation();
 
-  // Redirect to MobileShell for mobile/standalone PWA
+  React.useEffect(() => {
+    // Show briefly, then fade out
+    const t1 = setTimeout(() => setSplashOpacity(0), 400);
+    const t2 = setTimeout(() => setShowSplash(false), 1200);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, []);
+
+  // Temporarily hold back mobile app: show Coming Soon screen on mobile viewports/PWA
   if (isMobilePWAEnvironment()) {
-    return (
-      <div className="w-full h-full">
-        <MobileShell />
-        <TaskModal task={state.tasks.find(t => t.id === (state as any).selectedTaskId) || null} isOpen={!!(state as any).selectedTaskId} onClose={() => {}} />
-      </div>
-    );
+    return <MobileComingSoon />;
   }
 
   // View order for navigation direction
@@ -330,6 +338,13 @@ function MainApp() {
     };
     window.addEventListener('show-focus-prompt', handler as EventListener);
     return () => window.removeEventListener('show-focus-prompt', handler as EventListener);
+  }, []);
+
+  // Listen for PWA update notifications from SW bridge
+  useEffect(() => {
+    const onUpdate = () => setPwaUpdateAvailable(true);
+    window.addEventListener('pwa-update-available', onUpdate as EventListener);
+    return () => window.removeEventListener('pwa-update-available', onUpdate as EventListener);
   }, []);
 
   // Reset userExitedFocus when timer stops or new timer starts
@@ -717,19 +732,50 @@ function MainApp() {
             : getBackgroundStyles(state.preferences))
         : {};
   
+  // Resolve actual image to render: enforce bg12 (light) and bg13 (dark) pairing
+  const resolvedBackgroundImage = (() => {
+    const img = state.preferences.backgroundImage;
+    if (backgroundType === 'image' && img) {
+      const isBg12or13 = /\/backgrounds\/bg1(2|3)\.(png|jpg)$/.test(img);
+      if (isBg12or13) {
+        return isDarkMode ? '/backgrounds/bg13.png' : '/backgrounds/bg12.png';
+      }
+    }
+    return img;
+  })();
 
+
+  // Bust cached splash/background assets when SW updates
+  const assetVersion = (() => {
+    try { return localStorage.getItem('tf_asset_v') || ''; } catch { return ''; }
+  })();
 
   return (
     <div 
       className={`w-full h-full flex flex-col relative ${state.isBulkMode ? 'bulk-mode-active' : ''}`}
       style={backgroundStyles}
     >
+      {showSplash && (
+        <div className="fixed inset-0 z-[200000000] flex items-center justify-center pointer-events-none"
+             style={{ background: 'transparent', opacity: splashOpacity, transition: 'opacity 700ms ease' }}>
+          <img
+            src="/3d_fox.png"
+            alt="TaskFuchs"
+            style={{
+              width: '360px',
+              height: '360px',
+              objectFit: 'contain',
+              filter: 'drop-shadow(0 12px 28px rgba(0,0,0,0.35))',
+            }}
+          />
+        </div>
+      )}
       {/* Background Image with optional Blur - Behind everything */}
       {!isMinimalDesign && state.preferences.backgroundImage && shouldShowBackground && backgroundType === 'image' && (
         <div 
           className="absolute inset-0 pointer-events-none"
           style={{
-            backgroundImage: `url(${state.preferences.backgroundImage})`,
+            backgroundImage: `url(${resolvedBackgroundImage}${assetVersion ? `?v=${assetVersion}` : ''})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
@@ -902,36 +948,57 @@ function MainApp() {
       <ColumnSwitcher 
         currentView={currentView}
         isNoteEditorFullScreen={state.isNoteEditorFullScreen}
-        visibleColumns={state.preferences.columns.visible}
+        visibleColumns={
+          currentView === 'tasks'
+            ? (state.preferences.columns.plannerVisible ?? state.preferences.columns.visible)
+            : currentView === 'kanban'
+              ? (state.preferences.columns.projectsVisible ?? state.preferences.columns.visible)
+              : currentView === 'pins'
+                ? (state.preferences.columns.pinsVisible ?? state.preferences.columns.visible)
+                : state.preferences.columns.visible
+        }
         columnOptions={columnOptions}
-        onColumnCountChange={handleColumnCountChange}
+        onColumnCountChange={(count) => {
+          if (currentView === 'tasks') {
+            dispatch({ type: 'UPDATE_PREFERENCES', payload: { columns: { ...state.preferences.columns, plannerVisible: count } } });
+          } else if (currentView === 'kanban') {
+            dispatch({ type: 'UPDATE_PREFERENCES', payload: { columns: { ...state.preferences.columns, projectsVisible: count } } });
+          } else if (currentView === 'pins') {
+            dispatch({ type: 'UPDATE_PREFERENCES', payload: { columns: { ...state.preferences.columns, pinsVisible: count } } });
+          } else {
+            handleColumnCountChange(count);
+          }
+        }}
         colors={colors}
       />
 
       {/* Floating Add Button - Fixed at bottom right */}
       <FloatingAddButton
         onCreateTask={() => setShowSmartTaskModal(true)}
-        onCreateNote={() => {
-          const newNote = {
-            id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-            title: '',
-            content: '',
-            tags: [],
-            linkedTasks: [],
-            linkedNotes: [],
-            linkedProjects: [],
-            pinned: false,
-            archived: false,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-          };
-          dispatch({ type: 'ADD_NOTE', payload: newNote });
-          dispatch({ type: 'SELECT_NOTE', payload: newNote });
-          dispatch({ type: 'SET_NOTES_EDITING', payload: true });
-          setCurrentView('notes');
-        }}
         colors={colors}
       />
+
+      {/* PWA Update Banner */}
+      {pwaUpdateAvailable && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[100000]">
+          <div className="flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl border backdrop-blur-md bg-white/90 dark:bg-gray-900/90 border-gray-200 dark:border-gray-700">
+            <span className="text-sm text-gray-800 dark:text-gray-200">Neue Version verfügbar</span>
+            <button
+              onClick={() => { try { (window as any).__taskfuchs_applyUpdate?.(); } catch {} }}
+              className="px-3 py-1.5 rounded-lg text-white text-sm"
+              style={{ backgroundColor: colors.primary }}
+            >
+              Anwenden & Neu starten
+            </button>
+            <button
+              onClick={() => setPwaUpdateAvailable(false)}
+              className="px-2 py-1.5 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              Später
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Focus Mode Prompt */}
       {showFocusPrompt.visible && createPortal(
@@ -1100,8 +1167,11 @@ function AppRouter() {
 
 // Root App Component
 function App() {
+  // PWA update handling moved to main.tsx (no hook usage here)
+
   return (
     <AuthProvider>
+      {/* No custom update banner: manual reload activates latest SW (skipWaiting+clientsClaim) */}
       <AppRouter />
     </AuthProvider>
   );

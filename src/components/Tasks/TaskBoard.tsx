@@ -181,7 +181,7 @@ function SidebarTaskItem({ task, formatEstimatedTime }: { task: Task, formatEsti
       style={style}
       {...listeners}
       {...attributes}
-      className={`flex flex-col p-2.5 transition-all duration-200 cursor-move rounded-lg mx-2 mb-1.5 bg-white border border-gray-300 min-w-0 shadow-sm ${
+      className={`flex flex-col p-3 transition-all duration-200 cursor-move rounded-lg mx-3 mb-2 bg-white border border-gray-300 min-w-0 shadow-sm ${
         hasPriority ? `border-l-4 ${priorityBorderClass}` : ''
       } ${
         isDragging 
@@ -234,7 +234,7 @@ function DroppableProjectHeader({ project, tasks, isExpanded, onToggle, accentCo
     <button
       ref={setNodeRef}
       onClick={onToggle}
-      className={`relative w-full flex items-center justify-between p-3 transition-all duration-200 rounded-lg mx-2 mb-1 min-w-0 ${
+      className={`relative w-full flex items-center justify-between p-3 transition-all duration-200 rounded-lg mx-3 mb-2 min-w-0 ${
         isMinimalDesign
           ? `hover:bg-gray-50 dark:hover:bg-gray-800 ${
               isExpanded ? 'bg-gray-100 dark:bg-gray-800 border-l-4' : ''
@@ -364,7 +364,33 @@ export function TaskBoard() {
   // Ref for horizontal scrolling
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // ✨ Removed manual cursor tracking - caused worse positioning
+  // ✨ Added: Alt+S shortcut for task sidebar with typing guard
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented) return;
+      const activeEl = document.activeElement as HTMLElement | null;
+      const targetEl = event.target as HTMLElement | null;
+      const isTypingElement = (el: HTMLElement | null) => !!el && (
+        el.tagName === 'INPUT' ||
+        el.tagName === 'TEXTAREA' ||
+        el.tagName === 'SELECT' ||
+        el.isContentEditable ||
+        el.getAttribute('contenteditable') === 'true' ||
+        el.closest?.('[contenteditable="true"]') !== null ||
+        ['textbox','combobox','searchbox'].includes(el.getAttribute('role') || '')
+      );
+      const isTypingTarget = isTypingElement(activeEl) || isTypingElement(targetEl);
+
+      if ((event.key === 's' || event.key === 'S') && event.altKey && !event.ctrlKey && !event.metaKey) {
+        if (isTypingTarget) return;
+        event.preventDefault();
+        window.dispatchEvent(new CustomEvent('toggle-task-sidebar'));
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Handle event visibility toggle
   const handleToggleEventVisibility = useCallback((eventId: string) => {
@@ -916,7 +942,10 @@ export function TaskBoard() {
     const allDateColumns = state.columns.filter(column => column.type === 'date');
     const currentDateIndex = allDateColumns.findIndex(col => col.date === currentDateStr);
     const startIndex = Math.max(0, currentDateIndex);
-    const availableColumns = allDateColumns.slice(startIndex, startIndex + state.preferences.columns.visible);
+    const availableColumns = allDateColumns.slice(
+      startIndex,
+      startIndex + (state.preferences.columns.plannerVisible ?? state.preferences.columns.visible)
+    );
 
     // Check what we're dropping on - use ALL columns for drop validation, not just date columns
     const isDroppingOnColumn = state.columns.some(col => col.id === overId);
@@ -1285,8 +1314,9 @@ export function TaskBoard() {
   const startIndex = Math.max(0, currentDateIndex);
   
   // Get visible date columns starting from current date
+  const columnsToShow = state.preferences.columns.plannerVisible ?? state.preferences.columns.visible;
   const dateColumns = allDateColumns
-    .slice(startIndex, startIndex + state.preferences.columns.visible);
+    .slice(startIndex, startIndex + columnsToShow);
 
 
   
@@ -2055,14 +2085,14 @@ export function TaskBoard() {
               }}
             >
               <MobilePullToRefresh onRefresh={async () => dispatch({ type: 'NO_OP' } as any)}>
-              <div className="flex-1 flex flex-col relative z-10 px-4 pb-4 pt-2">
+              <div className="h-full flex flex-col relative z-10 px-4 pb-4">
 
             {/* Board Content */}
             <div style={{ 
               display: 'flex', 
               flexDirection: 'column', 
-              height: 'auto', 
-              gap: '12px',
+              height: '100%', 
+              gap: '17px',
               padding: '0',
               alignItems: 'stretch',
               width: '100%'
@@ -2072,10 +2102,10 @@ export function TaskBoard() {
                     ref={scrollContainerRef}
                     style={{ 
                       display: 'flex', 
-                      gap: isMinimalDesign ? '0px' : '4px',
-                      alignItems: 'flex-start',
+                      gap: isMinimalDesign ? '5px' : '9px',
+                      alignItems: 'stretch',
                       width: '100%',
-                      marginTop: '22px',
+                      marginTop: '10px',
                       overflowX: 'auto',
                       overflowY: 'hidden',
                       scrollbarWidth: 'thin',
@@ -2090,8 +2120,16 @@ export function TaskBoard() {
                     <div className="w-full flex sm:hidden flex-col gap-4">
                       {renderColumns(dateColumns)}
                     </div>
-                    <div className="w-full hidden sm:flex">
-                      {renderColumns(dateColumns)}
+                    <div className="w-full hidden sm:block">
+                      <div style={{
+                        display: 'flex',
+                        gap: isMinimalDesign ? '5px' : '9px',
+                        alignItems: 'stretch',
+                        height: '100%',
+                        minWidth: 'fit-content'
+                      }}>
+                        {renderColumns(dateColumns)}
+                      </div>
                     </div>
                 </div>
               )}

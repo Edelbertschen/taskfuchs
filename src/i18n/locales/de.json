@@ -200,8 +200,10 @@
     "description_collapse": "Beschreibung einklappen", 
     "description_edit": "Beschreibung bearbeiten",
     "description_preview": "Vorschau anzeigen",
+    "descriptionPlaceholder": "Beschreibung (optional)...",
     "date_select": "Datum auswählen",
     "project_select": "Projekt auswählen",
+    "project_none": "Kein Projekt",
     "priority_none": "Ohne Priorität",
     "visibility": {
       "project_and_planner": "Projekt & Planer",

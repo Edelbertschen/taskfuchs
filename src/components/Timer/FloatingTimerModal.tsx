@@ -102,20 +102,17 @@ export function FloatingTimerModal({ isVisible, onOpenTask, onClose }: FloatingT
 
   const formatTime = (minutes: number): string => {
     try {
-      if (typeof minutes !== 'number' || isNaN(minutes)) {
-        return '0:00';
-      }
-      
-      const absMinutes = Math.abs(minutes);
-      const hours = Math.floor(absMinutes / 60);
-      const mins = Math.floor(absMinutes % 60);
-      const secs = Math.floor((absMinutes % 1) * 60);
+      if (typeof minutes !== 'number' || isNaN(minutes)) return '0:00';
       const sign = minutes < 0 ? '-' : '';
-      
+      let totalSeconds = Math.max(0, Math.round(Math.abs(minutes) * 60));
+      const hours = Math.floor(totalSeconds / 3600);
+      totalSeconds = totalSeconds % 3600;
+      const mins = Math.floor(totalSeconds / 60);
+      const secs = totalSeconds % 60;
       if (hours > 0) {
-        return `${sign}${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        return `${sign}${hours}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
       }
-      return `${sign}${mins}:${secs.toString().padStart(2, '0')}`;
+      return `${sign}${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
     } catch (error) {
       console.error('Error formatting time:', error);
       return '0:00';
@@ -143,18 +140,21 @@ export function FloatingTimerModal({ isVisible, onOpenTask, onClose }: FloatingT
     }
   };
 
-  // Format elapsed time with seconds for live display (mm:ss or hh:mm:ss)
+  // Format elapsed time with seconds for live display (hh:mm:ss or mm:ss)
   const formatTimeWithSeconds = (minutes: number): string => {
     try {
       if (typeof minutes !== 'number' || isNaN(minutes)) return '0:00';
-      const totalSeconds = Math.max(0, Math.floor(minutes * 60));
+      const negative = minutes < 0;
+      let totalSeconds = Math.floor(Math.abs(minutes) * 60 + 1e-6);
       const hours = Math.floor(totalSeconds / 3600);
-      const mins = Math.floor((totalSeconds % 3600) / 60);
+      totalSeconds = totalSeconds % 3600;
+      const mins = Math.floor(totalSeconds / 60);
       const secs = totalSeconds % 60;
+      const sign = negative ? '-' : '';
       if (hours > 0) {
-        return `${hours}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        return `${sign}${hours}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
       }
-      return `${mins}:${String(secs).padStart(2, '0')}`;
+      return `${sign}${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
     } catch {
       return '0:00';
     }
@@ -180,6 +180,7 @@ export function FloatingTimerModal({ isVisible, onOpenTask, onClose }: FloatingT
   };
 
   const handleStop = () => {
+    // Stop only the task timer; Pomodoro continues
     dispatch({ type: 'STOP_TIMER' });
   };
 
@@ -301,7 +302,15 @@ export function FloatingTimerModal({ isVisible, onOpenTask, onClose }: FloatingT
                     ? '0 1px 4px rgba(0, 0, 0, 0.9)' 
                     : '0 1px 2px rgba(255, 255, 255, 0.8)'
                 }}>
-                  {formatTimeWithSeconds(activeTimer.elapsedTime || 0)}
+                  {(() => {
+                    const minutes = activeTimer.elapsedTime || 0;
+                    const sign = minutes < 0 ? '-' : '';
+                    let totalSeconds = Math.max(0, Math.round(Math.abs(minutes) * 60));
+                    const hours = Math.floor(totalSeconds / 3600);
+                    totalSeconds = totalSeconds % 3600;
+                    const mins = Math.floor(totalSeconds / 60);
+                    return hours > 0 ? `${sign}${hours}:${String(mins).padStart(2, '0')}` : `${sign}${mins}`;
+                  })()}
                 </span>
                 {isOvertime && (
                   <AlertTriangle className="w-3 h-3 text-red-500" />
@@ -427,7 +436,15 @@ export function FloatingTimerModal({ isVisible, onOpenTask, onClose }: FloatingT
                   ? 'drop-shadow(0 0 12px rgba(255, 255, 255, 0.3))' 
                   : 'none'
               }}>
-                {formatTimeWithSeconds(activeTimer.elapsedTime || 0)}
+                {(() => {
+                  const minutes = activeTimer.elapsedTime || 0;
+                  const sign = minutes < 0 ? '-' : '';
+                  let totalSeconds = Math.max(0, Math.round(Math.abs(minutes) * 60));
+                  const hours = Math.floor(totalSeconds / 3600);
+                  totalSeconds = totalSeconds % 3600;
+                  const mins = Math.floor(totalSeconds / 60);
+                  return hours > 0 ? `${sign}${hours}:${String(mins).padStart(2, '0')}` : `${sign}${mins}`;
+                })()}
               </span>
               {isOvertime && (
                 <AlertTriangle className="w-4 h-4 text-red-500" />

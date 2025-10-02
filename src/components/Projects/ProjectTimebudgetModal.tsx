@@ -67,6 +67,7 @@ export function ProjectTimebudgetModal({ isOpen, onClose, project }: ProjectTime
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const accentColor = state.preferences.accentColor;
+  const isDarkMode = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
 
   // Initialize data from project timebudget
   useEffect(() => {
@@ -308,7 +309,7 @@ export function ProjectTimebudgetModal({ isOpen, onClose, project }: ProjectTime
               className="p-1.5 rounded-lg transition-all hover:scale-105"
               style={{ 
                 backgroundColor: `${accentColor}10`,
-                color: accentColor
+                color: isDarkMode ? 'white' : accentColor
               }}
             >
               <X className="w-4 h-4" />
@@ -326,7 +327,7 @@ export function ProjectTimebudgetModal({ isOpen, onClose, project }: ProjectTime
                 className="p-1.5 rounded-lg transition-all hover:scale-105"
                 style={{ 
                   backgroundColor: `${accentColor}15`,
-                  color: accentColor
+                  color: isDarkMode ? 'white' : accentColor
                 }}
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -347,7 +348,7 @@ export function ProjectTimebudgetModal({ isOpen, onClose, project }: ProjectTime
                 className="p-1.5 rounded-lg transition-all hover:scale-105"
                 style={{ 
                   backgroundColor: `${accentColor}15`,
-                  color: accentColor
+                  color: isDarkMode ? 'white' : accentColor
                 }}
               >
                 <ChevronRight className="w-4 h-4" />
@@ -363,7 +364,7 @@ export function ProjectTimebudgetModal({ isOpen, onClose, project }: ProjectTime
                 }`}
                 style={{
                   backgroundColor: editMode === 'budget' ? accentColor : `${accentColor}20`,
-                  color: editMode === 'budget' ? 'white' : accentColor
+                  color: isDarkMode ? 'white' : (editMode === 'budget' ? 'white' : accentColor)
                 }}
               >
                 Plan Budget
@@ -375,7 +376,7 @@ export function ProjectTimebudgetModal({ isOpen, onClose, project }: ProjectTime
                 }`}
                 style={{
                   backgroundColor: editMode === 'tracked' ? accentColor : `${accentColor}20`,
-                  color: editMode === 'tracked' ? 'white' : accentColor
+                  color: isDarkMode ? 'white' : (editMode === 'tracked' ? 'white' : accentColor)
                 }}
               >
                 Track Time
@@ -385,7 +386,7 @@ export function ProjectTimebudgetModal({ isOpen, onClose, project }: ProjectTime
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex-1 overflow-y-auto p-4 text-gray-900 dark:text-gray-100">
           <div className="space-y-4">
             {editMode === 'budget' && (
               <>
@@ -395,11 +396,11 @@ export function ProjectTimebudgetModal({ isOpen, onClose, project }: ProjectTime
                   value={yearlyHours}
                   onChange={(e) => handleYearlyHoursChange(e.target.value)}
                   placeholder="Total Yearly Hours"
-                  className="w-full px-3 py-2 rounded-lg text-center font-medium focus:outline-none transition-all"
+                  className="w-full px-3 py-2 rounded-lg text-center font-medium focus:outline-none transition-all placeholder-gray-500 dark:placeholder-gray-300"
                   style={{ 
-                    backgroundColor: `${accentColor}10`,
-                    color: accentColor,
-                    border: `2px solid ${accentColor}30`
+                    backgroundColor: 'rgba(255,255,255,0.06)',
+                    color: isDarkMode ? 'white' : 'inherit',
+                    border: `1px solid rgba(255,255,255,0.18)`
                   }}
                   min="0"
                   step="1"
@@ -439,8 +440,8 @@ export function ProjectTimebudgetModal({ isOpen, onClose, project }: ProjectTime
             <div 
               className="text-center text-sm font-medium py-2 rounded-lg"
               style={{ 
-                backgroundColor: `${accentColor}10`,
-                color: accentColor
+                backgroundColor: 'rgba(255,255,255,0.08)',
+                color: isDarkMode ? 'white' : 'inherit'
               }}
             >
               {editMode === 'budget' ? `Total: ${getTotalBudgeted().toFixed(0)}h` : `Tracked: ${getTotalTracked().toFixed(0)}h`}
@@ -457,7 +458,7 @@ export function ProjectTimebudgetModal({ isOpen, onClose, project }: ProjectTime
                     <div 
                       className={`text-xs font-medium mb-1 ${isCurrentMonth ? 'font-bold' : ''}`}
                       style={{ 
-                        color: isCurrentMonth ? accentColor : `${accentColor}80`
+                        color: isDarkMode ? 'white' : (isCurrentMonth ? accentColor : 'inherit')
                       }}
                     >
                       {shortMonthNames[index]}
@@ -470,13 +471,13 @@ export function ProjectTimebudgetModal({ isOpen, onClose, project }: ProjectTime
                       value={editMode === 'budget' ? monthlyBudgets[month] || '0' : monthlyTracked[month] || '0'}
                       onChange={(e) => handleMonthlyChange(month, e.target.value, editMode)}
                       disabled={editMode === 'budget' && distributionMode === 'equal'}
-                      className={`w-full px-2 py-1.5 text-xs text-center rounded-lg focus:outline-none transition-all ${
+                      className={`w-full px-2 py-1.5 text-xs text-center rounded-lg focus:outline-none transition-all placeholder-gray-500 dark:placeholder-gray-300 ${
                         isCurrentMonth ? 'font-bold timebudget-current-month-input' : ''
                       }`}
                       style={{ 
-                        backgroundColor: isCurrentMonth ? accentColor : `${accentColor}15`,
-                        color: isCurrentMonth ? 'white !important' : accentColor,
-                        border: `1px solid ${accentColor}30`,
+                        backgroundColor: isCurrentMonth ? accentColor : 'rgba(255,255,255,0.06)',
+                        color: isCurrentMonth ? 'white !important' : (isDarkMode ? 'white' : 'inherit'),
+                        border: `1px solid rgba(255,255,255,0.18)`,
                         ...(isCurrentMonth ? {
                           WebkitTextFillColor: 'white !important',
                           MozTextFillColor: 'white !important',

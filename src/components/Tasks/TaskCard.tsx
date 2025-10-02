@@ -520,7 +520,7 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
       return;
     }
 
-    // Normal click opens modal
+    // Normal click opens modal – even if a timer is running
     setIsModalOpen(true);
   };
 
@@ -784,14 +784,19 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
                 </>
               )}
 
-              {/* Pin Icon - Show when task is pinned */}
+              {/* Pin Icon - Show when task is pinned (more visible) */}
               {!isFocusMode && task.pinned && (
-                <span 
-                  className="inline-flex items-center justify-center opacity-70 hover:opacity-100 transition-opacity"
+                <span
+                  className="inline-flex items-center justify-center rounded-full transition-all"
                   title={t('pins.pinned_task') || 'Aufgabe ist gepinnt'}
+                  style={{
+                    backgroundColor: (accentColor || '#0ea5e9') + '26',
+                    border: `1px solid ${accentColor}`,
+                    padding: '2px'
+                  }}
                 >
-                  <Pin 
-                    className="w-3 h-3"
+                  <Pin
+                    className="w-4 h-4"
                     style={{ color: task.completed ? '#6B7280' : accentColor }}
                   />
                 </span>
