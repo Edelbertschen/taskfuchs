@@ -173,6 +173,17 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
   const modalRef = useRef<HTMLDivElement | null>(null);
   // Track if the backdrop received the original mousedown to avoid immediate close
   const backdropMouseDownRef = useRef<boolean>(false);
+  // Suppress backdrop close for the initial click that opened the modal (prevents immediate close)
+  const suppressBackdropClickRef = useRef<boolean>(true);
+
+  useEffect(() => {
+    // Allow backdrop clicks only after the current event loop tick
+    const id = setTimeout(() => { suppressBackdropClickRef.current = false; }, 0);
+    return () => {
+      suppressBackdropClickRef.current = true;
+      clearTimeout(id);
+    };
+  }, []);
   const updateNavPositions = useCallback(() => {
     if (!modalRef.current) return;
     const rect = modalRef.current.getBoundingClientRect();
@@ -1899,6 +1910,11 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
           pointerEvents: 'auto'
         }}
         onMouseDown={(e) => {
+          if (suppressBackdropClickRef.current) {
+            // Ignore initial click immediately after opening
+            e.preventDefault();
+            return;
+          }
           // Register only if the press started on the backdrop itself
           if (e.target === e.currentTarget) {
             backdropMouseDownRef.current = true;
@@ -1912,6 +1928,10 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
           backdropMouseDownRef.current = false;
         }}
         onClick={(e) => {
+          if (suppressBackdropClickRef.current) {
+            e.preventDefault();
+            return;
+          }
           // Close only if the interaction both started and ended on the backdrop
           if (e.target === e.currentTarget && backdropMouseDownRef.current) {
             e.preventDefault();
