@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
+import { createPortal } from 'react-dom';
 import { useAppTranslation } from '../../utils/i18nHelpers';
 import { 
   DndContext, 
@@ -652,14 +653,15 @@ export function PinsView() {
           )}
         </DragOverlay>
 
-        {/* Task Modal */}
-        {isTaskModalOpen && selectedTask && (
+        {/* Task Modal (rendered via portal to avoid container interference) */}
+        {isTaskModalOpen && selectedTask && createPortal(
           <TaskModal
             // Always use freshest task instance from store (important during timer updates)
             task={state.tasks.find(t => t.id === selectedTask.id) || selectedTask}
             isOpen={isTaskModalOpen}
             onClose={handleCloseTaskModal}
-          />
+          />,
+          document.body
         )}
 
         {/* Pin Column Manager Modal */}

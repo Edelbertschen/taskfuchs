@@ -2212,7 +2212,8 @@ export function TaskBoard() {
       {/* Task Modal */}
       {isTaskModalOpen && selectedTask && createPortal(
         <TaskModal
-          task={selectedTask}
+          // Always use freshest task instance from store (important during timer updates)
+          task={state.tasks.find(t => t.id === selectedTask.id) || selectedTask}
           isOpen={isTaskModalOpen}
           onClose={() => {
             setIsTaskModalOpen(false);
