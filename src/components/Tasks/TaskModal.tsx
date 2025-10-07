@@ -1924,8 +1924,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
           }
         }}
         onMouseUp={() => {
-          // Reset on release
-          backdropMouseDownRef.current = false;
+          // Do not reset here; allow onClick to evaluate the flag first
         }}
         onClick={(e) => {
           if (suppressBackdropClickRef.current) {
@@ -1938,6 +1937,8 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
             backdropMouseDownRef.current = false;
             handleClose();
           }
+          // Always reset after click evaluation
+          backdropMouseDownRef.current = false;
         }}
       >
         {/* Modal Container */}
