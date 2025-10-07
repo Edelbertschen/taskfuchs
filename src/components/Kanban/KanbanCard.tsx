@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useDraggable } from '@dnd-kit/core';
 import type { Task, KanbanGroupingMode } from '../../types';
 import { 
@@ -479,12 +480,15 @@ export function KanbanCard({ task, isDragging = false }: KanbanCardProps) {
         </div>
       </div>
 
-      {/* Task Modal */}
-      <TaskModal 
-        task={task}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
+      {/* Task Modal (portal + freshest task instance) */}
+      {isModalOpen && createPortal(
+        <TaskModal 
+          task={state.tasks.find(t => t.id === task.id) || task}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />,
+        document.body
+      )}
 
       {/* Celebration effect */}
       {showCelebration && (
