@@ -521,7 +521,11 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
     }
 
     // Normal click opens modal – even if a timer is running
-    setIsModalOpen(true);
+    try {
+      window.dispatchEvent(new CustomEvent('open-task-modal', { detail: { taskId: task.id } }));
+    } catch {
+      setIsModalOpen(true);
+    }
   };
 
   // Calculate totals
