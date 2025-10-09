@@ -1485,7 +1485,7 @@
       "next_task": "Next task (Space/→)",
       "drag_to_navigate": "Drag card to navigate"
     },
-    "actions": {
+    "review_actions": {
       "edit_estimate": "Edit estimate (M)",
       "add_time": "Add time (M)",
       "add_time_button": "Add",
@@ -1502,7 +1502,7 @@
       "time_set": "Time set",
       "subtasks": "{completed}/{total} subtasks"
     },
-    "shortcuts": {
+    "review_shortcuts": {
       "skip": "Skip",
       "edit": "Edit",
       "review": "Review",
@@ -1573,14 +1573,12 @@
     "timer_status_running": "Running"
   },
   "notes_view": {
-    "notes": "Notes",
     "previous_day": "Previous day",
     "next_day": "Next day",
     "no_day_selected": "No day selected",
     "all_entries": "All entries",
     "daily_notes": "Daily Notes",
     "all_notes": "All Notes",
-    "notes": "Notes",
     "search_notes": "Search notes...",
     "no_notes_found": "No notes found",
     "try_other_search": "Try different search terms or remove filters.",
@@ -1589,7 +1587,7 @@
     "type": "Type",
     "notes_count": "{{count}} note",
     "notes_count_plural": "{{count}} notes",
-    "no_notes_found": "No notes found",
+    
     "no_daily_notes": "No daily notes available",
     "no_notes_available": "No notes available",
     "no_notes_match_filter": "No notes match the filter criteria.",
@@ -1639,7 +1637,7 @@
     "tag_usage": "Tag Usage",
     "most_used": "Most Used",
     "tasks": "Tasks",
-    "notes": "Notes",
+    
     "no_tags": "No Tags",
     "add_new_tag": "Add New Tag",
     "tag_name_placeholder": "Enter tag name...",
@@ -2056,8 +2054,41 @@
     "add_tag": "Add tag"
   },
   "inbox_view": {
-    "remove_filter": "Remove filter",
-    "delete_button": "Delete"
+    "title": "Inbox",
+    "filterByDate": "Filter by date",
+    "allTasks": "All tasks",
+    "select_all": "Select all",
+    "deselect_all": "Deselect all",
+    "delete_button": "Delete",
+    "newTaskTooltip": "Create new task",
+    "open_first_task": "Open top task",
+    "placeholders": {
+      "new_task": "Create task for Inbox..."
+    },
+    "emptyState": {
+      "title": "Inbox is empty",
+      "description": "No tasks in the Inbox. Use the smart button to create new tasks.",
+      "createFirst": "Create first task"
+    },
+    "projectSelect": "Select project",
+    "columnSelect": "Select column",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "searchProjects": "Search projects...",
+    "noProjectsFound": "No projects found",
+    "noProjectsAvailable": "No projects available",
+    "noColumnsInProject": "No columns in this project",
+    "createColumn": "Create column",
+    "newColumn": "Create new column",
+    "create": "Create",
+    "cancel": "Cancel",
+    "deleteConfirmation": {
+      "multiple": "Delete {count} selected tasks?"
+    },
+    "tooltips": {
+      "deleteTasks": "Delete tasks",
+      "deleteTask": "Delete task"
+    }
   },
   "backup_modal": {
     "title": "Set up backup",
