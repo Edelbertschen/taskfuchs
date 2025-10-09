@@ -1222,7 +1222,7 @@ function MainApp() {
               { id: 'inbox', label: 'Inbox', icon: Inbox },
               { id: 'tasks', label: 'Planer', icon: CheckSquare },
               { id: 'kanban', label: 'Projekte', icon: Columns },
-              { id: 'notes', label: 'Notizen', icon: FileText },
+              { id: 'notes', label: t('notes_view.notes'), icon: FileText },
             ].map(({ id, label, icon: Icon }) => {
               const active = currentView === id;
               return (

@@ -843,7 +843,7 @@ export function NotesView() {
                               state.preferences.minimalDesign
                                 ? 'text-gray-900 dark:text-white'
                                 : 'text-white'
-                            }`}>Favoriten</h2>
+                            }`}>{notesView.favorites()}</h2>
                           </div>
                           <span className={`text-xs ${
                             state.preferences.minimalDesign
