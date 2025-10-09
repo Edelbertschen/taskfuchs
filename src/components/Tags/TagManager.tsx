@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Hash, Edit2, Trash2, Palette, BarChart3, FileText, CheckSquare, Plus } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAppTranslation } from '../../utils/i18nHelpers';
+import { useTranslation } from 'react-i18next';
 import { getBackgroundStyles, getDarkModeBackgroundStyles } from '../../utils/backgroundUtils';
 import { Header } from '../Layout/Header';
 
@@ -9,6 +10,7 @@ import { Header } from '../Layout/Header';
 export function TagManager() {
   const { state, dispatch } = useApp();
   const { tagManager } = useAppTranslation();
+  const { t } = useTranslation();
   const isMinimalDesign = state.preferences.minimalDesign;
   const [activeTab, setActiveTab] = useState<'tasks' | 'notes'>('tasks');
 
@@ -639,7 +641,7 @@ export function TagManager() {
                 : 'text-gray-900 dark:text-white'
             }`}>{tagManager.deleteTagTitle()}</h3>
             <p className="text-gray-600 dark:text-gray-300 mb-6">
-              {tagManager.deleteConfirmation(tagToDelete?.name || '')}
+              {t('tag_manager.delete_confirmation', { name: tagToDelete?.name || '' })}
             </p>
             <div className="flex justify-end space-x-3">
               <button
