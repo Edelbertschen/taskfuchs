@@ -2337,7 +2337,7 @@ export function ProjectKanbanBoard() {
               setShowSmartTaskModal(false);
             }}
             targetColumn={smartTaskTargetColumn}
-                                  placeholder={t('create_task_for', { project: smartTaskTargetColumn?.title || 'Project' })}
+                                  placeholder={forms.createTaskFor({ title: smartTaskTargetColumn?.title || 'Projekt' })}
             projectId={selectedProject?.id}
             kanbanColumnId={smartTaskTargetColumn?.kanbanColumnId || smartTaskTargetColumn?.id}
           />

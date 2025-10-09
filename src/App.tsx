@@ -30,6 +30,7 @@ import { TaskModal } from './components/Tasks/TaskModal';
 import { TopTimerBar } from './components/Timer/TopTimerBar';
 import { FloatingTimerModal } from './components/Timer/FloatingTimerModal';
 import { NotificationManager } from './components/Common/NotificationManager';
+import { BackupSetupModal } from './components/Common/BackupSetupModal';
 import { OnboardingTour } from './components/Common/OnboardingTour';
 import { LanguageSelectionModal } from './components/Common/LanguageSelectionModal';
 import { useTranslation } from 'react-i18next';
@@ -211,15 +212,34 @@ function MainApp() {
   const [pwaUpdateAvailable, setPwaUpdateAvailable] = React.useState(false);
   const [userExitedFocus, setUserExitedFocus] = React.useState(false); // Track if user manually exited focus mode
   const [showFocusPrompt, setShowFocusPrompt] = React.useState<{visible: boolean; taskId?: string}>({ visible: false });
+  const [showBackupSetup, setShowBackupSetup] = React.useState(false);
   
   const { state, dispatch } = useApp();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   React.useEffect(() => {
     // Show briefly, then fade out
     const t1 = setTimeout(() => setSplashOpacity(0), 400);
     const t2 = setTimeout(() => setShowSplash(false), 1200);
     return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, []);
+
+  // Ensure i18n reflects stored preference (single source of truth)
+  React.useEffect(() => {
+    const prefLang = (state.preferences.language as 'de' | 'en' | undefined);
+    if (prefLang && i18n.language !== prefLang) {
+      try { i18n.changeLanguage(prefLang); } catch {}
+    }
+  }, [state.preferences.language, i18n]);
+
+  // Immediately suggest backup setup if no directory defined yet
+  React.useEffect(() => {
+    try {
+      const handle = (window as any).__taskfuchs_backup_dir__;
+      if (!handle) {
+        setShowBackupSetup(true);
+      }
+    } catch {}
   }, []);
 
   // Temporarily hold back mobile app: show Coming Soon screen on mobile viewports/PWA
@@ -722,11 +742,12 @@ function MainApp() {
   // Get background type (default to 'image' for backward compatibility)
   const backgroundType = state.preferences.backgroundType || 'image';
   
-  // Only use backgroundUtils for non-image backgrounds to avoid duplicate background images
+  // Use image backgrounds when type is 'image'; otherwise use background utils.
+  // If no image is chosen, we still render a default image (bg12) unless in Minimalismus-Modus.
   const backgroundStyles = isMinimalDesign 
     ? { backgroundColor: 'white' } // Force white background for minimal design
-    : shouldShowBackground && state.preferences.backgroundImage && backgroundType === 'image'
-      ? {} // Don't use backgroundUtils if we have a custom background image (handled separately with blur)
+    : shouldShowBackground && backgroundType === 'image'
+      ? {} // Image background handled separately below (with optional blur/overlay)
       : shouldShowBackground
         ? (isDarkMode 
             ? getDarkModeBackgroundStyles(state.preferences)
@@ -736,13 +757,19 @@ function MainApp() {
   // Resolve actual image to render: enforce bg12 (light) and bg13 (dark) pairing
   const resolvedBackgroundImage = (() => {
     const img = state.preferences.backgroundImage;
-    if (backgroundType === 'image' && img) {
-      const isBg12or13 = /\/backgrounds\/bg1(2|3)\.(png|jpg)$/.test(img);
-      if (isBg12or13) {
-        return isDarkMode ? '/backgrounds/bg13.png' : '/backgrounds/bg12.png';
+    if (backgroundType === 'image') {
+      if (img) {
+        const isBg12or13 = /\/backgrounds\/bg1(2|3)\.(png|jpg)$/.test(img);
+        if (isBg12or13) {
+          // Keep bg12/bg13 pairing when one of them is explicitly chosen
+          return isDarkMode ? '/backgrounds/bg13.png' : '/backgrounds/bg12.png';
+        }
+        return img;
       }
+      // Fallback when no image is chosen: always use bg12.png
+      return '/backgrounds/bg12.png';
     }
-    return img;
+    return undefined as unknown as string | undefined;
   })();
 
 
@@ -771,8 +798,9 @@ function MainApp() {
           />
         </div>
       )}
+      
       {/* Background Image with optional Blur - Behind everything */}
-      {!isMinimalDesign && state.preferences.backgroundImage && shouldShowBackground && backgroundType === 'image' && (
+      {!isMinimalDesign && shouldShowBackground && backgroundType === 'image' && resolvedBackgroundImage && (
         <div 
           className="absolute inset-0 pointer-events-none"
           style={{
@@ -794,7 +822,7 @@ function MainApp() {
       )}
       
       {/* Optional Dark Overlay over background */}
-      {state.preferences.backgroundImage && shouldShowBackground && backgroundType === 'image' && state.preferences.backgroundEffects?.overlay !== false && (
+      {resolvedBackgroundImage && shouldShowBackground && backgroundType === 'image' && state.preferences.backgroundEffects?.overlay !== false && (
         <div 
           className="absolute inset-0 pointer-events-none"
           style={{
@@ -1066,11 +1094,16 @@ function MainApp() {
               window.dispatchEvent(new CustomEvent('open-note-by-id', { detail: { noteId: id } }));
             }
           };
+          const handleOpenBackupSetup = () => {
+            setShowBackupSetup(true);
+          };
           window.addEventListener('open-task-modal', handleOpenTaskModal as any);
           window.addEventListener('open-note-modal', handleOpenNoteModal as any);
+          window.addEventListener('open-backup-setup', handleOpenBackupSetup as any);
           return () => {
             window.removeEventListener('open-task-modal', handleOpenTaskModal as any);
             window.removeEventListener('open-note-modal', handleOpenNoteModal as any);
+            window.removeEventListener('open-backup-setup', handleOpenBackupSetup as any);
             try { delete (window as any).__taskfuchs_openTask; } catch {}
           };
         }, []);
@@ -1118,9 +1151,42 @@ function MainApp() {
       backupIntervalIdRef.current = null;
     };
   }, [state.preferences.backup?.enabled, state.preferences.backup?.intervalMinutes, state.tasks, state.columns, state.tags, (state as any).notes, (state as any).viewState]);
+
         return null;
       })()}
-      
+
+      {/* Backup Setup Modal */}
+      {showBackupSetup && (
+        <BackupSetupModal
+          isOpen={true}
+          onClose={() => setShowBackupSetup(false)}
+          onChooseDirectory={async () => {
+            const { pickBackupDirectory } = await import('./utils/importExport');
+            // @ts-ignore
+            const handle = await pickBackupDirectory();
+            if (handle) {
+              try {
+                // @ts-ignore
+                const perm = await (handle as any).requestPermission?.({ mode: 'readwrite' });
+                if (perm === 'granted' || perm === undefined) {
+                  (window as any).__taskfuchs_backup_dir__ = handle;
+                  try {
+                    const name = (handle as any)?.name || '';
+                    window.dispatchEvent(new CustomEvent('backup-dir-selected', { detail: { name } }));
+                  } catch {}
+                  // Auto-activate backups if not enabled yet
+                  const prev = state.preferences.backup || { enabled: false, intervalMinutes: 60, notify: true };
+                  if (!prev.enabled) {
+                    dispatch({ type: 'UPDATE_PREFERENCES', payload: { backup: { enabled: true, intervalMinutes: prev.intervalMinutes || 60, notify: prev.notify ?? true, lastSuccess: prev.lastSuccess } } });
+                  }
+                }
+              } catch {}
+            }
+          }}
+        />
+      )}
+      {(() => { try { (window as any).__force_backup_modal_rerender__ = () => setShowBackupSetup(s => s); } catch {} return null; })()}
+
       {/* Notification Manager */}
       <NotificationManager />
       

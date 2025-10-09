@@ -836,11 +836,19 @@ export function downloadFile(content: string, filename: string, mimeType: string
 // File System Access API helpers (optional, browser support required)
 export async function pickBackupDirectory(): Promise<FileSystemDirectoryHandle | null> {
   try {
+    // Prefer documents as starting location; request readwrite access
     // @ts-ignore - experimental API
-    const handle = await (window as any).showDirectoryPicker?.();
+    const handle = await (window as any).showDirectoryPicker?.({ id: 'taskfuchs-backup', mode: 'readwrite', startIn: 'documents' });
     return handle || null;
   } catch (e) {
-    return null;
+    try {
+      // Fallback: no options
+      // @ts-ignore
+      const handle = await (window as any).showDirectoryPicker?.();
+      return handle || null;
+    } catch {
+      return null;
+    }
   }
 }
 

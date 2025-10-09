@@ -2229,7 +2229,7 @@ export function TaskBoard() {
           isOpen={showSmartTaskModal}
           onClose={() => setShowSmartTaskModal(false)}
           targetColumn={smartTaskTargetColumn}
-                                    placeholder={i18n.language === 'en' ? `Create task for ${smartTaskTargetColumn?.title || 'Column'}...` : `Aufgabe für ${smartTaskTargetColumn?.title || 'Spalte'} erstellen...`}
+                                    placeholder={t('forms.create_task_for', { title: smartTaskTargetColumn?.title || (i18n.language === 'en' ? 'Column' : 'Spalte') })}
         />
       )}
 

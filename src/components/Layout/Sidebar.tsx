@@ -67,7 +67,8 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
   }, [onViewChange, dispatch]);
 
   // Dropbox quick actions (sidebar): separate Upload/Download with LED indicators
-  const canDropbox = state.preferences.dropbox?.enabled;
+  const canDropbox = false; // Dropbox sync removed
+  const canLocalBackup = !!state.preferences.backup?.enabled && !!(window as any).__taskfuchs_backup_dir__;
   const [uploadLed, setUploadLed] = useState<'idle'|'syncing'|'success'|'error'>('idle');
   const [downloadLed, setDownloadLed] = useState<'idle'|'syncing'|'success'|'error'>('idle');
 
@@ -650,6 +651,40 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
               <button onClick={handleDownload} className="relative w-10 h-10 rounded-full flex items-center justify-center hover:opacity-90 focus:outline-none" title="Herunterladen" aria-label="Jetzt herunterladen">
                 <Download className="w-5 h-5 text-white" />
                 <span className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full pointer-events-none ${downloadLed==='success'?'bg-green-500':downloadLed==='error'?'bg-red-500':downloadLed==='syncing'?'bg-amber-400':'bg-gray-500'}`} />
+              </button>
+            </div>
+          )}
+          {canLocalBackup && (
+            <div className="mt-2 flex items-center justify-center px-1">
+              <button onClick={async () => {
+                try {
+                  const dir: any = (window as any).__taskfuchs_backup_dir__;
+                  if (!dir) { alert('Kein Backup‑Ordner gewählt.'); return; }
+                  const { exportToJSON, writeBackupToDirectory } = await import('../../utils/importExport');
+                  const data: any = {
+                    tasks: state.tasks,
+                    archivedTasks: state.archivedTasks,
+                    columns: state.columns,
+                    tags: state.tags,
+                    notes: state.notes?.notes || state.notes || [],
+                    noteLinks: state.noteLinks || [],
+                    preferences: state.preferences,
+                    viewState: state.viewState || {},
+                    projectKanbanColumns: state.viewState?.projectKanban?.columns || [],
+                    projectKanbanState: state.viewState?.projectKanban || {},
+                    exportDate: new Date().toISOString(),
+                    version: '2.3'
+                  };
+                  const json = exportToJSON(data);
+                  const filename = `TaskFuchs_${new Date().toISOString().replace(/[:]/g,'-').slice(0,19)}.json`;
+                  await writeBackupToDirectory(dir, filename, json);
+                  (window as any).__taskfuchs_backup_toast__ = true;
+                } catch (e) {
+                  console.error('Manual backup failed', e);
+                  alert('Backup fehlgeschlagen.');
+                }
+              }} className="relative w-10 h-10 rounded-full flex items-center justify-center hover:opacity-90 focus:outline-none" title="Backup jetzt sichern" aria-label="Backup jetzt sichern">
+                <Download className="w-5 h-5 text-white" />
               </button>
             </div>
           )}

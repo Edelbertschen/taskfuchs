@@ -75,11 +75,11 @@ import { MicrosoftToDoSettingsSection } from './MicrosoftToDoSettingsSection';
 import { SimpleApiSettings } from './SimpleApiSettings';
 import NextcloudSettings from '../Common/NextcloudSettings';
 import { NextcloudSection } from '../Common/NextcloudSection';
-import { TodoistSetupDialog } from '../Common/TodoistSetupDialogSimple';
+// import { TodoistSetupDialog } from '../Common/TodoistSetupDialogSimple';
 import { todoistSyncManager } from '../../utils/todoistSyncManagerNew';
 import { StockPhotosModal } from '../Common/StockPhotosModal';
 import { ConflictResolutionModal } from '../Common/ConflictResolutionModal';
-import { TodoistErrorRecoveryTest } from '../Common/TodoistErrorRecoveryTest';
+// import { TodoistErrorRecoveryTest } from '../Common/TodoistErrorRecoveryTest';
 import { stockPhotosService } from '../../utils/stockPhotosService';
 import * as ImportExport from '../../utils/importExport';
 import { playCompletionSound, SoundType, debugAudioSetup, testWhiteNoise } from '../../utils/soundUtils';
@@ -183,7 +183,7 @@ const Settings = React.memo(() => {
   // New Todoist Sync Manager states
   const [todoistSetupDialogOpen, setTodoistSetupDialogOpen] = useState(false);
   const [errorRecoveryTestOpen, setErrorRecoveryTestOpen] = useState(false);
-  const [newTodoistSyncConfig, setNewTodoistSyncConfig] = useState(todoistSyncManager.getConfig());
+  const [newTodoistSyncConfig, setNewTodoistSyncConfig] = useState<any>(todoistSyncManager.getConfig());
   const [newTodoistSyncStatus, setNewTodoistSyncStatus] = useState<'idle' | 'running' | 'success' | 'error'>('idle');
   const [newTodoistSyncMessage, setNewTodoistSyncMessage] = useState('');
   const [newTodoistSyncResult, setNewTodoistSyncResult] = useState<any>(null);
@@ -260,6 +260,14 @@ const Settings = React.memo(() => {
   // Normalize i18n lang like "de-DE" → "de" for toggle alignment
   const normalizeLang = (lng: string | undefined) => (lng || 'de').slice(0, 2);
   const [language, setLanguage] = useState(normalizeLang(state.preferences.language || i18n.language));
+
+  // Keep local UI toggle in sync when language changes outside (e.g., via modal switcher)
+  useEffect(() => {
+    const current = normalizeLang(i18n.language);
+    if (language !== current) {
+      setLanguage(current);
+    }
+  }, [i18n.language]);
   const [notifications, setNotifications] = useState(true);
   const [autoSave, setAutoSave] = useState(true);
   const [defaultPriority, setDefaultPriority] = useState<'none' | 'low' | 'medium' | 'high'>('medium');
@@ -889,10 +897,10 @@ const Settings = React.memo(() => {
     setIsDarkMode(dm);
   }, [state.preferences.theme]);
 
-  const handleLanguageChange = (newLang: 'en' | 'de' | string) => {
+  const handleLanguageChange = async (newLang: 'en' | 'de' | string) => {
     const lang = normalizeLang(newLang) as 'en' | 'de';
     setLanguage(lang);
-    i18n.changeLanguage(lang);
+    await i18n.changeLanguage(lang);
     localStorage.setItem('language', lang);
     try { dispatch({ type: 'UPDATE_PREFERENCES', payload: { language: lang } }); } catch {}
   };
@@ -3660,16 +3668,7 @@ const Settings = React.memo(() => {
           </div>
         )}
 
-                  {/* Setup Dialog */}
-          <TodoistSetupDialog
-            isOpen={todoistSetupDialogOpen}
-            onClose={() => setTodoistSetupDialogOpen(false)}
-            onSyncConfigured={() => {
-              setNewTodoistSyncConfig(todoistSyncManager.getConfig());
-              setTodoistSetupDialogOpen(false);
-            }}
-            editMode={isConfigured} // Im Bearbeitungsmodus wenn bereits konfiguriert
-          />
+          {/* Todoist entfernt */}
           
           {/* Conflict Resolution Modal */}
           <ConflictResolutionModal
@@ -4289,34 +4288,37 @@ const Settings = React.memo(() => {
                 </p>
               </div>
               
-              {/* Elegant Language Toggle */}
-              <div className="bg-gray-100 dark:bg-gray-800 p-2 rounded-2xl inline-flex relative">
-                <div 
-                  className="absolute top-2 h-10 rounded-xl transition-all duration-300 ease-in-out shadow-lg"
-                  style={{
-                    left: language === 'de' ? '8px' : '50%',
-                    width: 'calc(50% - 8px)',
-                    ...getAccentColorStyles().bg
-                  }}
-                />
-                
-                {[
+              {/* Robust Language Toggle */}
+              <div className="bg-gray-100 dark:bg-gray-800 p-2 rounded-2xl inline-flex relative select-none" role="tablist" aria-label="Language">
+                {([
                   { code: 'de', name: 'Deutsch' },
                   { code: 'en', name: 'English' }
-                ].map((lang) => (
-                  <button
-                    key={lang.code}
-                    onClick={() => handleLanguageChange(lang.code)}
-                    className={`relative z-10 flex items-center justify-center px-6 py-2 rounded-xl transition-all duration-300 font-medium ${
-                      language === lang.code
-                        ? 'font-semibold'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-                    }`}
-                    style={language === lang.code ? { color: '#ffffff' } : {}}
-                  >
-                    <span>{lang.name}</span>
-                  </button>
-                ))}
+                ] as const).map((lang) => {
+                  const active = language === lang.code;
+                  return (
+                    <button
+                      key={lang.code}
+                      onClick={async () => {
+                        if (!active) {
+                          await handleLanguageChange(lang.code);
+                        }
+                      }}
+                      className={`relative z-10 flex items-center justify-center px-6 py-2 rounded-xl transition-colors font-medium ${
+                        active ? 'text-white' : 'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'
+                      }`}
+                      aria-pressed={active}
+                      aria-current={active ? 'true' : undefined}
+                      role="tab"
+                    >
+                      {/* Active pill */}
+                      <span
+                        className="absolute inset-0 rounded-xl transition-colors"
+                        style={{ backgroundColor: active ? state.preferences.accentColor : 'transparent' }}
+                      />
+                      <span className="relative">{lang.name}</span>
+                    </button>
+                  );
+                })}
               </div>
               
               {/* Current Language Info */}
@@ -5822,7 +5824,7 @@ const Settings = React.memo(() => {
                   }}
                   className="px-4 py-2 text-sm bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
                 >
-                  🐛 Debug-Info,
+                  🐛 Debug-Info
   Target
                 </button>
                 
@@ -7106,9 +7108,7 @@ const Settings = React.memo(() => {
                 {[
                   { id: 'sync-nextcloud', title: 'Nextcloud' },
                   { id: 'sync-caldav', title: 'CalDAV' },
-                  { id: 'sync-dropbox', title: 'Dropbox (E2EE)' },
-                  { id: 'sync-ical', title: 'iCal Import' },
-                  { id: 'sync-todoist', title: 'Todoist' }
+                  { id: 'sync-ical', title: 'iCal Import' }
                 ].map((tab) => (
                   <button
                     key={tab.id}
@@ -7128,20 +7128,14 @@ const Settings = React.memo(() => {
 
             {/* Sync Tab Content */}
             <div className="mt-6 space-y-6">
-              {(activeIntegrationTab === 'sync-nextcloud' || !['sync-caldav','sync-ical','sync-todoist','sync-dropbox'].includes(String(activeIntegrationTab))) && (
+              {(activeIntegrationTab === 'sync-nextcloud' || !['sync-caldav','sync-ical'].includes(String(activeIntegrationTab))) && (
                 <NextcloudSection />
-              )}
-              {activeIntegrationTab === 'sync-dropbox' && (
-                renderDropboxSection()
               )}
               {activeIntegrationTab === 'sync-caldav' && (
                 renderCalDAVSection()
               )}
               {activeIntegrationTab === 'sync-ical' && (
                 renderICalSection()
-              )}
-              {activeIntegrationTab === 'sync-todoist' && (
-                renderTodoistSection()
               )}
             </div>
           </div>
@@ -7184,7 +7178,7 @@ const Settings = React.memo(() => {
               </nav>
             </div>
             {/* Backup Tab */}
-            {activeDataTab === 'data-backup' && (
+              {activeDataTab === 'data-backup' && (
               <div>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Automatisches Backup</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Regelmäßige lokale JSON‑Sicherung in ein ausgewähltes Verzeichnis.</p>
@@ -7268,6 +7262,112 @@ const Settings = React.memo(() => {
                 {state.preferences.backup?.lastSuccess && (
                   <div className="text-xs text-gray-500 dark:text-gray-400">Letztes Backup: {new Date(state.preferences.backup.lastSuccess).toLocaleString()}</div>
                 )}
+
+                {/* Restore row */}
+                <div className="mt-6 flex items-center gap-3">
+                  <button
+                    className="px-3 py-1.5 rounded-md border"
+                    onClick={async () => {
+                      try {
+                        // Try to read last file in the chosen dir; if none, fall back to file picker
+                        const handle = (window as any).__taskfuchs_backup_dir__ as FileSystemDirectoryHandle | undefined;
+                        let jsonContent: string | null = null;
+                        if (handle && (handle as any).values) {
+                          // @ts-ignore
+                          const entries = [] as any[]; for await (const e of (handle as any).values()) entries.push(e);
+                          const files = entries.filter((e: any) => e.kind === 'file' && /\.json$/i.test(e.name));
+                          files.sort((a: any, b: any) => b.name.localeCompare(a.name));
+                          if (files[0]) {
+                            // @ts-ignore
+                            const file = await files[0].getFile();
+                            jsonContent = await file.text();
+                          }
+                        }
+                        if (!jsonContent) {
+                          // Fallback to manual file selection
+                          const input = document.createElement('input');
+                          input.type = 'file';
+                          input.accept = 'application/json,.json';
+                          const picked: string = await new Promise((resolve) => {
+                            input.onchange = async () => {
+                              const file = input.files?.[0];
+                              if (file) {
+                                resolve(await file.text());
+                              } else {
+                                resolve('');
+                              }
+                            };
+                            input.click();
+                          });
+                          jsonContent = picked || null;
+                        }
+                        if (!jsonContent) return;
+                        const { importFromJSON } = await import('../../utils/importExport');
+                        const data = importFromJSON(jsonContent);
+                        if (!data) { alert('Ungültige Backup-Datei.'); return; }
+                        dispatch({ type: 'IMPORT_DATA_REPLACE', payload: {
+                          tasks: data.tasks,
+                          archivedTasks: data.archivedTasks as any,
+                          columns: data.columns as any,
+                          tags: data.tags as any,
+                          notes: data.notes as any,
+                          noteLinks: data.noteLinks as any,
+                          preferences: data.preferences as any,
+                          viewState: data.viewState as any,
+                          projectKanbanColumns: data.projectKanbanColumns as any,
+                          projectKanbanState: data.projectKanbanState as any,
+                          pinColumns: data.pinColumns as any,
+                        } });
+                        (window as any).__taskfuchs_backup_toast__ = true;
+                      } catch (e) {
+                        console.error(e);
+                        alert('Wiederherstellen fehlgeschlagen.');
+                      }
+                    }}
+                  >Wiederherstellen</button>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">Standard: letztes Backup im gewählten Ordner. Ohne Ordner erscheint ein Dateiauswahldialog.</div>
+                </div>
+
+                {/* Reset backups */}
+                <div className="mt-4 p-3 rounded-lg border border-red-300/50 dark:border-red-800/50 bg-red-50/40 dark:bg-red-900/10">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="text-sm text-red-700 dark:text-red-300">Backups komplett zurücksetzen</div>
+                    <button
+                      className="px-3 py-1.5 rounded-md text-white bg-red-600 hover:bg-red-700"
+                      onClick={async () => {
+                        const confirmReset = confirm('Alle Backup-Einstellungen zurücksetzen? Optional kannst du im nächsten Schritt auch TaskFuchs-Backupdateien aus dem gewählten Ordner entfernen.');
+                        if (!confirmReset) return;
+                        // Try to delete TaskFuchs_*.json files if user agrees and a directory handle exists
+                        try {
+                          const alsoDelete = confirm('TaskFuchs-Backupdateien (TaskFuchs_*.json) im gewählten Ordner löschen?');
+                          const dir: any = (window as any).__taskfuchs_backup_dir__;
+                          if (alsoDelete && dir && dir.values) {
+                            const entries: any[] = [];
+                            // @ts-ignore
+                            for await (const e of dir.values()) entries.push(e);
+                            const candidates = entries.filter((e: any) => e.kind === 'file' && /TaskFuchs_.*\.json$/i.test(e.name));
+                            for (const fileHandle of candidates) {
+                              try {
+                                if (dir.removeEntry) {
+                                  // @ts-ignore
+                                  await dir.removeEntry(fileHandle.name);
+                                }
+                              } catch {}
+                            }
+                          }
+                        } catch {}
+                        // Clear handle and disable backups
+                        try { (window as any).__taskfuchs_backup_dir__ = undefined; } catch {}
+                        const prev = state.preferences.backup || { enabled: false, intervalMinutes: 60, notify: true };
+                        dispatch({ type: 'UPDATE_PREFERENCES', payload: { backup: { enabled: false, intervalMinutes: prev.intervalMinutes, notify: prev.notify } } });
+                        // Open reminder modal immediately
+                        try { window.dispatchEvent(new CustomEvent('open-backup-setup')); } catch {}
+                        alert('Backup-Einstellungen zurückgesetzt.');
+                      }}
+                    >Zurücksetzen</button>
+                  </div>
+                  <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">Dies deaktiviert automatische Backups, entfernt den gewählten Ordner aus TaskFuchs und (optional) löscht TaskFuchs_*.json im Ordner.</div>
+                </div>
               </div>
             )}
 
@@ -8442,11 +8542,7 @@ const Settings = React.memo(() => {
         document.body
       )}
 
-      {/* Error Recovery Test Modal */}
-      <TodoistErrorRecoveryTest
-        isOpen={errorRecoveryTestOpen}
-        onClose={() => setErrorRecoveryTestOpen(false)}
-        />
+      {/* Todoist entfernt */}
     </>
   );
 });

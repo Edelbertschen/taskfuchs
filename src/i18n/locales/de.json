@@ -2080,5 +2080,16 @@
   "floatingAddButton": {
     "add": "Hinzufügen",
     "close": "Schließen"
+  },
+  "backup_modal": {
+    "title": "Backup einrichten",
+    "description": "Um Datenverlust zu vermeiden, speichert TaskFuchs regelmäßig automatische Backups als JSON. Bitte wähle ein Verzeichnis für die Sicherungen aus.",
+    "enable": "Automatische Backups aktivieren",
+    "interval": "Intervall (Minuten)",
+    "hint": "Du kannst Intervall und Ziel jederzeit unter Einstellungen → Daten → Backup ändern.",
+    "tip_title": "Tipp des Fuchses",
+    "tip_text": "Lege das Verzeichnis z. B. in deiner Cloud (Nextcloud/Dropbox/OneDrive) an, um zusätzliche Sicherheit zu haben.",
+    "cancel": "Später",
+    "choose": "Verzeichnis wählen"
   }
 } 

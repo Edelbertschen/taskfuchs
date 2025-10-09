@@ -2058,5 +2058,16 @@
   "inbox_view": {
     "remove_filter": "Remove filter",
     "delete_button": "Delete"
+  },
+  "backup_modal": {
+    "title": "Set up backup",
+    "description": "To prevent data loss, TaskFuchs creates automatic JSON backups. Please choose a directory for backups.",
+    "enable": "Enable automatic backups",
+    "interval": "Interval (minutes)",
+    "hint": "You can change interval and target anytime in Settings → Data → Backup.",
+    "tip_title": "Fox's tip",
+    "tip_text": "Place the folder in your cloud (Nextcloud/Dropbox/OneDrive) for extra safety.",
+    "cancel": "Later",
+    "choose": "Choose directory"
   }
 } 

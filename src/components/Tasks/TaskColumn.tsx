@@ -1028,7 +1028,7 @@ const TaskColumn = React.memo(({
         isOpen={showSmartTaskModal}
         onClose={() => setShowSmartTaskModal(false)}
         targetColumn={column}
-                  placeholder={t('forms.create_task_for', { title: column.title })}
+                  placeholder={forms.createTaskFor({ title: column.title })}
         projectId={projectId}
         kanbanColumnId={kanbanColumnId}
       />
