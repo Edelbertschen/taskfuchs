@@ -936,10 +936,10 @@ export function InboxView() {
                 lineHeight: '1.5', 
                 minHeight: '32px' 
               }}
-              title="Mehrfachauswahl (STRG/CMD + Klick)"
+              title={t('inbox_view.multi_select_hint', { defaultValue: (document.documentElement.lang || 'de').startsWith('en') ? 'Multi select (CTRL/CMD + click)' : 'Mehrfachauswahl (STRG/CMD + Klick)' })}
             >
               <CheckSquare className={`w-4 h-4 ${multiSelectMode ? 'fill-current' : ''}`} />
-              <span>{multiSelectMode ? 'Mehrfachauswahl' : 'Auswählen'}</span>
+              <span>{multiSelectMode ? actions.multiSelect?.() || 'Multi select' : actions.select?.() || 'Select'}</span>
             </button>
 
             {/* Select All - only show when multi-select is active */}
@@ -1382,7 +1382,7 @@ export function InboxView() {
                                   handleBulkTagModalAdd(tags[tags.length - 1]);
                                 }
                               }}
-                              placeholder="Neuen Tag eingeben..."
+                              placeholder={t('tag_input.add_tag_placeholder', 'Add tag...')}
                               className="w-full"
                             />
                           </div>
@@ -1397,7 +1397,7 @@ export function InboxView() {
                     style={{ lineHeight: '1.5', minHeight: '32px' }}
                   >
                     <Trash2 className="w-3 h-3" />
-                    <span>{inboxView.deleteButton()}</span>
+                    <span>{inboxView.delete_button ? inboxView.delete_button() : 'Delete'}</span>
                   </button>
                 </div>
               </div>
@@ -1785,7 +1785,7 @@ function InboxTaskCard({
                 : 'rgba(255, 255, 255, 0.1)',
               color: 'white'
             }}
-            title="Aufgabe abhaken"
+            title={actions.complete()}
           >
             <Check className="w-4 h-4" />
           </button>
@@ -1799,7 +1799,7 @@ function InboxTaskCard({
               }}
               className="p-2 text-white/70 hover:text-white rounded-lg backdrop-blur-xl border border-white/20 transition-all duration-200 hover:scale-110"
               style={{ background: 'rgba(255, 255, 255, 0.1)' }}
-              title="Termin setzen"
+              title={actions.choose_date()}
             >
               <Calendar className="w-4 h-4" />
             </button>
@@ -1810,7 +1810,7 @@ function InboxTaskCard({
               }}
               className="p-2 text-white/70 hover:text-white rounded-lg backdrop-blur-xl border border-white/20 transition-all duration-200 hover:scale-110"
               style={{ background: 'rgba(255, 255, 255, 0.1)' }}
-              title="Zu Projekt zuweisen"
+              title={actions.assign()}
             >
               <FolderOpen className="w-4 h-4" />
             </button>
@@ -1835,7 +1835,7 @@ function InboxTaskCard({
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleConfirmDelete}
                     title={inboxView.tooltips.deleteTask()}
-        message={`Möchten Sie die Aufgabe "${task.title}" wirklich löschen?`}
+        message={inboxView.deleteConfirmation?.single?.({ title: task.title }) || 'Do you really want to delete this task?'}
         simple={true}
       />
     </div>
