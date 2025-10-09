@@ -642,7 +642,6 @@ const Settings = React.memo(() => {
     </div>
   );
   const [showCaldavPassword, setShowCaldavPassword] = useState(false);
-
   const [nextcloudUsername, setNextcloudUsername] = useState(localStorage.getItem('nextcloudUsername') || '');
   const [nextcloudPassword, setNextcloudPassword] = useState('');
   const [nextcloudFolder, setNextcloudFolder] = useState(localStorage.getItem('nextcloudFolder') || '/TaskFuchs');
@@ -5469,7 +5468,6 @@ const Settings = React.memo(() => {
             {renderTogglSection()}
           </div>
         );
-      // integrations removed
       case 'toggl':
         return (
           <div className="space-y-8">
@@ -7167,6 +7165,7 @@ const Settings = React.memo(() => {
                   { id: 'data-export', title: 'Export-Optionen' },
                   { id: 'data-import', title: 'Import-Optionen' },
                   { id: 'data-images', title: 'Bildspeicher' },
+                  { id: 'data-backup', title: 'Backup' },
                   { id: 'data-danger', title: 'Gefahrenzone' }
                 ].map((tab) => (
                   <button
@@ -7184,6 +7183,93 @@ const Settings = React.memo(() => {
                 ))}
               </nav>
             </div>
+            {/* Backup Tab */}
+            {activeDataTab === 'data-backup' && (
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Automatisches Backup</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Regelmäßige lokale JSON‑Sicherung in ein ausgewähltes Verzeichnis.</p>
+
+                <div className="flex items-center gap-3 mb-3">
+                  <label className="inline-flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={!!state.preferences.backup?.enabled}
+                      onChange={(e) => dispatch({ type: 'UPDATE_PREFERENCES', payload: { backup: { ...(state.preferences.backup||{ intervalMinutes: 60, notify: true }), enabled: e.target.checked } } })}
+                    />
+                    <span>Automatische Backups aktivieren</span>
+                  </label>
+                </div>
+
+                <div className="flex items-center gap-3 mb-3">
+                  <label className="text-sm w-48">Intervall (Minuten)</label>
+                  <input
+                    type="number"
+                    min={1}
+                    value={state.preferences.backup?.intervalMinutes ?? 60}
+                    onChange={(e) => dispatch({ type: 'UPDATE_PREFERENCES', payload: { backup: { ...(state.preferences.backup||{ enabled: false, notify: true }), intervalMinutes: Math.max(1, parseInt(e.target.value)||60) } } })}
+                    className="w-28 px-2 py-1 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800"
+                  />
+                </div>
+
+                <div className="flex items-center gap-3 mb-3">
+                  <button
+                    className="px-3 py-1.5 rounded-md text-white"
+                    style={{ backgroundColor: state.preferences.accentColor }}
+                    onClick={async () => {
+                      const { pickBackupDirectory } = await import('../../utils/importExport');
+                      // @ts-ignore
+                      const handle = await pickBackupDirectory();
+                      if (handle) {
+                        try {
+                          // @ts-ignore
+                          const perm = await (handle as any).requestPermission?.({ mode: 'readwrite' });
+                          if (perm === 'granted' || perm === undefined) {
+                            (window as any).__taskfuchs_backup_dir__ = handle;
+                            dispatch({ type: 'UPDATE_PREFERENCES', payload: { backup: { ...(state.preferences.backup||{ intervalMinutes: 60, notify: true }), enabled: true } } });
+                          }
+                        } catch {}
+                      } else {
+                        alert('Dieser Browser unterstützt die Verzeichnis‑Auswahl nicht.');
+                      }
+                    }}
+                  >Backup‑Verzeichnis wählen</button>
+
+                  <button
+                    className="px-3 py-1.5 rounded-md border"
+                    onClick={async () => {
+                      const handle = (window as any).__taskfuchs_backup_dir__ as FileSystemDirectoryHandle | undefined;
+                      if (!handle) { alert('Kein Backup‑Verzeichnis gewählt.'); return; }
+                      const { exportToJSON, writeBackupToDirectory } = await import('../../utils/importExport');
+                      const data: any = {
+                        tasks: state.tasks,
+                        archivedTasks: state.archivedTasks,
+                        columns: state.columns,
+                        tags: state.tags,
+                        // Notes structure can vary; guard via optional chaining
+                        notes: state.notes?.notes || state.notes || [],
+                        noteLinks: state.noteLinks || [],
+                        preferences: state.preferences,
+                        viewState: state.viewState || {},
+                        projectKanbanColumns: state.viewState?.projectKanban?.columns || [],
+                        projectKanbanState: state.viewState?.projectKanban || {},
+                        exportDate: new Date().toISOString(),
+                        version: '2.3'
+                      };
+                      const json = exportToJSON(data);
+                      const filename = `TaskFuchs_${new Date().toISOString().replace(/[:]/g,'-').slice(0,19)}.json`;
+                      await writeBackupToDirectory(handle, filename, json);
+                      (window as any).__taskfuchs_backup_toast__ = true;
+                      const prev = state.preferences.backup || { enabled: true, intervalMinutes: 60, notify: true };
+                      dispatch({ type: 'UPDATE_PREFERENCES', payload: { backup: { enabled: prev.enabled, intervalMinutes: prev.intervalMinutes, notify: prev.notify, lastSuccess: new Date().toISOString() } } });
+                    }}
+                  >Jetzt sichern</button>
+                </div>
+
+                {state.preferences.backup?.lastSuccess && (
+                  <div className="text-xs text-gray-500 dark:text-gray-400">Letztes Backup: {new Date(state.preferences.backup.lastSuccess).toLocaleString()}</div>
+                )}
+              </div>
+            )}
 
             {/* Export Tab */}
             {activeDataTab === 'data-export' && (
@@ -7512,7 +7598,6 @@ const Settings = React.memo(() => {
               </div>
             </div>
             )}
-
             {/* Import Tab */}
             {activeDataTab === 'data-import' && (
             <div>

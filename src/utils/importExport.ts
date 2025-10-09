@@ -833,6 +833,26 @@ export function downloadFile(content: string, filename: string, mimeType: string
   URL.revokeObjectURL(url);
 }
 
+// File System Access API helpers (optional, browser support required)
+export async function pickBackupDirectory(): Promise<FileSystemDirectoryHandle | null> {
+  try {
+    // @ts-ignore - experimental API
+    const handle = await (window as any).showDirectoryPicker?.();
+    return handle || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+export async function writeBackupToDirectory(dir: FileSystemDirectoryHandle, filename: string, content: string): Promise<void> {
+  // @ts-ignore - experimental types
+  const fileHandle = await dir.getFileHandle(filename, { create: true });
+  // @ts-ignore
+  const writable = await fileHandle.createWritable();
+  await writable.write(content);
+  await writable.close();
+}
+
 export function generateFilename(prefix: string, extension: string): string {
   const timestamp = format(new Date(), 'yyyy-MM-dd_HH-mm-ss');
   return `${prefix}_${timestamp}.${extension}`;

@@ -378,8 +378,8 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
                 <div />
               )}
 
-              {/* Pomodoro Timer: show only when no task timer is shown to avoid duplicate timers */}
-              {pomodoroSession && !activeTimer && (
+              {/* Pomodoro Timer (always when session exists; visible even without task timer) */}
+              {pomodoroSession && (
                 <>
                   <div className="w-px h-6 bg-gray-300 dark:bg-gray-600" />
                   <div className="flex items-center space-x-2" title={getPomodoroTooltip()}>

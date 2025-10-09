@@ -205,6 +205,7 @@ function MainApp() {
   const [showSmartTaskModal, setShowSmartTaskModal] = React.useState(false);
   const [showFloatingTimer, setShowFloatingTimer] = React.useState(false);
   const [selectedTaskForModal, setSelectedTaskForModal] = React.useState<string | null>(null);
+  const backupIntervalIdRef = React.useRef<number | null>(null);
   const [showLanguageSelection, setShowLanguageSelection] = React.useState(false);
   const [showOnboarding, setShowOnboarding] = React.useState(false);
   const [pwaUpdateAvailable, setPwaUpdateAvailable] = React.useState(false);
@@ -1073,6 +1074,50 @@ function MainApp() {
             try { delete (window as any).__taskfuchs_openTask; } catch {}
           };
         }, []);
+
+  // Automated local JSON backup scheduler (File System Access API)
+  React.useEffect(() => {
+    if (backupIntervalIdRef.current) {
+      clearInterval(backupIntervalIdRef.current);
+      backupIntervalIdRef.current = null;
+    }
+    const prefs = state.preferences;
+    if (!prefs?.backup?.enabled) return;
+    const minutes = Math.max(1, prefs.backup.intervalMinutes || 60);
+    const runBackup = async () => {
+      try {
+        const handle = (window as any).__taskfuchs_backup_dir__ as FileSystemDirectoryHandle | undefined;
+        if (!handle) return;
+        const { exportToJSON, writeBackupToDirectory } = await import('./utils/importExport');
+        const data: any = {
+          tasks: state.tasks,
+          archivedTasks: (state as any).archivedTasks || [],
+          columns: state.columns,
+          tags: state.tags,
+          notes: (state as any).notes?.notes || (state as any).notes || [],
+          noteLinks: (state as any).noteLinks || [],
+          preferences: state.preferences,
+          viewState: (state as any).viewState || {},
+          projectKanbanColumns: (state as any).viewState?.projectKanban?.columns || [],
+          projectKanbanState: (state as any).viewState?.projectKanban || {},
+          exportDate: new Date().toISOString(),
+          version: '2.3'
+        };
+        const json = exportToJSON(data);
+        const filename = `TaskFuchs_${new Date().toISOString().replace(/[:]/g,'-').slice(0,19)}.json`;
+        await writeBackupToDirectory(handle, filename, json);
+        (window as any).__taskfuchs_backup_toast__ = true;
+        const prev = prefs.backup || { enabled: true, intervalMinutes: minutes, notify: true };
+        dispatch({ type: 'UPDATE_PREFERENCES', payload: { backup: { enabled: prev.enabled, intervalMinutes: prev.intervalMinutes, notify: prev.notify, lastSuccess: new Date().toISOString() } } });
+      } catch {}
+    };
+    const id = window.setInterval(runBackup, minutes * 60 * 1000);
+    backupIntervalIdRef.current = id;
+    return () => {
+      if (backupIntervalIdRef.current) clearInterval(backupIntervalIdRef.current);
+      backupIntervalIdRef.current = null;
+    };
+  }, [state.preferences.backup?.enabled, state.preferences.backup?.intervalMinutes, state.tasks, state.columns, state.tags, (state as any).notes, (state as any).viewState]);
         return null;
       })()}
       

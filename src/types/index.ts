@@ -361,6 +361,14 @@ export interface UserPreferences {
   };
   // Microsoft To Do Integration Settings
   microsoftTodo?: MicrosoftToDoSettings;
+
+  // Local JSON backup settings
+  backup?: {
+    enabled: boolean;
+    intervalMinutes: number; // how often to write backup automatically
+    notify?: boolean; // show 2s toast after backup
+    lastSuccess?: string; // ISO timestamp of last successful backup
+  };
 }
 
 export interface Statistics {

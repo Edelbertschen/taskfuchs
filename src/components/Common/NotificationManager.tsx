@@ -373,68 +373,57 @@ export function NotificationManager() {
 
   return (
     <>
-      {/* Notification Permission Banner */}
+      {/* Floating permission banner */}
       {showPermissionBanner && (
-        <div className="fixed top-4 left-4 right-4 z-50 mx-auto max-w-md">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4">
-            <div className="flex items-start gap-3">
-              <div className="p-2 rounded-full bg-blue-100 dark:bg-blue-900/30">
-                <Bell className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              </div>
-              
-              <div className="flex-1">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
-                  Benachrichtigungen aktivieren
-                </h3>
-                <p className="text-xs text-gray-600 dark:text-gray-300 mb-3">
-                  Lassen Sie sich an wichtige Aufgaben erinnern und verpassen Sie keine Termine.
-                </p>
-                
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleAllowNotifications}
-                    className="px-3 py-1.5 text-xs font-medium text-white rounded-md transition-colors duration-200 hover:opacity-90"
-                    style={{ backgroundColor: state.preferences.accentColor }}
-                  >
-                    Erlauben
-                  </button>
-                  
-                  <button
-                    onClick={handleDismissBanner}
-                    className="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
-                  >
-                    Später
-                  </button>
-                </div>
-              </div>
-              
-              <button
-                onClick={handleDismissBanner}
-                className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[10000] bg-white dark:bg-gray-900 shadow-xl rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center gap-3">
+          <Bell className="w-4 h-4 text-yellow-500" />
+          <span className="text-sm text-gray-800 dark:text-gray-200">Benachrichtigungen aktivieren?</span>
+          <div className="flex gap-2">
+            <button onClick={handleAllowNotifications} className="px-2 py-1 rounded-md text-white text-xs" style={{ backgroundColor: state.preferences.accentColor }}>Erlauben</button>
+            <button onClick={() => { localStorage.setItem('notificationPermissionBannerSeen', 'true'); setShowPermissionBanner(false); }} className="px-2 py-1 rounded-md text-xs border">Später</button>
           </div>
         </div>
       )}
 
-      {currentReminder && (
+      {/* Backup toast */}
+      {(() => {
+        try {
+          const anyWin = window as any;
+          if (anyWin.__taskfuchs_backup_toast__) {
+            setTimeout(() => { anyWin.__taskfuchs_backup_toast__ = false; }, 10);
+            return (
+              <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[200000000] pointer-events-none">
+                <div className="px-3 py-1.5 rounded-md text-white text-sm shadow-lg" style={{ backgroundColor: '#16a34a' }}>
+                  Backup gespeichert
+                </div>
+              </div>
+            );
+          }
+        } catch {}
+        return null;
+      })()}
+
+      {/* Existing overlays */}
+      {showOverlay && currentReminder && (
         <ReminderOverlay
           task={currentReminder}
-          isVisible={showOverlay}
-          onDismiss={handleDismiss}
-          onComplete={handleComplete}
-          onSnooze={handleSnooze}
-          onTaskClick={handleTaskClick}
+          isVisible={true}
+          onDismiss={() => setShowOverlay(false)}
+          onComplete={() => setShowOverlay(false)}
+          onSnooze={() => setShowOverlay(false)}
+          onTaskClick={() => {
+            setSelectedTask(currentReminder);
+            setShowTaskModal(true);
+          }}
         />
       )}
-      
+
+      {/* Task Modal for reminders */}
       {showTaskModal && selectedTask && (
         <TaskModal
           task={selectedTask}
           isOpen={showTaskModal}
-          onClose={handleCloseTaskModal}
+          onClose={() => setShowTaskModal(false)}
         />
       )}
     </>
