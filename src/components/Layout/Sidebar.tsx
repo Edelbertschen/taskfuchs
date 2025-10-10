@@ -55,6 +55,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
   const moreButtonRef = useRef<HTMLButtonElement | null>(null);
   const [moreMenuPos, setMoreMenuPos] = useState<{ left: number; top: number }>({ left: 0, top: 0 });
   const [showBackupSlideout, setShowBackupSlideout] = useState(false);
+  const [backupSlideIn, setBackupSlideIn] = useState(false);
   
   // Detect if running in Electron
   const isElectron = !!(window as any).require;
@@ -181,6 +182,17 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
       setDraggedTask(null);
     }
   };
+
+  // Smooth entrance for backup slideout
+  useEffect(() => {
+    if (showBackupSlideout) {
+      setBackupSlideIn(false);
+      const id = requestAnimationFrame(() => setBackupSlideIn(true));
+      return () => cancelAnimationFrame(id);
+    } else {
+      setBackupSlideIn(false);
+    }
+  }, [showBackupSlideout]);
 
   // JSON Export function - IDENTISCH zu Settings.tsx
   const handleJsonExport = useCallback(() => {
@@ -687,7 +699,16 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
       {showBackupSlideout && createPortal(
         <div className="fixed inset-0 z-[100000]" onClick={() => setShowBackupSlideout(false)}>
           <div className="absolute inset-0 bg-black/50" />
-          <div className="absolute bottom-4 left-24 w-[300px] md:left-24 md:w-[340px] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl p-4 animate-in slide-in-from-left-8" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="absolute bottom-4 left-24 w-[300px] md:left-24 md:w-[340px] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl p-4"
+            style={{
+              transform: backupSlideIn ? 'translateX(0) scale(1)' : 'translateX(-18px) scale(0.985)',
+              opacity: backupSlideIn ? 1 : 0,
+              transition: 'transform 260ms cubic-bezier(0.18,0.89,0.32,1.12), opacity 220ms ease',
+              boxShadow: backupSlideIn ? '0 20px 55px rgba(0,0,0,0.25)' : '0 10px 30px rgba(0,0,0,0.15)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center gap-2 mb-2">
               <Save className="w-4 h-4" style={{ color: state.preferences.accentColor }} />
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Backup</h3>
