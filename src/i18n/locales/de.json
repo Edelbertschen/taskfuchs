@@ -2094,6 +2094,10 @@
   },
   "backup": {
     "saved": "Backup gespeichert",
-    "restored": "Backup wiederhergestellt"
+    "restored": "Backup wiederhergestellt",
+    "title": "Backup",
+    "help": "Sichert alle Daten als JSON im gewählten Ordner. „Wiederherstellen“ lädt das neueste Backup oder öffnet eine Datei‑Auswahl, falls keines vorhanden ist.",
+    "create": "Backup erstellen",
+    "restore": "Backup wiederherstellen"
   }
 } 

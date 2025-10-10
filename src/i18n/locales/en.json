@@ -2106,6 +2106,10 @@
   },
   "backup": {
     "saved": "Backup saved",
-    "restored": "Backup restored"
+    "restored": "Backup restored",
+    "title": "Backup",
+    "help": "Backs up all data as JSON into the chosen folder. “Restore” loads the latest backup or opens a file picker if none exists.",
+    "create": "Create backup",
+    "restore": "Restore backup"
   }
 } 

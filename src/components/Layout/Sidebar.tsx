@@ -711,9 +711,9 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
           >
             <div className="flex items-center gap-2 mb-2">
               <Save className="w-4 h-4" style={{ color: state.preferences.accentColor }} />
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Backup</h3>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('backup.title', { defaultValue: 'Backup' })}</h3>
             </div>
-            <p className="text-xs text-gray-600 dark:text-gray-300 mb-3">Sichert alle Daten als JSON im gewählten Ordner. „Wiederherstellen“ lädt das neueste Backup oder öffnet eine Datei‑Auswahl, falls keines vorhanden ist.</p>
+            <p className="text-xs text-gray-600 dark:text-gray-300 mb-3">{t('backup.help', { defaultValue: 'Backs up all data as JSON into the chosen folder. “Restore” loads the latest backup or opens a file picker if none exists.' })}</p>
             <div className="flex items-center gap-2">
               <button
                 onClick={async () => {
@@ -754,7 +754,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                 style={{ backgroundColor: state.preferences.accentColor }}
               >
                 <Save className="w-4 h-4" />
-                Backup erstellen
+                {t('backup.create', { defaultValue: 'Create backup' })}
               </button>
               <button
                 onClick={async () => {
@@ -796,7 +796,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                 className="flex-1 px-3 py-2 rounded-md text-sm font-medium flex items-center justify-center gap-2 border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
               >
                 <RotateCcw className="w-4 h-4" />
-                Backup wiederherstellen
+                {t('backup.restore', { defaultValue: 'Restore backup' })}
               </button>
             </div>
           </div>
