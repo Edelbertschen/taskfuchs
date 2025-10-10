@@ -21,6 +21,8 @@ import {
   Pin,
   Upload,
   Download,
+  Save,
+  RotateCcw,
   User,
   MoreHorizontal
 } from 'lucide-react';
@@ -52,6 +54,8 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const moreButtonRef = useRef<HTMLButtonElement | null>(null);
   const [moreMenuPos, setMoreMenuPos] = useState<{ left: number; top: number }>({ left: 0, top: 0 });
+  const [showBackupSlideout, setShowBackupSlideout] = useState(false);
+  const [backupSlideIn, setBackupSlideIn] = useState(false);
   
   // Detect if running in Electron
   const isElectron = !!(window as any).require;
@@ -69,6 +73,8 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
   // Dropbox quick actions (sidebar): separate Upload/Download with LED indicators
   const canDropbox = false; // Dropbox sync removed
   const canLocalBackup = !!state.preferences.backup?.enabled && !!(window as any).__taskfuchs_backup_dir__;
+  const hasBackupPref = !!state.preferences.backup?.enabled;
+  const [localBackupState, setLocalBackupState] = useState<'idle'|'saving'|'success'|'error'>('idle');
   const [uploadLed, setUploadLed] = useState<'idle'|'syncing'|'success'|'error'>('idle');
   const [downloadLed, setDownloadLed] = useState<'idle'|'syncing'|'success'|'error'>('idle');
 
@@ -176,6 +182,17 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
       setDraggedTask(null);
     }
   };
+
+  // Smooth entrance for backup slideout
+  useEffect(() => {
+    if (showBackupSlideout) {
+      setBackupSlideIn(false);
+      const id = requestAnimationFrame(() => setBackupSlideIn(true));
+      return () => cancelAnimationFrame(id);
+    } else {
+      setBackupSlideIn(false);
+    }
+  }, [showBackupSlideout]);
 
   // JSON Export function - IDENTISCH zu Settings.tsx
   const handleJsonExport = useCallback(() => {
@@ -654,44 +671,138 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
               </button>
             </div>
           )}
-          {canLocalBackup && (
-            <div className="mt-2 flex items-center justify-center px-1">
-              <button onClick={async () => {
-                try {
-                  const dir: any = (window as any).__taskfuchs_backup_dir__;
-                  if (!dir) { alert('Kein Backup‑Ordner gewählt.'); return; }
-                  const { exportToJSON, writeBackupToDirectory } = await import('../../utils/importExport');
-                  const data: any = {
-                    tasks: state.tasks,
-                    archivedTasks: state.archivedTasks,
-                    columns: state.columns,
-                    tags: state.tags,
-                    notes: state.notes?.notes || state.notes || [],
-                    noteLinks: state.noteLinks || [],
-                    preferences: state.preferences,
-                    viewState: state.viewState || {},
-                    projectKanbanColumns: state.viewState?.projectKanban?.columns || [],
-                    projectKanbanState: state.viewState?.projectKanban || {},
-                    exportDate: new Date().toISOString(),
-                    version: '2.3'
-                  };
-                  const json = exportToJSON(data);
-                  const filename = `TaskFuchs_${new Date().toISOString().replace(/[:]/g,'-').slice(0,19)}.json`;
-                  await writeBackupToDirectory(dir, filename, json);
-                  (window as any).__taskfuchs_backup_toast__ = true;
-                } catch (e) {
-                  console.error('Manual backup failed', e);
-                  alert('Backup fehlgeschlagen.');
+          <div className="mt-2 flex items-center justify-center px-1">
+            <button
+              onClick={() => {
+                if (canLocalBackup) {
+                  setShowBackupSlideout(true);
+                } else {
+                  // Open setup modal if not configured
+                  window.dispatchEvent(new CustomEvent('open-backup-setup'));
                 }
-              }} className="relative w-10 h-10 rounded-full flex items-center justify-center hover:opacity-90 focus:outline-none" title="Backup jetzt sichern" aria-label="Backup jetzt sichern">
-                <Download className="w-5 h-5 text-white" />
-              </button>
-            </div>
-          )}
+              }}
+              className={`relative w-10 h-10 rounded-full flex items-center justify-center hover:opacity-90 focus:outline-none ${!canLocalBackup ? 'ring-1 ring-white/30' : ''}`}
+              title={canLocalBackup ? 'Backup' : 'Backup einrichten'}
+              aria-label="Backup"
+            >
+              <Save className="w-5 h-5 text-white" />
+              {!canLocalBackup && (
+                <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-400" />
+              )}
+            </button>
+          </div>
         </div>
 
       </div>
 
+      {/* Backup Slideout */}
+      {showBackupSlideout && createPortal(
+        <div className="fixed inset-0 z-[100000]" onClick={() => setShowBackupSlideout(false)}>
+          <div className="absolute inset-0 bg-black/50" />
+          <div
+            className="absolute bottom-4 left-24 w-[300px] md:left-24 md:w-[340px] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl p-4"
+            style={{
+              transform: backupSlideIn ? 'translateX(0) scale(1)' : 'translateX(-18px) scale(0.985)',
+              opacity: backupSlideIn ? 1 : 0,
+              transition: 'transform 260ms cubic-bezier(0.18,0.89,0.32,1.12), opacity 220ms ease',
+              boxShadow: backupSlideIn ? '0 20px 55px rgba(0,0,0,0.25)' : '0 10px 30px rgba(0,0,0,0.15)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <Save className="w-4 h-4" style={{ color: state.preferences.accentColor }} />
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('backup.title', { defaultValue: 'Backup' })}</h3>
+            </div>
+            <p className="text-xs text-gray-600 dark:text-gray-300 mb-3">{t('backup.help', { defaultValue: 'Backs up all data as JSON into the chosen folder. “Restore” loads the latest backup or opens a file picker if none exists.' })}</p>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={async () => {
+                  if (localBackupState === 'saving') return;
+                  try {
+                    setLocalBackupState('saving');
+                    const dir: any = (window as any).__taskfuchs_backup_dir__;
+                    if (!dir) { alert('Kein Backup‑Ordner gewählt.'); setLocalBackupState('idle'); return; }
+                    const { exportToJSON, writeBackupToDirectory } = await import('../../utils/importExport');
+                    const data: any = {
+                      tasks: state.tasks,
+                      archivedTasks: state.archivedTasks,
+                      columns: state.columns,
+                      tags: state.tags,
+                      notes: state.notes?.notes || state.notes || [],
+                      noteLinks: state.noteLinks || [],
+                      preferences: state.preferences,
+                      viewState: state.viewState || {},
+                      projectKanbanColumns: state.viewState?.projectKanban?.columns || [],
+                      projectKanbanState: state.viewState?.projectKanban || {},
+                      exportDate: new Date().toISOString(),
+                      version: '2.3'
+                    };
+                    const json = exportToJSON(data);
+                    const filename = `TaskFuchs_${new Date().toISOString().replace(/[:]/g,'-').slice(0,19)}.json`;
+                    await writeBackupToDirectory(dir, filename, json);
+                    (window as any).__taskfuchs_backup_toast__ = true;
+                    setLocalBackupState('success');
+                    setTimeout(() => setLocalBackupState('idle'), 1200);
+                  } catch (e) {
+                    console.error('Manual backup failed', e);
+                    setLocalBackupState('error');
+                    setTimeout(() => setLocalBackupState('idle'), 1500);
+                    alert('Backup fehlgeschlagen.');
+                  }
+                }}
+                className="flex-1 px-3 py-2 rounded-md text-white text-sm font-medium flex items-center justify-center gap-2"
+                style={{ backgroundColor: state.preferences.accentColor }}
+              >
+                <Save className="w-4 h-4" />
+                {t('backup.create', { defaultValue: 'Create backup' })}
+              </button>
+              <button
+                onClick={async () => {
+                  try {
+                    const dir: any = (window as any).__taskfuchs_backup_dir__;
+                    const { importFromJSON } = await import('../../utils/importExport');
+                    let fileHandle: any = null;
+                    if (dir && (dir as any).values) {
+                      try {
+                        const entries: any[] = [];
+                        // @ts-ignore
+                        for await (const entry of dir.values()) { entries.push(entry); }
+                        const candidates = entries.filter(e => e.kind==='file' && /TaskFuchs_.*\.json$/.test(e.name)).sort((a,b)=> b.name.localeCompare(a.name));
+                        if (candidates.length>0) { fileHandle = candidates[0]; }
+                      } catch {}
+                    }
+                    if (!fileHandle) {
+                      // @ts-ignore
+                      const picker = await (window as any).showOpenFilePicker?.({ types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }]});
+                      fileHandle = picker && picker[0];
+                    }
+                    if (!fileHandle) return;
+                    // @ts-ignore
+                    const file = await fileHandle.getFile();
+                    const text = await file.text();
+                    const data = importFromJSON(text, false);
+                    if (data) {
+                      dispatch({ type: 'IMPORT_DATA_REPLACE', payload: { ...data } as any });
+                      (window as any).__taskfuchs_backup_toast__ = 'restored';
+                      setShowBackupSlideout(false);
+                    } else {
+                      alert('Backup konnte nicht gelesen werden.');
+                    }
+                  } catch (e) {
+                    console.error('Restore failed', e);
+                    alert('Wiederherstellen fehlgeschlagen.');
+                  }
+                }}
+                className="flex-1 px-3 py-2 rounded-md text-sm font-medium flex items-center justify-center gap-2 border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
+                <RotateCcw className="w-4 h-4" />
+                {t('backup.restore', { defaultValue: 'Restore backup' })}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
 
 
       
