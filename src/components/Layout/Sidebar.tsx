@@ -72,6 +72,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
   // Dropbox quick actions (sidebar): separate Upload/Download with LED indicators
   const canDropbox = false; // Dropbox sync removed
   const canLocalBackup = !!state.preferences.backup?.enabled && !!(window as any).__taskfuchs_backup_dir__;
+  const hasBackupPref = !!state.preferences.backup?.enabled;
   const [localBackupState, setLocalBackupState] = useState<'idle'|'saving'|'success'|'error'>('idle');
   const [uploadLed, setUploadLed] = useState<'idle'|'syncing'|'success'|'error'>('idle');
   const [downloadLed, setDownloadLed] = useState<'idle'|'syncing'|'success'|'error'>('idle');
@@ -658,13 +659,26 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
               </button>
             </div>
           )}
-          {canLocalBackup && (
-            <div className="mt-2 flex items-center justify-center px-1">
-              <button onClick={() => setShowBackupSlideout(true)} className="relative w-10 h-10 rounded-full flex items-center justify-center hover:opacity-90 focus:outline-none" title="Backup" aria-label="Backup">
-                <Save className="w-5 h-5 text-white" />
-              </button>
-            </div>
-          )}
+          <div className="mt-2 flex items-center justify-center px-1">
+            <button
+              onClick={() => {
+                if (canLocalBackup) {
+                  setShowBackupSlideout(true);
+                } else {
+                  // Open setup modal if not configured
+                  window.dispatchEvent(new CustomEvent('open-backup-setup'));
+                }
+              }}
+              className={`relative w-10 h-10 rounded-full flex items-center justify-center hover:opacity-90 focus:outline-none ${!canLocalBackup ? 'ring-1 ring-white/30' : ''}`}
+              title={canLocalBackup ? 'Backup' : 'Backup einrichten'}
+              aria-label="Backup"
+            >
+              <Save className="w-5 h-5 text-white" />
+              {!canLocalBackup && (
+                <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-400" />
+              )}
+            </button>
+          </div>
         </div>
 
       </div>
