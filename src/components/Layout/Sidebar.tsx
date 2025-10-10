@@ -21,6 +21,8 @@ import {
   Pin,
   Upload,
   Download,
+  Save,
+  RotateCcw,
   User,
   MoreHorizontal
 } from 'lucide-react';
@@ -52,6 +54,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const moreButtonRef = useRef<HTMLButtonElement | null>(null);
   const [moreMenuPos, setMoreMenuPos] = useState<{ left: number; top: number }>({ left: 0, top: 0 });
+  const [showBackupSlideout, setShowBackupSlideout] = useState(false);
   
   // Detect if running in Electron
   const isElectron = !!(window as any).require;
@@ -657,6 +660,26 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
           )}
           {canLocalBackup && (
             <div className="mt-2 flex items-center justify-center px-1">
+              <button onClick={() => setShowBackupSlideout(true)} className="relative w-10 h-10 rounded-full flex items-center justify-center hover:opacity-90 focus:outline-none" title="Backup" aria-label="Backup">
+                <Save className="w-5 h-5 text-white" />
+              </button>
+            </div>
+          )}
+        </div>
+
+      </div>
+
+      {/* Backup Slideout */}
+      {showBackupSlideout && createPortal(
+        <div className="fixed inset-0 z-[100000]" onClick={() => setShowBackupSlideout(false)}>
+          <div className="absolute inset-0 bg-black/50" />
+          <div className="absolute bottom-4 left-4 right-4 md:left-auto md:right-6 md:w-[360px] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl p-4 animate-in slide-in-from-bottom-2" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center gap-2 mb-2">
+              <Save className="w-4 h-4" style={{ color: state.preferences.accentColor }} />
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Backup</h3>
+            </div>
+            <p className="text-xs text-gray-600 dark:text-gray-300 mb-3">Sichert alle Daten als JSON im gewählten Ordner. „Wiederherstellen“ lädt das neueste Backup oder öffnet eine Datei‑Auswahl, falls keines vorhanden ist.</p>
+            <div className="flex items-center gap-2">
               <button
                 onClick={async () => {
                   if (localBackupState === 'saving') return;
@@ -692,40 +715,59 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                     alert('Backup fehlgeschlagen.');
                   }
                 }}
-                className={`relative w-10 h-10 rounded-full flex items-center justify-center focus:outline-none transition-all duration-200 ${localBackupState==='saving' ? 'opacity-80 cursor-wait' : 'hover:opacity-90'}`}
-                title="Backup jetzt sichern"
-                aria-label="Backup jetzt sichern"
-                aria-busy={localBackupState==='saving'}
-                disabled={localBackupState==='saving'}
+                className="flex-1 px-3 py-2 rounded-md text-white text-sm font-medium flex items-center justify-center gap-2"
+                style={{ backgroundColor: state.preferences.accentColor }}
               >
-                {localBackupState==='saving' && (
-                  <svg className="w-5 h-5 text-white animate-spin" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-                  </svg>
-                )}
-                {localBackupState==='success' && (
-                  <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                )}
-                {localBackupState==='error' && (
-                  <svg className="w-5 h-5 text-red-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                )}
-                {localBackupState==='idle' && (
-                  <Download className="w-5 h-5 text-white" />
-                )}
-                {/* pulse halo on click/success */}
-                <span className={`absolute inset-0 rounded-full pointer-events-none transition-opacity ${localBackupState==='saving' || localBackupState==='success' ? 'opacity-100' : 'opacity-0'}`} style={{ boxShadow: localBackupState!=='error' ? `0 0 0 6px ${state.preferences.accentColor}25` : 'none' }} />
+                <Save className="w-4 h-4" />
+                Backup erstellen
+              </button>
+              <button
+                onClick={async () => {
+                  try {
+                    const dir: any = (window as any).__taskfuchs_backup_dir__;
+                    const { importFromJSON } = await import('../../utils/importExport');
+                    let fileHandle: any = null;
+                    if (dir && (dir as any).values) {
+                      try {
+                        const entries: any[] = [];
+                        // @ts-ignore
+                        for await (const entry of dir.values()) { entries.push(entry); }
+                        const candidates = entries.filter(e => e.kind==='file' && /TaskFuchs_.*\.json$/.test(e.name)).sort((a,b)=> b.name.localeCompare(a.name));
+                        if (candidates.length>0) { fileHandle = candidates[0]; }
+                      } catch {}
+                    }
+                    if (!fileHandle) {
+                      // @ts-ignore
+                      const picker = await (window as any).showOpenFilePicker?.({ types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }]});
+                      fileHandle = picker && picker[0];
+                    }
+                    if (!fileHandle) return;
+                    // @ts-ignore
+                    const file = await fileHandle.getFile();
+                    const text = await file.text();
+                    const data = importFromJSON(text, false);
+                    if (data) {
+                      dispatch({ type: 'IMPORT_DATA_REPLACE', payload: { ...data } as any });
+                      (window as any).__taskfuchs_backup_toast__ = true;
+                      setShowBackupSlideout(false);
+                    } else {
+                      alert('Backup konnte nicht gelesen werden.');
+                    }
+                  } catch (e) {
+                    console.error('Restore failed', e);
+                    alert('Wiederherstellen fehlgeschlagen.');
+                  }
+                }}
+                className="flex-1 px-3 py-2 rounded-md text-sm font-medium flex items-center justify-center gap-2 border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
+                <RotateCcw className="w-4 h-4" />
+                Backup wiederherstellen
               </button>
             </div>
-          )}
-        </div>
-
-      </div>
-
+          </div>
+        </div>,
+        document.body
+      )}
 
 
       
