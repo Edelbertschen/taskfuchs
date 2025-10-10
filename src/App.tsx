@@ -232,14 +232,16 @@ function MainApp() {
     }
   }, [state.preferences.language, i18n]);
 
-  // Immediately suggest backup setup if no directory defined yet
+  // Suggest backup setup once on app start if not configured
   React.useEffect(() => {
     try {
       const handle = (window as any).__taskfuchs_backup_dir__;
-      if (!handle) {
+      const isEnabled = !!state.preferences.backup?.enabled;
+      if (!handle && !isEnabled) {
         setShowBackupSetup(true);
       }
     } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Temporarily hold back mobile app: show Coming Soon screen on mobile viewports/PWA
