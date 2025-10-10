@@ -5,9 +5,11 @@ import { TaskModal } from '../Tasks/TaskModal';
 import { Task } from '../../types';
 import { notificationService } from '../../utils/notificationService';
 import { Bell, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export function NotificationManager() {
   const { state, dispatch } = useApp();
+  const { t } = useTranslation();
   const [currentReminder, setCurrentReminder] = useState<Task | null>(null);
   const [showOverlay, setShowOverlay] = useState(false);
   const [checkedReminders, setCheckedReminders] = useState<Set<string>>(new Set());
@@ -390,11 +392,12 @@ export function NotificationManager() {
         try {
           const anyWin = window as any;
           if (anyWin.__taskfuchs_backup_toast__) {
+            const mode = anyWin.__taskfuchs_backup_toast__;
             setTimeout(() => { anyWin.__taskfuchs_backup_toast__ = false; }, 10);
             return (
               <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[200000000] pointer-events-none">
                 <div className="px-3 py-1.5 rounded-md text-white text-sm shadow-lg" style={{ backgroundColor: '#16a34a' }}>
-                  Backup gespeichert
+                  {mode === 'restored' ? t('backup.restored') : t('backup.saved')}
                 </div>
               </div>
             );

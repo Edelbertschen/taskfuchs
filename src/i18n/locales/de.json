@@ -1171,8 +1171,8 @@
         "Volltext-Suche",
         "Tag-System"
       ]
-    },
-    "focus": {
+  },
+  "focus_alt": {
       "title": "Fokusmodus",
       "subtitle": "Konzentriert arbeiten",
       "description": "Aktiviere den Fokusmodus für ablenkungsfreies Arbeiten mit integriertem Timer.",
@@ -1338,7 +1338,7 @@
       "no_tasks_row": "Keine Aufgaben in dieser Spalte"
     }
   },
-  "header": {
+  "header_alt": {
     "logout_confirm": "Möchten Sie sich wirklich abmelden?",
     "task_due": "Aufgabe fällig",
     "task_due_message": "\"{title}\" ist jetzt fällig!",
@@ -2091,5 +2091,9 @@
     "tip_text": "Lege das Verzeichnis z. B. in deiner Cloud (Nextcloud/Dropbox/OneDrive) an, um zusätzliche Sicherheit zu haben.",
     "cancel": "Später",
     "choose": "Verzeichnis wählen"
+  },
+  "backup": {
+    "saved": "Backup gespeichert",
+    "restored": "Backup wiederhergestellt"
   }
 } 

@@ -762,7 +762,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                     const data = importFromJSON(text, false);
                     if (data) {
                       dispatch({ type: 'IMPORT_DATA_REPLACE', payload: { ...data } as any });
-                      (window as any).__taskfuchs_backup_toast__ = true;
+                      (window as any).__taskfuchs_backup_toast__ = 'restored';
                       setShowBackupSlideout(false);
                     } else {
                       alert('Backup konnte nicht gelesen werden.');

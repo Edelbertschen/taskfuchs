@@ -593,7 +593,7 @@
     "heading_2": "Heading 2", 
     "heading_3": "Heading 3"
   },
-  "focus": {
+  "focus_section": {
     "focus_time": "Focus Time",
     "break_time": "Break Time",
     "session_complete": "Session Complete",
@@ -1922,7 +1922,7 @@
     "today": "Today",
     "yesterday": "Yesterday"
   },
-  "focus_view": {
+  "focus_view_alt": {
     "estimated_time": "Estimated Time",
     "add_minutes": "Add {minutes} minute",
     "add_minutes_plural": "Add {minutes} minutes", 
@@ -2103,5 +2103,9 @@
     "tip_text": "Place the folder in your cloud (Nextcloud/Dropbox/OneDrive) for extra safety.",
     "cancel": "Later",
     "choose": "Choose directory"
+  },
+  "backup": {
+    "saved": "Backup saved",
+    "restored": "Backup restored"
   }
 } 
