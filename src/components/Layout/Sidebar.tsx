@@ -687,7 +687,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
       {showBackupSlideout && createPortal(
         <div className="fixed inset-0 z-[100000]" onClick={() => setShowBackupSlideout(false)}>
           <div className="absolute inset-0 bg-black/50" />
-          <div className="absolute bottom-4 left-4 right-4 md:left-auto md:right-6 md:w-[360px] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl p-4 animate-in slide-in-from-bottom-2" onClick={(e) => e.stopPropagation()}>
+          <div className="absolute bottom-4 left-24 w-[300px] md:left-24 md:w-[340px] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl p-4 animate-in slide-in-from-left-8" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center gap-2 mb-2">
               <Save className="w-4 h-4" style={{ color: state.preferences.accentColor }} />
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Backup</h3>
