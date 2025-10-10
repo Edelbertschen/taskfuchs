@@ -69,6 +69,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
   // Dropbox quick actions (sidebar): separate Upload/Download with LED indicators
   const canDropbox = false; // Dropbox sync removed
   const canLocalBackup = !!state.preferences.backup?.enabled && !!(window as any).__taskfuchs_backup_dir__;
+  const [localBackupState, setLocalBackupState] = useState<'idle'|'saving'|'success'|'error'>('idle');
   const [uploadLed, setUploadLed] = useState<'idle'|'syncing'|'success'|'error'>('idle');
   const [downloadLed, setDownloadLed] = useState<'idle'|'syncing'|'success'|'error'>('idle');
 
@@ -656,35 +657,68 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
           )}
           {canLocalBackup && (
             <div className="mt-2 flex items-center justify-center px-1">
-              <button onClick={async () => {
-                try {
-                  const dir: any = (window as any).__taskfuchs_backup_dir__;
-                  if (!dir) { alert('Kein Backup‑Ordner gewählt.'); return; }
-                  const { exportToJSON, writeBackupToDirectory } = await import('../../utils/importExport');
-                  const data: any = {
-                    tasks: state.tasks,
-                    archivedTasks: state.archivedTasks,
-                    columns: state.columns,
-                    tags: state.tags,
-                    notes: state.notes?.notes || state.notes || [],
-                    noteLinks: state.noteLinks || [],
-                    preferences: state.preferences,
-                    viewState: state.viewState || {},
-                    projectKanbanColumns: state.viewState?.projectKanban?.columns || [],
-                    projectKanbanState: state.viewState?.projectKanban || {},
-                    exportDate: new Date().toISOString(),
-                    version: '2.3'
-                  };
-                  const json = exportToJSON(data);
-                  const filename = `TaskFuchs_${new Date().toISOString().replace(/[:]/g,'-').slice(0,19)}.json`;
-                  await writeBackupToDirectory(dir, filename, json);
-                  (window as any).__taskfuchs_backup_toast__ = true;
-                } catch (e) {
-                  console.error('Manual backup failed', e);
-                  alert('Backup fehlgeschlagen.');
-                }
-              }} className="relative w-10 h-10 rounded-full flex items-center justify-center hover:opacity-90 focus:outline-none" title="Backup jetzt sichern" aria-label="Backup jetzt sichern">
-                <Download className="w-5 h-5 text-white" />
+              <button
+                onClick={async () => {
+                  if (localBackupState === 'saving') return;
+                  try {
+                    setLocalBackupState('saving');
+                    const dir: any = (window as any).__taskfuchs_backup_dir__;
+                    if (!dir) { alert('Kein Backup‑Ordner gewählt.'); setLocalBackupState('idle'); return; }
+                    const { exportToJSON, writeBackupToDirectory } = await import('../../utils/importExport');
+                    const data: any = {
+                      tasks: state.tasks,
+                      archivedTasks: state.archivedTasks,
+                      columns: state.columns,
+                      tags: state.tags,
+                      notes: state.notes?.notes || state.notes || [],
+                      noteLinks: state.noteLinks || [],
+                      preferences: state.preferences,
+                      viewState: state.viewState || {},
+                      projectKanbanColumns: state.viewState?.projectKanban?.columns || [],
+                      projectKanbanState: state.viewState?.projectKanban || {},
+                      exportDate: new Date().toISOString(),
+                      version: '2.3'
+                    };
+                    const json = exportToJSON(data);
+                    const filename = `TaskFuchs_${new Date().toISOString().replace(/[:]/g,'-').slice(0,19)}.json`;
+                    await writeBackupToDirectory(dir, filename, json);
+                    (window as any).__taskfuchs_backup_toast__ = true;
+                    setLocalBackupState('success');
+                    setTimeout(() => setLocalBackupState('idle'), 1200);
+                  } catch (e) {
+                    console.error('Manual backup failed', e);
+                    setLocalBackupState('error');
+                    setTimeout(() => setLocalBackupState('idle'), 1500);
+                    alert('Backup fehlgeschlagen.');
+                  }
+                }}
+                className={`relative w-10 h-10 rounded-full flex items-center justify-center focus:outline-none transition-all duration-200 ${localBackupState==='saving' ? 'opacity-80 cursor-wait' : 'hover:opacity-90'}`}
+                title="Backup jetzt sichern"
+                aria-label="Backup jetzt sichern"
+                aria-busy={localBackupState==='saving'}
+                disabled={localBackupState==='saving'}
+              >
+                {localBackupState==='saving' && (
+                  <svg className="w-5 h-5 text-white animate-spin" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                  </svg>
+                )}
+                {localBackupState==='success' && (
+                  <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+                {localBackupState==='error' && (
+                  <svg className="w-5 h-5 text-red-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                )}
+                {localBackupState==='idle' && (
+                  <Download className="w-5 h-5 text-white" />
+                )}
+                {/* pulse halo on click/success */}
+                <span className={`absolute inset-0 rounded-full pointer-events-none transition-opacity ${localBackupState==='saving' || localBackupState==='success' ? 'opacity-100' : 'opacity-0'}`} style={{ boxShadow: localBackupState!=='error' ? `0 0 0 6px ${state.preferences.accentColor}25` : 'none' }} />
               </button>
             </div>
           )}
