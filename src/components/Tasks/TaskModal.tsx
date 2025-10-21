@@ -2761,7 +2761,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                 {/* Priority Buttons */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                    {Priority}
+                    {"Priority"}
                   </label>
                   <div className="flex gap-1.5">
                     {[
