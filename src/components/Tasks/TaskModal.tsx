@@ -2761,14 +2761,14 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                 {/* Priority Buttons */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                    {taskModal.priority()}
+                    {taskModal.descriptionTitle?.() || 'Priority'}
                   </label>
                   <div className="flex gap-1.5">
                     {[
-                      { value: 'none', label: taskModal.priorityNone(), colorBg: 'rgba(107, 114, 128, 0.1)', colorBorder: 'rgb(107, 114, 128)', icon: '-' },
-                      { value: 'low', label: 'Niedrig', colorBg: 'rgba(34, 197, 94, 0.1)', colorBorder: 'rgb(34, 197, 94)', icon: '!' },
-                      { value: 'medium', label: 'Mittel', colorBg: 'rgba(234, 179, 8, 0.1)', colorBorder: 'rgb(234, 179, 8)', icon: '!!' },
-                      { value: 'high', label: 'Hoch', colorBg: 'rgba(239, 68, 68, 0.1)', colorBorder: 'rgb(239, 68, 68)', icon: '!!!' }
+                      { value: 'none', label: taskModal.priorityNone?.() || 'None', colorBg: 'rgba(107, 114, 128, 0.1)', colorBorder: 'rgb(107, 114, 128)', icon: '-' },
+                      { value: 'low', label: taskModal.priorityLow?.() || 'Low', colorBg: 'rgba(34, 197, 94, 0.1)', colorBorder: 'rgb(34, 197, 94)', icon: '!' },
+                      { value: 'medium', label: taskModal.priorityMedium?.() || 'Medium', colorBg: 'rgba(234, 179, 8, 0.1)', colorBorder: 'rgb(234, 179, 8)', icon: '!!' },
+                      { value: 'high', label: taskModal.priorityHigh?.() || 'High', colorBg: 'rgba(239, 68, 68, 0.1)', colorBorder: 'rgb(239, 68, 68)', icon: '!!!' }
                     ].map((priority) => (
                       <button
                         key={priority.value}
