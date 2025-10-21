@@ -2675,13 +2675,13 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
               backdropFilter: 'blur(8px)',
               WebkitBackdropFilter: 'blur(8px)',
             }}>
-              <style>{\`
+              <style>{`
                 .dark .content-glassmorphism {
                   background: linear-gradient(180deg, rgba(31, 41, 55, 0.3) 0%, rgba(17, 24, 39, 0.2) 100%) !important;
                   backdrop-filter: blur(8px) !important;
                   -webkit-backdrop-filter: blur(8px) !important;
                 }
-              \`}</style>
+              `}</style>
               <div className="dark:content-glassmorphism">
             
             {/* Smart Parsing Preview - Elegant Overlay */}
