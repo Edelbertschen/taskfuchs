@@ -2709,8 +2709,8 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                         'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800'
                       }`}>
                         <AlertTriangle className="w-3 h-3 mr-1" />
-                        {parseResult.task.priority === 'high' ? "High" : 
-                         parseResult.task.priority === 'medium' ? "Medium" : "Low"}
+                        {parseResult.task.priority === 'high' ? High : 
+                         parseResult.task.priority === 'medium' ? Medium : Low}
                       </div>
                     )}
                     
@@ -2761,14 +2761,14 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                 {/* Priority Buttons */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                    {"Priority"}
+                    {Priority}
                   </label>
                   <div className="flex gap-1.5">
                     {[
-                      { value: 'none', label: "None", colorBg: 'rgba(107, 114, 128, 0.1)', colorBorder: 'rgb(107, 114, 128)', icon: '-' },
-                      { value: 'low', label: "Low", colorBg: 'rgba(34, 197, 94, 0.1)', colorBorder: 'rgb(34, 197, 94)', icon: '!' },
-                      { value: 'medium', label: "Medium", colorBg: 'rgba(234, 179, 8, 0.1)', colorBorder: 'rgb(234, 179, 8)', icon: '!!' },
-                      { value: 'high', label: "High", colorBg: 'rgba(239, 68, 68, 0.1)', colorBorder: 'rgb(239, 68, 68)', icon: '!!!' }
+                      { value: 'none', label: None, colorBg: 'rgba(107, 114, 128, 0.1)', colorBorder: 'rgb(107, 114, 128)', icon: '-' },
+                      { value: 'low', label: Low, colorBg: 'rgba(34, 197, 94, 0.1)', colorBorder: 'rgb(34, 197, 94)', icon: '!' },
+                      { value: 'medium', label: Medium, colorBg: 'rgba(234, 179, 8, 0.1)', colorBorder: 'rgb(234, 179, 8)', icon: '!!' },
+                      { value: 'high', label: High, colorBg: 'rgba(239, 68, 68, 0.1)', colorBorder: 'rgb(239, 68, 68)', icon: '!!!' }
                     ].map((priority) => (
                       <button
                         key={priority.value}
@@ -2795,7 +2795,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   {/* Header with close button */}
                   <div className="flex items-center justify-between mb-2">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      "Description"
+                      Description
                     </label>
                     {!isDescriptionPreviewMode && (
                       <button
@@ -2888,7 +2888,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-2">
                       <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        "Subtasks" ({formData.subtasks.length})
+                        Subtasks ({formData.subtasks.length})
                       </label>
                       {formData.subtasks.length > 0 && (
                         <button
@@ -2936,7 +2936,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                             onChange={(e) => updateSubtask(subtask.id, { title: e.target.value })}
                             onKeyPress={(e) => handleSubtaskKeyPress(e, subtask.id)}
                             onPaste={(e) => handleSubtaskPaste(e, subtask.id)}
-                            placeholder={`$"Subtasks" ${index + 1}`}
+                            placeholder={`$Subtasks ${index + 1}`}
                             className="flex-1 px-2 py-1 text-sm border border-transparent focus:border-gray-300 dark:focus:border-gray-600 rounded focus:outline-none bg-transparent text-gray-900 dark:text-white"
                             data-subtask-input
                           />
@@ -3003,7 +3003,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   return (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        "Status"
+                        Status
                       </label>
                       <div 
                         className="flex items-center space-x-2 p-3 rounded-lg border transition-all duration-200"
@@ -3097,7 +3097,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                                   {taskModal.postponed()}
                                 </p>
                                 <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
-                                  "Review on" {format(reviewDate, 'dd.MM.yyyy', { locale: de })}
+                                  Review on {format(reviewDate, 'dd.MM.yyyy', { locale: de })}
                                 </p>
                               </div>
                               <button
@@ -3115,11 +3115,11 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   );
                 })()}
                 
-                {/* Zeitmanagement */}
+                {/* Time Management */}
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      "Time Management"
+                      Time Management
                     </label>
                     {!showTimeManagement && (
                       <button
@@ -3129,7 +3129,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                         }}
                         className="w-5 h-5 flex items-center justify-center text-xs hover:opacity-80 transition-colors rounded"
                         style={getAccentColorStyles().text}
-                        title="Zeitmanagement hinzufügen"
+                        title="Time Management hinzufügen"
                       >
                         +
                       </button>
@@ -3228,13 +3228,13 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                             className="flex-1 px-3 py-2 text-sm text-white rounded-lg transition-colors hover:opacity-90"
                             style={{ backgroundColor: state.preferences.accentColor }}
                           >
-                            Speichern
+                            Save
                           </button>
                           <button
                             onClick={cancelTimeEditing}
                             className="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
                           >
-                            Abbrechen
+                            Cancel
                           </button>
                         </div>
                       </div>
@@ -3414,7 +3414,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-2">
                       <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Verknüpfte Notizen
+                        Linked Notes
                       </label>
                       {formData.linkedNotes.length > 0 && (
                         <button
@@ -3505,7 +3505,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                 {/* Simplified Reminder Section */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Erinnerung
+                    Reminder
                   </label>
                   
                   {/* Reminder Display/Edit */}
@@ -3525,7 +3525,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                         <button
                           onClick={() => setIsEditingReminder(true)}
                           className="p-1 text-gray-400 hover:text-blue-500 rounded transition-colors opacity-0 group-hover:opacity-100"
-                          title="Erinnerung bearbeiten"
+                          title="Reminder bearbeiten"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
@@ -3541,7 +3541,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                             setHasUnsavedChanges(true);
                           }}
                           className="p-1 text-gray-400 hover:text-red-500 rounded transition-colors opacity-0 group-hover:opacity-100"
-                          title="Erinnerung entfernen"
+                          title="Reminder entfernen"
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -3558,7 +3558,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                           }}
                           className="w-5 h-5 flex items-center justify-center text-xs hover:opacity-80 transition-colors rounded"
                           style={getAccentColorStyles().text}
-                          title="Erinnerung hinzufügen"
+                          title="Reminder hinzufügen"
                         >
                           +
                         </button>
@@ -3815,7 +3815,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                 className="flex items-center space-x-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
               >
                 <Trash2 className="w-4 h-4" />
-                <span>Löschen</span>
+                <span>Delete</span>
               </button>
 
               {/* Completion Button - Center */}
@@ -3827,7 +3827,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
               >
                 <CheckSquare className="w-5 h-5 text-white" />
                 <span>
-                  {task?.completed ? 'Aufgabe unerledigt' : 'Aufgabe erledigt'}
+                  {task?.completed ? 'Aufgabe unerledigt' : 'Task completed'}
                 </span>
               </button>
 
@@ -3837,7 +3837,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   onClick={handleClose}
                   className="px-5 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
-                  Abbrechen
+                  Cancel
                 </button>
                 <button
                   onClick={handleSave}
@@ -3846,7 +3846,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   style={hasUnsavedChanges ? getAccentColorStyles().bg : {}}
                 >
                   <Save className="w-4 h-4" />
-                  <span>Speichern</span>
+                  <span>Save</span>
                 </button>
               </div>
             </div>
@@ -3917,7 +3917,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   Änderungen verwerfen
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Möchten Sie das Modal ohne Speichern schließen?
+                  Möchten Sie das Modal ohne Save schließen?
                 </p>
               </div>
             </div>
@@ -3934,7 +3934,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   onClick={() => setShowConfirmDialog(false)}
                   className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
-                  Abbrechen
+                  Cancel
                 </button>
                 <button
                   onClick={() => {
@@ -3944,7 +3944,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   className="px-4 py-2 text-white rounded-lg transition-colors hover:opacity-90"
                   style={getAccentColorStyles().bg}
                 >
-                  Speichern
+                  Save
                 </button>
               </div>
             </div>
@@ -4406,7 +4406,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                     }}
                   >Enter</kbd> für mehrere • <kbd 
                     className="px-1 py-0.5 text-xs bg-gray-100 dark:bg-gray-600 rounded"
-                  >Esc</kbd> zum Abbrechen
+                  >Esc</kbd> zum Cancel
                 </div>
               </div>
               <div 
