@@ -41,7 +41,6 @@ import {
   Minimize,
   Printer,
   FolderOpen,
-  Mail,
   BookOpen
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
@@ -59,11 +58,9 @@ import { handleImagePaste, getImageMarkdownReference, resolveImageUrls } from '.
 
 interface NoteEditorProps {
   onFullScreenToggle?: (isFullScreen: boolean) => void;
-  emailViewModal?: { isOpen: boolean; email: Note | null };
-  setEmailViewModal?: React.Dispatch<React.SetStateAction<{ isOpen: boolean; email: Note | null }>>;
 }
 
-export function NoteEditor({ onFullScreenToggle, emailViewModal, setEmailViewModal }: NoteEditorProps) {
+export function NoteEditor({ onFullScreenToggle }: NoteEditorProps) {
   const { state, dispatch } = useApp();
   const { noteEditor, pins } = useAppTranslation();
   const { t, i18n } = useTranslation();
@@ -673,8 +670,8 @@ export function NoteEditor({ onFullScreenToggle, emailViewModal, setEmailViewMod
                       setContent(newContent);
                       setHasUnsavedChanges(true);
                     }}
-                    emailViewModal={emailViewModal}
-                    setEmailViewModal={setEmailViewModal}
+                    emailViewModal={null}
+                    setEmailViewModal={null}
                   />
                 )}
               </div>
@@ -932,7 +929,7 @@ export function NoteEditor({ onFullScreenToggle, emailViewModal, setEmailViewMod
 
                   const getNoteIcon = (type: 'email' | 'dailynote' | 'note') => {
                     switch (type) {
-                      case 'email': return Mail;
+                      case 'email': return BookOpen;
                       case 'dailynote': return BookOpen;
                       default: return FileText;
                     }

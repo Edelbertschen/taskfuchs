@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { Search, Plus, List, Edit3, Filter, X, Pin, Archive, Link, FileText, Tag as TagIcon, Clock, RotateCcw, ChevronDown, ChevronRight, Calendar, ChevronLeft, Home, BookOpen, Mail } from 'lucide-react';
+import { Search, Plus, List, Edit3, Filter, X, Pin, Archive, Link, FileText, Tag as TagIcon, Clock, RotateCcw, ChevronDown, ChevronRight, Calendar, ChevronLeft, Home, BookOpen } from 'lucide-react';
 import { Header } from '../Layout/Header';
 import { useApp } from '../../context/AppContext';
 import { useAppTranslation } from '../../utils/i18nHelpers';
@@ -7,10 +7,8 @@ import { useTranslation } from 'react-i18next';
 import type { Note } from '../../types';
 import { NoteEditor } from './NoteEditor';
 import { DailyNoteConfirmationModal } from '../Common/DailyNoteConfirmationModal';
-import { EmailImportModal } from '../Common/EmailImportModal';
 import { format, addDays, subDays, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, isToday, parseISO, isThisMonth, isThisWeek, isSameMonth } from 'date-fns';
 import { de } from 'date-fns/locale';
-import type { ProcessedEmail } from '../../utils/emailService';
 
 export function NotesView() {
   const { state, dispatch } = useApp();
@@ -26,7 +24,6 @@ export function NotesView() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [showDailyNoteConfirmation, setShowDailyNoteConfirmation] = useState(false);
   const [pendingDailyNoteDate, setPendingDailyNoteDate] = useState<string | null>(null);
-  const [showEmailImport, setShowEmailImport] = useState(false);
   
   const handleFullScreenToggle = (isFullScreen: boolean) => {
     dispatch({ type: 'SET_NOTE_EDITOR_FULLSCREEN', payload: isFullScreen });
@@ -91,8 +88,8 @@ export function NotesView() {
       // Show only daily notes
       filtered = filtered.filter(note => note.dailyNote);
     } else {
-      // Show only regular notes (non-daily notes)
-      filtered = filtered.filter(note => !note.dailyNote);
+      // Show only regular notes (non-daily notes) and exclude email notes
+      filtered = filtered.filter(note => !note.dailyNote && !note.tags.includes('email'));
     }
 
     // Apply search filter
@@ -163,32 +160,6 @@ export function NotesView() {
       dispatch({ type: 'SET_NOTES_EDITING', payload: true });
     }
   }, [dailyNotesMode, dispatch]);
-
-  const handleEmailImport = useCallback(async (processedEmail: ProcessedEmail) => {
-    const newNote = {
-      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-      title: processedEmail.subject || 'Importierte E-Mail',
-      content: processedEmail.content || '',
-      tags: ['email'],
-      linkedTasks: [],
-      linkedNotes: [],
-      linkedProjects: [],
-      pinned: false,
-      archived: false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      emailData: {
-        from: processedEmail.from,
-        to: processedEmail.to,
-        subject: processedEmail.subject,
-        date: processedEmail.date,
-        isHtml: true, // Email content is typically HTML-formatted
-      },
-    };
-    dispatch({ type: 'ADD_NOTE', payload: newNote });
-    dispatch({ type: 'SELECT_NOTE', payload: newNote });
-    setShowEmailImport(false);
-  }, [dispatch]);
 
   const handleNoteSelect = useCallback((note: Note) => {
     dispatch({ type: 'SELECT_NOTE', payload: note });
@@ -437,41 +408,6 @@ export function NotesView() {
                 <span>{notesView.notes()}</span>
               </h1>
               <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => setShowEmailImport(true)}
-                  className={`p-2 rounded-md transition-colors duration-200 shadow-sm ${
-                    state.preferences.minimalDesign
-                      ? 'text-white'
-                      : 'text-white'
-                  }`}
-                  style={state.preferences.minimalDesign 
-                    ? { backgroundColor: state.preferences.accentColor }
-                    : getAccentColorStyles().bg
-                  }
-                  onMouseEnter={(e) => {
-                    if (state.preferences.minimalDesign) {
-                      const color = state.preferences.accentColor;
-                      // Darken the accent color for hover
-                      const rgb = color.match(/\w\w/g)?.map(x => parseInt(x, 16));
-                      if (rgb) {
-                        const darkerColor = `rgb(${Math.max(0, rgb[0] - 20)}, ${Math.max(0, rgb[1] - 20)}, ${Math.max(0, rgb[2] - 20)})`;
-                        e.currentTarget.style.backgroundColor = darkerColor;
-                      }
-                    } else {
-                      e.currentTarget.style.backgroundColor = getAccentColorStyles().bgHover.backgroundColor;
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (state.preferences.minimalDesign) {
-                      e.currentTarget.style.backgroundColor = state.preferences.accentColor;
-                    } else {
-                      e.currentTarget.style.backgroundColor = getAccentColorStyles().bg.backgroundColor;
-                    }
-                  }}
-                  title={notesView.createFirstEmailButton()}
-                >
-                  <Mail className="w-4 h-4" />
-                </button>
                 <button
                   onClick={handleCreateNote}
                   className={`p-2 rounded-md transition-colors duration-200 shadow-sm ${
@@ -1108,13 +1044,6 @@ export function NotesView() {
         onConfirm={handleDailyNoteConfirmation}
         date={pendingDailyNoteDate || ''}
         formattedDate={pendingDailyNoteDate ? format(parseISO(pendingDailyNoteDate), 'EEEE, dd. MMMM yyyy', { locale: de }) : ''}
-      />
-
-      {/* Email Import Modal */}
-      <EmailImportModal
-        isOpen={showEmailImport}
-        onClose={() => setShowEmailImport(false)}
-        onImport={handleEmailImport}
       />
     </div>
   );
