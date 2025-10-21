@@ -2791,12 +2791,12 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                 </div>
 
                 {/* Description */}
-                <div className="relative">
+                <div>
                   {/* Header with close button */}
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-2">
                       <BookOpen className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                         Description
                       </label>
                     </div>
@@ -2814,30 +2814,35 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                     )}
                   </div>
 
-                  {/* Preview Mode - Clean, minimal */}
-                  {isDescriptionPreviewMode && (
-                    <div 
-                      className={`relative w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white/80 dark:bg-gray-800/50 backdrop-blur-lg overflow-hidden group resize-y cursor-text ${
-                        isDescriptionExpanded ? 'h-[calc(100vh-300px)]' : 'h-auto min-h-24 max-h-96'
-                      }`}
-                      onClick={() => setIsDescriptionPreviewMode(false)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Escape') {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          setIsDescriptionPreviewMode(true);
-                          setIsDescriptionExpanded(false);
-                        }
-                      }}
-                    >
-                      {/* Resize handle */}
-                      {formData.description?.trim() && (
-                        <div className="absolute bottom-0 right-0 text-gray-300 dark:text-gray-600 cursor-se-resize p-2 opacity-50 hover:opacity-100 transition-opacity pointer-events-auto" title="Resize">
-                          <GripVertical className="w-4 h-4" />
-                        </div>
-                      )}
+                  {/* Unified container for preview and edit */}
+                  <div 
+                    className={`relative w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 overflow-hidden group resize-y ${
+                      isDescriptionPreviewMode ? 'bg-white/80 dark:bg-gray-800/50 backdrop-blur-lg cursor-text' : 'bg-white dark:bg-gray-800 focus-within:border-accent'
+                    } ${
+                      isDescriptionExpanded ? 'h-[calc(100vh-300px)]' : 'h-auto min-h-24 max-h-96'
+                    }`}
+                    onClick={() => isDescriptionPreviewMode && setIsDescriptionPreviewMode(false)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Escape' && !isDescriptionPreviewMode) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setIsDescriptionPreviewMode(true);
+                        setIsDescriptionExpanded(false);
+                      }
+                    }}
+                    style={{
+                      animation: !isDescriptionPreviewMode ? 'fadeInEditMode 0.3s ease-out' : 'none'
+                    }}
+                  >
+                    {/* Resize handle for preview */}
+                    {isDescriptionPreviewMode && formData.description?.trim() && (
+                      <div className="absolute bottom-0 right-0 text-gray-300 dark:text-gray-600 cursor-se-resize p-2 opacity-50 hover:opacity-100 transition-opacity pointer-events-auto" title="Resize">
+                        <GripVertical className="w-4 h-4" />
+                      </div>
+                    )}
 
-                      {/* Content */}
+                    {/* Preview content */}
+                    {isDescriptionPreviewMode && (
                       <div className="text-gray-900 dark:text-white text-sm leading-relaxed p-4 wysiwyg-content overflow-y-auto max-h-96">
                         {!formData.description?.trim() && (
                           <span className="text-gray-400 dark:text-gray-500 text-sm italic opacity-60">
@@ -2854,27 +2859,10 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                           />
                         )}
                       </div>
-                    </div>
-                  )}
+                    )}
 
-                  {/* Edit Mode - Full editor */}
-                  {!isDescriptionPreviewMode && (
-                    <div 
-                      className={`relative w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-accent bg-white dark:bg-gray-800 overflow-hidden group resize-y ${
-                        isDescriptionExpanded ? 'h-[calc(100vh-300px)]' : 'h-auto min-h-32 max-h-96'
-                      }`}
-                      style={{
-                        animation: 'fadeInEditMode 0.3s ease-out'
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Escape') {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          setIsDescriptionPreviewMode(true);
-                          setIsDescriptionExpanded(false);
-                        }
-                      }}
-                    >
+                    {/* Editor */}
+                    {!isDescriptionPreviewMode && (
                       <WysiwygEditor
                         value={formData.description}
                         onChange={(value) => {
@@ -2890,8 +2878,8 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                           setIsDescriptionExpanded(false);
                         }}
                       />
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
 
                 {/* Subtasks - Collapsible */}
