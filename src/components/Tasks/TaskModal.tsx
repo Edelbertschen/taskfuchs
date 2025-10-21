@@ -2761,27 +2761,28 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                     Priorität
                   </label>
-                  <div className="flex gap-2">
+                  <div className="flex gap-1.5">
                     {[
-                      { value: 'none', label: taskModal.priorityNone(), colorBg: 'rgba(107, 114, 128, 0.1)', colorBorder: 'rgb(107, 114, 128)', icon: '◯' },
-                      { value: 'low', label: 'Niedrig', colorBg: 'rgba(34, 197, 94, 0.1)', colorBorder: 'rgb(34, 197, 94)', icon: '▲' },
-                      { value: 'medium', label: 'Mittel', colorBg: 'rgba(234, 179, 8, 0.1)', colorBorder: 'rgb(234, 179, 8)', icon: '◆' },
-                      { value: 'high', label: 'Hoch', colorBg: 'rgba(239, 68, 68, 0.1)', colorBorder: 'rgb(239, 68, 68)', icon: '★' }
+                      { value: 'none', label: taskModal.priorityNone(), colorBg: 'rgba(107, 114, 128, 0.1)', colorBorder: 'rgb(107, 114, 128)', icon: '-' },
+                      { value: 'low', label: 'Niedrig', colorBg: 'rgba(34, 197, 94, 0.1)', colorBorder: 'rgb(34, 197, 94)', icon: '!' },
+                      { value: 'medium', label: 'Mittel', colorBg: 'rgba(234, 179, 8, 0.1)', colorBorder: 'rgb(234, 179, 8)', icon: '!!' },
+                      { value: 'high', label: 'Hoch', colorBg: 'rgba(239, 68, 68, 0.1)', colorBorder: 'rgb(239, 68, 68)', icon: '!!!' }
                     ].map((priority) => (
                       <button
                         key={priority.value}
                         onClick={() => setFormData(prev => ({ ...prev, priority: priority.value as any }))}
-                        className="relative group px-3 py-1.5 rounded-md text-sm transition-all duration-200 cursor-pointer hover:scale-105"
+                        className="relative group px-2.5 py-1.5 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer hover:scale-110"
                         style={{
                           backgroundColor: formData.priority === priority.value ? priority.colorBg : 'transparent',
                           borderLeft: `2px solid ${formData.priority === priority.value ? priority.colorBorder : 'transparent'}`,
-                          opacity: formData.priority === priority.value ? '1' : '0.5',
-                          paddingLeft: formData.priority === priority.value ? '12px' : '14px'
+                          opacity: formData.priority === priority.value ? '1' : '0.4',
+                          paddingLeft: formData.priority === priority.value ? '10px' : '12px',
+                          fontFamily: 'monospace',
+                          letterSpacing: '-1px'
                         }}
                         title={priority.label}
                       >
-                        <span className="text-base">{priority.icon}</span>
-                        <span className="hidden sm:inline text-xs ml-1.5">{priority.label}</span>
+                        {priority.icon}
                       </button>
                     ))}
                   </div>
@@ -2829,6 +2830,19 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                       }}
                       title={!formData.description?.trim() ? 'Klicken zum Bearbeiten' : undefined}
                     >
+                      {/* Collapse button */}
+                      {isDescriptionExpanded && formData.description?.trim() && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setIsDescriptionExpanded(false);
+                          }}
+                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
+                          title={taskModal.collapseDescription()}
+                        >
+                          <ChevronUp className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                        </button>
+                      )}
                       {!formData.description?.trim() && (
                         <span className="text-gray-400 dark:text-gray-500 text-sm italic opacity-60 group-hover:opacity-100 transition-opacity">
                           {taskModal.descriptionPlaceholder() || 'Click to edit...'}
@@ -2861,12 +2875,18 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                         className="h-full w-full"
                         useFullHeight={true}
                         showToolbar={true}
-                        onClickOutside={() => setIsDescriptionPreviewMode(true)}
+                        onClickOutside={() => {
+                          setIsDescriptionPreviewMode(true);
+                          setIsDescriptionExpanded(false);
+                        }}
                       />
                       <button
-                        onClick={() => setIsDescriptionPreviewMode(true)}
+                        onClick={() => {
+                          setIsDescriptionPreviewMode(true);
+                          setIsDescriptionExpanded(false);
+                        }}
                         className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
-                        title="Schließen"
+                        title={taskModal.closeDescription()}
                       >
                         <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                       </button>
@@ -3770,11 +3790,11 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
               <div className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-600">
                 <div className="flex justify-between gap-4 text-xs text-gray-600 dark:text-gray-400">
                   <div className="flex-1">
-                    <span className="font-medium">Erstellt:</span><br />
+                    <span className="font-medium">{taskModal.created()}:</span><br />
                     {format(new Date(task.createdAt), 'dd.MM.yyyy HH:mm', { locale: de })}
                   </div>
                   <div className="flex-1 text-right">
-                    <span className="font-medium">Zuletzt geändert:</span><br />
+                    <span className="font-medium">{taskModal.lastModified()}:</span><br />
                     {format(new Date(task.updatedAt), 'dd.MM.yyyy HH:mm', { locale: de })}
                   </div>
                 </div>
@@ -3797,7 +3817,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                     setShowSeriesDeleteModal(true);
                   } else {
                     // Normal confirmation for non-recurring tasks
-                    if (window.confirm(`Sind Sie sicher, dass Sie "${task.title}" löschen möchten?\n\nDiese Aktion kann nicht rückgängig gemacht werden.`)) {
+                    if (window.confirm(taskModal.deleteConfirm().replace('{title}', task.title))) {
                       dispatch({ type: 'DELETE_TASK', payload: task.id });
                       onClose();
                     }
