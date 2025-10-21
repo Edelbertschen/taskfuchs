@@ -2791,67 +2791,47 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                 </div>
 
                 {/* Description */}
-                <div>
-                  {/* Title and Buttons on same line */}
-                  <div className="flex items-center justify-between mb-3">
+                <div className="relative">
+                  {/* Header with close button */}
+                  <div className="flex items-center justify-between mb-2">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                       Beschreibung
                     </label>
-                    <div className="flex items-center gap-1">
-                      {/* Empty - buttons are in edit mode toolbar only */}
-                    </div>
+                    {!isDescriptionPreviewMode && (
+                      <button
+                        onClick={() => {
+                          setIsDescriptionPreviewMode(true);
+                          setIsDescriptionExpanded(false);
+                        }}
+                        className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
+                        title={taskModal.closeDescription()}
+                      >
+                        <X className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                      </button>
+                    )}
                   </div>
-                  
-                  {isDescriptionPreviewMode ? (
-                    <div 
-                      className={`relative group text-gray-900 dark:text-white text-sm leading-relaxed min-h-[120px] overflow-y-auto p-4 rounded-lg bg-white/80 dark:bg-gray-800/50 backdrop-blur-lg custom-scrollbar wysiwyg-content transition-all duration-300 border border-white/40 dark:border-gray-700/50 hover:border-white/60 dark:hover:border-gray-600/70 ${
-                        isDescriptionExpanded ? 'h-[calc(100vh-300px)]' : 'max-h-[300px]'
-                      } ${!formData.description?.trim() ? 'cursor-text flex items-center justify-center' : 'resize-y'}`}
-                      style={{
-                        scrollBehavior: 'smooth',
-                        transition: 'all 0.3s ease-in-out',
-                        overflowY: isDescriptionExpanded ? 'auto' : 'auto'
-                      }}
-                      onClick={(e) => {
-                        // Allow direct click to edit when empty or when clicking the background
-                        const isEmpty = !formData.description || formData.description.trim() === '';
-                        const clickedBackground = e.currentTarget === e.target;
-                        if (isEmpty || clickedBackground) {
-                          setIsDescriptionPreviewMode(false);
-                          // Don't expand - let user decide
-                        }
-                      }}
-                      title={!formData.description?.trim() ? 'Klicken zum Bearbeiten' : 'Zieh am unteren Rand zum Vergrößern'}
-                    >
-                      {/* Resize handle at bottom */}
-                      {formData.description?.trim() && (
-                        <div className="absolute bottom-1 right-1 text-gray-300 dark:text-gray-600 cursor-se-resize p-1" title="Größe ändern">
-                          <GripVertical className="w-3 h-3" />
-                        </div>
-                      )}
-                      {!formData.description?.trim() && (
-                        <span className="text-gray-400 dark:text-gray-500 text-sm italic opacity-60 group-hover:opacity-100 transition-opacity">
-                          {taskModal.descriptionPlaceholder() || 'Click to edit...'}
-                        </span>
-                      )}
-                      {formData.description?.trim() && (
-                        <MarkdownRenderer 
-                          content={formData.description}
-                          onCheckboxChange={(newDescription) => {
-                            setFormData(prev => ({ ...prev, description: newDescription }));
-                            setHasUnsavedChanges(true);
-                          }}
-                        />
-                      )}
-                     </div>
-                   ) : (
-                    <div className={`relative transition-all duration-500 w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-accent overflow-y-auto group ${
+
+                  {/* Single unified editor/preview frame */}
+                  <div 
+                    className={`relative w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-accent ${
+                      isDescriptionPreviewMode ? 'bg-white/80 dark:bg-gray-800/50 backdrop-blur-lg' : 'bg-white dark:bg-gray-800'
+                    } transition-all duration-300 overflow-hidden group resize-y ${
                       isDescriptionExpanded ? 'h-[calc(100vh-300px)]' : 'max-h-96'
                     }`}
                     style={{
-                      animation: 'fadeInEditMode 0.3s ease-out'
-                    }}>
-                      {/* Editor Toolbar */}
+                      animation: !isDescriptionPreviewMode ? 'fadeInEditMode 0.3s ease-out' : 'none'
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Escape' && !isDescriptionPreviewMode) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setIsDescriptionPreviewMode(true);
+                        setIsDescriptionExpanded(false);
+                      }
+                    }}
+                  >
+                    {/* Toolbar buttons for edit mode */}
+                    {!isDescriptionPreviewMode && (
                       <div className="absolute top-2 right-2 z-20 flex gap-1">
                         <button
                           onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
@@ -2864,27 +2844,47 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                             <Maximize className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                           )}
                         </button>
-                        <button
-                          onClick={() => {
-                            setIsDescriptionPreviewMode(true);
-                            setIsDescriptionExpanded(false);
-                          }}
-                          className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
-                          title={taskModal.closeDescription()}
-                        >
-                          <X className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                        </button>
                       </div>
-                      <div 
-                        onKeyDown={(e) => {
-                          if (e.key === 'Escape') {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setIsDescriptionPreviewMode(true);
-                            setIsDescriptionExpanded(false);
-                          }
-                        }}
-                      >
+                    )}
+
+                    {/* Resize handle */}
+                    {isDescriptionPreviewMode && formData.description?.trim() && (
+                      <div className="absolute bottom-1 right-1 text-gray-300 dark:text-gray-600 cursor-se-resize p-1" title="Größe ändern">
+                        <GripVertical className="w-3 h-3" />
+                      </div>
+                    )}
+
+                    {/* Content area */}
+                    <div className="overflow-y-auto h-full custom-scrollbar pt-2">
+                      {isDescriptionPreviewMode ? (
+                        <div 
+                          className={`text-gray-900 dark:text-white text-sm leading-relaxed p-4 wysiwyg-content ${
+                            !formData.description?.trim() ? 'flex items-center justify-center h-full' : ''
+                          }`}
+                          onClick={(e) => {
+                            const isEmpty = !formData.description || formData.description.trim() === '';
+                            if (isEmpty && e.currentTarget === e.target) {
+                              setIsDescriptionPreviewMode(false);
+                            }
+                          }}
+                          title={!formData.description?.trim() ? 'Klicken zum Bearbeiten' : 'Klicken zum Bearbeiten'}
+                        >
+                          {!formData.description?.trim() && (
+                            <span className="text-gray-400 dark:text-gray-500 text-sm italic opacity-60">
+                              {taskModal.descriptionPlaceholder() || 'Click to edit...'}
+                            </span>
+                          )}
+                          {formData.description?.trim() && (
+                            <MarkdownRenderer 
+                              content={formData.description}
+                              onCheckboxChange={(newDescription) => {
+                                setFormData(prev => ({ ...prev, description: newDescription }));
+                                setHasUnsavedChanges(true);
+                              }}
+                            />
+                          )}
+                        </div>
+                      ) : (
                         <WysiwygEditor
                           value={formData.description}
                           onChange={(value) => {
@@ -2892,7 +2892,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                             setHasUnsavedChanges(true);
                           }}
                           placeholder={taskModal.descriptionPlaceholder()}
-                          className="h-full w-full"
+                          className="h-full w-full p-4"
                           useFullHeight={true}
                           showToolbar={true}
                           onClickOutside={() => {
@@ -2900,9 +2900,9 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                             setIsDescriptionExpanded(false);
                           }}
                         />
-                      </div>
+                      )}
                     </div>
-                  )}
+                  </div>
                 </div>
 
                 {/* Subtasks - Collapsible */}
