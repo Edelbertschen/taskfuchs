@@ -32,12 +32,12 @@ export function LandingPage({ onGuestLogin }: LandingPageProps) {
     setIsTransitioning(true);
     setTimeout(() => {
       onGuestLogin();
-    }, 1200);
+    }, 500);
   };
 
   return (
         <div
-      className={`transition-all duration-1200 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}
+      className={`transition-all duration-500 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}
           style={{
         transform: isTransitioning ? 'scale(1.02)' : 'scale(1)',
         filter: isTransitioning ? 'blur(8px)' : 'blur(0)'
@@ -45,7 +45,7 @@ export function LandingPage({ onGuestLogin }: LandingPageProps) {
     >
       {/* Dynamic background that transitions to dark */}
       <div 
-        className={`min-h-screen bg-gradient-to-b transition-all duration-1200 ${
+        className={`min-h-screen bg-gradient-to-b transition-all duration-500 ${
           isTransitioning 
             ? 'from-gray-950 via-gray-900 to-gray-950 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950'
             : 'from-white via-slate-50 to-white dark:from-gray-950 dark:via-gray-900 dark:to-gray-950'
@@ -80,14 +80,14 @@ export function LandingPage({ onGuestLogin }: LandingPageProps) {
           {/* Animated background elements - transition to orange/dark */}
           <div className="absolute inset-0 pointer-events-none">
             <div 
-              className={`absolute top-20 left-10 w-72 h-72 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse transition-all duration-1200 ${
+              className={`absolute top-20 left-10 w-72 h-72 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse transition-all duration-500 ${
                 isTransitioning 
                   ? 'bg-orange-600' 
                   : 'bg-orange-300'
               }`}
             ></div>
             <div 
-              className={`absolute top-40 right-10 w-72 h-72 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse animation-delay-2000 transition-all duration-1200 ${
+              className={`absolute top-40 right-10 w-72 h-72 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse animation-delay-2000 transition-all duration-500 ${
                 isTransitioning 
                   ? 'bg-orange-700' 
                   : 'bg-amber-300'
@@ -101,7 +101,7 @@ export function LandingPage({ onGuestLogin }: LandingPageProps) {
               <div className="relative group">
                 {/* Glow effect - intensifies during transition */}
                 <div 
-                  className={`absolute -inset-12 rounded-full blur-3xl opacity-0 group-hover:opacity-30 transition-all duration-1200 ${
+                  className={`absolute -inset-12 rounded-full blur-3xl opacity-0 group-hover:opacity-30 transition-all duration-500 ${
                     isTransitioning
                       ? 'opacity-50 bg-gradient-to-r from-orange-500 to-red-500'
                       : 'bg-gradient-to-r from-orange-400 to-amber-400'
@@ -117,7 +117,7 @@ export function LandingPage({ onGuestLogin }: LandingPageProps) {
                   <img
                     src="/3d_fox.png"
             alt="TaskFuchs"
-                    className="w-96 h-96 object-contain drop-shadow-2xl transition-all duration-1200"
+                    className="w-96 h-96 object-contain drop-shadow-2xl transition-all duration-500"
                     style={{
                       transform: `translateY(${scrollY * 0.3}px) ${isTransitioning ? 'scale(1.05)' : 'scale(1)'} ${hoveredFox && !isTransitioning ? 'rotateZ(5deg)' : 'rotateZ(0deg)'}`,
                       transition: 'transform 0.1s ease-out, filter 1.2s ease',
@@ -134,7 +134,7 @@ export function LandingPage({ onGuestLogin }: LandingPageProps) {
 
             {/* Right: Content - Text color transitions */}
             <div className="space-y-16 flex flex-col justify-center">
-              <h1 className={`text-9xl lg:text-10xl font-black tracking-tighter leading-none transition-all duration-1200 ${
+              <h1 className={`text-9xl lg:text-10xl font-black tracking-tighter leading-none transition-all duration-500 ${
                 isTransitioning ? 'text-gray-100' : 'text-orange-500'
               }`}
               style={{
@@ -142,7 +142,7 @@ export function LandingPage({ onGuestLogin }: LandingPageProps) {
               }}>
                 TaskFuchs
               </h1>
-              <p className={`text-xl md:text-2xl font-light transition-all duration-1200 ${
+              <p className={`text-xl md:text-2xl font-light transition-all duration-500 ${
                 isTransitioning ? 'text-gray-300' : 'text-gray-600 dark:text-gray-300'
               }`}
               style={{
@@ -165,22 +165,22 @@ export function LandingPage({ onGuestLogin }: LandingPageProps) {
                   return (
                     <div 
                       key={idx} 
-                      className={`flex items-start space-x-4 p-4 rounded-xl transition-all duration-1200 ${
+                      className={`flex items-start space-x-4 p-4 rounded-xl transition-all duration-500 ${
                         isTransitioning
                           ? 'bg-gray-800/40 border-gray-700/40'
                           : 'bg-white/40 dark:bg-gray-800/40 border-white/20 dark:border-gray-700/20'
                       } backdrop-blur-md hover:shadow-lg border`}
                     >
-                      <Icon className={`w-7 h-7 mt-0.5 flex-shrink-0 transition-all duration-1200 ${
+                      <Icon className={`w-7 h-7 mt-0.5 flex-shrink-0 transition-all duration-500 ${
                         isTransitioning ? 'text-orange-400' : 'text-orange-500'
                       }`} />
                       <div>
-                        <p className={`font-semibold text-lg transition-all duration-1200 ${
+                        <p className={`font-semibold text-lg transition-all duration-500 ${
                           isTransitioning 
                             ? 'text-gray-100' 
                             : 'text-gray-900 dark:text-white'
                         }`}>{feature.title}</p>
-                        <p className={`text-sm transition-all duration-1200 ${
+                        <p className={`text-sm transition-all duration-500 ${
                           isTransitioning 
                             ? 'text-gray-400' 
                             : 'text-gray-600 dark:text-gray-400'
@@ -217,7 +217,7 @@ export function LandingPage({ onGuestLogin }: LandingPageProps) {
           </div>
 
           {/* Scroll indicator - Fades out on transition */}
-          <div className={`absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce transition-opacity duration-1200 ${
+          <div className={`absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce transition-opacity duration-500 ${
             isTransitioning ? 'opacity-0' : 'opacity-100'
           }`}>
             <ChevronDown className="w-6 h-6 text-gray-400" />
@@ -225,18 +225,18 @@ export function LandingPage({ onGuestLogin }: LandingPageProps) {
         </section>
 
         {/* Features Section */}
-        <section className={`py-24 px-4 transition-all duration-1200 ${
+        <section className={`py-24 px-4 transition-all duration-500 ${
           isTransitioning
             ? 'bg-gradient-to-b from-gray-900/50 to-transparent'
             : 'bg-gradient-to-b from-orange-50/50 to-transparent dark:from-orange-950/20 dark:to-transparent'
         }`}>
           <div className="max-w-6xl mx-auto">
-            <h2 className={`text-5xl font-bold text-center mb-20 transition-all duration-1200 ${
+            <h2 className={`text-5xl font-bold text-center mb-20 transition-all duration-500 ${
               isTransitioning 
                 ? 'text-gray-100' 
                 : 'text-gray-900 dark:text-white'
             }`}>
-              {t('landing_page.why_section')} <span className={`transition-all duration-1200 ${
+              {t('landing_page.why_section')} <span className={`transition-all duration-500 ${
                 isTransitioning ? 'text-orange-400' : 'text-orange-500'
               }`}>TaskFuchs</span>?
             </h2>
@@ -261,19 +261,19 @@ export function LandingPage({ onGuestLogin }: LandingPageProps) {
               ].map((feature, idx) => (
                 <div
                   key={idx}
-                  className={`p-10 rounded-2xl transition-all duration-1200 ${
+                  className={`p-10 rounded-2xl transition-all duration-500 ${
                     isTransitioning
                       ? 'bg-gray-800/50 border-gray-700/50'
                       : 'bg-white dark:bg-gray-800 border-orange-100 dark:border-orange-900/30'
                   } border hover:shadow-xl group`}
                 >
                   <div className={`w-16 h-16 rounded-xl bg-gradient-to-r ${feature.color} mb-6 group-hover:scale-110 transition-transform shadow-lg`}></div>
-                  <h3 className={`text-2xl font-bold mb-3 transition-all duration-1200 ${
+                  <h3 className={`text-2xl font-bold mb-3 transition-all duration-500 ${
                     isTransitioning 
                       ? 'text-gray-100' 
                       : 'text-gray-900 dark:text-white'
                   }`}>{feature.title}</h3>
-                  <p className={`text-lg transition-all duration-1200 ${
+                  <p className={`text-lg transition-all duration-500 ${
                     isTransitioning 
                       ? 'text-gray-400' 
                       : 'text-gray-600 dark:text-gray-400'
@@ -285,22 +285,22 @@ export function LandingPage({ onGuestLogin }: LandingPageProps) {
         </section>
 
         {/* CTA Section */}
-        <section className={`py-24 px-4 transition-all duration-1200 ${
+        <section className={`py-24 px-4 transition-all duration-500 ${
           isTransitioning
             ? 'bg-gradient-to-r from-gray-900 to-gray-950'
             : 'bg-gradient-to-r from-orange-500/5 to-amber-500/5 dark:from-orange-950/20 dark:to-amber-950/20'
         }`}>
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className={`text-4xl font-bold mb-6 transition-all duration-1200 ${
+            <h2 className={`text-4xl font-bold mb-6 transition-all duration-500 ${
               isTransitioning 
                 ? 'text-gray-100' 
                 : 'text-gray-900 dark:text-white'
             }`}>
-              Bereit für bessere <span className={`transition-all duration-1200 ${
+              Bereit für bessere <span className={`transition-all duration-500 ${
                 isTransitioning ? 'text-orange-400' : 'text-orange-500'
               }`}>Produktivität</span>?
             </h2>
-            <p className={`text-xl mb-10 leading-relaxed transition-all duration-1200 ${
+            <p className={`text-xl mb-10 leading-relaxed transition-all duration-500 ${
               isTransitioning 
                 ? 'text-gray-400' 
                 : 'text-gray-600 dark:text-gray-300'
@@ -323,12 +323,12 @@ export function LandingPage({ onGuestLogin }: LandingPageProps) {
         </section>
 
         {/* Footer */}
-        <footer className={`py-16 px-4 transition-all duration-1200 ${
+        <footer className={`py-16 px-4 transition-all duration-500 ${
           isTransitioning 
             ? 'border-gray-800 bg-gray-900/50' 
             : 'border-gray-200 dark:border-gray-800'
         } border-t`}>
-          <div className={`max-w-6xl mx-auto text-center text-sm transition-all duration-1200 ${
+          <div className={`max-w-6xl mx-auto text-center text-sm transition-all duration-500 ${
             isTransitioning 
               ? 'text-gray-500' 
               : 'text-gray-600 dark:text-gray-400'

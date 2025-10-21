@@ -2817,7 +2817,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   {/* Unified container for preview and edit */}
                   <div 
                     className={`relative w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 overflow-hidden group resize-y ${
-                      isDescriptionPreviewMode ? 'bg-white/80 dark:bg-gray-800/50 backdrop-blur-lg cursor-text' : 'bg-white dark:bg-gray-800 focus-within:border-accent'
+                      isDescriptionPreviewMode ? 'bg-white/60 dark:bg-gray-800/30 backdrop-blur-sm cursor-text' : 'bg-white dark:bg-gray-800 focus-within:border-accent'
                     } ${
                       isDescriptionExpanded ? 'h-[calc(100vh-300px)]' : 'h-auto min-h-24 max-h-96'
                     }`}
@@ -3577,7 +3577,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                               dispatch({ type: 'UPDATE_TASK', payload: updatedTask });
                               setHasUnsavedChanges(true);
                             }}
-                            className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white/80 dark:bg-gray-800/60 backdrop-blur-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 hover:bg-white/90 dark:hover:bg-gray-800/80"
+                            className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white/65 dark:bg-gray-800/40 backdrop-blur-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 hover:bg-white/90 dark:hover:bg-gray-800/80"
                             placeholder="Datum auswählen"
                           />
                           <input
@@ -3592,7 +3592,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                               dispatch({ type: 'UPDATE_TASK', payload: updatedTask });
                               setHasUnsavedChanges(true);
                             }}
-                            className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white/80 dark:bg-gray-800/60 backdrop-blur-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 hover:bg-white/90 dark:hover:bg-gray-800/80"
+                            className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white/65 dark:bg-gray-800/40 backdrop-blur-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 hover:bg-white/90 dark:hover:bg-gray-800/80"
                             placeholder="Zeit auswählen"
                           />
                           <div className="col-span-2 flex items-center justify-end space-x-2">
