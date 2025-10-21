@@ -95,17 +95,25 @@ export function LandingPage({ onGuestLogin }: LandingPageProps) {
             <div className="space-y-16 flex flex-col justify-center">
               <h1 className={`text-9xl lg:text-10xl font-black tracking-tighter leading-none transition-all duration-1200 ${
                 isTransitioning ? 'text-gray-100' : 'text-orange-500'
-              }`}>
+              }`}
+              style={{
+                animation: 'fadeInDown 0.8s ease-out 0.1s both'
+              }}>
                 TaskFuchs
               </h1>
               <p className={`text-xl md:text-2xl font-light transition-all duration-1200 ${
                 isTransitioning ? 'text-gray-300' : 'text-gray-600 dark:text-gray-300'
-              }`}>
+              }`}
+              style={{
+                animation: 'fadeInUp 0.8s ease-out 0.3s both'
+              }}>
                 {t('landing_page.tagline')}
               </p>
 
               {/* Features - Icons transition color */}
-              <div className="space-y-5">
+              <div className="space-y-5" style={{
+                animation: 'fadeInUp 0.8s ease-out 0.5s both'
+              }}>
                 {[
                   { icon: Zap, title: t('landing_page.features.smart_parsing.title'), desc: t('landing_page.features.smart_parsing.desc') },
                   { icon: BarChart3, title: t('landing_page.features.analytics.title'), desc: t('landing_page.features.analytics.desc') },
@@ -142,19 +150,28 @@ export function LandingPage({ onGuestLogin }: LandingPageProps) {
                 })}
               </div>
 
-              {/* CTA Button - Transitions to prominent orange */}
-              <button
-                onClick={handleStartApp}
-                disabled={isTransitioning}
-                className={`w-full md:w-auto px-10 py-4 text-white font-bold text-lg rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 disabled:opacity-75 disabled:cursor-not-allowed flex items-center justify-center md:justify-start ${
-                  isTransitioning
-                    ? 'bg-orange-600 hover:bg-orange-700'
-                    : 'bg-orange-500 hover:bg-orange-600'
-                }`}
-              >
-                App Starten
-                <ChevronDown className={`inline-block ml-3 w-5 h-5 transition-transform ${isTransitioning ? 'scale-0' : ''}`} />
-              </button>
+              {/* CTA Button - Centered and prominent */}
+              <div style={{
+                animation: 'fadeInUp 0.8s ease-out 0.6s both',
+                display: 'flex',
+                justifyContent: 'center'
+              }}>
+                <button
+                  onClick={handleStartApp}
+                  disabled={isTransitioning}
+                  className={`px-12 py-5 text-white font-bold text-lg rounded-xl transition-all duration-300 disabled:opacity-75 disabled:cursor-not-allowed flex items-center justify-center gap-3 ${
+                    isTransitioning
+                      ? 'bg-orange-600'
+                      : 'bg-orange-500 hover:bg-orange-600 hover:scale-110 shadow-lg hover:shadow-orange-500/50'
+                  }`}
+                  style={!isTransitioning ? {
+                    animation: 'pulseGlow 2s ease-in-out infinite'
+                  } : {}}
+                >
+                  {t('landing_page.start_app')}
+                  <ChevronDown className={`w-5 h-5 transition-transform ${isTransitioning ? 'scale-0' : ''}`} />
+                </button>
+              </div>
             </div>
           </div>
 
