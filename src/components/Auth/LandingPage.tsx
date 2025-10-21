@@ -9,13 +9,24 @@ interface LandingPageProps {
 export function LandingPage({ onGuestLogin }: LandingPageProps) {
   const [scrollY, setScrollY] = React.useState(0);
   const [isTransitioning, setIsTransitioning] = React.useState(false);
-  const { t } = useTranslation();
+  const [hoveredFox, setHoveredFox] = React.useState(false);
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Detect browser language on mount
+  React.useEffect(() => {
+    const browserLang = navigator.language.split('-')[0];
+    if (browserLang === 'de' || browserLang === 'en') {
+      if (i18n.language !== browserLang) {
+        i18n.changeLanguage(browserLang);
+      }
+    }
+  }, [i18n]);
 
   const handleStartApp = () => {
     setIsTransitioning(true);
@@ -40,6 +51,30 @@ export function LandingPage({ onGuestLogin }: LandingPageProps) {
             : 'from-white via-slate-50 to-white dark:from-gray-950 dark:via-gray-900 dark:to-gray-950'
         }`}
       >
+        {/* Language Selector */}
+        <div className="absolute top-6 right-6 z-20 flex gap-2">
+          <button
+            onClick={() => i18n.changeLanguage('de')}
+            className={`px-3 py-1 rounded-lg text-sm font-medium transition-all duration-300 ${
+              i18n.language === 'de'
+                ? 'bg-orange-500 text-white shadow-lg'
+                : 'bg-white/20 dark:bg-gray-800/20 text-gray-700 dark:text-gray-300 hover:bg-white/30 dark:hover:bg-gray-800/30 backdrop-blur-sm'
+            }`}
+          >
+            DE
+          </button>
+          <button
+            onClick={() => i18n.changeLanguage('en')}
+            className={`px-3 py-1 rounded-lg text-sm font-medium transition-all duration-300 ${
+              i18n.language === 'en'
+                ? 'bg-orange-500 text-white shadow-lg'
+                : 'bg-white/20 dark:bg-gray-800/20 text-gray-700 dark:text-gray-300 hover:bg-white/30 dark:hover:bg-gray-800/30 backdrop-blur-sm'
+            }`}
+          >
+            EN
+          </button>
+        </div>
+
         {/* Hero Section */}
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-4">
           {/* Animated background elements - transition to orange/dark */}
@@ -74,17 +109,23 @@ export function LandingPage({ onGuestLogin }: LandingPageProps) {
                 ></div>
                 
                 {/* Fox Image */}
-                <div className="relative">
+                <div 
+                  className="relative cursor-pointer"
+                  onMouseEnter={() => setHoveredFox(true)}
+                  onMouseLeave={() => setHoveredFox(false)}
+                >
                   <img
                     src="/3d_fox.png"
                     alt="TaskFuchs"
                     className="w-96 h-96 object-contain drop-shadow-2xl transition-all duration-1200"
                     style={{
-                      transform: `translateY(${scrollY * 0.3}px) ${isTransitioning ? 'scale(1.05)' : 'scale(1)'}`,
+                      transform: `translateY(${scrollY * 0.3}px) ${isTransitioning ? 'scale(1.05)' : 'scale(1)'} ${hoveredFox && !isTransitioning ? 'rotateZ(5deg)' : 'rotateZ(0deg)'}`,
                       transition: 'transform 0.1s ease-out, filter 1.2s ease',
                       filter: isTransitioning 
                         ? 'drop-shadow(0 30px 80px rgba(251, 146, 60, 0.5))' 
-                        : 'drop-shadow(0 20px 60px rgba(251, 146, 60, 0.3))'
+                        : 'drop-shadow(0 20px 60px rgba(251, 146, 60, 0.3))',
+                      animation: hoveredFox && !isTransitioning ? 'wagTail 0.6s ease-in-out infinite' : 'none',
+                      transformOrigin: 'center center'
                     }}
                   />
                 </div>
