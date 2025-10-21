@@ -2765,10 +2765,10 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   </label>
                   <div className="flex gap-1.5">
                     {[
-                      { value: 'none', label: None, colorBg: 'rgba(107, 114, 128, 0.1)', colorBorder: 'rgb(107, 114, 128)', icon: '-' },
-                      { value: 'low', label: Low, colorBg: 'rgba(34, 197, 94, 0.1)', colorBorder: 'rgb(34, 197, 94)', icon: '!' },
-                      { value: 'medium', label: Medium, colorBg: 'rgba(234, 179, 8, 0.1)', colorBorder: 'rgb(234, 179, 8)', icon: '!!' },
-                      { value: 'high', label: High, colorBg: 'rgba(239, 68, 68, 0.1)', colorBorder: 'rgb(239, 68, 68)', icon: '!!!' }
+                      { value: 'none', label: "None", colorBg: 'rgba(107, 114, 128, 0.1)', colorBorder: 'rgb(107, 114, 128)', icon: '-' },
+                      { value: 'low', label: "Low", colorBg: 'rgba(34, 197, 94, 0.1)', colorBorder: 'rgb(34, 197, 94)', icon: '!' },
+                      { value: 'medium', label: "Medium", colorBg: 'rgba(234, 179, 8, 0.1)', colorBorder: 'rgb(234, 179, 8)', icon: '!!' },
+                      { value: 'high', label: "High", colorBg: 'rgba(239, 68, 68, 0.1)', colorBorder: 'rgb(239, 68, 68)', icon: '!!!' }
                     ].map((priority) => (
                       <button
                         key={priority.value}
