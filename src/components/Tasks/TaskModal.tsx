@@ -2861,11 +2861,8 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                           className={`text-gray-900 dark:text-white text-sm leading-relaxed p-4 wysiwyg-content ${
                             !formData.description?.trim() ? 'flex items-center justify-center h-full' : ''
                           }`}
-                          onClick={(e) => {
-                            const isEmpty = !formData.description || formData.description.trim() === '';
-                            if (isEmpty && e.currentTarget === e.target) {
-                              setIsDescriptionPreviewMode(false);
-                            }
+                          onClick={() => {
+                            setIsDescriptionPreviewMode(false);
                           }}
                           title={!formData.description?.trim() ? 'Klicken zum Bearbeiten' : 'Klicken zum Bearbeiten'}
                         >
