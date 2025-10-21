@@ -2020,11 +2020,18 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
 
           {/* Header with editable title, date, and project */}
           <div className="relative p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-            {/* Close button */}
-            <div className="absolute top-4 right-4 z-10">
+            {/* Close and Help buttons */}
+            <div className="absolute top-4 right-4 z-10 flex items-center gap-1">
+              <button
+                className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                title="Hilfe"
+              >
+                <HelpCircle className="w-5 h-5" />
+              </button>
               <button
                 onClick={handleClose}
                 className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                title="Schließen"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -2895,15 +2902,13 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                       {/* Resize Handle */}
                       <div
                         onMouseDown={handleDescriptionResize}
-                        className="absolute bottom-0 right-0 w-5 h-5 cursor-se-resize group/resize hover:bg-blue-400/20 dark:hover:bg-blue-400/20 rounded-tl transition-all"
-                        style={{ pointerEvents: 'auto', zIndex: 10 }}
-                        title="Größe ändern"
+                        className="absolute bottom-0 right-0 w-6 h-6 cursor-se-resize group/resize hover:bg-orange-400/40 dark:hover:bg-orange-400/40 rounded-tl-lg transition-all flex items-center justify-center"
+                        style={{ pointerEvents: 'auto', zIndex: 10, backgroundColor: 'rgba(251, 146, 60, 0.15)' }}
+                        title="Zum Ändern der Größe ziehen"
                       >
-                        <div className="absolute bottom-0 right-0 w-5 h-5 flex items-center justify-center opacity-50 group-hover/resize:opacity-100 transition-opacity">
-                          <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                          </svg>
-                        </div>
+                        <svg className="w-5 h-5 text-orange-500 dark:text-orange-400 opacity-70 group-hover/resize:opacity-100 transition-opacity" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                        </svg>
                       </div>
                      </div>
                    ) : (
@@ -2958,15 +2963,13 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                       {/* Resize Handle */}
                       <div
                         onMouseDown={handleDescriptionResize}
-                        className="absolute bottom-0 right-0 w-5 h-5 cursor-se-resize group/resize hover:bg-blue-400/20 dark:hover:bg-blue-400/20 rounded-tl transition-all"
-                        style={{ pointerEvents: 'auto', zIndex: 10 }}
-                        title="Größe ändern"
+                        className="absolute bottom-0 right-0 w-6 h-6 cursor-se-resize group/resize hover:bg-orange-400/40 dark:hover:bg-orange-400/40 rounded-tl-lg transition-all flex items-center justify-center"
+                        style={{ pointerEvents: 'auto', zIndex: 10, backgroundColor: 'rgba(251, 146, 60, 0.15)' }}
+                        title="Zum Ändern der Größe ziehen"
                       >
-                        <div className="absolute bottom-0 right-0 w-5 h-5 flex items-center justify-center opacity-50 group-hover/resize:opacity-100 transition-opacity">
-                          <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                          </svg>
-                        </div>
+                        <svg className="w-5 h-5 text-orange-500 dark:text-orange-400 opacity-70 group-hover/resize:opacity-100 transition-opacity" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                        </svg>
                       </div>
                     </div>
                   )}
