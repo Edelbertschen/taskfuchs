@@ -8,7 +8,7 @@ import {
   CalendarDays, FolderOpen, ChevronDown, Target, Zap, Search, GripHorizontal,
   Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Code, Quote, 
   Minus, CheckSquare, HelpCircle, EyeOff, Pin, Edit2, ChevronLeft, ChevronRight,
-  ArrowLeftRight, Inbox, Bell, Maximize, Minimize, ChevronUp
+  ArrowLeftRight, Inbox, Bell, Maximize, Minimize, ChevronUp, GripVertical
 } from 'lucide-react';
 import { MarkdownRenderer } from '../Common/MarkdownRenderer';
 import type { Task, Subtask, Column, RecurrenceRule, TaskReminder } from '../../types';
@@ -2798,19 +2798,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                       Beschreibung
                     </label>
                     <div className="flex items-center gap-1">
-                      {formData.description?.trim() && (
-                        <button
-                          onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                          className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-                          title={isDescriptionExpanded ? taskModal.descriptionCollapse() : taskModal.descriptionExpand()}
-                        >
-                          {isDescriptionExpanded ? (
-                            <Minimize className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                          ) : (
-                            <Maximize className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                          )}
-                        </button>
-                      )}
+                      {/* Empty - buttons are in edit mode toolbar only */}
                     </div>
                   </div>
                   
@@ -2818,10 +2806,11 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                     <div 
                       className={`relative group text-gray-900 dark:text-white text-sm leading-relaxed min-h-[120px] overflow-y-auto p-4 rounded-lg bg-white/80 dark:bg-gray-800/50 backdrop-blur-lg custom-scrollbar wysiwyg-content transition-all duration-300 border border-white/40 dark:border-gray-700/50 hover:border-white/60 dark:hover:border-gray-600/70 ${
                         isDescriptionExpanded ? 'h-[calc(100vh-300px)]' : 'max-h-[300px]'
-                      } ${!formData.description?.trim() ? 'cursor-text flex items-center justify-center' : ''}`}
+                      } ${!formData.description?.trim() ? 'cursor-text flex items-center justify-center' : 'resize-y'}`}
                       style={{
                         scrollBehavior: 'smooth',
-                        transition: 'all 0.3s ease-in-out'
+                        transition: 'all 0.3s ease-in-out',
+                        overflowY: isDescriptionExpanded ? 'auto' : 'auto'
                       }}
                       onClick={(e) => {
                         // Allow direct click to edit when empty or when clicking the background
@@ -2832,9 +2821,14 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                           // Don't expand - let user decide
                         }
                       }}
-                      title={!formData.description?.trim() ? 'Klicken zum Bearbeiten' : undefined}
+                      title={!formData.description?.trim() ? 'Klicken zum Bearbeiten' : 'Zieh am unteren Rand zum Vergrößern'}
                     >
-                      {/* Collapse button - MOVED TO HEADER */}
+                      {/* Resize handle at bottom */}
+                      {formData.description?.trim() && (
+                        <div className="absolute bottom-1 right-1 text-gray-300 dark:text-gray-600 cursor-se-resize p-1" title="Größe ändern">
+                          <GripVertical className="w-3 h-3" />
+                        </div>
+                      )}
                       {!formData.description?.trim() && (
                         <span className="text-gray-400 dark:text-gray-500 text-sm italic opacity-60 group-hover:opacity-100 transition-opacity">
                           {taskModal.descriptionPlaceholder() || 'Click to edit...'}
