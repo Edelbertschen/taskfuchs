@@ -3526,7 +3526,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                             setIsEditingReminder(true);
                             setReminderTimeInput(formData.reminderTime || '');
                           }}
-                          className="w-6 h-6 flex items-center justify-center text-sm rounded hover:opacity-80"
+                          className="w-5 h-5 flex items-center justify-center text-xs hover:opacity-80 transition-colors rounded"
                           style={getAccentColorStyles().text}
                           title="Erinnerung hinzufügen"
                         >
