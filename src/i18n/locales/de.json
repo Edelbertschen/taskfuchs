@@ -2083,13 +2083,39 @@
   },
   "backup_modal": {
     "title": "Backup einrichten",
-    "description": "Um Datenverlust zu vermeiden, speichert TaskFuchs regelmäßig automatische Backups als JSON. Bitte wähle ein Verzeichnis für die Sicherungen aus.",
+    "description": "Um Datenverlust zu vermeiden, erstellt TaskFuchs automatische JSON-Backups. Bitte wählen Sie ein Verzeichnis für Backups.",
     "enable": "Automatische Backups aktivieren",
     "interval": "Intervall (Minuten)",
-    "hint": "Du kannst Intervall und Ziel jederzeit unter Einstellungen → Daten → Backup ändern.",
-    "tip_title": "Tipp des Fuchses",
-    "tip_text": "Lege das Verzeichnis z. B. in deiner Cloud (Nextcloud/Dropbox/OneDrive) an, um zusätzliche Sicherheit zu haben.",
+    "hint": "Sie können Intervall und Ziel jederzeit unter Einstellungen → Daten → Backup ändern.",
+    "tip_title": "Fuchs-Tipp",
+    "tip_text": "Platzieren Sie den Ordner in Ihrer Cloud (Nextcloud/Dropbox/OneDrive) für zusätzliche Sicherheit.",
     "cancel": "Später",
-    "choose": "Verzeichnis wählen"
+    "choose": "Verzeichnis auswählen"
+  },
+  "settings_appearance": {
+    "darkMode": "Dunkler Modus",
+    "darkModeDesc": "Schaltet zwischen hellem und dunklem Design um",
+    "minimalistDesign": "Minimalistisches Design",
+    "minimalistDesignDesc": "Reduziertes Design ohne Glaseffekte und Schatten",
+    "colorPalette": "Farbpalette",
+    "backgroundEffects": "Hintergrund-Effekte",
+    "blurEffect": "Blur-Effekt",
+    "blurEffectDesc": "Weichzeichnung für Hintergrundbilder",
+    "darkOverlay": "Dunkles Overlay",
+    "darkOverlayDesc": "Transparente Verdunklung für bessere Lesbarkeit"
+  },
+  "settings_information": {
+    "privacyTitle": "Datenschutz & Sicherheit",
+    "yourDataStaysLocal": "🔒 Ihre Daten bleiben lokal",
+    "dataStoredLocally": "Alle Daten werden nur in Ihrem Browser gespeichert (localStorage)",
+    "noDataTransfer": "Keine Datenübertragung an externe Server (außer gewählte Sync-Optionen)",
+    "completeControl": "Vollständige Kontrolle über Ihre Aufgaben und Notizen",
+    "openSource": "Open Source - transparenter Code",
+    "localStorage": "Lokaler Speicher",
+    "tasks": "Aufgaben",
+    "boards": "Boards",
+    "tags": "Tags",
+    "notes": "Notizen",
+    "entries": "Einträge"
   }
 } 

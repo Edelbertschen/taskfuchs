@@ -2084,5 +2084,31 @@
     "tip_text": "Place the folder in your cloud (Nextcloud/Dropbox/OneDrive) for extra safety.",
     "cancel": "Later",
     "choose": "Choose directory"
+  },
+  "settings_appearance": {
+    "darkMode": "Dark Mode",
+    "darkModeDesc": "Switch between light and dark design",
+    "minimalistDesign": "Minimalist Design",
+    "minimalistDesignDesc": "Reduced design without glass effects and shadows",
+    "colorPalette": "Color Palette",
+    "backgroundEffects": "Background Effects",
+    "blurEffect": "Blur Effect",
+    "blurEffectDesc": "Soften background images",
+    "darkOverlay": "Dark Overlay",
+    "darkOverlayDesc": "Transparent darkening for better readability"
+  },
+  "settings_information": {
+    "privacyTitle": "Privacy & Security",
+    "yourDataStaysLocal": "🔒 Your data stays local",
+    "dataStoredLocally": "All data is stored only in your browser (localStorage)",
+    "noDataTransfer": "No data transfer to external servers (except chosen sync options)",
+    "completeControl": "Complete control over your tasks and notes",
+    "openSource": "Open Source - transparent code",
+    "localStorage": "Local Storage",
+    "tasks": "Tasks",
+    "boards": "Boards",
+    "tags": "Tags",
+    "notes": "Notes",
+    "entries": "entries"
   }
 } 
