@@ -2827,7 +2827,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                         const clickedBackground = e.currentTarget === e.target;
                         if (isEmpty || clickedBackground) {
                           setIsDescriptionPreviewMode(false);
-                          setIsDescriptionExpanded(true);
+                          // Don't expand - let user decide
                         }
                       }}
                       title={!formData.description?.trim() ? 'Klicken zum Bearbeiten' : undefined}
@@ -2861,8 +2861,8 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                       )}
                      </div>
                    ) : (
-                    <div className={`relative transition-all duration-500 w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-accent overflow-hidden group ${
-                      isDescriptionExpanded ? 'h-[calc(100vh-300px)]' : 'h-64'
+                    <div className={`relative transition-all duration-500 w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-accent overflow-y-auto group ${
+                      isDescriptionExpanded ? 'h-[calc(100vh-300px)]' : 'max-h-96'
                     }`}
                     style={{
                       animation: 'fadeInEditMode 0.3s ease-out'
@@ -2898,10 +2898,10 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                           setIsDescriptionPreviewMode(true);
                           setIsDescriptionExpanded(false);
                         }}
-                        className="absolute top-3 right-3 z-20 p-2 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg transition-all opacity-100 hover:scale-110"
+                        className="absolute top-2 left-2 z-20 p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-all opacity-70 hover:opacity-100"
                         title={taskModal.closeDescription()}
                       >
-                        <X className="w-5 h-5 text-gray-700 dark:text-gray-300 font-bold" />
+                        <X className="w-4 h-4 text-gray-600 dark:text-gray-400" />
                       </button>
                     </div>
                   )}
