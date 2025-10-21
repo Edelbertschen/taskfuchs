@@ -2814,9 +2814,13 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   
                   {isDescriptionPreviewMode ? (
                     <div 
-                      className={`relative group text-gray-900 dark:text-white text-sm leading-relaxed min-h-[120px] overflow-y-auto p-4 rounded-lg bg-white/80 dark:bg-gray-800/50 backdrop-blur-lg custom-scrollbar wysiwyg-content transition-all duration-300 border border-white/40 dark:border-gray-700/50 hover:border-white/60 dark:hover:border-gray-600/70 ${
-                        isDescriptionExpanded ? 'h-[calc(100vh-300px)]' : 'max-h-[300px]'
-                      } ${!formData.description?.trim() ? 'cursor-text flex items-center justify-center' : ''}`}
+                      ref={descriptionResizeRef}
+                      className={`relative group text-gray-900 dark:text-white text-sm leading-relaxed min-h-[120px] overflow-y-auto p-4 rounded-lg bg-white/80 dark:bg-gray-800/50 backdrop-blur-lg custom-scrollbar wysiwyg-content transition-none border border-white/40 dark:border-gray-700/50 hover:border-white/60 dark:hover:border-gray-600/70 ${
+                        !formData.description?.trim() ? 'cursor-text flex items-center justify-center' : ''}`}
+                      style={{
+                        height: `${descriptionHeight}px`,
+                        scrollBehavior: 'smooth'
+                      }}
                       style={{
                         scrollBehavior: 'smooth',
                         transition: 'all 0.3s ease-in-out'
@@ -2859,11 +2863,25 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                           }}
                         />
                       )}
+                      {/* Resize Handle */}
+                      <div
+                        onMouseDown={handleDescriptionResize}
+                        className="absolute bottom-0 right-0 w-5 h-5 cursor-se-resize group/resize hover:bg-blue-400/20 dark:hover:bg-blue-400/20 rounded-tl transition-all"
+                        title="Größe ändern"
+                      >
+                        <div className="absolute bottom-0 right-0 w-5 h-5 flex items-center justify-center opacity-50 group-hover/resize:opacity-100 transition-opacity">
+                          <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                          </svg>
+                        </div>
+                      </div>
                      </div>
                    ) : (
-                    <div className={`relative transition-all duration-500 w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-accent overflow-y-auto group ${
-                      isDescriptionExpanded ? 'h-[calc(100vh-300px)]' : 'max-h-96'
-                    }`}
+                    <div 
+                      className="relative transition-none w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-accent overflow-y-auto group"
+                      style={{
+                        height: `${descriptionHeight}px`
+                      }}
                     style={{
                       animation: 'fadeInEditMode 0.3s ease-out'
                     }}>
@@ -2903,6 +2921,18 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                       >
                         <X className="w-4 h-4 text-gray-600 dark:text-gray-400" />
                       </button>
+                      {/* Resize Handle */}
+                      <div
+                        onMouseDown={handleDescriptionResize}
+                        className="absolute bottom-0 right-0 w-5 h-5 cursor-se-resize group/resize hover:bg-blue-400/20 dark:hover:bg-blue-400/20 rounded-tl transition-all"
+                        title="Größe ändern"
+                      >
+                        <div className="absolute bottom-0 right-0 w-5 h-5 flex items-center justify-center opacity-50 group-hover/resize:opacity-100 transition-opacity">
+                          <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                          </svg>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
