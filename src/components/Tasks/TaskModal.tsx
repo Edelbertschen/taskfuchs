@@ -2669,6 +2669,20 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                 </div>
               </div>
             </div>
+            {/* Content Area with Subtle Glassmorphism */}
+            <div className="flex-1 overflow-y-auto" style={{
+              background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, rgba(249, 250, 251, 0.3) 100%)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+            }}>
+              <style>{\`
+                .dark .content-glassmorphism {
+                  background: linear-gradient(180deg, rgba(31, 41, 55, 0.3) 0%, rgba(17, 24, 39, 0.2) 100%) !important;
+                  backdrop-filter: blur(8px) !important;
+                  -webkit-backdrop-filter: blur(8px) !important;
+                }
+              \`}</style>
+              <div className="dark:content-glassmorphism">
             
             {/* Smart Parsing Preview - Elegant Overlay */}
             {parseResult && parseResult.success && parseResult.task && (
@@ -3883,6 +3897,8 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
             </div>
           </div>
 
+              </div>
+            </div>
           {/* Footer */}
           <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 sticky bottom-0">
             {/* Action Buttons */}
