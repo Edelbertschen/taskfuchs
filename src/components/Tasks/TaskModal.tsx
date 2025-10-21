@@ -1960,18 +1960,20 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
             pointerEvents: 'auto',
             transform: navDirection === 'next' ? 'translateX(8px)' : navDirection === 'prev' ? 'translateX(-8px)' : 'translateX(0)',
             transition: 'transform 200ms ease',
-            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.85) 100%)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.15)',
+            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 251, 0.92) 100%)',
+            backdropFilter: 'blur(30px)',
+            WebkitBackdropFilter: 'blur(30px)',
+            border: '1.5px solid rgba(255, 255, 255, 0.4)',
+            boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.25), inset 0 0 32px rgba(255, 255, 255, 0.3)',
           }}
         >
           <style>{`
             .dark .task-modal-root {
-              background: linear-gradient(135deg, rgba(17, 24, 39, 0.9) 0%, rgba(31, 41, 55, 0.85) 100%) !important;
-              border: 1px solid rgba(255, 255, 255, 0.1) !important;
-              box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
+              background: linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(31, 41, 55, 0.90) 100%) !important;
+              border: 1.5px solid rgba(255, 255, 255, 0.15) !important;
+              box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4), inset 0 0 32px rgba(255, 255, 255, 0.05) !important;
+              backdrop-filter: blur(30px) !important;
+              -webkit-backdrop-filter: blur(30px) !important;
             }
           `}</style>
           {/* Progress Line at Top */}
@@ -2812,7 +2814,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   
                   {isDescriptionPreviewMode ? (
                     <div 
-                      className={`relative group text-gray-900 dark:text-white text-sm leading-relaxed min-h-[120px] overflow-y-auto p-4 rounded-lg bg-white/70 dark:bg-gray-800/40 backdrop-blur-sm custom-scrollbar wysiwyg-content transition-all duration-300 border border-white/20 dark:border-gray-700/30 hover:border-white/30 dark:hover:border-gray-600/50 ${
+                      className={`relative group text-gray-900 dark:text-white text-sm leading-relaxed min-h-[120px] overflow-y-auto p-4 rounded-lg bg-white/80 dark:bg-gray-800/50 backdrop-blur-lg custom-scrollbar wysiwyg-content transition-all duration-300 border border-white/40 dark:border-gray-700/50 hover:border-white/60 dark:hover:border-gray-600/70 ${
                         isDescriptionExpanded ? 'h-[calc(100vh-300px)]' : 'max-h-[300px]'
                       } ${!formData.description?.trim() ? 'cursor-text flex items-center justify-center' : ''}`}
                       style={{
@@ -2860,35 +2862,46 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                      </div>
                    ) : (
                     <div className={`relative transition-all duration-500 w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-accent overflow-hidden group ${
-                      isDescriptionExpanded ? 'h-[calc(100vh-300px)]' : 'h-48'
+                      isDescriptionExpanded ? 'h-[calc(100vh-300px)]' : 'h-64'
                     }`}
                     style={{
                       animation: 'fadeInEditMode 0.3s ease-out'
                     }}>
-                      <WysiwygEditor
-                        value={formData.description}
-                        onChange={(value) => {
-                          setFormData(prev => ({ ...prev, description: value }));
-                          setHasUnsavedChanges(true);
+                      <div 
+                        onKeyDown={(e) => {
+                          if (e.key === 'Escape') {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setIsDescriptionPreviewMode(true);
+                            setIsDescriptionExpanded(false);
+                          }
                         }}
-                        placeholder={taskModal.descriptionPlaceholder()}
-                        className="h-full w-full"
-                        useFullHeight={true}
-                        showToolbar={true}
-                        onClickOutside={() => {
-                          setIsDescriptionPreviewMode(true);
-                          setIsDescriptionExpanded(false);
-                        }}
-                      />
+                      >
+                        <WysiwygEditor
+                          value={formData.description}
+                          onChange={(value) => {
+                            setFormData(prev => ({ ...prev, description: value }));
+                            setHasUnsavedChanges(true);
+                          }}
+                          placeholder={taskModal.descriptionPlaceholder()}
+                          className="h-full w-full"
+                          useFullHeight={true}
+                          showToolbar={true}
+                          onClickOutside={() => {
+                            setIsDescriptionPreviewMode(true);
+                            setIsDescriptionExpanded(false);
+                          }}
+                        />
+                      </div>
                       <button
                         onClick={() => {
                           setIsDescriptionPreviewMode(true);
                           setIsDescriptionExpanded(false);
                         }}
-                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
+                        className="absolute top-3 right-3 z-20 p-2 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg transition-all opacity-100 hover:scale-110"
                         title={taskModal.closeDescription()}
                       >
-                        <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                        <X className="w-5 h-5 text-gray-700 dark:text-gray-300 font-bold" />
                       </button>
                     </div>
                   )}
