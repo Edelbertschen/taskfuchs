@@ -3515,9 +3515,24 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
 
                 {/* Simplified Reminder Section */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Reminder
-                  </label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Reminder
+                    </label>
+                    {!isEditingReminder && !(task?.reminderDate && task?.reminderTime) && (
+                      <button
+                        onClick={() => {
+                          setIsEditingReminder(true);
+                          setReminderTimeInput(formData.reminderTime || '');
+                        }}
+                        className="w-5 h-5 flex items-center justify-center text-xs hover:opacity-80 transition-colors rounded"
+                        style={getAccentColorStyles().text}
+                        title="Reminder hinzufügen"
+                      >
+                        +
+                      </button>
+                    )}
+                  </div>
                   
                   {/* Reminder Display/Edit */}
                   {task?.reminderDate && task?.reminderTime && !isEditingReminder ? (
@@ -3560,20 +3575,6 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      {/* When not editing and no reminder exists, show only a + button */}
-                      {!isEditingReminder && !(task?.reminderDate && task?.reminderTime) && (
-                        <button
-                          onClick={() => {
-                            setIsEditingReminder(true);
-                            setReminderTimeInput(formData.reminderTime || '');
-                          }}
-                          className="w-5 h-5 flex items-center justify-center text-xs hover:opacity-80 transition-colors rounded"
-                          style={getAccentColorStyles().text}
-                          title="Reminder hinzufügen"
-                        >
-                          +
-                        </button>
-                      )}
                       {isEditingReminder && (
                         <div className="grid grid-cols-2 gap-2">
                           <input
