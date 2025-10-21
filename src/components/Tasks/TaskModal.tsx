@@ -111,8 +111,6 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
   const [showMarkdownHelp, setShowMarkdownHelp] = useState(false);
   const [notesSearchQuery, setNotesSearchQuery] = useState('');
   const [isDescriptionPreview, setIsDescriptionPreview] = useState(false);
-  const [descriptionHeight, setDescriptionHeight] = useState(300);
-  const descriptionResizeRef = useRef<HTMLDivElement>(null);
   
   // Collapsible sections state - auto-expand if content exists
   const [isSubtasksExpanded, setIsSubtasksExpanded] = useState(false);
@@ -1902,28 +1900,6 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
 
   if (!isOpen || !task) return null;
 
-  // Handle description resize
-  const handleDescriptionResize = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const startY = e.clientY;
-    const startHeight = descriptionHeight;
-    
-    const handleMouseMove = (e: MouseEvent) => {
-      const delta = e.clientY - startY;
-      const newHeight = Math.max(200, Math.min(800, startHeight + delta));
-      setDescriptionHeight(newHeight);
-    };
-    
-    const handleMouseUp = () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-    
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-  }, [descriptionHeight]);
-
   const modalContent = (
     <>
       {/* Backdrop */}
@@ -2020,18 +1996,11 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
 
           {/* Header with editable title, date, and project */}
           <div className="relative p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-            {/* Close and Help buttons */}
-            <div className="absolute top-4 right-4 z-10 flex items-center gap-1">
-              <button
-                className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
-                title="Hilfe"
-              >
-                <HelpCircle className="w-5 h-5" />
-              </button>
+            {/* Close button */}
+            <div className="absolute top-4 right-4 z-10">
               <button
                 onClick={handleClose}
                 className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
-                title="Schließen"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -2669,20 +2638,6 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                 </div>
               </div>
             </div>
-            {/* Content Area with Subtle Glassmorphism */}
-            <div className="flex-1 overflow-y-auto" style={{
-              background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, rgba(249, 250, 251, 0.3) 100%)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-            }}>
-              <style>{`
-                .dark .content-glassmorphism {
-                  background: linear-gradient(180deg, rgba(31, 41, 55, 0.3) 0%, rgba(17, 24, 39, 0.2) 100%) !important;
-                  backdrop-filter: blur(8px) !important;
-                  -webkit-backdrop-filter: blur(8px) !important;
-                }
-              `}</style>
-              <div className="dark:content-glassmorphism">
             
             {/* Smart Parsing Preview - Elegant Overlay */}
             {parseResult && parseResult.success && parseResult.task && (
@@ -2836,41 +2791,34 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                 </div>
 
                 {/* Description */}
-                <div onClick={(e) => {
-                  // Close editor if clicking in description area but outside the editor
-                  if (!isDescriptionPreviewMode && e.currentTarget === e.target) {
-                    setIsDescriptionPreviewMode(true);
-                  }
-                }}>
+                <div>
                   {/* Title and Buttons on same line */}
                   <div className="flex items-center justify-between mb-3">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                       Beschreibung
                     </label>
-                    {formData.description?.trim() && (
-                      <button
-                        onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                        className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-                        title={isDescriptionExpanded ? taskModal.descriptionCollapse() : taskModal.descriptionExpand()}
-                      >
-                        <ChevronDown 
-                          className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
-                            isDescriptionExpanded ? 'rotate-180' : ''
-                          }`}
-                        />
-                      </button>
-                    )}
+                    <div className="flex items-center gap-1">
+                      {formData.description?.trim() && (
+                        <button
+                          onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                          className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                          title={isDescriptionExpanded ? taskModal.descriptionCollapse() : taskModal.descriptionExpand()}
+                        >
+                          {isDescriptionExpanded ? (
+                            <Minimize className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                          ) : (
+                            <Maximize className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                          )}
+                        </button>
+                      )}
+                    </div>
                   </div>
                   
                   {isDescriptionPreviewMode ? (
                     <div 
-                      ref={descriptionResizeRef}
-                      className={`relative group text-gray-900 dark:text-white text-sm leading-relaxed min-h-[120px] overflow-y-auto p-4 rounded-lg bg-white/80 dark:bg-gray-800/50 backdrop-blur-lg custom-scrollbar wysiwyg-content transition-none border border-white/40 dark:border-gray-700/50 hover:border-white/60 dark:hover:border-gray-600/70 ${
-                        !formData.description?.trim() ? 'cursor-text flex items-center justify-center' : ''}`}
-                      style={{
-                        height: `${descriptionHeight}px`,
-                        scrollBehavior: 'smooth'
-                      }}
+                      className={`relative group text-gray-900 dark:text-white text-sm leading-relaxed min-h-[120px] overflow-y-auto p-4 rounded-lg bg-white/80 dark:bg-gray-800/50 backdrop-blur-lg custom-scrollbar wysiwyg-content transition-all duration-300 border border-white/40 dark:border-gray-700/50 hover:border-white/60 dark:hover:border-gray-600/70 ${
+                        isDescriptionExpanded ? 'h-[calc(100vh-300px)]' : 'max-h-[300px]'
+                      } ${!formData.description?.trim() ? 'cursor-text flex items-center justify-center' : ''}`}
                       style={{
                         scrollBehavior: 'smooth',
                         transition: 'all 0.3s ease-in-out'
@@ -2886,19 +2834,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                       }}
                       title={!formData.description?.trim() ? 'Klicken zum Bearbeiten' : undefined}
                     >
-                      {/* Collapse button */}
-                      {isDescriptionExpanded && formData.description?.trim() && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setIsDescriptionExpanded(false);
-                          }}
-                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
-                          title={taskModal.collapseDescription()}
-                        >
-                          <ChevronUp className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                        </button>
-                      )}
+                      {/* Collapse button - MOVED TO HEADER */}
                       {!formData.description?.trim() && (
                         <span className="text-gray-400 dark:text-gray-500 text-sm italic opacity-60 group-hover:opacity-100 transition-opacity">
                           {taskModal.descriptionPlaceholder() || 'Click to edit...'}
@@ -2913,77 +2849,63 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                           }}
                         />
                       )}
-                      {/* Resize Handle */}
-                      <div
-                        onMouseDown={handleDescriptionResize}
-                        className="absolute bottom-0 right-0 w-6 h-6 cursor-se-resize group/resize hover:bg-orange-400/40 dark:hover:bg-orange-400/40 rounded-tl-lg transition-all flex items-center justify-center"
-                        style={{ pointerEvents: 'auto', zIndex: 10, backgroundColor: 'rgba(251, 146, 60, 0.15)' }}
-                        title="Zum Ändern der Größe ziehen"
-                      >
-                        <svg className="w-5 h-5 text-orange-500 dark:text-orange-400 opacity-70 group-hover/resize:opacity-100 transition-opacity" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                        </svg>
-                      </div>
                      </div>
                    ) : (
-                    <div 
-                      className="relative transition-none w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-accent group"
-                      onClick={(e) => {
-                        // Only close if clicking on the background, not on content
-                        if (e.currentTarget === e.target || e.target === e.currentTarget) {
-                          setIsDescriptionPreviewMode(true);
-                        }
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Escape') {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          setIsDescriptionPreviewMode(true);
-                          setIsDescriptionExpanded(false);
-                        }
-                      }}
-                      style={{
-                        height: `${descriptionHeight}px`,
-                        animation: 'fadeInEditMode 0.3s ease-out',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        overflow: 'hidden'
-                      }}>
-                      <WysiwygEditor
-                        value={formData.description}
-                        onChange={(value) => {
-                          setFormData(prev => ({ ...prev, description: value }));
-                          setHasUnsavedChanges(true);
+                    <div className={`relative transition-all duration-500 w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-accent overflow-y-auto group ${
+                      isDescriptionExpanded ? 'h-[calc(100vh-300px)]' : 'max-h-96'
+                    }`}
+                    style={{
+                      animation: 'fadeInEditMode 0.3s ease-out'
+                    }}>
+                      {/* Editor Toolbar */}
+                      <div className="absolute top-2 right-2 z-20 flex gap-1">
+                        <button
+                          onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                          className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
+                          title={isDescriptionExpanded ? taskModal.descriptionCollapse() : taskModal.descriptionExpand()}
+                        >
+                          {isDescriptionExpanded ? (
+                            <Minimize className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                          ) : (
+                            <Maximize className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                          )}
+                        </button>
+                        <button
+                          onClick={() => {
+                            setIsDescriptionPreviewMode(true);
+                            setIsDescriptionExpanded(false);
+                          }}
+                          className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
+                          title={taskModal.closeDescription()}
+                        >
+                          <X className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                        </button>
+                      </div>
+                      <div 
+                        onKeyDown={(e) => {
+                          if (e.key === 'Escape') {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setIsDescriptionPreviewMode(true);
+                            setIsDescriptionExpanded(false);
+                          }
                         }}
-                        placeholder={taskModal.descriptionPlaceholder()}
-                        className="h-full w-full flex-1"
-                        useFullHeight={true}
-                        showToolbar={true}
-                        onClickOutside={() => {
-                          setIsDescriptionPreviewMode(true);
-                          setIsDescriptionExpanded(false);
-                        }}
-                      />
-                      <button
-                        onClick={() => {
-                          setIsDescriptionPreviewMode(true);
-                          setIsDescriptionExpanded(false);
-                        }}
-                        className="absolute top-2 left-2 z-20 p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-all opacity-70 hover:opacity-100"
-                        title={taskModal.closeDescription()}
                       >
-                        <X className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                      </button>
-                      {/* Resize Handle */}
-                      <div
-                        onMouseDown={handleDescriptionResize}
-                        className="absolute bottom-0 right-0 w-6 h-6 cursor-se-resize group/resize hover:bg-orange-400/40 dark:hover:bg-orange-400/40 rounded-tl-lg transition-all flex items-center justify-center"
-                        style={{ pointerEvents: 'auto', zIndex: 10, backgroundColor: 'rgba(251, 146, 60, 0.15)' }}
-                        title="Zum Ändern der Größe ziehen"
-                      >
-                        <svg className="w-5 h-5 text-orange-500 dark:text-orange-400 opacity-70 group-hover/resize:opacity-100 transition-opacity" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                        </svg>
+                        <WysiwygEditor
+                          value={formData.description}
+                          onChange={(value) => {
+                            setFormData(prev => ({ ...prev, description: value }));
+                            setHasUnsavedChanges(true);
+                          }}
+                          placeholder={taskModal.descriptionPlaceholder()}
+                          className="h-full w-full"
+                          useFullHeight={true}
+                          showToolbar={true}
+                          onClickOutside={() => {
+                            setIsDescriptionPreviewMode(true);
+                            setIsDescriptionExpanded(false);
+                          }}
+                        />
                       </div>
                     </div>
                   )}
@@ -3897,8 +3819,6 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
             </div>
           </div>
 
-              </div>
-            </div>
           {/* Footer */}
           <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 sticky bottom-0">
             {/* Action Buttons */}

@@ -36,9 +36,9 @@ export function LandingPage({ onGuestLogin }: LandingPageProps) {
   };
 
   return (
-    <div 
+        <div
       className={`transition-all duration-1200 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}
-      style={{
+          style={{
         transform: isTransitioning ? 'scale(1.02)' : 'scale(1)',
         filter: isTransitioning ? 'blur(8px)' : 'blur(0)'
       }}
@@ -93,7 +93,7 @@ export function LandingPage({ onGuestLogin }: LandingPageProps) {
                   : 'bg-amber-300'
               }`}
             ></div>
-          </div>
+      </div>
 
           <div className="relative z-10 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
             {/* Left: Fox Image - Glow intensifies on transition */}
@@ -116,7 +116,7 @@ export function LandingPage({ onGuestLogin }: LandingPageProps) {
                 >
                   <img
                     src="/3d_fox.png"
-                    alt="TaskFuchs"
+            alt="TaskFuchs"
                     className="w-96 h-96 object-contain drop-shadow-2xl transition-all duration-1200"
                     style={{
                       transform: `translateY(${scrollY * 0.3}px) ${isTransitioning ? 'scale(1.05)' : 'scale(1)'} ${hoveredFox && !isTransitioning ? 'rotateZ(5deg)' : 'rotateZ(0deg)'}`,
@@ -189,7 +189,7 @@ export function LandingPage({ onGuestLogin }: LandingPageProps) {
                     </div>
                   );
                 })}
-              </div>
+        </div>
 
               {/* CTA Button - Centered and prominent */}
               <div style={{
@@ -221,7 +221,7 @@ export function LandingPage({ onGuestLogin }: LandingPageProps) {
             isTransitioning ? 'opacity-0' : 'opacity-100'
           }`}>
             <ChevronDown className="w-6 h-6 text-gray-400" />
-          </div>
+        </div>
         </section>
 
         {/* Features Section */}
@@ -334,7 +334,7 @@ export function LandingPage({ onGuestLogin }: LandingPageProps) {
               : 'text-gray-600 dark:text-gray-400'
           }`}>
             <p>TaskFuchs © 2025 | Open Source | Privacy First</p>
-          </div>
+        </div>
         </footer>
 
         <style>{`
