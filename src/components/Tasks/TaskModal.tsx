@@ -1904,10 +1904,12 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
     <>
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-[99999999] modal-backdrop"
+        className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 z-[99999999] modal-backdrop"
         style={{ 
           isolation: 'isolate',
-          pointerEvents: 'auto'
+          pointerEvents: 'auto',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)'
         }}
         onMouseDown={(e) => {
           if (suppressBackdropClickRef.current) {
@@ -1944,7 +1946,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
         {/* Modal Container */}
         <div 
           ref={modalRef}
-          className="task-modal-root relative bg-white dark:bg-gray-900 rounded-none sm:rounded-2xl shadow-2xl w-screen sm:w-full sm:max-w-6xl h-[100svh] sm:h-[90vh] overflow-hidden flex flex-col modal-content animate-modal-in"
+          className="task-modal-root relative rounded-none sm:rounded-2xl shadow-2xl w-screen sm:w-full sm:max-w-6xl h-[100svh] sm:h-[90vh] overflow-hidden flex flex-col modal-content animate-modal-in"
           onClick={e => e.stopPropagation()}
           onMouseDown={(e) => e.stopPropagation()}
           onMouseMove={(e) => e.stopPropagation()}
@@ -1957,9 +1959,21 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
           style={{ 
             pointerEvents: 'auto',
             transform: navDirection === 'next' ? 'translateX(8px)' : navDirection === 'prev' ? 'translateX(-8px)' : 'translateX(0)',
-            transition: 'transform 200ms ease'
+            transition: 'transform 200ms ease',
+            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.85) 100%)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.15)',
           }}
         >
+          <style>{`
+            .dark .task-modal-root {
+              background: linear-gradient(135deg, rgba(17, 24, 39, 0.9) 0%, rgba(31, 41, 55, 0.85) 100%) !important;
+              border: 1px solid rgba(255, 255, 255, 0.1) !important;
+              box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
+            }
+          `}</style>
           {/* Progress Line at Top */}
           {formData.estimatedTime > 0 && (
             <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-t-2xl overflow-hidden">
@@ -2797,7 +2811,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   
                   {isDescriptionPreviewMode ? (
                     <div 
-                      className={`relative group text-gray-900 dark:text-white text-sm leading-relaxed min-h-[120px] overflow-y-auto p-4 rounded-lg bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 custom-scrollbar wysiwyg-content transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 ${
+                      className={`relative group text-gray-900 dark:text-white text-sm leading-relaxed min-h-[120px] overflow-y-auto p-4 rounded-lg bg-white/70 dark:bg-gray-800/40 backdrop-blur-sm custom-scrollbar wysiwyg-content transition-all duration-300 border border-white/20 dark:border-gray-700/30 hover:border-white/30 dark:hover:border-gray-600/50 ${
                         isDescriptionExpanded ? 'h-[calc(100vh-300px)]' : 'max-h-[300px]'
                       } ${!formData.description?.trim() ? 'cursor-text flex items-center justify-center' : ''}`}
                       style={{
@@ -3554,7 +3568,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                               dispatch({ type: 'UPDATE_TASK', payload: updatedTask });
                               setHasUnsavedChanges(true);
                             }}
-                            className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white/80 dark:bg-gray-800/60 backdrop-blur-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 hover:bg-white/90 dark:hover:bg-gray-800/80"
                             placeholder="Datum auswählen"
                           />
                           <input
@@ -3569,7 +3583,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                               dispatch({ type: 'UPDATE_TASK', payload: updatedTask });
                               setHasUnsavedChanges(true);
                             }}
-                            className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white/80 dark:bg-gray-800/60 backdrop-blur-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 hover:bg-white/90 dark:hover:bg-gray-800/80"
                             placeholder="Zeit auswählen"
                           />
                           <div className="col-span-2 flex items-center justify-end space-x-2">
