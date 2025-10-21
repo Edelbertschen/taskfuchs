@@ -939,7 +939,7 @@ export function InboxView() {
               title="Mehrfachauswahl (STRG/CMD + Klick)"
             >
               <CheckSquare className={`w-4 h-4 ${multiSelectMode ? 'fill-current' : ''}`} />
-              <span>{multiSelectMode ? 'Mehrfachauswahl' : 'Auswählen'}</span>
+              <span>{multiSelectMode ? t('inbox_view.multiSelectMode', { defaultValue: 'Multi-select' }) : t('inbox_view.select', { defaultValue: 'Select' })}</span>
             </button>
 
             {/* Select All - only show when multi-select is active */}
@@ -949,7 +949,7 @@ export function InboxView() {
                 className={`transition-colors px-3 py-2 rounded-lg text-sm font-medium flex items-center ${isMinimalDesign ? 'text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700' : 'text-white/70 hover:text-white hover:bg-white/10 backdrop-blur-xl'}`}
                 style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.5)', lineHeight: '1.5', minHeight: '32px' }}
               >
-                {selectedTasks.size === inboxTasks.length ? t('inbox_view.deselect_all', { defaultValue: 'Auswahl aufheben' }) : t('inbox_view.select_all', { defaultValue: 'Alle auswählen' })}
+                {selectedTasks.size === inboxTasks.length ? t('inbox_view.deselect_all') : t('inbox_view.select_all')}
               </button>
             )}
           </div>

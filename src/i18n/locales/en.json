@@ -2056,8 +2056,23 @@
     "add_tag": "Add tag"
   },
   "inbox_view": {
+    "title": "Inbox",
+    "filterByDate": "Filter by date",
+    "allTasks": "All tasks",
+    "select_all": "Select all",
+    "deselect_all": "Deselect all",
+    "multiSelectMode": "Multi-select",
+    "select": "Select",
     "remove_filter": "Remove filter",
-    "delete_button": "Delete"
+    "delete_button": "Delete",
+    "placeholders": {
+      "new_task": "Create new task for inbox..."
+    },
+    "empty_state": {
+      "title": "Inbox is empty",
+      "description": "No tasks in inbox. Use the smart button to create new tasks.",
+      "createFirst": "Create first task"
+    }
   },
   "backup_modal": {
     "title": "Set up backup",
