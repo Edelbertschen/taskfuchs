@@ -2772,50 +2772,33 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                 {/* Description */}
                 <div>
                   {/* Title and Buttons on same line */}
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center justify-between mb-3">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                       Beschreibung
                     </label>
-                    <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                      className="px-3 py-1.5 rounded-lg text-xs transition-all flex items-center space-x-2 bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600"
-                      title={isDescriptionExpanded ? taskModal.descriptionCollapse() : taskModal.descriptionExpand()}
-                    >
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isDescriptionExpanded ? "M19 9l-7 7-7-7" : "M5 15l7-7 7 7"} />
-                      </svg>
-                      <span>{isDescriptionExpanded ? taskModal.descriptionCollapse() : taskModal.descriptionExpand()}</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        setIsDescriptionPreviewMode(!isDescriptionPreviewMode);
-                        if (isDescriptionPreviewMode) {
-                          // Beim Wechsel in den Bearbeitungsmodus automatisch vergrößern
-                          setIsDescriptionExpanded(true);
-                        }
-                      }}
-                      className={`px-3 py-1.5 rounded-lg text-xs transition-all flex items-center space-x-2 ${
-                        isDescriptionPreviewMode
-                          ? 'text-white'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600'
-                      }`}
-                      style={isDescriptionPreviewMode ? getAccentColorStyles().bg : {}}
-                    >
-                      {isDescriptionPreviewMode ? <Edit className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                      <span>{isDescriptionPreviewMode ? taskModal.descriptionEdit() : taskModal.descriptionPreview()}</span>
-                    </button>
-                    </div>
+                    {formData.description?.trim() && (
+                      <button
+                        onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                        className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                        title={isDescriptionExpanded ? taskModal.descriptionCollapse() : taskModal.descriptionExpand()}
+                      >
+                        <ChevronDown 
+                          className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
+                            isDescriptionExpanded ? 'rotate-180' : ''
+                          }`}
+                        />
+                      </button>
+                    )}
                   </div>
                   
                   {isDescriptionPreviewMode ? (
                     <div 
-                      className={`text-gray-900 dark:text-white text-sm leading-relaxed min-h-[200px] overflow-y-auto p-3 rounded-lg bg-white dark:bg-gray-800 custom-scrollbar wysiwyg-content transition-all duration-300 ${
+                      className={`relative group text-gray-900 dark:text-white text-sm leading-relaxed min-h-[120px] overflow-y-auto p-4 rounded-lg bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 custom-scrollbar wysiwyg-content transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 ${
                         isDescriptionExpanded ? 'h-[calc(100vh-300px)]' : 'max-h-[300px]'
-                      } ${!formData.description?.trim() ? 'cursor-text' : ''}`}
+                      } ${!formData.description?.trim() ? 'cursor-text flex items-center justify-center' : ''}`}
                       style={{
                         scrollBehavior: 'smooth',
-                        transition: 'all 0.2s ease-in-out'
+                        transition: 'all 0.3s ease-in-out'
                       }}
                       onClick={(e) => {
                         // Allow direct click to edit when empty or when clicking the background
@@ -2828,21 +2811,34 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                       }}
                       title={!formData.description?.trim() ? 'Klicken zum Bearbeiten' : undefined}
                     >
-                       <MarkdownRenderer 
-                         content={formData.description}
-                         onCheckboxChange={(newDescription) => {
-                           setFormData(prev => ({ ...prev, description: newDescription }));
-                           setHasUnsavedChanges(true);
-                         }}
-                       />
+                      {!formData.description?.trim() && (
+                        <span className="text-gray-400 dark:text-gray-500 text-sm italic opacity-60 group-hover:opacity-100 transition-opacity">
+                          {taskModal.descriptionPlaceholder() || 'Click to edit...'}
+                        </span>
+                      )}
+                      {formData.description?.trim() && (
+                        <MarkdownRenderer 
+                          content={formData.description}
+                          onCheckboxChange={(newDescription) => {
+                            setFormData(prev => ({ ...prev, description: newDescription }));
+                            setHasUnsavedChanges(true);
+                          }}
+                        />
+                      )}
                      </div>
                    ) : (
-                    <div className={`transition-all duration-300 w-full ${
+                    <div className={`transition-all duration-500 w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-accent overflow-hidden ${
                       isDescriptionExpanded ? 'h-[calc(100vh-300px)]' : 'h-48'
-                    }`}>
+                    }`}
+                    style={{
+                      animation: 'fadeInEditMode 0.3s ease-out'
+                    }}>
                       <WysiwygEditor
                         value={formData.description}
-                        onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
+                        onChange={(value) => {
+                          setFormData(prev => ({ ...prev, description: value }));
+                          setHasUnsavedChanges(true);
+                        }}
                         placeholder={taskModal.descriptionPlaceholder()}
                         className="h-full w-full"
                         useFullHeight={true}
@@ -4416,6 +4412,50 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
   };
 
 
+
+  // Add global styles for animations
+  React.useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes checkboxPop {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+      }
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes fadeInEditMode {
+        from {
+          opacity: 0;
+          transform: scale(0.98);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      @keyframes slideDown {
+        from {
+          max-height: 0;
+          opacity: 0;
+        }
+        to {
+          max-height: 500px;
+          opacity: 1;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
+  }, []);
 
   return (
     <>
