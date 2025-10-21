@@ -571,8 +571,8 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
 
                     {/* Planner (Today) count badge */}
                     {item.id === 'tasks' && (() => {
-                      const todayColumn = state.columns.find(col => col.title === 'Today');
-                      const todayCount = todayColumn ? (state.tasks || []).filter(t => t.columnId === todayColumn.id && !t.completed).length : 0;
+                      const today = new Date().toISOString().split('T')[0];
+                      const todayCount = (state.tasks || []).filter(t => t.columnId === today && !t.completed).length;
                       return todayCount > 0 ? (
                         <span className="absolute top-[5px] right-[5px] text-[10px] min-w-[16px] h-[16px] px-1 rounded-full flex items-center justify-center bg-blue-500 text-white shadow">
                           {todayCount}
