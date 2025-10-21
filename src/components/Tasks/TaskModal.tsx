@@ -2761,7 +2761,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                 {/* Priority Buttons */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                    Priorität
+                    {taskModal.priority()}
                   </label>
                   <div className="flex gap-1.5">
                     {[
@@ -2795,7 +2795,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   {/* Header with close button */}
                   <div className="flex items-center justify-between mb-2">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Beschreibung
+                      {taskModal.description()}
                     </label>
                     {!isDescriptionPreviewMode && (
                       <button
@@ -2813,7 +2813,6 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
 
                   {/* Single unified editor/preview frame */}
                   <div 
-                    ref={descriptionContainerRef}
                     className={`relative w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-accent ${
                       isDescriptionPreviewMode ? 'bg-white/80 dark:bg-gray-800/50 backdrop-blur-lg' : 'bg-white dark:bg-gray-800'
                     } transition-colors duration-200 overflow-hidden group resize-y ${
@@ -2833,7 +2832,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   >
                     {/* Resize handle - bottom right corner */}
                     {isDescriptionPreviewMode && formData.description?.trim() && (
-                      <div className="absolute bottom-0 right-0 text-gray-300 dark:text-gray-600 cursor-se-resize p-2 opacity-50 hover:opacity-100 transition-opacity" title="Größe ändern">
+                      <div className="absolute bottom-0 right-0 text-gray-300 dark:text-gray-600 cursor-se-resize p-2 opacity-50 hover:opacity-100 transition-opacity" title={taskModal.resize_tooltip?.() || 'Resize'}>
                         <GripVertical className="w-4 h-4" />
                       </div>
                     )}
@@ -2847,7 +2846,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                         onClick={() => {
                           setIsDescriptionPreviewMode(false);
                         }}
-                        title={!formData.description?.trim() ? 'Klicken zum Bearbeiten' : 'Klicken zum Bearbeiten'}
+                        title={taskModal.click_to_edit_tooltip?.() || 'Click to edit'}
                       >
                         {!formData.description?.trim() && (
                           <span className="text-gray-400 dark:text-gray-500 text-sm italic opacity-60">
@@ -2889,7 +2888,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-2">
                       <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Unteraufgaben ({formData.subtasks.length})
+                        {taskModal.subtasks()} ({formData.subtasks.length})
                       </label>
                       {formData.subtasks.length > 0 && (
                         <button
@@ -2937,7 +2936,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                             onChange={(e) => updateSubtask(subtask.id, { title: e.target.value })}
                             onKeyPress={(e) => handleSubtaskKeyPress(e, subtask.id)}
                             onPaste={(e) => handleSubtaskPaste(e, subtask.id)}
-                            placeholder={`Unteraufgabe ${index + 1}`}
+                            placeholder={`${taskModal.subtasks()} ${index + 1}`}
                             className="flex-1 px-2 py-1 text-sm border border-transparent focus:border-gray-300 dark:focus:border-gray-600 rounded focus:outline-none bg-transparent text-gray-900 dark:text-white"
                             data-subtask-input
                           />
@@ -2981,16 +2980,16 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                         };
                       case 'planner':
                         return {
-                          text: 'Nur im Planer',
+                          text: taskModal.placeholder_only_im_planer?.() || 'Planner only',
                           icon: 'Calendar',
-                          description: 'Diese Aufgabe ist nur im Planer sichtbar',
+                          description: taskModal.placeholder_only_im_planer?.() || 'This task is visible in planner only',
                           color: accentColor
                         };
                       case 'inbox':
                         return {
-                          text: 'Im Eingang',
+                          text: taskModal.placeholder_im_eingang?.() || 'In Inbox',
                           icon: 'Inbox',
-                          description: 'Diese Aufgabe ist nur im Eingang sichtbar (kein Projekt oder Datum zugewiesen)',
+                          description: taskModal.placeholder_im_eingang?.() || 'This task is in inbox (no project or date assigned)',
                           color: accentColor
                         };
                       default:
@@ -3004,7 +3003,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   return (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Status
+                        {taskModal.status()}
                       </label>
                       <div 
                         className="flex items-center space-x-2 p-3 rounded-lg border transition-all duration-200"
@@ -3098,13 +3097,13 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                                   {taskModal.postponed()}
                                 </p>
                                 <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
-                                  Review am {format(reviewDate, 'dd.MM.yyyy', { locale: de })}
+                                  {taskModal.review_am?.() || 'Review on'} {format(reviewDate, 'dd.MM.yyyy', { locale: de })}
                                 </p>
                               </div>
                               <button
                                 onClick={removeReviewStatus}
                                 className="p-1.5 text-gray-400 hover:text-red-500 dark:hover:text-red-400 rounded transition-colors"
-                                title="Review-Status entfernen"
+                                title={taskModal.removeReviewStatus?.() || 'Remove review status'}
                               >
                                 <X className="w-3.5 h-3.5" />
                               </button>
