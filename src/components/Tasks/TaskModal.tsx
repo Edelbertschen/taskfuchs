@@ -2763,9 +2763,8 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                     {"Priority"}
                   </label>
-                  <div className="flex gap-1.5">
+                  <div className="flex gap-1.5 items-center">
                     {[
-                      { value: 'none', label: "None", colorBg: 'rgba(107, 114, 128, 0.1)', colorBorder: 'rgb(107, 114, 128)', icon: '-' },
                       { value: 'low', label: "Low", colorBg: 'rgba(34, 197, 94, 0.1)', colorBorder: 'rgb(34, 197, 94)', icon: '!' },
                       { value: 'medium', label: "Medium", colorBg: 'rgba(234, 179, 8, 0.1)', colorBorder: 'rgb(234, 179, 8)', icon: '!!' },
                       { value: 'high', label: "High", colorBg: 'rgba(239, 68, 68, 0.1)', colorBorder: 'rgb(239, 68, 68)', icon: '!!!' }
@@ -2773,11 +2772,11 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                       <button
                         key={priority.value}
                         onClick={() => setFormData(prev => ({ ...prev, priority: priority.value as any }))}
-                        className="relative group px-2.5 py-1.5 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer hover:scale-110"
+                        className="relative group px-2.5 py-1.5 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer hover:scale-110 border-2"
                         style={{
                           backgroundColor: formData.priority === priority.value ? priority.colorBg : 'transparent',
-                          borderLeft: `2px solid ${formData.priority === priority.value ? priority.colorBorder : 'transparent'}`,
-                          opacity: formData.priority === priority.value ? '1' : '0.4',
+                          borderColor: formData.priority === priority.value ? priority.colorBorder : 'rgba(0,0,0,0.1)',
+                          opacity: formData.priority === priority.value ? '1' : '0.5',
                           paddingLeft: formData.priority === priority.value ? '10px' : '12px',
                           fontFamily: 'monospace',
                           letterSpacing: '-1px'
@@ -2787,6 +2786,17 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                         {priority.icon}
                       </button>
                     ))}
+                    
+                    {/* Clear priority button */}
+                    {formData.priority && formData.priority !== 'none' && (
+                      <button
+                        onClick={() => setFormData(prev => ({ ...prev, priority: 'none' }))}
+                        className="ml-2 px-2 py-1.5 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer hover:scale-110 border-2 border-gray-300 dark:border-gray-600 hover:border-red-400 dark:hover:border-red-400 text-gray-400 hover:text-red-400 dark:hover:text-red-400"
+                        title="Clear priority"
+                      >
+                        ×
+                      </button>
+                    )}
                   </div>
                 </div>
 
