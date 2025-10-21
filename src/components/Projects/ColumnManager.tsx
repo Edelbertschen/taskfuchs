@@ -102,7 +102,7 @@ function ColorPicker({ selectedColor, onColorChange, onClose }: {
         onClick={onClose}
         className="w-full px-3 py-1 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
       >
-        Schließen
+        {i18n.language === 'en' ? 'Close' : 'Schließen'}
       </button>
     </div>
   );
@@ -173,7 +173,7 @@ function AddColumnItem({ onAddColumn }: AddColumnItemProps) {
                 onClick={handleCancel}
                 className="px-3 py-1.5 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
               >
-                Abbrechen
+                {i18n.language === 'en' ? 'Cancel' : 'Abbrechen'}
               </button>
               <button
                 onClick={handleSubmit}
@@ -181,7 +181,7 @@ function AddColumnItem({ onAddColumn }: AddColumnItemProps) {
                 className="px-4 py-1.5 text-sm font-medium text-white rounded-lg transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ backgroundColor: newTitle.trim() ? accentColor : '#9ca3af' }}
               >
-                Hinzufügen
+                {i18n.language === 'en' ? 'Add' : 'Hinzufügen'}
               </button>
             </div>
           </div>
@@ -367,7 +367,7 @@ function SortableColumnItem({
                   className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-600 rounded-lg transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-500 hover:scale-105"
                 >
                   <X className="w-4 h-4" />
-                  <span>Abbrechen</span>
+                  <span>{i18n.language === 'en' ? 'Cancel' : 'Abbrechen'}</span>
                 </button>
                 
               <button
@@ -379,7 +379,7 @@ function SortableColumnItem({
                 }}
               >
                   <CheckCircle className="w-4 h-4" />
-                <span>Speichern</span>
+                <span>{i18n.language === 'en' ? 'Save' : 'Speichern'}</span>
               </button>
               </div>
             </div>
@@ -415,7 +415,7 @@ function SortableColumnItem({
             title="Spalte bearbeiten"
           >
             <Edit2 className="w-4 h-4" />
-            <span className="hidden sm:inline">Bearbeiten</span>
+            <span className="hidden sm:inline">{i18n.language === 'en' ? 'Edit' : 'Bearbeiten'}</span>
           </button>
           <button
             onClick={onDelete}
@@ -426,7 +426,7 @@ function SortableColumnItem({
             title="Spalte löschen"
           >
             <Trash2 className="w-4 h-4" />
-            <span className="hidden sm:inline">Löschen</span>
+            <span className="hidden sm:inline">{i18n.language === 'en' ? 'Delete' : 'Löschen'}</span>
           </button>
         </div>
       )}
@@ -565,7 +565,7 @@ export function ColumnManager({ isOpen, onClose, projectId, projectTitle }: Colu
 
   const handleConfirmDelete = () => {
     if (projectColumns.length <= 1) {
-      alert('Mindestens eine Spalte muss vorhanden bleiben. Ein Projekt ohne Spalten ist nicht möglich.');
+      alert(i18n.language === 'en' ? 'At least one column must remain. A project without columns is not possible.' : 'Mindestens eine Spalte muss vorhanden bleiben. Ein Projekt ohne Spalten ist nicht möglich.');
       return;
     }
 
@@ -573,7 +573,7 @@ export function ColumnManager({ isOpen, onClose, projectId, projectTitle }: Colu
     setDeleteModal({ isOpen: false, columnId: '', columnTitle: '' });
   };
 
-  const handleAddColumn = (title: string = 'Neue Spalte') => {
+  const handleAddColumn = (title: string = (i18n.language === 'en' ? 'New Column' : 'Neue Spalte')) => {
     // Generate a unique ID for the new column to track it
     const tempId = 'temp_' + Date.now();
     setNewlyAddedColumnId(tempId);
@@ -670,7 +670,7 @@ export function ColumnManager({ isOpen, onClose, projectId, projectTitle }: Colu
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    Spalten organisieren
+                    {i18n.language === 'en' ? 'Organize Columns' : 'Spalten organisieren'}
               </h2>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                 {projectTitle} • {projectColumns.length} {projectColumns.length === 1 ? 'Spalte' : 'Spalten'}
@@ -715,10 +715,10 @@ export function ColumnManager({ isOpen, onClose, projectId, projectTitle }: Colu
                   <Columns className="w-8 h-8" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                  Keine Spalten vorhanden
+                  {i18n.language === 'en' ? 'No columns found' : 'Keine Spalten vorhanden'}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md">
-                  Erstellen Sie Ihre erste Spalte, um mit der Organisation Ihres Projekts zu beginnen.
+                  {i18n.language === 'en' ? 'Create your first column to start organizing your project.' : 'Erstellen Sie Ihre erste Spalte, um mit der Organisation Ihres Projekts zu beginnen.'}
                 </p>
                 <button
                   onClick={handleAddColumnClick}
@@ -726,7 +726,7 @@ export function ColumnManager({ isOpen, onClose, projectId, projectTitle }: Colu
                   style={{ backgroundColor: accentColor }}
                 >
                   <Plus className="w-5 h-5" />
-                  <span>Erste Spalte erstellen</span>
+                  <span>{i18n.language === 'en' ? 'Create first column' : 'Erste Spalte erstellen'}</span>
                 </button>
               </div>
             ) : (
@@ -774,12 +774,12 @@ export function ColumnManager({ isOpen, onClose, projectId, projectTitle }: Colu
           <div className="flex items-center justify-between p-8 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center space-x-4">
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                <span className="font-medium">{projectColumns.length}</span> von <span className="font-medium">10</span> Spalten verwendet
+                <span className="font-medium">{projectColumns.length}</span> {i18n.language === 'en' ? 'of' : 'von'} <span className="font-medium">10</span> {i18n.language === 'en' ? 'columns used' : 'Spalten verwendet'}
               </div>
               {projectColumns.length >= 8 && (
                 <div className="flex items-center space-x-2 px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 rounded-lg">
                   <AlertTriangle className="w-4 h-4" />
-                  <span className="text-sm font-medium">Limit fast erreicht</span>
+                  <span className="text-sm font-medium">{i18n.language === 'en' ? 'Limit almost reached' : 'Limit fast erreicht'}</span>
                 </div>
               )}
             </div>
@@ -789,7 +789,7 @@ export function ColumnManager({ isOpen, onClose, projectId, projectTitle }: Colu
                 onClick={onClose}
                 className="px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl font-medium transition-all duration-200 hover:scale-105"
               >
-                Schließen
+                {i18n.language === 'en' ? 'Close' : 'Schließen'}
               </button>
               <button
                 onClick={handleAddColumnClick}
@@ -798,7 +798,7 @@ export function ColumnManager({ isOpen, onClose, projectId, projectTitle }: Colu
                 style={{ backgroundColor: projectColumns.length >= 10 ? '#9ca3af' : accentColor }}
               >
                 <Plus className="w-5 h-5" />
-                <span>Spalte hinzufügen</span>
+                <span>{i18n.language === 'en' ? 'Add column' : 'Spalte hinzufügen'}</span>
               </button>
             </div>
           </div>
@@ -810,10 +810,10 @@ export function ColumnManager({ isOpen, onClose, projectId, projectTitle }: Colu
         isOpen={deleteModal.isOpen}
         onClose={() => setDeleteModal({ isOpen: false, columnId: '', columnTitle: '' })}
         onConfirm={handleConfirmDelete}
-        title="Spalte löschen"
-        message={`Möchten Sie die Spalte "${deleteModal.columnTitle}" wirklich löschen? Alle Aufgaben in dieser Spalte werden zur ersten verfügbaren Spalte verschoben.`}
+        title={i18n.language === 'en' ? 'Delete column' : 'Spalte löschen'}
+        message={`${i18n.language === 'en' ? 'Are you sure you want to delete the column "' : 'Möchten Sie die Spalte "'} ${deleteModal.columnTitle} ${i18n.language === 'en' ? '"? All tasks in this column will be moved to the first available column.' : '"? Alle Aufgaben in dieser Spalte werden zur ersten verfügbaren Spalte verschoben.'}`}
         itemName={deleteModal.columnTitle}
-        warningText="Diese Aktion kann nicht rückgängig gemacht werden."
+        warningText={i18n.language === 'en' ? 'This action cannot be undone.' : 'Diese Aktion kann nicht rückgängig gemacht werden.'}
       />
     </>,
     document.body
