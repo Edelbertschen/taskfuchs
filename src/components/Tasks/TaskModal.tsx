@@ -111,6 +111,8 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
   const [showMarkdownHelp, setShowMarkdownHelp] = useState(false);
   const [notesSearchQuery, setNotesSearchQuery] = useState('');
   const [isDescriptionPreview, setIsDescriptionPreview] = useState(false);
+  const [descriptionHeight, setDescriptionHeight] = useState(300);
+  const descriptionResizeRef = useRef<HTMLDivElement>(null);
   
   // Collapsible sections state - auto-expand if content exists
   const [isSubtasksExpanded, setIsSubtasksExpanded] = useState(false);
