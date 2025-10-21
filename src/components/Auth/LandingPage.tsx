@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronDown, Zap, BarChart3, Target, Clock } from 'lucide-react';
 
 interface LandingPageProps {
@@ -8,6 +9,7 @@ interface LandingPageProps {
 export function LandingPage({ onGuestLogin }: LandingPageProps) {
   const [scrollY, setScrollY] = React.useState(0);
   const [isTransitioning, setIsTransitioning] = React.useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -96,14 +98,19 @@ export function LandingPage({ onGuestLogin }: LandingPageProps) {
               }`}>
                 TaskFuchs
               </h1>
+              <p className={`text-xl md:text-2xl font-light transition-all duration-1200 ${
+                isTransitioning ? 'text-gray-300' : 'text-gray-600 dark:text-gray-300'
+              }`}>
+                {t('landing_page.tagline')}
+              </p>
 
               {/* Features - Icons transition color */}
               <div className="space-y-5">
                 {[
-                  { icon: Zap, title: 'Smart Parsing', desc: 'Erstelle Tasks mit natürlicher Sprache' },
-                  { icon: BarChart3, title: 'Produktivitäts Analytics', desc: 'Verstehe deine Arbeitsweise' },
-                  { icon: Target, title: 'Focus Mode', desc: 'Konzentriere dich auf das Wesentliche' },
-                  { icon: Clock, title: 'Integrierter Timer', desc: 'Pomodoro & Zeiterfassung' }
+                  { icon: Zap, title: t('landing_page.features.smart_parsing.title'), desc: t('landing_page.features.smart_parsing.desc') },
+                  { icon: BarChart3, title: t('landing_page.features.analytics.title'), desc: t('landing_page.features.analytics.desc') },
+                  { icon: Target, title: t('landing_page.features.focus.title'), desc: t('landing_page.features.focus.desc') },
+                  { icon: Clock, title: t('landing_page.features.timer.title'), desc: t('landing_page.features.timer.desc') }
                 ].map((feature, idx) => {
                   const Icon = feature.icon;
                   return (
@@ -171,7 +178,7 @@ export function LandingPage({ onGuestLogin }: LandingPageProps) {
                 ? 'text-gray-100' 
                 : 'text-gray-900 dark:text-white'
             }`}>
-              Warum <span className={`transition-all duration-1200 ${
+              {t('landing_page.why_section')} <span className={`transition-all duration-1200 ${
                 isTransitioning ? 'text-orange-400' : 'text-orange-500'
               }`}>TaskFuchs</span>?
             </h2>

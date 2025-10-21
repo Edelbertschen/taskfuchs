@@ -1614,5 +1614,46 @@
     "settings": "Settings",
     "user_guide": "User Guide",
     "onboarding_tour": "Onboarding Tour"
+  },
+  "landing_page": {
+    "tagline": "Intelligent Task Management",
+    "features": {
+      "smart_parsing": {
+        "title": "Smart Parsing",
+        "desc": "Create tasks with natural language"
+      },
+      "analytics": {
+        "title": "Productivity Analytics",
+        "desc": "Understand your working style"
+      },
+      "focus": {
+        "title": "Focus Mode",
+        "desc": "Concentrate on what matters"
+      },
+      "timer": {
+        "title": "Integrated Timer",
+        "desc": "Pomodoro & Time Tracking"
+      }
+    },
+    "why_section": "Why TaskFuchs?",
+    "intuitive": {
+      "title": "Intuitive",
+      "desc": "Designed for simplicity and elegance"
+    },
+    "productive": {
+      "title": "Productive",
+      "desc": "Build better habits and workflows"
+    },
+    "private": {
+      "title": "Private",
+      "desc": "Your data stays with you"
+    },
+    "ready_section": "Ready for better productivity?",
+    "start_app": "Start App",
+    "credits_1": "Photo by",
+    "credits_2": "on",
+    "unsplash": "Unsplash",
+    "pixabay": "Pixabay",
+    "footer": "© 2025 TaskFuchs. All rights reserved."
   }
 }

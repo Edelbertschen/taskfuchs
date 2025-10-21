@@ -2182,5 +2182,46 @@
     "tags": "Tags",
     "notes": "Notizen",
     "entries": "Einträge"
+  },
+  "landing_page": {
+    "tagline": "Schlaues Aufgabenmanagement",
+    "features": {
+      "smart_parsing": {
+        "title": "Smart Parsing",
+        "desc": "Erstelle Tasks mit natürlicher Sprache"
+      },
+      "analytics": {
+        "title": "Produktivitäts Analytics",
+        "desc": "Verstehe deine Arbeitsweise"
+      },
+      "focus": {
+        "title": "Focus Mode",
+        "desc": "Konzentriere dich auf das Wesentliche"
+      },
+      "timer": {
+        "title": "Integrierter Timer",
+        "desc": "Pomodoro & Zeiterfassung"
+      }
+    },
+    "why_section": "Warum TaskFuchs?",
+    "intuitive": {
+      "title": "Intuitiv",
+      "desc": "Entwickelt für Einfachheit und Eleganz"
+    },
+    "productive": {
+      "title": "Produktiv",
+      "desc": "Bessere Gewohnheiten und Arbeitsabläufe aufbauen"
+    },
+    "private": {
+      "title": "Privat",
+      "desc": "Deine Daten bleiben bei dir"
+    },
+    "ready_section": "Bereit für bessere Produktivität?",
+    "start_app": "App Starten",
+    "credits_1": "Foto von",
+    "credits_2": "auf",
+    "unsplash": "Unsplash",
+    "pixabay": "Pixabay",
+    "footer": "© 2025 TaskFuchs. Alle Rechte vorbehalten."
   }
 }
