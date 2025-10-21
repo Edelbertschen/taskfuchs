@@ -2896,6 +2896,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                       <div
                         onMouseDown={handleDescriptionResize}
                         className="absolute bottom-0 right-0 w-5 h-5 cursor-se-resize group/resize hover:bg-blue-400/20 dark:hover:bg-blue-400/20 rounded-tl transition-all"
+                        style={{ pointerEvents: 'auto', zIndex: 10 }}
                         title="Größe ändern"
                       >
                         <div className="absolute bottom-0 right-0 w-5 h-5 flex items-center justify-center opacity-50 group-hover/resize:opacity-100 transition-opacity">
@@ -2907,43 +2908,43 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                      </div>
                    ) : (
                     <div 
-                      className="relative transition-none w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-accent overflow-y-auto group"
+                      className="relative transition-none w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-accent group"
                       onClick={(e) => {
                         // Only close if clicking on the background, not on content
                         if (e.currentTarget === e.target || e.target === e.currentTarget) {
                           setIsDescriptionPreviewMode(true);
                         }
                       }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Escape') {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setIsDescriptionPreviewMode(true);
+                          setIsDescriptionExpanded(false);
+                        }
+                      }}
                       style={{
                         height: `${descriptionHeight}px`,
-                        animation: 'fadeInEditMode 0.3s ease-out'
+                        animation: 'fadeInEditMode 0.3s ease-out',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        overflow: 'hidden'
                       }}>
-                      <div 
-                        onKeyDown={(e) => {
-                          if (e.key === 'Escape') {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setIsDescriptionPreviewMode(true);
-                            setIsDescriptionExpanded(false);
-                          }
+                      <WysiwygEditor
+                        value={formData.description}
+                        onChange={(value) => {
+                          setFormData(prev => ({ ...prev, description: value }));
+                          setHasUnsavedChanges(true);
                         }}
-                      >
-                        <WysiwygEditor
-                          value={formData.description}
-                          onChange={(value) => {
-                            setFormData(prev => ({ ...prev, description: value }));
-                            setHasUnsavedChanges(true);
-                          }}
-                          placeholder={taskModal.descriptionPlaceholder()}
-                          className="h-full w-full"
-                          useFullHeight={true}
-                          showToolbar={true}
-                          onClickOutside={() => {
-                            setIsDescriptionPreviewMode(true);
-                            setIsDescriptionExpanded(false);
-                          }}
-                        />
-                      </div>
+                        placeholder={taskModal.descriptionPlaceholder()}
+                        className="h-full w-full flex-1"
+                        useFullHeight={true}
+                        showToolbar={true}
+                        onClickOutside={() => {
+                          setIsDescriptionPreviewMode(true);
+                          setIsDescriptionExpanded(false);
+                        }}
+                      />
                       <button
                         onClick={() => {
                           setIsDescriptionPreviewMode(true);
@@ -2958,6 +2959,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                       <div
                         onMouseDown={handleDescriptionResize}
                         className="absolute bottom-0 right-0 w-5 h-5 cursor-se-resize group/resize hover:bg-blue-400/20 dark:hover:bg-blue-400/20 rounded-tl transition-all"
+                        style={{ pointerEvents: 'auto', zIndex: 10 }}
                         title="Größe ändern"
                       >
                         <div className="absolute bottom-0 right-0 w-5 h-5 flex items-center justify-center opacity-50 group-hover/resize:opacity-100 transition-opacity">
