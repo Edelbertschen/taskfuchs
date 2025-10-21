@@ -198,8 +198,6 @@ function ColumnSwitcher({
 // Main App Component (authenticated users)
 function MainApp() {
   const [currentView, setCurrentView] = React.useState('today');
-  const [showSplash, setShowSplash] = React.useState(true);
-  const [splashOpacity, setSplashOpacity] = React.useState(1);
   const [previousView, setPreviousView] = React.useState<string | null>(null);
   const [isTransitioning, setIsTransitioning] = React.useState(false);
   const [transitionDirection, setTransitionDirection] = React.useState<'left' | 'right'>('right');
@@ -218,13 +216,6 @@ function MainApp() {
   
   const { state, dispatch } = useApp();
   const { t, i18n } = useTranslation();
-
-  React.useEffect(() => {
-    // Show splash screen for longer to see the animation
-    const t1 = setTimeout(() => setSplashOpacity(0), 2000);
-    const t2 = setTimeout(() => setShowSplash(false), 2700);
-    return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, []);
 
   // Ensure i18n reflects stored preference (single source of truth)
   React.useEffect(() => {
@@ -790,128 +781,6 @@ function MainApp() {
       className={`w-full h-full flex flex-col relative ${state.isBulkMode ? 'bulk-mode-active' : ''}`}
       style={backgroundStyles}
     >
-      {showSplash && (
-        <div 
-          className="fixed inset-0 z-[1000] flex flex-col items-center justify-center pointer-events-none overflow-hidden"
-          data-version="splash-v3-20251021-120000"
-          style={{ 
-            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #0f1729 50%, #1a2332 75%, #0f172a 100%)',
-            opacity: splashOpacity, 
-            transition: 'opacity 700ms ease',
-            backdropFilter: 'blur(10px)'
-          }}>
-          
-          {/* Animated background elements */}
-          <div 
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: 'radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%)',
-              animation: 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-            }}
-          />
-          <div 
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: 'radial-gradient(circle at 80% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%)',
-              animation: 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite 2s'
-            }}
-          />
-          
-          {/* Main content */}
-          <div className="relative z-10 flex flex-col items-center justify-center space-y-6">
-            {/* Fox image with glow effect */}
-            <div className="relative">
-              <div 
-                className="absolute inset-0 rounded-full blur-3xl pointer-events-none"
-                style={{
-                  background: 'radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%)',
-                  width: '500px',
-                  height: '500px',
-                  left: '-50px',
-                  top: '-50px'
-                }}
-              />
-              <img
-                src="/3d_fox.png"
-                alt="TaskFuchs"
-                style={{
-                  width: '400px',
-                  height: '400px',
-                  minWidth: '400px',
-                  minHeight: '400px',
-                  maxWidth: '400px',
-                  maxHeight: '400px',
-                  flexShrink: 0,
-                  flexGrow: 0,
-                  filter: 'drop-shadow(0 20px 40px rgba(59, 130, 246, 0.3)) drop-shadow(0 0px 20px rgba(139, 92, 246, 0.2))',
-                  opacity: 1,
-                  position: 'relative',
-                  zIndex: 10
-                }}
-              />
-            </div>
-            
-            {/* Text - TaskFuchs */}
-            <div className="text-center space-y-3 mt-8">
-              <h1 
-                className="text-5xl font-bold tracking-tight"
-                style={{
-                  background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #3b82f6 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                  letterSpacing: '0.05em',
-                  textShadow: 'none',
-                  fontSize: '3.5rem',
-                  fontWeight: '700',
-                  marginTop: '2rem'
-                }}
-              >
-                TaskFuchs
-              </h1>
-              
-              {/* Subtitle with animation */}
-              <p 
-                className="text-base font-light tracking-widest"
-                style={{
-                  color: 'rgba(148, 163, 184, 0.8)',
-                  animation: 'fadeInUp 1s ease-out 0.5s both',
-                  letterSpacing: '0.15em',
-                  textTransform: 'uppercase'
-                }}
-              >
-                Smart Task Management
-              </p>
-            </div>
-          </div>
-          
-          {/* Bottom accent line */}
-          <div 
-            className="absolute bottom-0 left-0 right-0 h-1"
-            style={{
-              background: 'linear-gradient(90deg, transparent, #3b82f6, #8b5cf6, transparent)',
-              opacity: 0.5
-            }}
-          />
-        </div>
-      )}
-      
-      <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 0.5; }
-          50% { opacity: 1; }
-        }
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
       
       {/* Background Image with optional Blur - Behind everything */}
       {!isMinimalDesign && shouldShowBackground && backgroundType === 'image' && resolvedBackgroundImage && (

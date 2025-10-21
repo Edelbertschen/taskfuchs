@@ -53,7 +53,10 @@ export function WelcomeScreen({ onGuestMode }: WelcomeScreenProps) {
   if (authMode === 'login') {
     return (
       <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4 transition-opacity duration-200 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}>
-        <LandingPage onGuestLogin={handleGuestMode} />
+        <LoginForm
+          onSwitchToRegister={() => handleModeChange('register')}
+          onGuestMode={handleGuestMode}
+        />
       </div>
     );
   }
@@ -61,18 +64,17 @@ export function WelcomeScreen({ onGuestMode }: WelcomeScreenProps) {
   if (authMode === 'register') {
     return (
       <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4 transition-opacity duration-200 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}>
-        <LandingPage onGuestLogin={handleGuestMode} />
+        <RegisterForm
+          onSwitchToLogin={() => handleModeChange('login')}
+          onGuestMode={handleGuestMode}
+        />
       </div>
     );
   }
 
   // Only show landing page for web apps, not desktop apps
   if (!isDesktopApp) {
-    return (
-      <div className={`transition-opacity duration-200 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}>
-        <LandingPage onGuestLogin={handleGuestMode} />
-      </div>
-    );
+    return <LandingPage onGuestLogin={handleGuestMode} />;
   }
 
   // This should not happen in desktop apps due to the useEffect above,
