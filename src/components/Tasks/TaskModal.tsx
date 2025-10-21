@@ -2794,9 +2794,12 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                 <div className="relative">
                   {/* Header with close button */}
                   <div className="flex items-center justify-between mb-2">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Description
-                    </label>
+                    <div className="flex items-center space-x-2">
+                      <BookOpen className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Description
+                      </label>
+                    </div>
                     {!isDescriptionPreviewMode && (
                       <button
                         onClick={() => {
@@ -2813,9 +2816,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
 
                   {/* Single unified editor/preview frame */}
                   <div 
-                    className={`relative w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-accent ${
-                      isDescriptionPreviewMode ? 'bg-white/80 dark:bg-gray-800/50 backdrop-blur-lg' : 'bg-white dark:bg-gray-800'
-                    } transition-colors duration-200 overflow-hidden group resize-y ${
+                    className={`relative w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-accent bg-white/80 dark:bg-gray-800/50 backdrop-blur-lg overflow-hidden group resize-y ${
                       isDescriptionExpanded ? 'h-[calc(100vh-300px)]' : 'h-auto min-h-24 max-h-96'
                     }`}
                     style={{
@@ -3818,31 +3819,30 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                 <span>Delete</span>
               </button>
 
-              {/* Completion Button - Center */}
-              <button
-                onClick={task?.completed ? handleToggleComplete : handleCompleteAndClose}
-                className="flex items-center space-x-2 px-5 py-3 text-sm font-medium text-white rounded-xl transition-all duration-200 hover:scale-105 shadow-lg hover:opacity-90"
-                style={{ backgroundColor: state.preferences.accentColor }}
-                title={task?.completed ? 'Als nicht erledigt markieren' : 'Aufgabe abhaken und schließen'}
-              >
-                <CheckSquare className="w-5 h-5 text-white" />
-                <span>
-                  {task?.completed ? 'Aufgabe unerledigt' : 'Task completed'}
-                </span>
-              </button>
-
-              {/* Save/Cancel - Right Side */}
+              {/* Action Buttons - Right Side */}
               <div className="flex items-center space-x-2 sm:space-x-3">
                 <button
                   onClick={handleClose}
-                  className="px-5 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
                   Cancel
                 </button>
+                
+                {/* Task Completed Button */}
+                <button
+                  onClick={task?.completed ? handleToggleComplete : handleCompleteAndClose}
+                  className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white rounded-lg transition-all duration-200 hover:opacity-90"
+                  style={{ backgroundColor: state.preferences.accentColor }}
+                  title={task?.completed ? 'Mark as incomplete' : 'Mark task completed'}
+                >
+                  <CheckSquare className="w-4 h-4" />
+                  <span>{task?.completed ? 'Incomplete' : 'Task completed'}</span>
+                </button>
+                
                 <button
                   onClick={handleSave}
                   disabled={!hasUnsavedChanges}
-                  className="flex items-center space-x-2 px-5 py-2 disabled:bg-gray-400 text-white rounded-lg transition-colors disabled:cursor-not-allowed hover:opacity-90"
+                  className="flex items-center space-x-2 px-4 py-2 disabled:bg-gray-400 text-white text-sm rounded-lg transition-colors disabled:cursor-not-allowed hover:opacity-90"
                   style={hasUnsavedChanges ? getAccentColorStyles().bg : {}}
                 >
                   <Save className="w-4 h-4" />
