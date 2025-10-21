@@ -2747,23 +2747,27 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                     Priorität
                   </label>
-                  <div className="flex space-x-2">
+                  <div className="flex gap-2">
                     {[
-                      { value: 'none', label: taskModal.priorityNone(), color: 'gray' },
-                      { value: 'low', label: 'Niedrig', color: 'green' },
-                      { value: 'medium', label: 'Mittel', color: 'yellow' },
-                      { value: 'high', label: 'Hoch', color: 'red' }
+                      { value: 'none', label: taskModal.priorityNone(), colorBg: 'rgba(107, 114, 128, 0.1)', colorBorder: 'rgb(107, 114, 128)', icon: '◯' },
+                      { value: 'low', label: 'Niedrig', colorBg: 'rgba(34, 197, 94, 0.1)', colorBorder: 'rgb(34, 197, 94)', icon: '▲' },
+                      { value: 'medium', label: 'Mittel', colorBg: 'rgba(234, 179, 8, 0.1)', colorBorder: 'rgb(234, 179, 8)', icon: '◆' },
+                      { value: 'high', label: 'Hoch', colorBg: 'rgba(239, 68, 68, 0.1)', colorBorder: 'rgb(239, 68, 68)', icon: '★' }
                     ].map((priority) => (
                       <button
                         key={priority.value}
                         onClick={() => setFormData(prev => ({ ...prev, priority: priority.value as any }))}
-                        className={`px-4 py-2 text-xs font-medium rounded-full border transition-all ${
-                          formData.priority === priority.value
-                            ? getPriorityColor(priority.value)
-                            : getPriorityColorLight(priority.value)
-                        }`}
+                        className="relative group px-3 py-1.5 rounded-md text-sm transition-all duration-200 cursor-pointer hover:scale-105"
+                        style={{
+                          backgroundColor: formData.priority === priority.value ? priority.colorBg : 'transparent',
+                          borderLeft: `2px solid ${formData.priority === priority.value ? priority.colorBorder : 'transparent'}`,
+                          opacity: formData.priority === priority.value ? '1' : '0.5',
+                          paddingLeft: formData.priority === priority.value ? '12px' : '14px'
+                        }}
+                        title={priority.label}
                       >
-                        {priority.label}
+                        <span className="text-base">{priority.icon}</span>
+                        <span className="hidden sm:inline text-xs ml-1.5">{priority.label}</span>
                       </button>
                     ))}
                   </div>
@@ -2827,7 +2831,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                       )}
                      </div>
                    ) : (
-                    <div className={`transition-all duration-500 w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-accent overflow-hidden ${
+                    <div className={`relative transition-all duration-500 w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-accent overflow-hidden group ${
                       isDescriptionExpanded ? 'h-[calc(100vh-300px)]' : 'h-48'
                     }`}
                     style={{
@@ -2845,6 +2849,13 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                         showToolbar={true}
                         onClickOutside={() => setIsDescriptionPreviewMode(true)}
                       />
+                      <button
+                        onClick={() => setIsDescriptionPreviewMode(true)}
+                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
+                        title="Schließen"
+                      >
+                        <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                      </button>
                     </div>
                   )}
                 </div>
