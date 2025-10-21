@@ -2814,41 +2814,31 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                     )}
                   </div>
 
-                  {/* Single unified editor/preview frame */}
-                  <div 
-                    className={`relative w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-accent bg-white/80 dark:bg-gray-800/50 backdrop-blur-lg overflow-hidden group resize-y ${
-                      isDescriptionExpanded ? 'h-[calc(100vh-300px)]' : 'h-auto min-h-24 max-h-96'
-                    }`}
-                    style={{
-                      animation: !isDescriptionPreviewMode ? 'fadeInEditMode 0.3s ease-out' : 'none'
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Escape' && !isDescriptionPreviewMode) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setIsDescriptionPreviewMode(true);
-                        setIsDescriptionExpanded(false);
-                      }
-                    }}
-                  >
-                    {/* Resize handle - bottom right corner */}
-                    {isDescriptionPreviewMode && formData.description?.trim() && (
-                      <div className="absolute bottom-0 right-0 text-gray-300 dark:text-gray-600 cursor-se-resize p-2 opacity-50 hover:opacity-100 transition-opacity" title="Resize">
-                        <GripVertical className="w-4 h-4" />
-                      </div>
-                    )}
+                  {/* Preview Mode - Clean, minimal */}
+                  {isDescriptionPreviewMode && (
+                    <div 
+                      className={`relative w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white/80 dark:bg-gray-800/50 backdrop-blur-lg overflow-hidden group resize-y cursor-text ${
+                        isDescriptionExpanded ? 'h-[calc(100vh-300px)]' : 'h-auto min-h-24 max-h-96'
+                      }`}
+                      onClick={() => setIsDescriptionPreviewMode(false)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Escape') {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setIsDescriptionPreviewMode(true);
+                          setIsDescriptionExpanded(false);
+                        }
+                      }}
+                    >
+                      {/* Resize handle */}
+                      {formData.description?.trim() && (
+                        <div className="absolute bottom-0 right-0 text-gray-300 dark:text-gray-600 cursor-se-resize p-2 opacity-50 hover:opacity-100 transition-opacity pointer-events-auto" title="Resize">
+                          <GripVertical className="w-4 h-4" />
+                        </div>
+                      )}
 
-                    {/* Content area - no nested scrolling */}
-                    {isDescriptionPreviewMode ? (
-                      <div 
-                        className={`text-gray-900 dark:text-white text-sm leading-relaxed p-4 wysiwyg-content cursor-text overflow-y-auto max-h-96 ${
-                          !formData.description?.trim() ? 'flex items-center justify-center' : ''
-                        }`}
-                        onClick={() => {
-                          setIsDescriptionPreviewMode(false);
-                        }}
-                        title="Click to edit"
-                      >
+                      {/* Content */}
+                      <div className="text-gray-900 dark:text-white text-sm leading-relaxed p-4 wysiwyg-content overflow-y-auto max-h-96">
                         {!formData.description?.trim() && (
                           <span className="text-gray-400 dark:text-gray-500 text-sm italic opacity-60">
                             {taskModal.descriptionPlaceholder() || 'Click to edit...'}
@@ -2864,7 +2854,27 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                           />
                         )}
                       </div>
-                    ) : (
+                    </div>
+                  )}
+
+                  {/* Edit Mode - Full editor */}
+                  {!isDescriptionPreviewMode && (
+                    <div 
+                      className={`relative w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-accent bg-white dark:bg-gray-800 overflow-hidden group resize-y ${
+                        isDescriptionExpanded ? 'h-[calc(100vh-300px)]' : 'h-auto min-h-32 max-h-96'
+                      }`}
+                      style={{
+                        animation: 'fadeInEditMode 0.3s ease-out'
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Escape') {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setIsDescriptionPreviewMode(true);
+                          setIsDescriptionExpanded(false);
+                        }
+                      }}
+                    >
                       <WysiwygEditor
                         value={formData.description}
                         onChange={(value) => {
@@ -2880,8 +2890,8 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                           setIsDescriptionExpanded(false);
                         }}
                       />
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Subtasks - Collapsible */}
