@@ -2813,10 +2813,11 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
 
                   {/* Single unified editor/preview frame */}
                   <div 
+                    ref={descriptionContainerRef}
                     className={`relative w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-accent ${
                       isDescriptionPreviewMode ? 'bg-white/80 dark:bg-gray-800/50 backdrop-blur-lg' : 'bg-white dark:bg-gray-800'
-                    } transition-all duration-300 overflow-hidden group resize-y ${
-                      isDescriptionExpanded ? 'h-[calc(100vh-300px)]' : 'max-h-96'
+                    } transition-colors duration-200 overflow-hidden group resize-y ${
+                      isDescriptionExpanded ? 'h-[calc(100vh-300px)]' : 'h-auto min-h-24 max-h-96'
                     }`}
                     style={{
                       animation: !isDescriptionPreviewMode ? 'fadeInEditMode 0.3s ease-out' : 'none'
@@ -2830,75 +2831,56 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                       }
                     }}
                   >
-                    {/* Toolbar buttons for edit mode */}
-                    {!isDescriptionPreviewMode && (
-                      <div className="absolute top-2 right-2 z-20 flex gap-1">
-                        <button
-                          onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                          className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
-                          title={isDescriptionExpanded ? taskModal.descriptionCollapse() : taskModal.descriptionExpand()}
-                        >
-                          {isDescriptionExpanded ? (
-                            <Minimize className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                          ) : (
-                            <Maximize className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                          )}
-                        </button>
-                      </div>
-                    )}
-
-                    {/* Resize handle */}
+                    {/* Resize handle - bottom right corner */}
                     {isDescriptionPreviewMode && formData.description?.trim() && (
-                      <div className="absolute bottom-1 right-1 text-gray-300 dark:text-gray-600 cursor-se-resize p-1" title="Größe ändern">
-                        <GripVertical className="w-3 h-3" />
+                      <div className="absolute bottom-0 right-0 text-gray-300 dark:text-gray-600 cursor-se-resize p-2 opacity-50 hover:opacity-100 transition-opacity" title="Größe ändern">
+                        <GripVertical className="w-4 h-4" />
                       </div>
                     )}
 
-                    {/* Content area */}
-                    <div className="overflow-y-auto h-full custom-scrollbar pt-2">
-                      {isDescriptionPreviewMode ? (
-                        <div 
-                          className={`text-gray-900 dark:text-white text-sm leading-relaxed p-4 wysiwyg-content ${
-                            !formData.description?.trim() ? 'flex items-center justify-center h-full' : ''
-                          }`}
-                          onClick={() => {
-                            setIsDescriptionPreviewMode(false);
-                          }}
-                          title={!formData.description?.trim() ? 'Klicken zum Bearbeiten' : 'Klicken zum Bearbeiten'}
-                        >
-                          {!formData.description?.trim() && (
-                            <span className="text-gray-400 dark:text-gray-500 text-sm italic opacity-60">
-                              {taskModal.descriptionPlaceholder() || 'Click to edit...'}
-                            </span>
-                          )}
-                          {formData.description?.trim() && (
-                            <MarkdownRenderer 
-                              content={formData.description}
-                              onCheckboxChange={(newDescription) => {
-                                setFormData(prev => ({ ...prev, description: newDescription }));
-                                setHasUnsavedChanges(true);
-                              }}
-                            />
-                          )}
-                        </div>
-                      ) : (
-                        <WysiwygEditor
-                          value={formData.description}
-                          onChange={(value) => {
-                            setFormData(prev => ({ ...prev, description: value }));
-                            setHasUnsavedChanges(true);
-                          }}
-                          placeholder={taskModal.descriptionPlaceholder()}
-                          className="h-full w-full p-4"
-                          useFullHeight={true}
-                          showToolbar={true}
-                          onClickOutside={() => {
-                            setIsDescriptionPreviewMode(true);
-                            setIsDescriptionExpanded(false);
-                          }}
-                        />
-                      )}
-                    </div>
+                    {/* Content area - no nested scrolling */}
+                    {isDescriptionPreviewMode ? (
+                      <div 
+                        className={`text-gray-900 dark:text-white text-sm leading-relaxed p-4 wysiwyg-content cursor-text overflow-y-auto max-h-96 ${
+                          !formData.description?.trim() ? 'flex items-center justify-center' : ''
+                        }`}
+                        onClick={() => {
+                          setIsDescriptionPreviewMode(false);
+                        }}
+                        title={!formData.description?.trim() ? 'Klicken zum Bearbeiten' : 'Klicken zum Bearbeiten'}
+                      >
+                        {!formData.description?.trim() && (
+                          <span className="text-gray-400 dark:text-gray-500 text-sm italic opacity-60">
+                            {taskModal.descriptionPlaceholder() || 'Click to edit...'}
+                          </span>
+                        )}
+                        {formData.description?.trim() && (
+                          <MarkdownRenderer 
+                            content={formData.description}
+                            onCheckboxChange={(newDescription) => {
+                              setFormData(prev => ({ ...prev, description: newDescription }));
+                              setHasUnsavedChanges(true);
+                            }}
+                          />
+                        )}
+                      </div>
+                    ) : (
+                      <WysiwygEditor
+                        value={formData.description}
+                        onChange={(value) => {
+                          setFormData(prev => ({ ...prev, description: value }));
+                          setHasUnsavedChanges(true);
+                        }}
+                        placeholder={taskModal.descriptionPlaceholder()}
+                        className="h-full w-full p-4"
+                        useFullHeight={true}
+                        showToolbar={true}
+                        onClickOutside={() => {
+                          setIsDescriptionPreviewMode(true);
+                          setIsDescriptionExpanded(false);
+                        }}
+                      />
+                    )}
                   </div>
                 </div>
 
