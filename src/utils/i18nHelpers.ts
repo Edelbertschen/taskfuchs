@@ -114,5 +114,13 @@ export const useAppTranslation = () => {
     microsoftAuthModal: createNamespaceWrapper('microsoft_auth_modal'),
     floatingAddButton: createNamespaceWrapper('floating_add_button'),
     tasks: createNamespaceWrapper('tasks'),
+    settings_appearance: createNamespaceWrapper('settings_appearance'),
+  settings_notes: createNamespaceWrapper('settings_notes'),
+  settings_sidebar: createNamespaceWrapper('settings_sidebar'),
+  settings_notifications: createNamespaceWrapper('settings_notifications'),
+  settings_timer: createNamespaceWrapper('settings_timer'),
+  settings_information: createNamespaceWrapper('settings_information'),
+  settings_data: createNamespaceWrapper('settings_data'),
+  settings_sync: createNamespaceWrapper('settings_sync'),
   };
 }; 

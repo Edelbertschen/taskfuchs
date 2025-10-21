@@ -10,10 +10,12 @@ import {
   Circle
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { useAppTranslation } from '../../utils/i18nHelpers';
 import type { TaskPriority } from '../../types';
 
 export function ProjectKanbanFilters() {
   const { state, dispatch } = useApp();
+  const { common } = useAppTranslation();
   const { tags, viewState } = state;
   const [showPriorityFilter, setShowPriorityFilter] = useState(false);
   const [showTagFilter, setShowTagFilter] = useState(false);
@@ -98,13 +100,13 @@ export function ProjectKanbanFilters() {
   const getPriorityLabel = (priority: TaskPriority) => {
     switch (priority) {
       case 'high':
-        return 'Hoch';
+        return common.priority.high;
       case 'medium':
-        return 'Mittel';
+        return common.priority.medium;
       case 'low':
-        return 'Niedrig';
+        return common.priority.low;
       case 'none':
-        return 'Ohne Priorität';
+        return common.priority.none;
       default:
         return priority;
     }
@@ -126,7 +128,7 @@ export function ProjectKanbanFilters() {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <input
             type="text"
-            placeholder="Aufgaben durchsuchen..."
+            placeholder={common.searchPlaceholder}
             value={searchQuery}
             onChange={(e) => handleSearchChange(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -152,7 +154,7 @@ export function ProjectKanbanFilters() {
             }`}
           >
             <Filter className="w-4 h-4" />
-            <span className="text-sm font-medium">Priorität</span>
+            <span className="text-sm font-medium">{common.priority}</span>
             {priorityFilters.length > 0 && (
               <span className="bg-blue-600 text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center">
                 {priorityFilters.length}
@@ -197,7 +199,7 @@ export function ProjectKanbanFilters() {
             }`}
           >
             <Tag className="w-4 h-4" />
-            <span className="text-sm font-medium">Tags</span>
+            <span className="text-sm font-medium">{common.tags}</span>
             {tagFilters.length > 0 && (
               <span className="bg-blue-600 text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center">
                 {tagFilters.length}
@@ -230,7 +232,7 @@ export function ProjectKanbanFilters() {
                   ))
                 ) : (
                   <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
-                    Keine Tags verfügbar
+                    {common.noTagsAvailable}
                   </div>
                 )}
               </div>
@@ -248,7 +250,7 @@ export function ProjectKanbanFilters() {
           }`}
         >
           <CheckCircle className="w-4 h-4" />
-          <span className="text-sm font-medium">Erledigt</span>
+          <span className="text-sm font-medium">{common.completed()}</span>
         </button>
 
         {/* Clear All Filters */}
@@ -258,7 +260,7 @@ export function ProjectKanbanFilters() {
             className="flex items-center space-x-2 px-3 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
           >
             <X className="w-4 h-4" />
-            <span className="text-sm font-medium">Löschen</span>
+            <span className="text-sm font-medium">{common.clear_filters()}</span>
           </button>
         )}
       </div>
@@ -269,7 +271,7 @@ export function ProjectKanbanFilters() {
           {searchQuery && (
             <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
               <Search className="w-3 h-3 mr-1" />
-              "{searchQuery}"
+              {`${common.searchQuery}: "${searchQuery}"`}
               <button
                 onClick={() => handleSearchChange('')}
                 className="ml-1 text-blue-600 hover:text-blue-800"
@@ -314,7 +316,7 @@ export function ProjectKanbanFilters() {
           {showCompleted && (
             <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
               <CheckCircle className="w-3 h-3 mr-1" />
-              Erledigt anzeigen
+              {common.show_completed()}
               <button
                 onClick={handleShowCompletedToggle}
                 className="ml-1 text-green-600 hover:text-green-800"

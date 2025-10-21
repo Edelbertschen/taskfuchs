@@ -116,7 +116,7 @@
         "inbox_only_desc": "This task is only visible in inbox (no project or date assigned)"
       },
       "linked_tasks": "Linked Tasks",
-      "linked_projects": "Linked Projects", 
+      "linked_projects": "Linked Projects",
       "linked_notes": "Linked Notes",
       "linked_notes_more": "more",
       "remove_link": "Remove link",
@@ -189,7 +189,7 @@
   },
   "task_modal": {
     "description_expand": "Expand description",
-    "description_collapse": "Collapse description", 
+    "description_collapse": "Collapse description",
     "description_edit": "Edit description",
     "description_preview": "Show preview",
     "descriptionPlaceholder": "Description (optional)...",
@@ -209,7 +209,11 @@
     "close": "Close",
     "project_unknown": "Unknown project",
     "column_select": "Select column",
-    "time_management": "Time Management"
+    "time_management": "Time Management",
+    "new_column": "Create new column",
+    "column_name_placeholder": "Column name...",
+    "create": "Create",
+    "move_to_inbox": "Move to Inbox"
   },
   "tags": {
     "filter_by_tags": "Filter by tags",
@@ -256,7 +260,7 @@
     "includes_all_planned_tasks": "Includes all planned tasks with remaining time",
     "under_budget": "Under budget",
     "yearly_progress": "Yearly Progress",
-    "expected_progress": "Expected Progress", 
+    "expected_progress": "Expected Progress",
     "actual_progress": "Actual Progress",
     "expected_vs_actual": "Expected vs. Actual",
     "expected_label": "Expected",
@@ -316,6 +320,7 @@
     "yearly_utilization": "Yearly Utilization"
   },
   "common": {
+    "backup": "Backup",
     "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",
@@ -323,13 +328,15 @@
     "close": "Close",
     "loading": "Loading...",
     "error": "Error",
-          "success": "Success",
-          "confirm": "Confirm",
+    "success": "Success",
+    "confirm": "Confirm",
     "yes": "Yes",
     "no": "No",
     "completed": "completed",
     "reset": "Reset",
-    "locale": "en-US"
+    "locale": "en-US",
+    "show_completed": "Show completed",
+    "clear_filters": "Clear"
   },
   "settings": {
     "title": "Settings",
@@ -525,14 +532,14 @@
     "enter_delete_to_confirm": "Type 'DELETE' to confirm:",
     "placeholder_tag": "Add tag...",
     "custom_time_input": "Enter custom time",
-          "column_name_placeholder": "Enter column name...",
-      "placeholder_smart_task": "Enter new task...",
-      "placeholder_new_task": "Enter new task...",
-      "placeholder_quick_mode": "Enter next task... (ESC to exit)",
-      "quick_mode": "Quick Mode",
-      "parsing_error": "Parsing error",
-      "create_task_for_inbox": "Create task for Inbox...",
-      "create_task_for": "Create task for {{title}}...",
+    "column_name_placeholder": "Enter column name...",
+    "placeholder_smart_task": "Enter new task...",
+    "placeholder_new_task": "Enter new task...",
+    "placeholder_quick_mode": "Enter next task... (ESC to exit)",
+    "quick_mode": "Quick Mode",
+    "parsing_error": "Parsing error",
+    "create_task_for_inbox": "Create task for Inbox...",
+    "create_task_for": "Create task for {{title}}...",
     "create_new_task_for": "Create new task for {{title}}...",
     "set_reminder": "Set Reminder",
     "time_optional": "Time (optional)"
@@ -590,987 +597,398 @@
   },
   "headings": {
     "heading_1": "Heading 1",
-    "heading_2": "Heading 2", 
+    "heading_2": "Heading 2",
     "heading_3": "Heading 3"
   },
   "focus": {
-    "focus_time": "Focus Time",
-    "break_time": "Break Time",
-    "session_complete": "Session Complete",
-    "overtime": "Overtime"
+    "focus_mode": "Focus Mode",
+    "select_task": "Select Task",
+    "select_task_instruction": "Choose a task to get started",
+    "tasks_from_column": "{count} tasks available",
+    "all_tasks_completed": "All tasks completed!",
+    "all_tasks_finished": "Great! You've completed all tasks.",
+    "back_to_overview": "Back to Overview",
+    "exit_focus_mode": "Exit Focus Mode (ESC)",
+    "to_exit": "to exit"
   },
   "user_guide": {
-    "example_meeting": "Prepare meeting #work !! 1h30m @today note Create presentation",
-    "example_result": "→ Title: 'Prepare meeting', Tag: work, Priority: high, Time: 1.5h, Column: today, Description: 'Create presentation'",
-    "example_important": "**Important** Meeting #work #client !!! 2h @today note Prepare presentation and check [document](https://docs.com)",
-    "title": "User Guide",
-    "close": "Close",
     "welcome_title": "Welcome to TaskFuchs! 🦊",
+    "header_title": "User Guide",
+    "header_subtitle": "TaskFuchs Help & Documentation",
+    "close": "Close",
+    "tip_text": "💡 Tip: Press",
+    "tip_to_open": "to open this help",
     "sections": {
       "overview": {
         "title": "Overview",
-        "subtitle": "TaskFuchs is your intelligent productivity app for tasks, notes and projects.",
-        "description": "This guide shows you all features and how to use them optimally.",
+        "subtitle": "Discover what makes TaskFuchs special",
+        "description": "TaskFuchs is a comprehensive task management system with an integrated timer, smart parsing, kanban boards, and much more.",
         "features": {
           "tasks": {
-            "title": "Tasks",
-            "description": "Organize your tasks with priorities, tags, subtasks and reminders."
+            "title": "Task Management",
+            "description": "Create, organize, and track tasks with priorities, due dates, and custom tags."
           },
           "notes": {
-            "title": "Notes",
-            "description": "Create markdown notes with linked tasks and daily notes."
+            "title": "Notes & Templates",
+            "description": "Write rich markdown notes with daily templates and auto-formatting."
           },
           "kanban": {
-            "title": "Kanban",
-            "description": "Visualize your workflow with customizable kanban boards."
+            "title": "Kanban Boards",
+            "description": "Visualize your work with customizable kanban boards and project management."
           },
           "timer": {
-            "title": "Timer",
-            "description": "Track your time with integrated timer and pomodoro technique."
+            "title": "Integrated Timer",
+            "description": "Built-in Pomodoro timer with sound effects and white noise."
           },
           "pins": {
-            "title": "Pins",
-            "description": "Pin important tasks for flexible column management."
+            "title": "Quick Access Pins",
+            "description": "Pin your most important tasks for easy access at a glance."
           },
           "emails": {
-            "title": "Emails",
-            "description": "Import and manage important emails directly in TaskFuchs."
+            "title": "Email Integration",
+            "description": "Import emails directly as tasks and stay organized."
           }
         }
-      },
-      "tasks_guide": {
-        "title": "Tasks",
-        "heading": "Managing Tasks",
-        "description": "TaskFuchs provides powerful tools for task management.",
-        "create_new": {
-          "title": "Create new task",
-          "items": [
-            "Click the + button or use N or ⌘ N",
-            "Use Smart Task Input for quick entry: \"Shopping #personal !high tomorrow 15:00\"",
-            "Add descriptions in Markdown",
-            "Set priorities: None, Low, Medium, High"
-          ]
-        },
-        "edit": {
-          "title": "Edit tasks",
-          "items": [
-            "Right-click on a task opens the context menu",
-            "Double-click opens the task detail modal",
-            "Drag & drop to move between columns",
-            "Start timer by clicking the timer icon"
-          ]
-        },
-        "organization": {
-          "title": "Task organization",
-          "items": [
-            "Organize tasks in columns by date or project",
-            "Use tags for categorization",
-            "Set priorities for important tasks",
-            "Use time estimates for better planning"
-          ]
-        }
-      },
-      "smart_input": {
-        "title": "Smart Input",
-        "heading": "⚡ Smart Task Input",
-        "description": "With Smart Task Input you can create tasks lightning-fast with all details in one line. The AI automatically recognizes priorities, tags, times and more.",
-        "example_basic": "\"Prepare meeting #work !! 1h30m @today note Create presentation\"",
-        "example_result": "→ Title: \"Prepare meeting\", Tag: work, Priority: high, Time: 1.5h, Column: today, Description: \"Create presentation\"",
-        "priorities": {
-          "title": "Priorities",
-          "low": "Low priority",
-          "medium": "Medium priority",
-          "high": "High priority",
-          "note": "Also in German: \"niedrig\", \"mittel\", \"hoch\""
-        },
-        "tags": {
-          "title": "Tags & Categories",
-          "single": "Single tag",
-          "multiple": "Multiple tags",
-          "popular": "Popular tags",
-          "warning": "Tags need a space before: \"Text #tag\" ✓, \"Text#tag\" ✗"
-        },
-        "time": {
-          "title": "Time estimates",
-          "minutes": "Minutes",
-          "hours": "Hours",
-          "mixed": "Mixed",
-          "note": "Also: \"min\", \"minutes\", \"hours\" (English)"
-        },
-        "dates": {
-          "title": "Dates & Times",
-          "relative": "Relative dates",
-          "english": "English",
-          "specific": "Specific dates",
-          "auto_assignment": "Automatic assignment to corresponding date columns"
-        },
-        "columns": {
-          "title": "Column assignment",
-          "inbox": "Inbox",
-          "today": "Today", 
-          "tomorrow": "Tomorrow",
-          "backlog": "Backlog"
-        },
-        "descriptions": {
-          "title": "Descriptions & Notes",
-          "add": "Add description",
-          "alternative": "Alternative",
-          "tip": "Everything after \"note \" is saved as description"
-        },
-        "markdown": {
-          "title": "Markdown & Links",
-          "formatting": "Formatting",
-          "strikethrough": "Strikethrough",
-          "links": "Links",
-          "code": "Code",
-          "note": "Links are automatically inserted into the description"
-        },
-        "complex_example": "\"**Important** Meeting #work #client !!! 2h @today note Prepare presentation and check [document](https://docs.com)\"",
-        "complex_result": "Bold title, Tags: work+client, Priority: high, 2 hours, today-column, Description with link",
-        "tips": {
-          "title": "Pro Tips:",
-          "order": "Order doesn't matter: \"#tag !!! 30m Title\" works just as well",
-          "spaces": "Spaces are important: \"#tag\" ✓, but \"text#tag\" ✗",
-          "multiple": "Multiple tags: \"#tag1 #tag2 #tag3\" - all are recognized",
-          "autocomplete": "Auto-completion: The app suggests matching tags",
-          "combinable": "Combinable: All features can be used in one input",
-          "chain": "Chain-Input: In projects the modal stays open for more inputs after creation"
-        }
-      },
-      "pins_guide": {
-        "title": "Pins",
-        "heading": "Important tasks overview",
-        "description": "Pins help you organize important tasks and manage them flexibly in custom columns.",
-        "pinning": {
-          "title": "Pin tasks",
-          "items": [
-            "In TaskModal: Select pin column from dropdown",
-            "In context menu: Right-click on pin options",
-            "Drag & Drop: Drag tasks directly to the pins board",
-            "Multiple view: Pinned tasks remain in their original position"
-          ]
-        },
-        "manage": {
-          "title": "Manage columns",
-          "items": [
-            "New column: \"Add column\" button in header",
-            "Rename column: Double-click on column title",
-            "Sort columns: Drag & drop column headers",
-            "Column count: 3, 5 or 7 columns via buttons below"
-          ]
-        },
-        "best_practices": {
-          "title": "Best Practices",
-          "items": [
-            "Create categories: e.g. \"Urgent\", \"This week\", \"Important projects\"",
-            "Optimize workflow: Use pins for daily review routine",
-            "Stay focused: Maximum 5-7 tasks per column",
-            "Clean up regularly: Completed tasks are automatically unpinned"
-          ]
-        }
-      },
-      "emails_guide": {
-        "title": "Emails",
-        "heading": "📧 Email Integration",
-        "description": "Import and manage important emails directly in TaskFuchs. Perfect for linking email content with tasks and projects.",
-        "import": {
-          "title": "Import emails",
-          "items": [
-            "EML files: Drag & drop or file upload in email modal",
-            "From webmail: Save email as .eml and import",
-            "Automatic processing: MIME boundaries and attachments are cleaned",
-            "Formatting: Emails are displayed like in email client"
-          ]
-        },
-        "manage": {
-          "title": "Manage emails",
-          "items": [
-            "In mails tab: All imported emails chronologically sorted",
-            "Edit title: Adjust email title for better organization",
-            "Links: Link emails with tasks and other notes",
-            "Search: Full-text search in email content"
-          ]
-        },
-        "use_cases": {
-          "title": "Use cases",
-          "items": [
-            "Project documentation: Archive important project emails",
-            "Create tasks: Derive direct tasks from email content",
-            "References: Keep important information for later",
-            "Follow-ups: Link emails with tasks for tracking"
-          ]
-        }
-      },
-      "shortcuts_guide": {
-        "title": "Shortcuts",
-        "heading": "⌨️ Keyboard Shortcuts",
-        "description": "Work more efficiently with these practical key combinations. TaskFuchs supports both Windows/Linux (Ctrl) and macOS (⌘) shortcuts.",
-        "navigation": {
-          "title": "Navigation",
-          "dashboard": "Dashboard",
-          "inbox": "Inbox",
-          "planner": "Planner",
-          "projects": "Projects",
-          "notes": "Notes",
-          "pins": "Pins",
-          "tags": "Tags",
-          "statistics": "Statistics",
-          "archive": "Archive",
-          "settings": "Settings"
-        },
-        "quick_actions": {
-          "title": "Quick actions",
-          "new_task": "New task",
-          "search": "Open search",
-          "settings": "Settings",
-          "theme": "Switch theme",
-          "help": "Open help",
-          "close": "Close modal"
-        },
-        "focus_timer": {
-          "title": "Focus & Timer",
-          "focus_mode": "Focus mode",
-          "review_mode": "Review mode",
-          "timer_toggle": "Pause/resume timer",
-          "exit_focus": "Exit focus"
-        },
-        "board_nav": {
-          "title": "Board navigation",
-          "previous": "Previous day",
-          "next": "Next day",
-          "note": "Works in planner and review mode"
-        },
-        "review": {
-          "title": "Review mode",
-          "next_task": "Next task",
-          "prev_task": "Previous task",
-          "skip": "Skip task",
-          "archive": "Archive",
-          "edit": "Edit",
-          "estimate": "Estimate time",
-          "calendar": "Open calendar",
-          "plan": "Plan review"
-        },
-        "pro_tips": {
-          "title": "Pro Tips",
-          "vim": "Vim-style navigation: Use H/L for board navigation",
-          "quick_switch": "Quick Switch: Press F to quickly switch to focus mode",
-          "timer_control": "Timer Control: Spacebar pauses/starts timer from anywhere",
-          "universal_esc": "Universal ESC: Escape closes all modals and exits modes",
-          "cross_platform": "Cross-Platform: ⌘ on Mac, Ctrl on Windows/Linux",
-          "smart_input": "Smart Input: All shortcuts don't work in input fields"
-        },
-        "keyboard_ref": {
-          "title": "Keyboard Layout Reference"
-        }
-      },
-      "settings_guide": {
-        "title": "Settings",
-        "heading": "App Settings",
-        "description": "Customize TaskFuchs to your needs.",
-        "appearance": {
-          "title": "Appearance",
-          "items": [
-            "Choose between light and dark design",
-            "Customize accent color",
-            "Configure sidebar behavior",
-            "Customizable widget layouts"
-          ]
-        },
-        "notifications": {
-          "title": "Notifications",
-          "items": [
-            "Configure sound notifications",
-            "Customize reminder behavior",
-            "Timer sounds and behavior",
-            "End-of-day summaries"
-          ]
-        },
-        "data": {
-          "title": "Data management",
-          "items": [
-            "Export all data as JSON",
-            "Import data from other apps",
-            "Backup and restore",
-            "Delete and reset data"
-          ]
-        }
-      },
-      "tasks": {
-        "title": "Tasks",
-        "heading": "Manage Tasks",
-        "features": [
-          "Create tasks with natural language",
-          "Set priorities and due dates",
-          "Organize with tags and categories",
-          "Add subtasks and descriptions",
-          "Track time with integrated timer",
-          "Filter tasks by tags and priorities",
-          "Use recurring tasks",
-          "Automatically move overdue tasks"
-        ]
-      },
-      "notes": {
-        "title": "Notes",
-        "heading": "Notes & Daily Notes",
-        "description": "Create and manage notes with full markdown support.",
-        "features": [
-          "Full markdown editor",
-          "Link notes with tasks",
-          "Automatic daily notes",
-          "Search through all notes",
-          "Export to various formats",
-          "Create automatically dated notes"
-        ]
-      },
-      "kanban": {
-        "title": "Kanban",
-        "heading": "Kanban Boards",
-        "description": "Visualize your workflow with flexible kanban boards.",
-        "move_tasks": {
-          "title": "Move Tasks",
-          "features": [
-            "Drag tasks between columns",
-            "Tasks in \"Completed\" are automatically marked as finished"
-          ]
-        },
-        "project": {
-          "delete_title": "Delete Project",
-          "delete_confirm": "Do you really want to delete the project \"{title}\"?",
-          "delete_warning": "⚠️ This project has {count} tasks that will also be deleted.",
-          "delete_input_label": "Type \"DELETE\" to confirm:",
-          "delete_placeholder": "DELETE",
-          "delete_button": "Delete",
-          "delete_cancel": "Cancel",
-          "rename_title": "Rename Project",
-          "min_one_column": "At least one column must remain. A project without columns is not possible.",
-          "no_projects": "No projects available",
-          "no_projects_desc": "Create your first project and organize your tasks.",
-          "new_project": "New Project",
-          "create_new": "Create new project",
-          "no_project_selected": "No project selected",
-          "no_project_desc": "Select a project from the sidebar to manage your tasks."
-        },
-        "column": {
-          "add_title": "Add new column",
-          "add_button": "Add column",
-          "moving": "Moving column...",
-          "previous": "Previous columns",
-          "next": "Next columns"
-        },
-        "notes": {
-          "manage": "Manage notes",
-          "add": "Add",
-          "no_linked": "No linked notes",
-          "click_to_add": "Click \"Add\" to link notes",
-          "pin": "Pin to project",
-          "unpin": "Remove pin",
-          "remove_link": "Remove link",
-          "no_notes_found": "No notes found",
-          "all_linked": "All notes are already linked"
-        },
-        "filter": {
-          "title": "Filter",
-          "clear_all": "Clear all",
-          "close": "Close filter",
-          "no_tags": "No tags available"
-        }
-      },
-      "shortcuts": {
-        "title": "Shortcuts",
-        "heading": "Keyboard Shortcuts",
-        "general": {
-          "title": "General Shortcuts",
-          "settings": "Settings",
-          "dashboard": "Dashboard",
-          "tasks": "Tasks",
-          "kanban": "Kanban",
-          "notes": "Notes"
-        }
-      },
-      "settings": {
-        "title": "Settings",
-        "heading": "App Settings",
-        "features": [
-          "Timer sounds and behavior"
-        ]
       }
-    },
-    "smart_input": {
-      "backlog_projects": "Backlog & Projects",
-      "descriptions_notes": "Descriptions & Notes",
-      "combinable": "Combinable: All features can be used in one input"
-    }
-  },
-  "microsoft_todo": {
-    "automatic_sync": "Automatic synchronization",
-    "sync_on_startup": "Synchronize on startup", 
-    "sync_on_changes": "Synchronize on changes",
-    "bidirectional_sync": "Bidirectional synchronization",
-    "manual_decide": "Decide manually",
-    "prefer_local": "Prefer local version",
-    "prefer_remote": "Prefer Microsoft To Do version",
-    "connected": "Connected"
-  },
-  "onboarding": {
-    "welcome": {
-      "title": "Welcome to TaskFuchs",
-      "subtitle": "Your personal productivity assistant",
-      "description": "Great to have you here! I'm TaskFuchs and I'm excited to get to know you.",
-      "fox_message": "Hello! I'm TaskFuchs and I'm thrilled to meet you. Let's take your productivity to the next level together!",
-      "features": [
-        "Intelligent task management",
-        "Natural language input",
-        "Beautiful & intuitive interface",
-        "Fully customizable"
-      ]
-    },
-    "today_dashboard": {
-      "title": "Dashboard",
-      "subtitle": "Your daily overview",
-      "description": "This is where you start every day. All important information at a glance.",
-      "fox_message": "The dashboard is your command center! Here you can instantly see what's on for today, which deadlines are approaching, and how productive you've been. Perfect for starting your day!",
-      "features": [
-        "Today's tasks",
-        "Upcoming deadlines",
-        "Productivity widgets",
-        "Customizable view"
-      ]
-    },
-    "inbox": {
-      "title": "Inbox",
-      "subtitle": "Collect everything in one place",
-      "description": "Quickly capture thoughts and tasks, organize them later.",
-      "fox_message": "The inbox is your catch-all for spontaneous ideas! Just throw everything in and sort it out later. You'll never forget anything important again!",
-      "features": [
-        "Quick capture",
-        "Smart sorting",
-        "Batch processing",
-        "Automatic categorization"
-      ],
-      "new_task_tooltip": "Create new task",
-      "new_task": "Create new task",
-      "add": "Add",
-      "task_count": "{count} task",
-      "task_count_plural": "{count} tasks",
-      "tasks_count": "{count} task",
-      "tasks_count_plural": "{count} tasks",
-      "selected_count": "{count} task selected",
-      "selected_count_plural": "{count} tasks selected",
-      "delete_button": "Delete",
-      "delete": "Delete",
-      "empty_title": "Inbox is empty",
-      "empty_description": "No tasks in inbox. Use the smart button to create new tasks.",
-      "create_first_task": "Create first task",
-      "all_tasks": "All tasks",
-      "filter_by_date": "Filter by date",
-      "remove_filter": "Remove filter",
-      "tasks_to_process": "{count} task to process",
-      "tasks_to_process_plural": "{count} tasks to process",
-      "tasks_on_date": "{count} task on this date",
-      "tasks_on_date_plural": "{count} tasks on this date",
-      "select_all": "Select all",
-      "deselect_all": "Deselect all",
-      "project_select": "Select project",
-      "column_select": "Select column",
-      "today": "Today",
-      "tomorrow": "Tomorrow",
-      "search_projects": "Search projects...",
-      "no_projects_found": "No projects found",
-      "no_projects_available": "No projects available",
-      "no_columns_in_project": "No columns in this project",
-      "create_column": "Create column",
-      "new_column": "Create new column",
-      "create": "Create",
-      "cancel": "Cancel",
-      "add_tag": "Add tag"
-    },
-
-    "smart_input": {
-      "title": "Smart Input",
-      "subtitle": "Speak naturally to TaskFuchs",
-      "description": "Create tasks with natural language - just type and you're done.",
-      "fox_message": "This is my superpower! Just write 'Meeting tomorrow at 10 #work !!' and I understand: title, date, tag, and priority. Magical, isn't it?",
-      "features": [
-        "Natural language input",
-        "Automatic date parsing",
-        "Tag recognition",
-        "Priority parser"
-      ]
     },
     "tasks": {
-      "title": "Daily Planner",
-      "subtitle": "Work structured",
-      "description": "Organize your tasks in clear columns.",
-      "fox_message": "This is where things get organized! Drag tasks between columns, set priorities, and keep track. Your brain will thank you!",
-      "features": [
-        "Drag & Drop",
-        "Flexible columns",
-        "Prioritization",
-        "Time tracking"
-      ]
-    },
-    "kanban": {
-      "title": "Kanban Boards",
-      "subtitle": "Master projects",
-      "description": "Manage complex projects with professional Kanban boards.",
-      "fox_message": "For the big projects! Create boards for different projects and work in teams. This way you keep track even with complex endeavors!",
-      "features": [
-        "Project boards",
-        "Team collaboration",
-        "Progress tracking",
-        "Flexible workflows"
-      ],
-      "completed_tasks": "{completed}/{total} completed"
-    },
-    "notes": {
-      "title": "Notes",
-      "subtitle": "Capture thoughts",
-      "description": "Write, plan and connect your ideas with each other.",
-      "fox_message": "This is where your thoughts live! Write markdown notes, link them to tasks, and build your personal knowledge system. Brilliant, right?",
-      "features": [
-        "Markdown editor",
-        "Task linking",
-        "Full-text search",
-        "Tag system"
-      ]
-    },
-    "focus": {
-      "title": "Focus Mode",
-      "subtitle": "Work concentrated",
-      "description": "Activate focus mode for distraction-free work with integrated timer.",
-      "fox_message": "Time for deep work! In focus mode you only see your current task and a timer. Perfect for Pomodoro sessions or when you want to really concentrate!",
-      "features": [
-        "Distraction-free interface",
-        "Pomodoro timer",
-        "Time tracking",
-        "Full-screen mode"
-      ]
-    },
-    "series": {
-      "title": "Recurring Tasks",
-      "subtitle": "Automate routines",
-      "description": "Create and manage recurring tasks for your regular routines.",
-      "fox_message": "Never forget again! Create a series once and I'll make sure these tasks automatically reappear. Perfect for routines and regular to-dos!",
-      "features": [
-        "Daily, weekly, monthly recurrence",
-        "Flexible intervals",
-        "Automatic creation",
-        "Series management"
-      ]
-    },
-    "review": {
-      "title": "Review System",
-      "subtitle": "Reflect & optimize",
-      "description": "Regularly look back at your tasks and optimize your productivity.",
-      "fox_message": "Reflection makes you strong! The review system helps you think through your tasks, set priorities and continuously improve. Wisdom through repetition!",
-      "features": [
-        "Task review",
-        "Priority setting",
-        "Progress tracking",
-        "Productivity insights"
-      ]
-    },
-    "timer": {
-      "title": "Timer & Time Tracking",
-      "subtitle": "Keep time in focus",
-      "description": "Track your work time and use Pomodoro techniques for better productivity.",
-      "fox_message": "Tick, tock! The timer helps you use your time consciously. Start it for tasks, use Pomodoro sessions and see how productive you really are!",
-      "features": [
-        "Pomodoro timer",
-        "Automatic time tracking",
-        "Break reminders",
-        "Productivity statistics"
-      ]
-    },
-    "statistics": {
-      "title": "Reports & Statistics",
-      "subtitle": "Understand your productivity",
-      "description": "Get detailed insights into your work habits and productivity patterns.",
-      "fox_message": "Numbers don't lie! Here you see how productive you really are. Recognize patterns, find your best working time and continuously optimize your performance!",
-      "features": [
-        "Productivity trends",
-        "Time statistics",
-        "Task analysis",
-        "Progress reports"
-      ]
-    },
-    "smart_features": {
-      "title": "Smart Features",
-      "subtitle": "Modern productivity",
-      "description": "TaskFuchs learns your habits and helps you become more productive.",
-      "fox_message": "Now it gets really clever! I recognize patterns in your work, suggest optimizations and help you achieve your goals. This is modern productivity!",
-      "features": [
-        "Natural language input",
-        "Smart suggestions",
-        "Automatic categorization",
-        "Productivity insights"
-      ]
-    },
-    "customization": {
-      "title": "Customization",
-      "subtitle": "Make it yours",
-      "description": "Adapt TaskFuchs to your needs and style.",
-      "fox_message": "Make me yours! Choose colors, themes, sounds, and layouts that suit you. TaskFuchs should feel like your personal workspace!",
-      "features": [
-        "Color themes",
-        "Customizable layouts",
-        "Sounds & animations",
-        "Advanced options"
-      ]
-    },
-    "ready": {
-      "title": "Ready for the Journey",
-      "subtitle": "Let's get started!",
-      "description": "You're now ready to work productively with TaskFuchs.",
-      "fox_message": "Wow, that was a great tour! You now know all my superpowers. I'm so excited to become productive together with you. Let's go!",
-      "features": [
-        "Use natural language",
-        "Experiment with features",
-        "Have fun organizing!",
-        "Discover all functions!"
-      ]
-    },
-    "navigation": {
-      "next": "Next",
-      "previous": "Previous",
-      "skip": "Skip",
-      "finish": "Finish",
-      "complete_in": "Complete in",
-      "seconds": "seconds"
-    },
-    "completion": {
-      "title": "🎉 Welcome to TaskFuchs!",
-      "subtitle": "You're ready to be productive",
-      "message": "Your journey starts now. Good luck with TaskFuchs!",
-      "close_automatically": "Closing automatically in"
-    }
-  },
-  "task_column": {
-    "title_confirm": "Confirm title",
-    "delete_column": "Delete column",
-    "delete_confirm_with_tasks": "Do you really want to delete the column \"{title}\"? This column contains {count} task.",
-    "delete_confirm_with_tasks_plural": "Do you really want to delete the column \"{title}\"? This column contains {count} tasks.",
-    "delete_confirm_empty": "Do you really want to delete the column \"{title}\"? This column is empty.",
-    "delete_warning": "All tasks in this column will be permanently lost!",
-    "smart_add_task": "Smart add task",
-    "add_task": "Add task",
-    "edit_column": "Edit column",
-    "focus_column": "Focus column",
-    "archive_completed": "Archive {count} completed tasks",
-    "archive_confirm": "Do you want to move all {count} completed tasks from \"{title}\" to archive?",
-    "export_tasks": "Export tasks",
-    "drag_to_sort": "Drag column to sort",
-    "drop_task_here": "Drop task here",
-    "drop_column_here": "Drop column here",
-    "export": {
-      "title": "Task export from {date}",
-      "no_tasks": "No tasks in this column.",
-      "export_task_count": "Number of tasks: {count}",
-      "completed_count": "Completed tasks: {count}",
-      "total_time": "Total time (incl. events): {time}",
-      "task_time": "- Tasks: {time}",
-      "event_time": "- Events: {time}",
-      "tracked_time": "Total tracked time: {time}",
-      "tasks_header": "--- TASKS ---",
-      "open_tasks": "OPEN TASKS ({count}):",
-      "completed_tasks": "COMPLETED TASKS ({count}):",
-      "estimated_time": "Estimated time: {time}",
-      "subtasks": "Subtasks: {completed}/{total} completed",
-      "csv_headers": {
-        "title": "Title",
-        "status": "Status",
-        "priority": "Priority",
-        "tags": "Tags",
-        "estimated_time": "Estimated Time",
-        "total_time": "Total Time",
-        "tracked_time": "Tracked Time",
-        "description": "Description",
-        "subtasks": "Subtasks"
+      "title": "Tasks",
+      "description": "Master the art of task management in TaskFuchs with these comprehensive guides.",
+      "create_task": {
+        "title": "Creating Tasks",
+        "option1": "Click the + button to create a new task",
+        "option2": "Use Smart Input for quick task creation",
+        "option3": "Import tasks from emails",
+        "option4": "Create tasks with time estimates"
       },
-      "status": {
-        "completed": "Completed",
-        "open": "Open"
+      "edit_task": {
+        "title": "Editing Tasks",
+        "option1": "Click on any task to open the editor",
+        "option2": "Change priority, date, tags, and description",
+        "option3": "Estimate time needed for completion"
       },
-      "priority": {
-        "high": "High",
-        "medium": "Medium",
-        "low": "Low"
-      },
-      "column_section": "Tasks",
-      "no_tasks_row": "No tasks in this column"
-    }
-  },
-  "header": {
-    "logout_confirm": "Do you really want to log out?",
-    "task_due": "Task due",
-    "task_due_message": "\"{title}\" is now due!",
-    "no_overdue_tasks": "No overdue tasks",
-    "all_tasks_current": "All tasks are current.",
-    "tasks_moved": "Tasks moved",
-    "overdue_moved_message": "{count} overdue tasks have been moved to today.",
-    "today": "Today",
-    "date_select": "Select date",
-    "notes_show_details": "Show notes details",
-    "notes_hide_details": "Hide notes details",
-    "project_tasks_show": "Show project tasks",
-    "project_tasks_hide": "Hide project tasks",
-    "search": "Search",
-    "search_placeholder": {
-      "settings": "Search settings...",
-      "general": "Search tasks and notes...",
-      "c": "Search tasks and notes..."
-    },
-    "search_results": {
-      "tasks": "Tasks ({{count}})",
-      "notes": "Notes ({{count}})"
-    },
-    "filter": "Filter",
-    "filter_close": "Close filter",
-    "move_overdue": "Move {count} overdue tasks (left of today) to today",
-    "move_overdue_tasks_tooltip": "Move {count} overdue tasks (left of today) to today",
-    "overdue_tasks": "{count} Overdue",
-    "completed_tasks": "Completed",
-    "completed_tasks_show": "Show completed tasks",
-    "completed_tasks_hide": "Hide completed tasks",
-    "completed_tasks_show_tooltip": "Show completed tasks",
-    "completed_tasks_hide_tooltip": "Hide completed tasks",
-    "completed_tasks_toggle_tooltip": "Toggle completed tasks",
-    "priority_none": "No priority",
-    "events": "Events",
-    "events_show": "Show events",
-    "events_hide": "Hide events",
-    "events_show_tooltip": "Show events",
-    "events_hide_tooltip": "Hide events",
-    "events_toggle_tooltip": "Toggle events",
-    "edit_profile": "Edit profile",
-    "settings": "Settings",
-    "logout": "Logout",
-    "onboarding_tour": "Onboarding Tour",
-    "user_guide": "User Guide",
-    "navigate_to_date": "Navigate to date",
-    "priority": {
-      "none": "No Priority"
-    },
-    "organize_columns": "Organize Columns",
-    "export_planner": "Export Planner"
-  },
-  "simple_today_view": {
-    "reminder_notification": "Time for your checklist item!",
-    "unsaved_changes": "There are unsaved changes. Do you want to close anyway?",
-    "task_created": "Task created",
-    "task_moved": "Task moved",
-    "task_moved_message": "\"{title}\" was moved to today.",
-    "end_day": "End day",
-    "search_placeholder": "Search tasks, notes and tags (e.g. #private)...",
-    "notes_section": "Notes",
-    "today_tasks": "Today's Tasks",
-    "all_done": "All done!",
-    "enjoy_day": "Enjoy your day.",
-    "today": "Today",
-    "convert_to_task": "Convert to task",
-    "delete": "Delete",
-    "completed": "Completed ({count})",
-    "all_checked": "Check everything off!",
-    "add_entry": "Add entry",
-    "pinned_tasks": "Pinned Tasks",
-    "pinned_notes": "Pinned Notes",
-    "no_notes_pinned": "No notes pinned",
-    "pin_notes_help": "Pin important notes for quick access.",
-    "all_on_schedule": "All on schedule!",
-    "no_urgent_appointments": "No urgent appointments.",
-    "open_in_notes": "Open in notes",
-    "deadlines": "Deadlines",
-    "deadlines_countdown": "Deadlines with Countdown",
-    "no_upcoming_deadlines": "No upcoming deadlines",
-    "all_tasks_on_schedule": "All tasks are on schedule",
-    "time_remaining": "remaining",
-    "time_overdue": "overdue",
-    "toolbar": {
-      "heading1": "Heading 1",
-      "heading2": "Heading 2", 
-      "heading3": "Heading 3",
-      "bold": "Bold",
-      "italic": "Italic",
-      "code": "Code",
-      "list": "List",
-      "numbered_list": "Numbered List",
-      "checkbox": "Checkbox",
-      "insert_link": "Insert link",
-      "markdown_help": "Markdown Help"
-    },
-    "markdown_help_text": "Markdown Help:\n\n# Heading\n**bold**, *italic*, `code`\n- List, 1. Numbered\n- [ ] Checkbox\n[Link](URL)\n---",
-    "empty_note": "This note is empty.",
-    "link_text_prompt": "Link text (optional):"
-  },
-  "board_manager": {
-    "title": "Board Management",
-    "create_new_board": "Create New Board",
-    "board_name_placeholder": "Board Name",
-    "description_placeholder": "Description (optional)",
-    "create_board": "Create Board",
-    "no_boards_yet": "No boards created yet",
-    "create_first_board": "Create your first board from a template or create your own.",
-    "default": "Default",
-    "columns_count": "{count} Columns",
-    "created": "Created: {date}",
-    "edit": "Edit",
-    "delete": "Delete",
-    "edit_board": "Edit Board",
-    "name": "Name",
-    "description": "Description",
-    "add_column": "Add Column",
-    "cancel": "Cancel",
-    "save": "Save",
-    "delete_board": "Delete Board",
-    "delete_confirm": "Are you sure you want to permanently delete this Kanban board?",
-    "delete_warning": "The board and all its configurations will be permanently removed. Tasks will remain.",
-    "copy_suffix": "(Copy)",
-    "new_column": "New Column",
-    "templates": {
-      "status_board": {
-        "name": "Status Board",
-        "description": "Classic Kanban with To Do, In Progress, Done"
-      },
-      "priority_board": {
-        "name": "Priority Board",
-        "description": "Grouping by task priority"
-      },
-      "deadline_board": {
-        "name": "Deadline Board",
-        "description": "Grouping by due dates"
-      },
-      "project_board": {
-        "name": "Project Board",
-        "description": "Grouping by projects and columns"
+      "organize_tasks": {
+        "title": "Organizing Tasks",
+        "option1": "Use columns to organize tasks",
+        "option2": "Filter tasks by tags or priority",
+        "option3": "Archive completed tasks"
       }
     },
-    "columns": {
-      "overdue": "Overdue",
-      "today": "Today",
-      "tomorrow": "Tomorrow",
-      "later": "Later"
+    "smart_input": {
+      "title": "Smart Parsing",
+      "description": "Quickly create feature-rich tasks using simple text patterns.",
+      "example": {
+        "title": "Example",
+        "input": "Buy groceries !2 #shopping @tomorrow",
+        "result": "Creates a task with priority 2, tag 'shopping', and tomorrow's date"
+      },
+      "priorities": {
+        "title": "Priorities",
+        "low": "Low Priority",
+        "low_shortcut": "!1 or -",
+        "medium": "Medium Priority",
+        "medium_shortcut": "!2 or o",
+        "high": "High Priority",
+        "high_shortcut": "!3 or +",
+        "or": "or",
+        "low_alt": "-",
+        "medium_alt": "o",
+        "high_alt": "+",
+        "english_tip": "You can use symbols instead of German equivalents"
+      },
+      "tags": {
+        "title": "Tags",
+        "single_tag": "Add a single tag",
+        "single_tag_shortcut": "#tagname",
+        "multiple_tags": "Add multiple tags",
+        "multiple_tags_shortcut": "#tag1 #tag2",
+        "popular_tags": "Use popular tags",
+        "popular_tags_shortcut": "Start typing # to see tags",
+        "note": "Tags help organize and filter tasks"
+      },
+      "time": {
+        "title": "Time Estimates",
+        "minutes": "Minutes",
+        "minutes_shortcut": "30m",
+        "hours": "Hours",
+        "hours_shortcut": "2h",
+        "mixed": "Mixed time",
+        "mixed_shortcut": "1h30m",
+        "english_tip": "Use 'm' for minutes and 'h' for hours"
+      },
+      "dates": {
+        "title": "Dates",
+        "relative_dates": "Relative dates",
+        "relative_dates_shortcut": "@today, @tomorrow, @nextweek",
+        "english": "English date names",
+        "english_shortcut": "@monday, @friday, @next monday",
+        "specific_dates": "Specific dates",
+        "specific_dates_shortcut": "@2024-12-25 or @25.12.2024",
+        "calendar_assignment": "These assign to the date column"
+      },
+      "columns": {
+        "title": "Column Assignment",
+        "inbox": "Move to Inbox",
+        "inbox_shortcut": "@inbox",
+        "today": "Assign to Today",
+        "today_shortcut": "@today",
+        "tomorrow": "Assign to Tomorrow",
+        "tomorrow_shortcut": "@tomorrow",
+        "backlog": "Move to Backlog",
+        "backlog_shortcut": "@backlog"
+      },
+      "descriptions": {
+        "title": "Descriptions",
+        "add_description": "Add description",
+        "add_description_shortcut": ":: Your description",
+        "alternative": "Alternative format",
+        "alternative_shortcut": "-- Your description",
+        "tip": "Description separated by :: or --"
+      },
+      "markdown": {
+        "title": "Markdown Formatting",
+        "formatting": "Italics or emphasis",
+        "formatting_shortcut": "*text* or **bold**",
+        "strikethrough": "Strikethrough",
+        "strikethrough_shortcut": "~~text~~",
+        "links": "Add links",
+        "links_shortcut": "[text](url)",
+        "code": "Code formatting",
+        "code_shortcut": "`code`",
+        "links_note": "Use standard Markdown syntax"
+      },
+      "complex_example": {
+        "title": "Complex Example",
+        "input": "Review proposal !3 #work #urgent @friday 2h :: Need to review",
+        "result": "High-priority task with multiple tags, scheduled for Friday"
+      },
+      "pro_tips": {
+        "title": "Pro Tips",
+        "order_is_irrelevant": "Order doesn't matter",
+        "space_is_important": "Always use spaces",
+        "multiple_tags": "Add multiple tags",
+        "auto_completion": "See suggestions",
+        "combinable": "Combine all elements",
+        "chain_input": "Create multiple tasks"
+      }
     },
-    "grouping": {
-      "priority": "Priority",
-      "date": "Date",
-      "project": "Project",
-      "status": "Status"
-    }
-  },
-  "review_view": {
-    "title": "Review Center",
-    "subtitle": "Review your tasks and make sure nothing is overlooked",
-    "progress": "Progress",
-    "today": "Today",
-    "all_reviewed": "All tasks reviewed!",
-    "no_tasks_to_review": "No tasks to review. Create new tasks or check back later.",
-    "review_complete": "You've reviewed all {count} tasks! The review system has helped,",
-    "review_task_count": "Task {current} of {total}",
-    "remaining_tasks": "{count} tasks remaining",
-    "project_label": "Project",
-    "column_label": "Column",
-    "completion": {
-      "title": "Fantastic!",
-      "message": "to keep track of everything and stay organized."
+    "pins": {
+      "important_tasks_overview": "Quick Access with Pins",
+      "pins_description": "Keep important tasks visible at all times.",
+      "pinning_tasks": {
+        "option1": "Right-click task and select 'Pin'",
+        "option2": "Use the pin icon on hover",
+        "option3": "Pinned tasks appear at top",
+        "option4": "Click pin icon again to unpin"
+      },
+      "manage_columns": {
+        "title": "Organizing Pinned Content",
+        "option1": "Drag and drop to reorder",
+        "option2": "View all pins in Pins section",
+        "option3": "Filter pins by project",
+        "option4": "Archive when no longer needed"
+      },
+      "best_practices": {
+        "title": "Best Practices",
+        "option1": "Keep top 3-5 tasks pinned",
+        "option2": "Review pins weekly",
+        "option3": "Use for critical work",
+        "option4": "Combine with tags"
+      }
     },
-    "stats": {
-      "reviewed": "Reviewed",
-      "tagged": "Tagged",
-      "archived": "Archived",
-      "skipped": "Skipped"
-    },
-    "navigation": {
-      "previous_task": "Previous task (←)",
-      "next_task": "Next task (Space/→)",
-      "drag_to_navigate": "Drag card to navigate"
-    },
-    "actions": {
-      "edit_estimate": "Edit estimate (M)",
-      "add_time": "Add time (M)",
-      "add_time_button": "Add",
-      "edit_task": "Edit task (E)",
-      "next_review": "Next review (R)",
-      "skip": "Skip (S/Space)",
-      "cancel": "Cancel",
-      "save": "Save"
-    },
-    "status": {
-      "no_estimate": "No estimate",
-      "archived": "Archived",
-      "time_updated": "Time updated",
-      "time_set": "Time set",
-      "subtasks": "{completed}/{total} subtasks"
+    "emails": {
+      "title": "Email Integration",
+      "description": "Convert emails into tasks.",
+      "import_emails": {
+        "title": "Importing Emails",
+        "option1": "Connect email account",
+        "option2": "Select emails to convert",
+        "option3": "Content added as descriptions",
+        "option4": "Sender and timestamp preserved"
+      },
+      "manage_emails": {
+        "title": "Managing Email Tasks",
+        "option1": "Email tasks marked with icon",
+        "option2": "Reply from task",
+        "option3": "Archive when complete"
+      },
+      "use_cases": {
+        "title": "Use Cases",
+        "option1": "Convert meeting notes",
+        "option2": "Turn requests into tasks",
+        "option3": "Track follow-ups",
+        "option4": "Organize communications"
+      }
     },
     "shortcuts": {
-      "skip": "Skip",
-      "edit": "Edit",
-      "review": "Review",
-      "next": "Next",
-      "previous": "Previous",
-      "date": "Date",
-      "archive": "Archive"
-    },
-    "tooltip": {
-      "plan_date": "Plan date (C)",
-      "archive": "Archive (A)"
-    },
-    "time_editor": {
-      "quick_select": "Quick select",
-      "manual_input": "Or enter manually"
-    },
-    "calendar": {
-      "title": "Planner"
-    },
-    "workload": {
-      "light": "Light",
-      "medium": "Medium",
-      "heavy": "Heavy",
-      "overload": "Overload"
-    },
-    "modals": {
-      "edit_time": {
-        "title": "Edit time for \"{title}\""
+      "title": "Keyboard Shortcuts",
+      "description": "Master TaskFuchs with keyboard shortcuts.",
+      "navigation": {
+        "title": "Navigation",
+        "dashboard": "Go to Today",
+        "dashboard_shortcut": "1",
+        "inbox": "Go to Inbox",
+        "inbox_shortcut": "2",
+        "inbox_alt_shortcut": "I",
+        "planner": "Go to Planner",
+        "planner_shortcut": "3",
+        "planner_alt_shortcut": "T",
+        "projects": "Go to Projects",
+        "projects_shortcut": "4",
+        "notes": "Go to Notes",
+        "notes_shortcut": "5",
+        "pins": "Go to Pins",
+        "pins_shortcut": "6",
+        "tags": "Go to Tags",
+        "tags_shortcut": "7",
+        "statistics": "Go to Statistics",
+        "statistics_shortcut": "8",
+        "archive": "Go to Archive",
+        "archive_shortcut": "9",
+        "settings": "Go to Settings",
+        "settings_shortcut": "0",
+        "or": "or"
       },
-      "select_day": {
-        "title": "Select a day for task \"{title}\"",
-        "planned_time": "{count} {count, plural, one {task} other {tasks}}"
+      "quick_actions": {
+        "title": "Quick Actions",
+        "new_task": "Create new task",
+        "new_task_shortcut": "N",
+        "new_task_alt_shortcut": "Ctrl/Cmd + N",
+        "open_search": "Open search",
+        "open_search_shortcut": "S or Ctrl/Cmd + F",
+        "open_settings": "Open settings",
+        "open_settings_shortcut": "Ctrl/Cmd + ,",
+        "toggle_theme": "Toggle theme",
+        "toggle_theme_shortcut": "Ctrl/Cmd + Shift + D",
+        "open_help": "Open help",
+        "open_help_shortcut": "?",
+        "close_modal": "Close modal",
+        "close_modal_shortcut": "Esc",
+        "or": "or"
       },
-      "next_review": {
-        "title": "Next review for \"{title}\"",
-        "description": "Select a date when this task should appear in review again at the earliest.",
-        "in_week": "In 1 week",
-        "in_month": "In 1 month"
+      "focus_and_timer": {
+        "title": "Focus & Timer",
+        "focus_mode": "Enter Focus mode",
+        "focus_mode_shortcut": "F",
+        "review_mode": "Enter Review mode",
+        "review_mode_shortcut": "R",
+        "pause_resume_timer": "Pause/Resume timer",
+        "pause_resume_timer_shortcut": "Space",
+        "leave_focus": "Leave Focus",
+        "leave_focus_shortcut": "Esc"
+      },
+      "board_navigation": {
+        "title": "Board Navigation",
+        "previous_day": "Previous day",
+        "previous_day_shortcut": "H",
+        "previous_day_alt_shortcut": "←",
+        "next_day": "Next day",
+        "next_day_shortcut": "L",
+        "next_day_alt_shortcut": "→",
+        "note": "These work in Planner and Calendar views",
+        "or": "or"
+      },
+      "review_mode": {
+        "title": "Review Mode",
+        "next_task": "Next task",
+        "next_task_shortcut": "J",
+        "next_task_alt_shortcut": "↓",
+        "previous_task": "Previous task",
+        "previous_task_shortcut": "K",
+        "skip_task": "Skip task",
+        "skip_task_shortcut": "S",
+        "archive": "Archive task",
+        "archive_shortcut": "A",
+        "edit": "Edit task",
+        "edit_shortcut": "E",
+        "estimate_time": "Estimate time",
+        "estimate_time_shortcut": "T",
+        "open_calendar": "Open calendar",
+        "open_calendar_shortcut": "D",
+        "plan_review": "Plan review",
+        "plan_review_shortcut": "P",
+        "or": "or"
+      },
+      "pro_tips": {
+        "title": "Pro Tips",
+        "vim_style_navigation": "Vim-style navigation",
+        "quick_switch": "Number keys switch sections",
+        "timer_control": "Space pauses timer",
+        "universal_esc": "Esc closes modals",
+        "cross_platform": "Works on all platforms",
+        "smart_input_shortcuts": "Chain commands"
+      },
+      "keyboard_layout_reference": {
+        "title": "Keyboard Reference",
+        "today": "Today",
+        "inbox": "Inbox",
+        "tasks": "Tasks",
+        "kanban": "Kanban",
+        "notes": "Notes",
+        "tags": "Tags",
+        "stats": "Stats",
+        "archive": "Archive",
+        "settings": "Settings",
+        "review": "Review",
+        "focus": "Focus",
+        "left": "Left",
+        "right": "Right",
+        "new": "New",
+        "help": "Help",
+        "timer": "Play/Pause"
+      }
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "Customize your TaskFuchs experience.",
+      "appearance": {
+        "title": "Appearance",
+        "option1": "Customize colors",
+        "option2": "Set backgrounds",
+        "option3": "Choose dark/light mode",
+        "option4": "Adjust UI density"
+      },
+      "notifications": {
+        "title": "Notifications",
+        "option1": "Browser notifications",
+        "option2": "Sound alerts",
+        "option3": "Notification timing",
+        "option4": "Notification content"
+      },
+      "data_management": {
+        "title": "Data & Sync",
+        "option1": "Backup data",
+        "option2": "Import data",
+        "option3": "Sync across devices",
+        "option4": "Export data"
       }
     }
   },
   "focus_view": {
-    "focus_mode": "Focus Mode",
-    "to_exit": "to exit",
-    "back_to_overview": "Back to Overview",
-    "exit_focus_mode": "Exit Focus Mode",
     "estimated_time": "Estimated Time",
-    "add_minutes": "Add {{minutes}} minute",
-    "add_minutes_plural": "Add {{minutes}} minutes",
-    "adjust_time": "Adjust time",
-    "time_adjustment_help": "Positive values add time, negative values subtract",
+    "add_minutes": "Add {minutes} minute",
+    "add_minutes_plural": "Add {minutes} minutes",
+    "adjust_time": "Adjust Time",
+    "time_adjustment_help": "Click the +/- buttons or enter a custom time",
     "cancel": "Cancel",
     "add": "Add",
-    "select_task": "Select task",
-    "select_task_instruction": "Select a task to start focus mode",
-    "tasks_from_column": "{{count}} tasks from this column",
+    "select_task": "Select Task",
+    "select_task_instruction": "Choose a task to get started",
+    "tasks_from_column": "{count} tasks available",
     "all_tasks_completed": "All tasks completed!",
-    "all_tasks_finished": "You have completed all open tasks.",
-    "estimate_time": "Estimate time",
-    "more_tasks": "... and {{count}} more tasks",
-    "add_estimated_time": "Add estimated time",
+    "all_tasks_finished": "Great! You've completed all tasks.",
+    "estimate_time": "Estimate Time",
+    "more_tasks": "{count} more tasks",
+    "add_estimated_time": "Add Estimated Time",
     "time_in_minutes": "Time in minutes",
-    "time_exceeded": "Planned time exceeded by {{time}}",
-    "keyboard_shortcuts": "ESC to exit • Click title to edit",
-    "timer_status_overflow": "Overflow",
-    "timer_status_remaining": "Remaining",
-    "timer_status_paused": "Paused",
-    "timer_status_running": "Running"
+    "time_exceeded": "Time exceeded by {time}",
+    "keyboard_shortcuts": "Keyboard Shortcuts",
+    "timer_status": {
+      "overflow": "Overflow",
+      "remaining": "Remaining",
+      "paused": "Paused",
+      "running": "Running"
+    }
   },
   "notes_view": {
     "notes": "Notes",
@@ -1580,16 +998,14 @@
     "all_entries": "All entries",
     "daily_notes": "Daily Notes",
     "all_notes": "All Notes",
-    "notes": "Notes",
     "search_notes": "Search notes...",
     "no_notes_found": "No notes found",
     "try_other_search": "Try different search terms or remove filters.",
     "all_notes_linked": "All available notes are already linked or archived.",
-    "filter": "Filter", 
+    "filter": "Filter",
     "type": "Type",
     "notes_count": "{{count}} note",
     "notes_count_plural": "{{count}} notes",
-    "no_notes_found": "No notes found",
     "no_daily_notes": "No daily notes available",
     "no_notes_available": "No notes available",
     "no_notes_match_filter": "No notes match the filter criteria.",
@@ -1804,17 +1220,6 @@
       "delete": "Delete"
     }
   },
-  "focus": {
-    "focus_mode": "Focus Mode",
-    "select_task": "Select Task",
-    "select_task_instruction": "Choose a task to get started",
-    "tasks_from_column": "{count} tasks available",
-    "all_tasks_completed": "All tasks completed!",
-    "all_tasks_finished": "Great! You've completed all tasks.",
-    "back_to_overview": "Back to Overview",
-    "exit_focus_mode": "Exit Focus Mode (ESC)",
-    "to_exit": "to exit"
-  },
   "pins": {
     "title": "Pins",
     "tasks_count": "{{count}} tasks",
@@ -1899,7 +1304,7 @@
   },
   "recurring_tasks_widget": {
     "daily": "Daily",
-    "weekly": "Weekly", 
+    "weekly": "Weekly",
     "monthly": "Monthly",
     "yearly": "Yearly",
     "skip": "Skip",
@@ -1922,35 +1327,9 @@
     "today": "Today",
     "yesterday": "Yesterday"
   },
-  "focus_view": {
-    "estimated_time": "Estimated Time",
-    "add_minutes": "Add {minutes} minute",
-    "add_minutes_plural": "Add {minutes} minutes", 
-    "adjust_time": "Adjust Time",
-    "time_adjustment_help": "Click the +/- buttons or enter a custom time",
-    "cancel": "Cancel",
-    "add": "Add",
-    "select_task": "Select Task",
-    "select_task_instruction": "Choose a task to get started",
-    "tasks_from_column": "{count} tasks available",
-    "all_tasks_completed": "All tasks completed!",
-    "all_tasks_finished": "Great! You've completed all tasks.",
-    "estimate_time": "Estimate Time",
-    "more_tasks": "{count} more tasks",
-    "add_estimated_time": "Add Estimated Time",
-    "time_in_minutes": "Time in minutes",
-    "time_exceeded": "Time exceeded by {time}",
-    "keyboard_shortcuts": "Keyboard Shortcuts",
-    "timer_status": {
-      "overflow": "Overflow",
-      "remaining": "Remaining", 
-      "paused": "Paused",
-      "running": "Running"
-    }
-  },
   "time": {
     "minutes": "{minutes} minutes",
-    "hours": "{hours} hours", 
+    "hours": "{hours} hours",
     "hours_minutes": "{hours} hours {minutes} minutes"
   },
   "projects": {
@@ -1991,7 +1370,7 @@
   "planner": {
     "export_tasks": "Export tasks",
     "archive_completed": "Archive completed tasks",
-    "focus_column": "Focus column", 
+    "focus_column": "Focus column",
     "deadline_reached": "Deadline reached!",
     "visible_in_project_and_planner": "Visible in project and planner",
     "day_planner": "Day Planner",
@@ -2009,7 +1388,7 @@
     "weekdays": {
       "mo": "Mo",
       "tu": "Tu",
-      "we": "We", 
+      "we": "We",
       "th": "Th",
       "fr": "Fr",
       "sa": "Sa",
@@ -2086,16 +1465,136 @@
     "choose": "Choose directory"
   },
   "settings_appearance": {
+    "gradients": {
+      "bottomRight": "Bottom Right",
+      "right": "Right",
+      "bottom": "Bottom",
+      "left": "Left",
+      "top": "Top",
+      "topRight": "Top Right",
+      "bottomLeft": "Bottom Left",
+      "topLeft": "Top Left"
+    },
     "darkMode": "Dark Mode",
-    "darkModeDesc": "Switch between light and dark design",
+    "darkModeDesc": "Toggle between light and dark design",
     "minimalistDesign": "Minimalist Design",
     "minimalistDesignDesc": "Reduced design without glass effects and shadows",
+    "colors": "Colors",
+    "primaryColor": "Primary Color",
+    "primaryColorDesc": "Primary accent color of the app",
     "colorPalette": "Color Palette",
+    "active": "Active",
+    "success": "Success",
+    "warning": "Warning",
+    "error": "Error",
+    "secondary": "Secondary",
     "backgroundEffects": "Background Effects",
+    "notAvailableInMinimal": "(Not available in minimalist design)",
     "blurEffect": "Blur Effect",
-    "blurEffectDesc": "Soften background images",
+    "blurEffectDesc": "Blur for background images",
     "darkOverlay": "Dark Overlay",
-    "darkOverlayDesc": "Transparent darkening for better readability"
+    "darkOverlayDesc": "Transparent darkening for better readability",
+    "overlayTransparency": "Overlay Transparency",
+    "background": "Background",
+    "backgroundType": "Background Type",
+    "backgroundImage": "Image",
+    "backgroundColor": "Color",
+    "backgroundGradient": "Gradient",
+    "backgroundImages": "Background Images",
+    "credentials": "Credentials",
+    "current": "Current",
+    "photoCredentials": "Photo Credentials",
+    "addImageLink": "Add Link to",
+    "addImageFile": "Image File",
+    "defaultImages": "Default Images",
+    "restoreDefaultImages": "Restore default images",
+    "photoCredits": "Photo by [Ray Hennessy](https://unsplash.com/@rayhennessy?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash) on [Unsplash](https://unsplash.com/photos/brown-fox-on-snow-field-xUUZcpQlqpM?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash)\n\nPhoto by [Dario Jud](https://unsplash.com/@dariojud_?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash) on [Unsplash](https://unsplash.com/photos/neblige-baume-die-in-einen-nebligen-dunst-gehullt-sind-4EvreRzmq44?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash)\n\nPhoto by [Christoph de Haar](https://pixabay.com/users/dehaar-8454267/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=3250275) on [Pixabay](https://pixabay.com/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=3250275)\n\nPhoto by [John Lee](https://unsplash.com/@john_artifexfilm?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash) on [Unsplash](https://unsplash.com/photos/landschaft-der-berge-oMneOBYhJxY?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash)\n\nPhoto by [NEOM](https://unsplash.com/@neom?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash) on [Unsplash](https://unsplash.com/photos/die-sonne-geht-uber-einer-wustenlandschaft-unter-va9218QJFAk?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash)\n\nPhoto by [Mark Harpur](https://unsplash.com/@luckybeanz?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash) on [Unsplash](https://unsplash.com/photos/brauner-holzsteg-zwischen-lavendelblumenfeld-in-der-nahe-eines-gewassers-wahrend-der-goldenen-stunde-K2s_YE031CA?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash)\n\nPhoto by [Abubakr Abdelatif](https://pixabay.com/users/onatee-27254887/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=8650151) on [Pixabay](https://pixabay.com/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=8650151)\n\nPhoto by [Jonathan Reichel](https://pixabay.com/users/orcatec-2164300/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=4335571) on [Pixabay](https://pixabay.com/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=4335571)\n\nImage by [Angi128](https://pixabay.com/users/angi128-22878334/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=6553345) on [Pixabay](https://pixabay.com/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=6553345)\n\nImage by [Dan Fador](https://pixabay.com/users/danfador-55851/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=190055) on [Pixabay](https://pixabay.com/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=190055)"
+  },
+  "settings_notes": {
+    "dailyNoteTemplate": "Template for new Daily Notes",
+    "defineTemplate": "Define a template for new Daily Notes. Use",
+    "asDatePlaceholder": "as a placeholder for the date.",
+    "templatePlaceholder": "# {date}\n\n## Goals for Today\n- \n\n## Notes\n\n\n## Reflection\n- What went well?\n- What could be better?\n- Next steps:",
+    "markdownTip": "Tip: Use Markdown syntax for formatting (e.g. # for headings, - for lists)"
+  },
+  "settings_sidebar": {
+    "description": "Customize menu and set which items appear behind \"... More\"",
+    "dragToSort": "Drag to sort",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "placeInMoreMenu": "Place in More menu",
+    "cannotHideThisItem": "This menu item cannot be hidden",
+    "hide": "Hide",
+    "show": "Show",
+    "hint": "Note",
+    "hintText": "The items \"Inbox\" and \"Planner\" cannot be hidden as they are required for the basic functionality of the app."
+  },
+  "settings_notifications": {
+    "browserNotifications": "Browser Notifications",
+    "desktopNotifications": "Desktop Notifications",
+    "remindersInBackground": "Receive reminders even when the app is running in the background",
+    "notificationsEnabled": "Notifications are enabled",
+    "receiveTaskReminders": "You will receive reminders for your tasks",
+    "test": "Test",
+    "blocked": "Blocked",
+    "pending": "Pending",
+    "audioNotifications": "Audio Notifications",
+    "soundsEnabled": "Sounds enabled",
+    "enablesAudioNotifications": "Enables audio notifications",
+    "volume": "Volume",
+    "successSound": "Success Sound",
+    "behavior": "Behavior",
+    "showTaskPriorities": "Show task priorities",
+    "showsPriorityIndicators": "Shows priority indicators in tasks"
+  },
+  "settings_timer": {
+    "title": "Time Tracking & Pomodoro",
+    "description": "Set the timer display, configure Pomodoro intervals, and connect optional time integrations.",
+    "timerDisplay": "Timer Display",
+    "timerDisplayMode": "Timer Display Mode",
+    "chooseTimerDisplay": "Choose how the timer should be displayed",
+    "topBar": "Timer Bar (top)",
+    "topBarDesc": "Shows the timer in a fixed bar at the top of the screen",
+    "floatingWidget": "Floating Widget",
+    "floatingWidgetDesc": "Movable timer widget with minimal display",
+    "pomodoroTechnique": "Pomodoro Technique",
+    "pomodoroEnabled": "Pomodoro enabled",
+    "pomodoroDesc": "Enables structured work and break times",
+    "focusMode": "Focus Mode",
+    "focusModeEnable": "Enable Focus Mode",
+    "focusModeDesc": "Enables the use of Focus Mode for concentrated work"
+  },
+  "settings_data": {
+    "exportOptions": "Export Options",
+    "importOptions": "Import Options",
+    "imageStorage": "Image Storage",
+    "dangerZone": "Danger Zone",
+    "automaticBackup": "Automatic Backup",
+    "regularBackupDesc": "Regular local JSON backup to a selected directory.",
+    "enableAutoBackup": "Enable automatic backups",
+    "intervalMinutes": "Interval (Minutes)",
+    "selectBackupDir": "Select Backup Directory",
+    "browserNoSupport": "Your browser does not support directory selection.",
+    "noBackupDirSelected": "No backup directory selected.",
+    "backupNow": "Backup Now",
+    "lastBackup": "Last Backup",
+    "invalidBackupFile": "Invalid backup file.",
+    "restore": "Restore",
+    "restoreDesc": "Default: last backup in the selected folder. Without a folder, a file selection dialog appears.",
+    "resetBackups": "Completely reset backups",
+    "confirmResetBackup": "Reset all backup settings? Optionally, you can also remove TaskFuchs backup files from the selected folder in the next step.",
+    "confirmDeleteBackupFiles": "Delete TaskFuchs backup files (TaskFuchs_*.json) in the selected folder?",
+    "reset": "Reset",
+    "resetDesc": "This disables automatic backups, removes the selected folder from TaskFuchs, and (optionally) deletes TaskFuchs_*.json in the folder.",
+    "backupResetSuccess": "Backup settings reset.",
+    "jsonComplete": "JSON (Complete)",
+    "jsonCompleteDesc": "All data, settings and boards"
+  },
+  "settings_sync": {
+    "description": "Sync & Online Backups",
+    "nextcloud": "Nextcloud",
+    "caldav": "CalDAV",
+    "icalImport": "iCal Import"
   },
   "settings_information": {
     "privacyTitle": "Privacy & Security",
@@ -2110,5 +1609,10 @@
     "tags": "Tags",
     "notes": "Notes",
     "entries": "entries"
+  },
+  "header": {
+    "settings": "Settings",
+    "user_guide": "User Guide",
+    "onboarding_tour": "Onboarding Tour"
   }
-} 
+}

@@ -197,7 +197,7 @@
   },
   "task_modal": {
     "description_expand": "Beschreibung erweitern",
-    "description_collapse": "Beschreibung einklappen", 
+    "description_collapse": "Beschreibung einklappen",
     "description_edit": "Beschreibung bearbeiten",
     "description_preview": "Vorschau anzeigen",
     "descriptionPlaceholder": "Beschreibung (optional)...",
@@ -219,7 +219,11 @@
     "close": "Schließen",
     "project_unknown": "Unbekanntes Projekt",
     "column_select": "Spalte auswählen",
-    "time_management": "Zeitmanagement"
+    "time_management": "Zeitmanagement",
+    "new_column": "Neue Spalte erstellen",
+    "column_name_placeholder": "Spaltenname...",
+    "create": "Erstellen",
+    "move_to_inbox": "Zu Inbox verschieben"
   },
   "tags": {
     "filter_by_tags": "Nach Tags filtern",
@@ -326,6 +330,7 @@
     "yearly_utilization": "Jahresauslastung"
   },
   "common": {
+    "backup": "Backup",
     "save": "Speichern",
     "cancel": "Abbrechen",
     "delete": "Löschen",
@@ -333,13 +338,15 @@
     "close": "Schließen",
     "loading": "Laden...",
     "error": "Fehler",
-          "success": "Erfolgreich",
-          "confirm": "Bestätigen",
+    "success": "Erfolgreich",
+    "confirm": "Bestätigen",
     "yes": "Ja",
     "no": "Nein",
     "completed": "erledigt",
     "reset": "Zurücksetzen",
-    "locale": "de-DE"
+    "locale": "de-DE",
+    "show_completed": "Erledigt anzeigen",
+    "clear_filters": "Löschen"
   },
   "settings": {
     "title": "Einstellungen",
@@ -358,11 +365,11 @@
         "title": "Erscheinungsbild",
         "description": "Theme, Farben & Design"
       },
-              "language": {
-          "title": "Sprache",
-          "description": "Spracheinstellungen",
-          "current": "Aktuelle Sprache",
-          "description_text": "Alle Texte werden auf Deutsch angezeigt"
+      "language": {
+        "title": "Sprache",
+        "description": "Spracheinstellungen",
+        "current": "Aktuelle Sprache",
+        "description_text": "Alle Texte werden auf Deutsch angezeigt"
       },
       "notes": {
         "title": "Notizen",
@@ -474,13 +481,62 @@
     "completed_tasks": "Erledigte Aufgaben"
   },
   "header": {
-    "search": "Suche",
-    "search_placeholder_general": "Aufgaben und Notizen durchsuchen...",
-    "search_placeholder_settings": "Einstellungen durchsuchen...",
-    "user_guide": "Benutzeranleitung",
-    "onboarding_tour": "Onboarding-Tour",
+    "logout_confirm": "Möchten Sie sich wirklich abmelden?",
     "task_due": "Aufgabe fällig",
-    "task_due_message": "{title} ist jetzt fällig"
+    "task_due_message": "\"{title}\" ist jetzt fällig!",
+    "no_overdue_tasks": "Keine überfälligen Aufgaben",
+    "all_tasks_current": "Alle Aufgaben sind aktuell.",
+    "tasks_moved": "Aufgaben verschoben",
+    "overdue_moved_message": "{count} überfällige Aufgaben wurden in den heutigen Tag verschoben.",
+    "today": "Heute",
+    "date_select": "Datum auswählen",
+    "notes_show_details": "Notizen-Details anzeigen",
+    "notes_hide_details": "Notizen-Details schließen",
+    "project_tasks_show": "Projekt-Aufgaben einblenden",
+    "project_tasks_hide": "Projekt-Aufgaben ausblenden",
+    "move_overdue_tasks_tooltip": "{{count}} überfällige Aufgaben (links von heute) in den heutigen Tag verschieben",
+    "overdue_tasks": "{{count}} Überfällige",
+    "search": "Suchen",
+    "search_placeholder": {
+      "settings": "Einstellungen durchsuchen...",
+      "general": "Aufgaben und Notizen durchsuchen...",
+      "c": "Aufgaben und Notizen durchsuchen..."
+    },
+    "search_results": {
+      "tasks": "Aufgaben ({count})",
+      "notes": "Notizen ({count})"
+    },
+    "filter": "Filter",
+    "filter_close": "Filter schließen",
+    "move_overdue": "{count} überfällige Aufgaben (links von heute) in den heutigen Tag verschieben",
+    "completed_tasks": "Erledigte",
+    "completed_show": "Erledigte anzeigen",
+    "completed_hide": "Erledigte verbergen",
+    "completed_tasks_show": "Erledigte Aufgaben einblenden",
+    "completed_tasks_hide": "Erledigte Aufgaben ausblenden",
+    "completed_tasks_show_tooltip": "Erledigte Aufgaben einblenden",
+    "completed_tasks_hide_tooltip": "Erledigte Aufgaben ausblenden",
+    "completed_tasks_toggle_tooltip": "Erledigte Aufgaben ein-/ausblenden",
+    "priority_none": "Keine Priorität",
+    "events": "Termine",
+    "events_show": "Termine einblenden",
+    "events_hide": "Termine ausblenden",
+    "events_show_tooltip": "Termine einblenden",
+    "events_hide_tooltip": "Termine ausblenden",
+    "events_toggle_tooltip": "Termine ein-/ausblenden",
+    "edit_profile": "Profil bearbeiten",
+    "settings": "Einstellungen",
+    "logout": "Abmelden",
+    "onboarding_tour": "Onboarding Tour",
+    "user_guide": "Benutzeranleitung",
+    "navigate_to_date": "Zu Datum navigieren",
+    "priority": {
+      "none": "Ohne Priorität"
+    },
+    "show_project_sidebar": "Projektsidebar einblenden",
+    "hide_project_sidebar": "Projektsidebar ausblenden",
+    "organize_columns": "Spalten organisieren",
+    "export_planner": "Planer exportieren"
   },
   "actions": {
     "edit": "Bearbeiten",
@@ -518,19 +574,19 @@
     "add_1_minute": "1 Minute hinzufügen",
     "add_5_minutes": "5 Minuten hinzufügen",
     "add_10_minutes": "10 Minuten hinzufügen",
-          "open_in_notes": "In Notizen öffnen",
-      "click_to_enlarge": "Klicken zum Vergrößern",
-      "click_to_add_notes": "Klicken Sie auf 'Hinzufügen', um Notizen zu verknüpfen",
-      "schedule": "Terminieren",
-      "assign": "Zuweisen",
-      "tag": "Tag",
-      "back": "Zurück",
-      "tomorrow": "Morgen",
-      "next_week": "Nächste Woche",
-      "columns_count": "Spalten",
-      "tasks_selected": "Aufgaben ausgewählt",
-      "assign_task": "Aufgabe zuweisen",
-      "task_assigned": "Aufgabe zugewiesen!",
+    "open_in_notes": "In Notizen öffnen",
+    "click_to_enlarge": "Klicken zum Vergrößern",
+    "click_to_add_notes": "Klicken Sie auf 'Hinzufügen', um Notizen zu verknüpfen",
+    "schedule": "Terminieren",
+    "assign": "Zuweisen",
+    "tag": "Tag",
+    "back": "Zurück",
+    "tomorrow": "Morgen",
+    "next_week": "Nächste Woche",
+    "columns_count": "Spalten",
+    "tasks_selected": "Aufgaben ausgewählt",
+    "assign_task": "Aufgabe zuweisen",
+    "task_assigned": "Aufgabe zugewiesen!",
     "task_assigned_to_planner": "\"{title}\" wurde dem Planer hinzugefügt",
     "remove_reminder": "Erinnerung entfernen"
   },
@@ -542,17 +598,17 @@
     "placeholder_next_task": "Nächste Aufgabe eingeben... (ESC zum Beenden)",
     "placeholder_delete_confirmation": "LÖSCHEN eingeben...",
     "enter_delete_exactly": "Bitte geben Sie exakt 'LÖSCHEN' ein (ohne Anführungszeichen)",
-          "enter_delete_to_confirm": "Geben Sie 'LÖSCHEN' ein, um zu bestätigen:",
-      "placeholder_tag": "Tag hinzufügen...",
-      "custom_time_input": "Benutzerdefinierte Zeit eingeben",
-      "column_name_placeholder": "Spaltenname eingeben...",
-      "placeholder_smart_task": "Neue Aufgabe eingeben...",
-      "placeholder_new_task": "Neue Aufgabe eingeben...",
-      "placeholder_quick_mode": "Nächste Aufgabe eingeben... (ESC zum Beenden)",
-      "quick_mode": "Schnell-Modus",
-      "parsing_error": "Fehler beim Parsen",
-      "create_task_for_inbox": "Aufgabe für Inbox erstellen...",
-      "create_task_for": "Aufgabe für {{title}} erstellen...",
+    "enter_delete_to_confirm": "Geben Sie 'LÖSCHEN' ein, um zu bestätigen:",
+    "placeholder_tag": "Tag hinzufügen...",
+    "custom_time_input": "Benutzerdefinierte Zeit eingeben",
+    "column_name_placeholder": "Spaltenname eingeben...",
+    "placeholder_smart_task": "Neue Aufgabe eingeben...",
+    "placeholder_new_task": "Neue Aufgabe eingeben...",
+    "placeholder_quick_mode": "Nächste Aufgabe eingeben... (ESC zum Beenden)",
+    "quick_mode": "Schnell-Modus",
+    "parsing_error": "Fehler beim Parsen",
+    "create_task_for_inbox": "Aufgabe für Inbox erstellen...",
+    "create_task_for": "Aufgabe für {{title}} erstellen...",
     "create_new_task_for": "Neue Aufgabe für {{title}} erstellen...",
     "set_reminder": "Erinnerung setzen",
     "time_optional": "Zeit (optional)"
@@ -620,406 +676,356 @@
     "overtime": "Überstunden"
   },
   "user_guide": {
-    "example_meeting": "Meeting vorbereiten #arbeit !! 1h30m @heute note Präsentation erstellen",
-    "example_result": "→ Titel: 'Meeting vorbereiten', Tag: arbeit, Priorität: hoch, Zeit: 1.5h, Spalte: heute, Beschreibung: 'Präsentation erstellen'",
-    "example_important": "**Wichtiges** Meeting #arbeit #kunde !!! 2h @heute note Präsentation vorbereiten und [Dokument](https://docs.com) überprüfen",
-    "title": "Benutzeranleitung",
-    "close": "Schließen",
     "welcome_title": "Willkommen bei TaskFuchs! 🦊",
+    "header_title": "Benutzeranleitung",
+    "header_subtitle": "TaskFuchs Hilfe & Dokumentation",
+    "close": "Schließen",
+    "tip_text": "💡 Tipp: Drücke",
+    "tip_to_open": "um diese Hilfe zu öffnen",
     "sections": {
       "overview": {
         "title": "Überblick",
-        "subtitle": "TaskFuchs ist deine intelligente Produktivitäts-App für Aufgaben, Notizen und Projekte.",
-        "description": "Diese Anleitung zeigt dir alle Funktionen und wie du sie optimal nutzt.",
+        "subtitle": "Entdecke, was TaskFuchs besonders macht",
+        "description": "TaskFuchs ist ein umfassendes Aufgabenmanagementsystem mit integriertem Timer, smartem Parsing und Kanban-Boards.",
         "features": {
           "tasks": {
-            "title": "Aufgaben",
-            "description": "Organisiere deine Aufgaben mit Prioritäten, Tags, Unteraufgaben und Erinnerungen."
+            "title": "Aufgabenverwaltung",
+            "description": "Erstelle, organisiere und verfolgst Aufgaben mit Prioritäten, Fälligkeitsdaten und benutzerdefinierten Tags."
           },
           "notes": {
-            "title": "Notizen",
-            "description": "Erstelle Markdown-Notizen mit verlinkten Aufgaben und Daily Notes."
+            "title": "Notizen & Templates",
+            "description": "Schreibe Rich-Markdown-Notizen mit täglichen Templates und automatischer Formatierung."
           },
           "kanban": {
-            "title": "Kanban",
-            "description": "Visualisiere deinen Workflow mit anpassbaren Kanban-Boards."
+            "title": "Kanban-Boards",
+            "description": "Visualisiere deine Arbeit mit anpassbaren Kanban-Boards und Projektmanagement."
           },
           "timer": {
-            "title": "Timer",
-            "description": "Tracke deine Zeit mit integriertem Timer und Pomodoro-Technik."
+            "title": "Integrierter Timer",
+            "description": "Integrierte Pomodoro-Timer mit Soundeffekten und weißem Rauschen."
           },
           "pins": {
-            "title": "Pins",
-            "description": "Pinne wichtige Aufgaben für flexibles Spalten-Management."
+            "title": "Schnellzugriff-Pins",
+            "description": "Fixiere deine wichtigsten Aufgaben für einfachen Zugriff auf einen Blick."
           },
           "emails": {
-            "title": "E-Mails",
-            "description": "Importiere und verwalte wichtige E-Mails direkt in TaskFuchs."
+            "title": "E-Mail-Integration",
+            "description": "Importiere E-Mails direkt als Aufgaben und bleibe organisiert."
           }
         }
+      }
+    },
+    "tasks": {
+      "title": "Aufgaben",
+      "description": "Meistere die Aufgabenverwaltung in TaskFuchs.",
+      "create_task": {
+        "title": "Aufgaben erstellen",
+        "option1": "Klicke auf die Schaltfläche +",
+        "option2": "Nutze die Smart-Eingabe",
+        "option3": "Importiere aus E-Mails",
+        "option4": "Erstelle mit Zeitschätzungen"
       },
-      "tasks_guide": {
-        "title": "Aufgaben",
-        "heading": "Aufgaben verwalten",
-        "description": "TaskFuchs bietet dir mächtige Tools zur Aufgabenverwaltung.",
-        "create_new": {
-          "title": "Neue Aufgabe erstellen",
-          "items": [
-            "Klicke auf den + Button oder nutze N oder ⌘ N",
-            "Nutze den Smart Task Input für schnelle Eingabe: \"Einkaufen #privat !hoch morgen 15:00\"",
-            "Füge Beschreibungen in Markdown hinzu",
-            "Setze Prioritäten: Keine, Niedrig, Mittel, Hoch"
-          ]
-        },
-        "edit": {
-          "title": "Aufgaben bearbeiten",
-          "items": [
-            "Rechtsklick auf eine Aufgabe öffnet das Kontextmenü",
-            "Doppelklick öffnet das Aufgaben-Detail-Modal",
-            "Drag & Drop zum Verschieben zwischen Spalten",
-            "Timer starten durch Klick auf das Timer-Symbol"
-          ]
-        },
-        "organization": {
-          "title": "Aufgaben-Organisation",
-          "items": [
-            "Organisiere Aufgaben in Spalten nach Datum oder Projekt",
-            "Nutze Tags für Kategorisierung",
-            "Setze Prioritäten für wichtige Aufgaben",
-            "Verwende Zeitschätzungen für bessere Planung"
-          ]
-        }
+      "edit_task": {
+        "title": "Aufgaben bearbeiten",
+        "option1": "Klicke auf die Aufgabe",
+        "option2": "Ändere Priorität und Datum",
+        "option3": "Schätze die Zeit"
       },
-      "smart_input": {
-        "title": "Smart Input",
-        "heading": "⚡ Smart Task Input",
-        "description": "Mit dem Smart Task Input kannst du Aufgaben blitzschnell mit allen Details in einer Zeile erstellen. Die KI erkennt automatisch Prioritäten, Tags, Zeiten und mehr.",
-        "example_basic": "\"Meeting vorbereiten #arbeit !! 1h30m @heute note Präsentation erstellen\"",
-        "example_result": "→ Titel: \"Meeting vorbereiten\", Tag: arbeit, Priorität: hoch, Zeit: 1.5h, Spalte: heute, Beschreibung: \"Präsentation erstellen\"",
-        "priorities": {
-          "title": "Prioritäten",
-          "low": "Niedrige Priorität",
-          "medium": "Mittlere Priorität",
-          "high": "Hohe Priorität",
-          "note": "Auch auf Englisch: \"low\", \"medium\", \"high\""
-        },
-        "tags": {
-          "title": "Tags & Kategorien",
-          "single": "Einzelner Tag",
-          "multiple": "Mehrere Tags",
-          "popular": "Beliebte Tags",
-          "warning": "Tags brauchen ein Leerzeichen davor: \"Text #tag\" ✓, \"Text#tag\" ✗"
-        },
-        "time": {
-          "title": "Zeitschätzungen",
-          "minutes": "Minuten",
-          "hours": "Stunden",
-          "mixed": "Gemischt",
-          "note": "Auch: \"std\", \"stunden\", \"minuten\" (Deutsch)"
-        },
-        "dates": {
-          "title": "Termine & Daten",
-          "relative": "Relative Daten",
-          "english": "Englisch",
-          "specific": "Spezifische Daten",
-          "auto_assignment": "Automatische Zuordnung zu entsprechenden Datumsspalten"
-        },
-        "columns": {
-          "title": "Spalten-Zuordnung",
-          "inbox": "Inbox",
-          "today": "Heute", 
-          "tomorrow": "Morgen",
-          "backlog": "Backlog"
-        },
-        "descriptions": {
-          "title": "Beschreibungen & Notizen",
-          "add": "Beschreibung hinzufügen",
-          "alternative": "Alternative",
-          "tip": "Alles nach \"note \" wird als Beschreibung gespeichert"
-        },
-        "markdown": {
-          "title": "Markdown & Links",
-          "formatting": "Formatierungen",
-          "strikethrough": "Durchgestrichen",
-          "links": "Links",
-          "code": "Code",
-          "note": "Links werden automatisch in die Beschreibung eingefügt"
-        },
-        "complex_example": "\"**Wichtiges** Meeting #arbeit #kunde !!! 2h @heute note Präsentation vorbereiten und [Dokument](https://docs.com) überprüfen\"",
-        "complex_result": "Fetter Titel, Tags: arbeit+kunde, Priorität: hoch, 2 Stunden, heute-Spalte, Beschreibung mit Link",
-        "tips": {
-          "title": "Profi-Tipps:",
-          "order": "Reihenfolge ist egal: \"#tag !!! 30m Titel\" funktioniert genauso",
-          "spaces": "Leerzeichen sind wichtig: \"#tag\" ✓, aber \"text#tag\" ✗",
-          "multiple": "Mehrere Tags: \"#tag1 #tag2 #tag3\" - alle werden erkannt",
-          "autocomplete": "Auto-Vervollständigung: Die App schlägt passende Tags vor",
-          "combinable": "Kombinierbar: Alle Features können in einer Eingabe verwendet werden",
-          "chain": "Chain-Input: In Projekten bleibt das Modal nach Erstellen offen für weitere Eingaben"
-        }
-              },
-        "pins_guide": {
-          "title": "Pins",
-          "heading": "Wichtige Aufgaben im Überblick",
-          "description": "Pins helfen dir dabei, wichtige Aufgaben zu organisieren und flexibel in benutzerdefinierten Spalten zu verwalten.",
-          "pinning": {
-            "title": "Aufgaben anpinnen",
-            "items": [
-              "Im TaskModal: Pin-Spalte aus Dropdown auswählen",
-              "Im Kontextmenü: Rechtsklick auf Pin-Optionen",
-              "Drag & Drop: Ziehe Aufgaben direkt ins Pins-Board",
-              "Mehrfache Ansicht: Gepinnte Aufgaben bleiben in ihrer ursprünglichen Position"
-            ]
-          },
-          "manage": {
-            "title": "Spalten verwalten",
-            "items": [
-              "Neue Spalte: \"Spalte hinzufügen\" Button im Header",
-              "Spalte umbenennen: Doppelklick auf den Spaltentitel",
-              "Spalten sortieren: Drag & Drop der Spalten-Header",
-              "Spaltenanzahl: 3, 5 oder 7 Spalten über die Buttons unten"
-            ]
-          },
-          "best_practices": {
-            "title": "Best Practices",
-            "items": [
-              "Kategorien erstellen: z.B. \"Dringend\", \"Diese Woche\", \"Wichtige Projekte\"",
-              "Workflow optimieren: Nutze Pins für tägliche Review-Routine",
-              "Fokus behalten: Maximal 5-7 Aufgaben pro Spalte",
-              "Regelmäßig aufräumen: Erledigte Aufgaben werden automatisch entpinnt"
-            ]
-          }
-        },
-        "emails_guide": {
-          "title": "E-Mails",
-          "heading": "📧 E-Mail Integration",
-          "description": "Importiere und verwalte wichtige E-Mails direkt in TaskFuchs. Perfekt für die Verknüpfung von E-Mail-Inhalten mit Aufgaben und Projekten.",
-          "import": {
-            "title": "E-Mails importieren",
-            "items": [
-              "EML-Dateien: Drag & Drop oder Datei-Upload im E-Mail-Modal",
-              "Aus Webmail: E-Mail als .eml speichern und importieren",
-              "Automatische Verarbeitung: MIME-Grenzen und Anhänge werden bereinigt",
-              "Formatierung: E-Mails werden wie im E-Mail-Client dargestellt"
-            ]
-          },
-          "manage": {
-            "title": "E-Mails verwalten",
-            "items": [
-              "Im Mails-Tab: Alle importierten E-Mails chronologisch sortiert",
-              "Titel bearbeiten: E-Mail-Titel für bessere Organisation anpassen",
-              "Verknüpfungen: E-Mails mit Aufgaben und anderen Notizen verlinken",
-              "Suche: Volltextsuche in E-Mail-Inhalten"
-            ]
-          },
-          "use_cases": {
-            "title": "Anwendungsfälle",
-            "items": [
-              "Projektdokumentation: Wichtige Projekt-E-Mails archivieren",
-              "Aufgaben erstellen: Aus E-Mail-Inhalten direkte Aufgaben ableiten",
-              "Referenzen: Wichtige Informationen für später aufbewahren",
-              "Follow-ups: E-Mails mit Aufgaben verknüpfen für Nachverfolgung"
-            ]
-          }
-        },
-        "shortcuts_guide": {
-          "title": "Shortcuts",
-          "heading": "⌨️ Tastatur-Shortcuts",
-          "description": "Arbeite effizienter mit diesen praktischen Tastenkombinationen. TaskFuchs unterstützt sowohl Windows/Linux (Strg) als auch macOS (⌘) Shortcuts.",
-          "navigation": {
-            "title": "Navigation",
-            "dashboard": "Dashboard",
-            "inbox": "Inbox",
-            "planner": "Planer",
-            "projects": "Projekte",
-            "notes": "Notizen",
-            "pins": "Pins",
-            "tags": "Tags",
-            "statistics": "Statistiken",
-            "archive": "Archiv",
-            "settings": "Einstellungen"
-          },
-          "quick_actions": {
-            "title": "Schnellaktionen",
-            "new_task": "Neue Aufgabe",
-            "search": "Suche öffnen",
-            "settings": "Einstellungen",
-            "theme": "Theme wechseln",
-            "help": "Hilfe öffnen",
-            "close": "Modal schließen"
-          },
-          "focus_timer": {
-            "title": "Fokus & Timer",
-            "focus_mode": "Fokus-Modus",
-            "review_mode": "Review-Modus",
-            "timer_toggle": "Timer pausieren/fortsetzen",
-            "exit_focus": "Fokus verlassen"
-          },
-          "board_nav": {
-            "title": "Board-Navigation",
-            "previous": "Vorheriger Tag",
-            "next": "Nächster Tag",
-            "note": "Funktioniert im Planer und Review-Modus"
-          },
-          "review": {
-            "title": "Review-Modus",
-            "next_task": "Nächste Aufgabe",
-            "prev_task": "Vorherige Aufgabe",
-            "skip": "Aufgabe überspringen",
-            "archive": "Archivieren",
-            "edit": "Bearbeiten",
-            "estimate": "Zeit schätzen",
-            "calendar": "Kalender öffnen",
-            "plan": "Review planen"
-          },
-          "pro_tips": {
-            "title": "Pro-Tipps",
-            "vim": "Vim-Style Navigation: Nutze H/L für Board-Navigation",
-            "quick_switch": "Quick Switch: Drücke F um schnell in den Fokus-Modus zu wechseln",
-            "timer_control": "Timer Control: Leertaste pausiert/startet Timer von überall",
-            "universal_esc": "Universal ESC: Escape schließt alle Modals und verlässt Modi",
-            "cross_platform": "Cross-Platform: ⌘ auf Mac, Strg auf Windows/Linux",
-            "smart_input": "Smart Input: Alle Shortcuts funktionieren nicht in Eingabefeldern"
-          },
-          "keyboard_ref": {
-            "title": "Tastatur-Layout Referenz"
-          }
-        },
-        "settings_guide": {
-          "title": "Einstellungen",
-          "heading": "App-Einstellungen",
-          "description": "Passe TaskFuchs an deine Bedürfnisse an.",
-          "appearance": {
-            "title": "Erscheinungsbild",
-            "items": [
-              "Wähle zwischen hellem und dunklem Design",
-              "Passe die Akzentfarbe an",
-              "Konfiguriere Sidebar-Verhalten",
-              "Anpassbare Widget-Layouts"
-            ]
-          },
-          "notifications": {
-            "title": "Benachrichtigungen",
-            "items": [
-              "Konfiguriere Sound-Benachrichtigungen",
-              "Erinnerungs-Verhalten anpassen",
-              "Timer-Sounds und -Verhalten",
-              "End-of-Day Zusammenfassungen"
-            ]
-          },
-          "data": {
-            "title": "Datenmanagement",
-            "items": [
-              "Exportiere alle Daten als JSON",
-              "Importiere Daten aus anderen Apps",
-              "Backup und Wiederherstellung",
-              "Daten löschen und zurücksetzen"
-            ]
-        }
-      },
-      "tasks": {
-        "title": "Aufgaben",
-        "heading": "Aufgaben verwalten",
-        "features": [
-          "Erstelle Aufgaben mit natürlicher Sprache",
-          "Setze Prioritäten und Fälligkeitsdaten",
-          "Organisiere mit Tags und Kategorien",
-          "Füge Unteraufgaben und Beschreibungen hinzu",
-          "Tracke Zeit mit integriertem Timer",
-          "Filtere Aufgaben nach Tags und Prioritäten",
-          "Nutze wiederkehrende Aufgaben",
-          "Verschiebe überfällige Aufgaben automatisch"
-        ]
-      },
-      "notes": {
-        "title": "Notizen",
-        "heading": "Notizen & Daily Notes",
-        "description": "Erstelle und verwalte Notizen mit vollständiger Markdown-Unterstützung.",
-        "features": [
-          "Vollständiger Markdown-Editor",
-          "Verknüpfe Notizen mit Aufgaben",
-          "Automatische Tagesnotizen",
-          "Suchfunktion durch alle Notizen",
-          "Export in verschiedene Formate",
-          "Erstelle automatisch datierte Notizen"
-        ]
-      },
-      "kanban": {
-        "title": "Kanban",
-        "heading": "Kanban-Boards",
-        "description": "Visualisiere deinen Workflow mit flexiblen Kanban-Boards.",
-        "move_tasks": {
-          "title": "Aufgaben verschieben",
-          "features": [
-            "Ziehe Aufgaben zwischen Spalten",
-            "Aufgaben in \"Erledigt\" werden automatisch als abgeschlossen markiert"
-          ]
-        },
-        "project": {
-          "delete_title": "Projekt löschen",
-          "delete_confirm": "Möchten Sie das Projekt \"{title}\" wirklich löschen?",
-          "delete_warning": "⚠️ Dieses Projekt hat {count} Aufgaben, die ebenfalls gelöscht werden.",
-          "delete_input_label": "Geben Sie \"LÖSCHEN\" ein, um zu bestätigen:",
-          "delete_placeholder": "LÖSCHEN",
-          "delete_button": "Löschen",
-          "delete_cancel": "Abbrechen",
-          "rename_title": "Projekt umbenennen",
-          "min_one_column": "Mindestens eine Spalte muss vorhanden bleiben. Ein Projekt ohne Spalten ist nicht möglich.",
-          "no_projects": "Keine Projekte vorhanden",
-          "no_projects_desc": "Erstelle dein erstes Projekt und organisiere deine Aufgaben.",
-          "new_project": "Neues Projekt",
-          "create_new": "Neues Projekt erstellen",
-          "no_project_selected": "Kein Projekt ausgewählt",
-          "no_project_desc": "Wähle ein Projekt aus der Seitenleiste aus, um deine Aufgaben zu verwalten."
-        },
-        "column": {
-          "add_title": "Neue Spalte hinzufügen",
-          "add_button": "Spalte hinzufügen",
-          "moving": "Spalte verschieben...",
-          "previous": "Vorherige Spalten",
-          "next": "Nächste Spalten"
-        },
-        "notes": {
-          "manage": "Notizen verwalten",
-          "add": "Hinzufügen",
-          "no_linked": "Keine verknüpften Notizen",
-          "click_to_add": "Klicken Sie auf \"Hinzufügen\", um Notizen zu verknüpfen",
-          "pin": "An Projekt anheften",
-          "unpin": "Anheftung entfernen",
-          "remove_link": "Verknüpfung entfernen",
-          "no_notes_found": "Keine Notizen gefunden",
-          "all_linked": "Alle Notizen sind bereits verknüpft"
-        },
-        "filter": {
-          "title": "Filter",
-          "clear_all": "Alle löschen",
-          "close": "Filter schließen",
-          "no_tags": "Keine Tags vorhanden"
-        }
-      },
-      "shortcuts": {
-        "title": "Shortcuts",
-        "heading": "Tastatur-Shortcuts",
-        "general": {
-          "title": "Allgemeine Shortcuts",
-          "settings": "Einstellungen",
-          "dashboard": "Dashboard",
-          "tasks": "Aufgaben",
-          "kanban": "Kanban",
-          "notes": "Notizen"
-        }
-      },
-      "settings": {
-        "title": "Einstellungen",
-        "heading": "App-Einstellungen",
-        "features": [
-          "Timer-Sounds und -Verhalten"
-        ]
+      "organize_tasks": {
+        "title": "Aufgaben organisieren",
+        "option1": "Nutze Spalten",
+        "option2": "Filtere nach Tags",
+        "option3": "Archiviere fertige Aufgaben"
       }
     },
     "smart_input": {
-      "backlog_projects": "Backlog & Projekte",
-      "descriptions_notes": "Beschreibungen & Notizen",
-      "combinable": "Kombinierbar: Alle Features können in einer Eingabe verwendet werden"
+      "title": "Smartes Parsing",
+      "description": "Erstelle schnell funktionsreiche Aufgaben.",
+      "example": {
+        "title": "Beispiel",
+        "input": "Lebensmittel !2 #shopping @morgen",
+        "result": "Erstellt eine Aufgabe mit Priorität 2"
+      },
+      "priorities": {
+        "title": "Prioritäten",
+        "low": "Niedrige Priorität",
+        "low_shortcut": "!1 oder -",
+        "medium": "Mittlere Priorität",
+        "medium_shortcut": "!2 oder o",
+        "high": "Hohe Priorität",
+        "high_shortcut": "!3 oder +",
+        "or": "oder",
+        "low_alt": "-",
+        "medium_alt": "o",
+        "high_alt": "+",
+        "english_tip": "Du kannst Symbole verwenden"
+      },
+      "tags": {
+        "title": "Tags",
+        "single_tag": "Füge ein Tag hinzu",
+        "single_tag_shortcut": "#tagname",
+        "multiple_tags": "Mehrere Tags",
+        "multiple_tags_shortcut": "#tag1 #tag2",
+        "popular_tags": "Beliebte Tags",
+        "popular_tags_shortcut": "Tippe #",
+        "note": "Tags helfen bei der Organisation"
+      },
+      "time": {
+        "title": "Zeitschätzungen",
+        "minutes": "Minuten",
+        "minutes_shortcut": "30m",
+        "hours": "Stunden",
+        "hours_shortcut": "2h",
+        "mixed": "Gemischte Zeit",
+        "mixed_shortcut": "1h30m",
+        "english_tip": "Verwende 'm' und 'h'"
+      },
+      "dates": {
+        "title": "Daten",
+        "relative_dates": "Relative Daten",
+        "relative_dates_shortcut": "@today, @tomorrow",
+        "english": "Englische Namen",
+        "english_shortcut": "@monday, @friday",
+        "specific_dates": "Spezifische Daten",
+        "specific_dates_shortcut": "@2024-12-25",
+        "calendar_assignment": "Zuweisungen zum Kalender"
+      },
+      "columns": {
+        "title": "Spaltenzuweisung",
+        "inbox": "Zum Posteingang",
+        "inbox_shortcut": "@inbox",
+        "today": "Heute zuweisen",
+        "today_shortcut": "@today",
+        "tomorrow": "Morgen zuweisen",
+        "tomorrow_shortcut": "@tomorrow",
+        "backlog": "Zum Backlog",
+        "backlog_shortcut": "@backlog"
+      },
+      "descriptions": {
+        "title": "Beschreibungen",
+        "add_description": "Beschreibung hinzufügen",
+        "add_description_shortcut": ":: Beschreibung",
+        "alternative": "Alternatives Format",
+        "alternative_shortcut": "-- Beschreibung",
+        "tip": "Trennung durch ::"
+      },
+      "markdown": {
+        "title": "Markdown-Formatierung",
+        "formatting": "Kursiv",
+        "formatting_shortcut": "*text* oder **bold**",
+        "strikethrough": "Durchgestrichen",
+        "strikethrough_shortcut": "~~text~~",
+        "links": "Links",
+        "links_shortcut": "[text](url)",
+        "code": "Code",
+        "code_shortcut": "`code`",
+        "links_note": "Standard-Markdown"
+      },
+      "complex_example": {
+        "title": "Komplexes Beispiel",
+        "input": "Überprüfen !3 #work @friday",
+        "result": "Hochpriorisierte Aufgabe"
+      },
+      "pro_tips": {
+        "title": "Tipps",
+        "order_is_irrelevant": "Reihenfolge ist egal",
+        "space_is_important": "Leerzeichen wichtig",
+        "multiple_tags": "Mehrere Tags",
+        "auto_completion": "Auto-Vervollständigung",
+        "combinable": "Kombinierbar",
+        "chain_input": "Schnelle Eingabe"
+      }
+    },
+    "pins": {
+      "important_tasks_overview": "Schnellzugriff mit Pins",
+      "pins_description": "Halte wichtige Aufgaben sichtbar.",
+      "pinning_tasks": {
+        "option1": "Rechtsklick und 'Fixieren'",
+        "option2": "Pin-Symbol",
+        "option3": "Oben angezeigt",
+        "option4": "Nochmal klicken zum Entfernen"
+      },
+      "manage_columns": {
+        "title": "Organisieren",
+        "option1": "Drag and Drop",
+        "option2": "Alle Pins sehen",
+        "option3": "Nach Projekt filtern",
+        "option4": "Archivieren"
+      },
+      "best_practices": {
+        "title": "Best Practices",
+        "option1": "3-5 Aufgaben",
+        "option2": "Wöchentlich überprüfen",
+        "option3": "Für kritische Arbeit",
+        "option4": "Mit Tags kombinieren"
+      }
+    },
+    "emails": {
+      "title": "E-Mail-Integration",
+      "description": "Konvertiere E-Mails in Aufgaben.",
+      "import_emails": {
+        "title": "E-Mails importieren",
+        "option1": "E-Mail-Konto verbinden",
+        "option2": "E-Mails auswählen",
+        "option3": "Inhalt als Beschreibung",
+        "option4": "Absender erhalten"
+      },
+      "manage_emails": {
+        "title": "Verwalten",
+        "option1": "Mit Symbol gekennzeichnet",
+        "option2": "Antworte direkt",
+        "option3": "Archivieren"
+      },
+      "use_cases": {
+        "title": "Anwendungsfälle",
+        "option1": "Besprechungsnotizen",
+        "option2": "Kundenanfragen",
+        "option3": "Follow-ups",
+        "option4": "Kommunikation"
+      }
+    },
+    "shortcuts": {
+      "title": "Tastenkombinationen",
+      "description": "Meistere TaskFuchs mit Tastenkombinationen.",
+      "navigation": {
+        "title": "Navigation",
+        "dashboard": "Gehe zu heute",
+        "dashboard_shortcut": "1",
+        "inbox": "Gehe zum Posteingang",
+        "inbox_shortcut": "2",
+        "inbox_alt_shortcut": "I",
+        "planner": "Gehe zum Planer",
+        "planner_shortcut": "3",
+        "planner_alt_shortcut": "T",
+        "projects": "Gehe zu Projekten",
+        "projects_shortcut": "4",
+        "notes": "Gehe zu Notizen",
+        "notes_shortcut": "5",
+        "pins": "Gehe zu Pins",
+        "pins_shortcut": "6",
+        "tags": "Gehe zu Tags",
+        "tags_shortcut": "7",
+        "statistics": "Gehe zu Statistiken",
+        "statistics_shortcut": "8",
+        "archive": "Gehe zum Archiv",
+        "archive_shortcut": "9",
+        "settings": "Gehe zu Einstellungen",
+        "settings_shortcut": "0",
+        "or": "oder"
+      },
+      "quick_actions": {
+        "title": "Schnellaktionen",
+        "new_task": "Neue Aufgabe",
+        "new_task_shortcut": "N",
+        "new_task_alt_shortcut": "Strg/Cmd + N",
+        "open_search": "Suche öffnen",
+        "open_search_shortcut": "S oder Strg/Cmd + F",
+        "open_settings": "Einstellungen",
+        "open_settings_shortcut": "Strg/Cmd + ,",
+        "toggle_theme": "Design wechseln",
+        "toggle_theme_shortcut": "Strg/Cmd + Shift + D",
+        "open_help": "Hilfe öffnen",
+        "open_help_shortcut": "?",
+        "close_modal": "Modal schließen",
+        "close_modal_shortcut": "Esc",
+        "or": "oder"
+      },
+      "focus_and_timer": {
+        "title": "Focus & Timer",
+        "focus_mode": "Fokus-Modus",
+        "focus_mode_shortcut": "F",
+        "review_mode": "Überprüfungsmodus",
+        "review_mode_shortcut": "R",
+        "pause_resume_timer": "Timer pausieren",
+        "pause_resume_timer_shortcut": "Leertaste",
+        "leave_focus": "Fokus beenden",
+        "leave_focus_shortcut": "Esc"
+      },
+      "board_navigation": {
+        "title": "Board-Navigation",
+        "previous_day": "Vorheriger Tag",
+        "previous_day_shortcut": "H",
+        "previous_day_alt_shortcut": "←",
+        "next_day": "Nächster Tag",
+        "next_day_shortcut": "L",
+        "next_day_alt_shortcut": "→",
+        "note": "In Planer- und Kalenderansichten",
+        "or": "oder"
+      },
+      "review_mode": {
+        "title": "Überprüfungsmodus",
+        "next_task": "Nächste Aufgabe",
+        "next_task_shortcut": "J",
+        "next_task_alt_shortcut": "↓",
+        "previous_task": "Vorherige Aufgabe",
+        "previous_task_shortcut": "K",
+        "skip_task": "Überspringen",
+        "skip_task_shortcut": "S",
+        "archive": "Archivieren",
+        "archive_shortcut": "A",
+        "edit": "Bearbeiten",
+        "edit_shortcut": "E",
+        "estimate_time": "Zeit schätzen",
+        "estimate_time_shortcut": "T",
+        "open_calendar": "Kalender öffnen",
+        "open_calendar_shortcut": "D",
+        "plan_review": "Plan-Überprüfung",
+        "plan_review_shortcut": "P",
+        "or": "oder"
+      },
+      "pro_tips": {
+        "title": "Tipps",
+        "vim_style_navigation": "Vim-Navigation",
+        "quick_switch": "Zahlentasten",
+        "timer_control": "Leertaste pausiert",
+        "universal_esc": "Esc schließt",
+        "cross_platform": "Alle Plattformen",
+        "smart_input_shortcuts": "Befehle verketten"
+      },
+      "keyboard_layout_reference": {
+        "title": "Tastaturreferenz",
+        "today": "Heute",
+        "inbox": "Posteingang",
+        "tasks": "Aufgaben",
+        "kanban": "Kanban",
+        "notes": "Notizen",
+        "tags": "Tags",
+        "stats": "Statistiken",
+        "archive": "Archiv",
+        "settings": "Einstellungen",
+        "review": "Überprüfung",
+        "focus": "Fokus",
+        "left": "Links",
+        "right": "Rechts",
+        "new": "Neu",
+        "help": "Hilfe",
+        "timer": "Play/Pause"
+      }
+    },
+    "settings": {
+      "title": "Einstellungen",
+      "description": "Passe dein TaskFuchs-Erlebnis an.",
+      "appearance": {
+        "title": "Aussehen",
+        "option1": "Farben anpassen",
+        "option2": "Hintergründe",
+        "option3": "Dunkel-/Hellmodus",
+        "option4": "UI-Dichte"
+      },
+      "notifications": {
+        "title": "Benachrichtigungen",
+        "option1": "Browser-Benachrichtigungen",
+        "option2": "Sound-Benachrichtigungen",
+        "option3": "Timing",
+        "option4": "Inhalt"
+      },
+      "data_management": {
+        "title": "Daten & Sync",
+        "option1": "Sicherung",
+        "option2": "Daten importieren",
+        "option3": "Synchronisierung",
+        "option4": "Daten exportieren"
+      }
     }
   },
   "microsoft_todo": {
@@ -1105,7 +1111,6 @@
       "cancel": "Abbrechen",
       "add_tag": "Tag hinzufügen"
     },
-
     "smart_input": {
       "title": "Intelligente Eingabe",
       "subtitle": "Spreche natürlich mit TaskFuchs",
@@ -1146,7 +1151,7 @@
         "all_tasks_completed": "Alle Aufgaben erledigt!",
         "no_completed_tasks": "Noch keine erledigten Aufgaben",
         "no_high_priority_tasks": "Keine hochprioren Aufgaben",
-        "no_medium_priority_tasks": "Keine mittelprioren Aufgaben", 
+        "no_medium_priority_tasks": "Keine mittelprioren Aufgaben",
         "no_low_priority_tasks": "Keine niedrigprioren Aufgaben",
         "no_priority_tasks": "Keine Aufgaben ohne Priorität",
         "no_overdue_tasks": "Keine überfälligen Aufgaben",
@@ -1251,7 +1256,7 @@
       "fox_message": "Mach mich zu deinem! Wähle Farben, Themes, Sounds und Layouts, die zu dir passen. TaskFuchs soll sich anfühlen wie dein persönlicher Arbeitsplatz!",
       "features": [
         "Farbthemes",
-        "Anpassbare Layouts", 
+        "Anpassbare Layouts",
         "Sounds & Animationen",
         "Erweiterte Optionen"
       ]
@@ -1299,7 +1304,6 @@
     "export_tasks": "Aufgaben exportieren",
     "drag_to_sort": "Spalte ziehen um zu sortieren",
     "drop_task_here": "Aufgabe hier ablegen",
-
     "export": {
       "title": "Aufgaben-Export vom {date}",
       "no_tasks": "Keine Aufgaben in dieser Spalte.",
@@ -1337,64 +1341,6 @@
       "column_section": "Aufgaben",
       "no_tasks_row": "Keine Aufgaben in dieser Spalte"
     }
-  },
-  "header": {
-    "logout_confirm": "Möchten Sie sich wirklich abmelden?",
-    "task_due": "Aufgabe fällig",
-    "task_due_message": "\"{title}\" ist jetzt fällig!",
-    "no_overdue_tasks": "Keine überfälligen Aufgaben",
-    "all_tasks_current": "Alle Aufgaben sind aktuell.",
-    "tasks_moved": "Aufgaben verschoben",
-    "overdue_moved_message": "{count} überfällige Aufgaben wurden in den heutigen Tag verschoben.",
-    "today": "Heute",
-    "date_select": "Datum auswählen",
-    "notes_show_details": "Notizen-Details anzeigen",
-    "notes_hide_details": "Notizen-Details schließen",
-    "project_tasks_show": "Projekt-Aufgaben einblenden",
-    "project_tasks_hide": "Projekt-Aufgaben ausblenden",
-    "move_overdue_tasks_tooltip": "{{count}} überfällige Aufgaben (links von heute) in den heutigen Tag verschieben",
-    "overdue_tasks": "{{count}} Überfällige",
-    "search": "Suchen",
-    "search_placeholder": {
-      "settings": "Einstellungen durchsuchen...",
-      "general": "Aufgaben und Notizen durchsuchen...",
-      "c": "Aufgaben und Notizen durchsuchen..."
-    },
-    "search_results": {
-      "tasks": "Aufgaben ({count})",
-      "notes": "Notizen ({count})"
-    },
-    "filter": "Filter",
-    "filter_close": "Filter schließen",
-    "move_overdue": "{count} überfällige Aufgaben (links von heute) in den heutigen Tag verschieben",
-    "completed_tasks": "Erledigte",
-    "completed_show": "Erledigte anzeigen",
-    "completed_hide": "Erledigte verbergen",
-    "completed_tasks_show": "Erledigte Aufgaben einblenden",
-    "completed_tasks_hide": "Erledigte Aufgaben ausblenden",
-    "completed_tasks_show_tooltip": "Erledigte Aufgaben einblenden",
-    "completed_tasks_hide_tooltip": "Erledigte Aufgaben ausblenden",
-    "completed_tasks_toggle_tooltip": "Erledigte Aufgaben ein-/ausblenden",
-    "priority_none": "Keine Priorität",
-    "events": "Termine",
-    "events_show": "Termine einblenden",
-    "events_hide": "Termine ausblenden",
-    "events_show_tooltip": "Termine einblenden",
-    "events_hide_tooltip": "Termine ausblenden",
-    "events_toggle_tooltip": "Termine ein-/ausblenden",
-    "edit_profile": "Profil bearbeiten",
-    "settings": "Einstellungen",
-    "logout": "Abmelden",
-    "onboarding_tour": "Onboarding Tour",
-    "user_guide": "Benutzeranleitung",
-    "navigate_to_date": "Zu Datum navigieren",
-    "priority": {
-      "none": "Ohne Priorität"
-    },
-    "show_project_sidebar": "Projektsidebar einblenden",
-    "hide_project_sidebar": "Projektsidebar ausblenden",
-    "organize_columns": "Spalten organisieren",
-    "export_planner": "Planer exportieren"
   },
   "notes_view": {
     "notes": "Notizen",
@@ -1814,7 +1760,7 @@
     "time_overdue": "überfällig",
     "toolbar": {
       "heading1": "Überschrift 1",
-      "heading2": "Überschrift 2", 
+      "heading2": "Überschrift 2",
       "heading3": "Überschrift 3",
       "bold": "Fett",
       "italic": "Kursiv",
@@ -1863,7 +1809,7 @@
   },
   "recurring_tasks_widget": {
     "daily": "Täglich",
-    "weekly": "Wöchentlich", 
+    "weekly": "Wöchentlich",
     "monthly": "Monatlich",
     "yearly": "Jährlich",
     "skip": "Überspringen",
@@ -1888,7 +1834,7 @@
   },
   "time": {
     "minutes": "{minutes} Minuten",
-    "hours": "{hours} Stunden", 
+    "hours": "{hours} Stunden",
     "hours_minutes": "{hours} Stunden {minutes} Minuten"
   },
   "projects": {
@@ -1932,7 +1878,7 @@
   },
   "planner": {
     "export_tasks": "Aufgaben exportieren",
-    "archive_completed": "Erledigte Aufgaben archivieren", 
+    "archive_completed": "Erledigte Aufgaben archivieren",
     "focus_column": "Spalte fokussieren",
     "deadline_reached": "Deadline erreicht!",
     "visible_in_project_and_planner": "Sichtbar in Projekt und Planer",
@@ -1950,7 +1896,7 @@
     "assigned_date_label": "Zugewiesenes Datum:",
     "weekdays": {
       "mo": "Mo",
-      "tu": "Di", 
+      "tu": "Di",
       "we": "Mi",
       "th": "Do",
       "fr": "Fr",
@@ -2038,7 +1984,6 @@
     "tagNamePlaceholder": "Tag-Name...",
     "add": "Hinzufügen"
   },
-
   "reviewView": {
     "allReviewed": "Alle Aufgaben überprüft!",
     "noTasksToReview": "Keine Aufgaben zu überprüfen"
@@ -2093,16 +2038,136 @@
     "choose": "Verzeichnis auswählen"
   },
   "settings_appearance": {
+    "gradients": {
+      "bottomRight": "Nach unten rechts",
+      "right": "Nach rechts",
+      "bottom": "Nach unten",
+      "left": "Nach links",
+      "top": "Nach oben",
+      "topRight": "Nach oben rechts",
+      "bottomLeft": "Nach unten links",
+      "topLeft": "Nach oben links"
+    },
     "darkMode": "Dunkler Modus",
     "darkModeDesc": "Schaltet zwischen hellem und dunklem Design um",
     "minimalistDesign": "Minimalistisches Design",
     "minimalistDesignDesc": "Reduziertes Design ohne Glaseffekte und Schatten",
+    "colors": "Farben",
+    "primaryColor": "Hauptfarbe",
+    "primaryColorDesc": "Primäre Akzentfarbe der App",
     "colorPalette": "Farbpalette",
+    "active": "Aktiv",
+    "success": "Erfolg",
+    "warning": "Warnung",
+    "error": "Fehler",
+    "secondary": "Sekundär",
     "backgroundEffects": "Hintergrund-Effekte",
+    "notAvailableInMinimal": "(Im minimalistischen Design nicht verfügbar)",
     "blurEffect": "Blur-Effekt",
     "blurEffectDesc": "Weichzeichnung für Hintergrundbilder",
     "darkOverlay": "Dunkles Overlay",
-    "darkOverlayDesc": "Transparente Verdunklung für bessere Lesbarkeit"
+    "darkOverlayDesc": "Transparente Verdunklung für bessere Lesbarkeit",
+    "overlayTransparency": "Overlay-Transparenz",
+    "background": "Hintergrund",
+    "backgroundType": "Hintergrundtyp",
+    "backgroundImage": "Bild",
+    "backgroundColor": "Farbe",
+    "backgroundGradient": "Farbverlauf",
+    "backgroundImages": "Hintergrundbilder",
+    "credentials": "Credentials",
+    "current": "Aktuell",
+    "photoCredentials": "Foto-Anrechnung",
+    "addImageLink": "Link zu einer",
+    "addImageFile": "Bilddatei hinzufügen",
+    "defaultImages": "Standardbilder",
+    "restoreDefaultImages": "Standardbilder wiederherstellen",
+    "photoCredits": "Foto von [Ray Hennessy](https://unsplash.com/de/@rayhennessy?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash) auf [Unsplash](https://unsplash.com/de/fotos/brown-fox-on-snow-field-xUUZcpQlqpM?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash)\n\nFoto von [Dario Jud](https://unsplash.com/de/@dariojud_?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash) auf [Unsplash](https://unsplash.com/de/fotos/neblige-baume-die-in-einen-nebligen-dunst-gehullt-sind-4EvreRzmq44?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash)\n\nFoto von [Christoph de Haar](https://pixabay.com/de/users/dehaar-8454267/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=3250275) auf [Pixabay](https://pixabay.com/de/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=3250275)\n\nFoto von [John Lee](https://unsplash.com/de/@john_artifexfilm?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash) auf [Unsplash](https://unsplash.com/de/fotos/landschaft-der-berge-oMneOBYhJxY?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash)\n\nFoto von [NEOM](https://unsplash.com/de/@neom?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash) auf [Unsplash](https://unsplash.com/de/fotos/die-sonne-geht-uber-einer-wustenlandschaft-unter-va9218QJFAk?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash)\n\nFoto von [Mark Harpur](https://unsplash.com/de/@luckybeanz?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash) auf [Unsplash](https://unsplash.com/de/fotos/brauner-holzsteg-zwischen-lavendelblumenfeld-in-der-nahe-eines-gewassers-wahrend-der-goldenen-stunde-K2s_YE031CA?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash)\n\nFoto von [Abubakr Abdelatif](https://pixabay.com/de/users/onatee-27254887/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=8650151) auf [Pixabay](https://pixabay.com/de/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=8650151)\n\nFoto von [Jonathan Reichel](https://pixabay.com/de/users/orcatec-2164300/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=4335571) auf [Pixabay](https://pixabay.com/de/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=4335571)\n\nBild von [Angi128](https://pixabay.com/de/users/angi128-22878334/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=6553345) auf [Pixabay](https://pixabay.com/de/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=6553345)\n\nBild von [Dan Fador](https://pixabay.com/de/users/danfador-55851/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=190055) auf [Pixabay](https://pixabay.com/de/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=190055)"
+  },
+  "settings_notes": {
+    "dailyNoteTemplate": "Template für neue Daily Notes",
+    "defineTemplate": "Definiere eine Vorlage für neue Daily Notes. Verwende",
+    "asDatePlaceholder": "als Platzhalter für das Datum.",
+    "templatePlaceholder": "# {date}\n\n## Ziele für heute\n- \n\n## Notizen\n\n\n## Reflexion\n- Was lief gut?\n- Was könnte besser werden?\n- Nächste Schritte:",
+    "markdownTip": "Tipp: Verwende Markdown-Syntax für Formatierung (z.B. # für Überschriften, - für Listen)"
+  },
+  "settings_sidebar": {
+    "description": "Menü anpassen und Festlegen, welche Einträge hinter \"... Mehr\" erscheinen sollen.",
+    "dragToSort": "Ziehen zum Sortieren",
+    "moveUp": "Nach oben",
+    "moveDown": "Nach unten",
+    "placeInMoreMenu": "Im Mehr-Menü anzeigen",
+    "cannotHideThisItem": "Dieser Menüpunkt kann nicht ausgeblendet werden",
+    "hide": "Ausblenden",
+    "show": "Einblenden",
+    "hint": "Hinweis",
+    "hintText": "Die Punkte \"Inbox\" und \"Tagesplaner\" können nicht ausgeblendet werden, da sie für die Grundfunktion der App erforderlich sind."
+  },
+  "settings_notifications": {
+    "browserNotifications": "Browser-Benachrichtigungen",
+    "desktopNotifications": "Desktop-Benachrichtigungen",
+    "remindersInBackground": "Erhalten Sie Erinnerungen auch wenn die App im Hintergrund läuft",
+    "notificationsEnabled": "Benachrichtigungen sind aktiviert",
+    "receiveTaskReminders": "Sie erhalten Erinnerungen für Ihre Aufgaben",
+    "test": "Testen",
+    "blocked": "Blockiert",
+    "pending": "Ausstehend",
+    "audioNotifications": "Audio-Benachrichtigungen",
+    "soundsEnabled": "Sounds aktiviert",
+    "enablesAudioNotifications": "Aktiviert Audio-Benachrichtigungen",
+    "volume": "Lautstärke",
+    "successSound": "Erfolgsklang",
+    "behavior": "Verhalten",
+    "showTaskPriorities": "Aufgaben-Prioritäten anzeigen",
+    "showsPriorityIndicators": "Zeigt Prioritäts-Indikatoren in Aufgaben"
+  },
+  "settings_timer": {
+    "title": "Zeiterfassung & Pomodoro",
+    "description": "Stelle die Timer-Anzeige ein, konfiguriere Pomodoro-Intervalle und verbinde optionale Zeit-Integrationen.",
+    "timerDisplay": "Timer-Anzeige",
+    "timerDisplayMode": "Timer-Anzeigemodus",
+    "chooseTimerDisplay": "Wählen Sie, wie der Timer angezeigt werden soll",
+    "topBar": "Timer-Leiste (oben)",
+    "topBarDesc": "Zeigt den Timer in einer festen Leiste am oberen Bildschirmrand",
+    "floatingWidget": "Schwebendes Widget",
+    "floatingWidgetDesc": "Verschiebares Timer-Widget mit minimaler Anzeige",
+    "pomodoroTechnique": "Pomodoro-Technik",
+    "pomodoroEnabled": "Pomodoro aktiviert",
+    "pomodoroDesc": "Aktiviert strukturierte Arbeits- und Pausenzeiten",
+    "focusMode": "Fokusmodus",
+    "focusModeEnable": "Fokusmodus aktivieren",
+    "focusModeDesc": "Ermöglicht die Nutzung des Fokusmodus für konzentriertes Arbeiten"
+  },
+  "settings_data": {
+    "exportOptions": "Export-Optionen",
+    "importOptions": "Import-Optionen",
+    "imageStorage": "Bildspeicher",
+    "dangerZone": "Gefahrenzone",
+    "automaticBackup": "Automatisches Backup",
+    "regularBackupDesc": "Regelmäßige lokale JSON‑Sicherung in ein ausgewähltes Verzeichnis.",
+    "enableAutoBackup": "Automatische Backups aktivieren",
+    "intervalMinutes": "Intervall (Minuten)",
+    "selectBackupDir": "Backup‑Verzeichnis wählen",
+    "browserNoSupport": "Dieser Browser unterstützt die Verzeichnis‑Auswahl nicht.",
+    "noBackupDirSelected": "Kein Backup‑Verzeichnis gewählt.",
+    "backupNow": "Jetzt sichern",
+    "lastBackup": "Letztes Backup",
+    "invalidBackupFile": "Ungültige Backup-Datei.",
+    "restore": "Wiederherstellen",
+    "restoreDesc": "Standard: letztes Backup im gewählten Ordner. Ohne Ordner erscheint ein Dateiauswahldialog.",
+    "resetBackups": "Backups komplett zurücksetzen",
+    "confirmResetBackup": "Alle Backup-Einstellungen zurücksetzen? Optional kannst du im nächsten Schritt auch TaskFuchs-Backupdateien aus dem gewählten Ordner entfernen.",
+    "confirmDeleteBackupFiles": "TaskFuchs-Backupdateien (TaskFuchs_*.json) im gewählten Ordner löschen?",
+    "reset": "Zurücksetzen",
+    "resetDesc": "Dies deaktiviert automatische Backups, entfernt den gewählten Ordner aus TaskFuchs und (optional) löscht TaskFuchs_*.json im Ordner.",
+    "backupResetSuccess": "Backup-Einstellungen zurückgesetzt.",
+    "jsonComplete": "JSON (Vollständig)",
+    "jsonCompleteDesc": "Alle Daten, Einstellungen und Boards"
+  },
+  "settings_sync": {
+    "description": "Sync & Onlinebackups",
+    "nextcloud": "Nextcloud",
+    "caldav": "CalDAV",
+    "icalImport": "iCal Import"
   },
   "settings_information": {
     "privacyTitle": "Datenschutz & Sicherheit",
@@ -2118,4 +2183,4 @@
     "notes": "Notizen",
     "entries": "Einträge"
   }
-} 
+}

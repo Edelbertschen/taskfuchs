@@ -1567,7 +1567,7 @@ export function ProjectKanbanBoard() {
                 ? 'bg-gray-50 hover:bg-gray-100 border-2 border-dashed border-gray-300 hover:border-gray-400'
                 : 'bg-gray-100 bg-opacity-20 hover:bg-opacity-35 dark:bg-gray-700 dark:bg-opacity-20 dark:hover:bg-opacity-35 border border-dashed border-gray-300 border-opacity-40 dark:border-gray-600 dark:border-opacity-40'
             }`}
-            title={t('add_new_column')}
+            title={actions.add_column()}
           >
             <Plus className={`w-6 h-6 mb-1 transition-colors ${
               isMinimalDesign
@@ -1579,7 +1579,7 @@ export function ProjectKanbanBoard() {
                 ? 'text-gray-600 group-hover:text-gray-800'
                 : 'text-white group-hover:text-white'
             }`}>
-              {t('add_column')}
+              {actions.add_column()}
             </span>
           </button>
           </div>

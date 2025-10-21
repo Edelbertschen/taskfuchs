@@ -2529,7 +2529,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                                         >
                                           <div className="flex items-center space-x-2">
                                             <Plus className="w-4 h-4" />
-                                            <span>Neue Spalte erstellen</span>
+                                            <span>{taskModal.new_column()}</span>
                                           </div>
                                         </button>
                                       )}
@@ -2542,7 +2542,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                                               type="text"
                                               value={newColumnTitle}
                                               onChange={(e) => setNewColumnTitle(e.target.value)}
-                                              placeholder="Spaltenname..."
+                                              placeholder={taskModal.column_name_placeholder()}
                                               className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                               autoFocus
                                               onKeyPress={(e) => {
@@ -2558,7 +2558,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                                               onClick={handleCreateColumn}
                                               className="px-3 py-2 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600 transition-colors"
                                             >
-                                              Erstellen
+                                              {taskModal.create()}
                                             </button>
                                             <button
                                               onClick={() => {
@@ -2611,7 +2611,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                                 }}
                                 className="font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
                               >
-                                Zu Inbox verschieben
+                                {taskModal.move_to_inbox()}
                               </button>
                             </div>
                           </div>

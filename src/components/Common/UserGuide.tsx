@@ -128,14 +128,14 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
     },
     {
       id: 'tasks',
-      title: 'Aufgaben',
+      title: t('user_guide.tasks.title'),
       icon: CheckSquare,
       content: (
         <div className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Aufgaben verwalten</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('user_guide.tasks.title')}</h2>
             <p className="text-gray-700 dark:text-gray-300 mb-6">
-              TaskFuchs bietet dir mächtige Tools zur Aufgabenverwaltung.
+              {t('user_guide.tasks.description')}
             </p>
           </div>
 
@@ -143,39 +143,37 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <div className="flex items-center space-x-2 mb-3">
                 <Plus className="w-5 h-5" style={getAccentColorStyles().text} />
-                <h3 className="font-semibold text-gray-900 dark:text-white">Neue Aufgabe erstellen</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-white">{t('user_guide.tasks.create_task.title')}</h3>
               </div>
               <ul className="space-y-2 text-gray-700 dark:text-gray-300">
-                <li>• Klicke auf den <strong>+ Button</strong> oder nutze <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs">N</kbd> oder <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs">⌘ N</kbd></li>
-                <li>• Nutze den <strong>Smart Task Input</strong> für schnelle Eingabe: "Einkaufen #privat !hoch morgen 15:00"</li>
-                <li>• Füge Beschreibungen in Markdown hinzu</li>
-                <li>• Setze Prioritäten: Keine, Niedrig, Mittel, Hoch</li>
+                <li>• {t('user_guide.tasks.create_task.option1')}</li>
+                <li>• {t('user_guide.tasks.create_task.option2')}</li>
+                <li>• {t('user_guide.tasks.create_task.option3')}</li>
+                <li>• {t('user_guide.tasks.create_task.option4')}</li>
               </ul>
             </div>
 
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <div className="flex items-center space-x-2 mb-3">
                 <Edit className="w-5 h-5" style={getAccentColorStyles().text} />
-                <h3 className="font-semibold text-gray-900 dark:text-white">Aufgaben bearbeiten</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-white">{t('user_guide.tasks.edit_task.title')}</h3>
               </div>
               <ul className="space-y-2 text-gray-700 dark:text-gray-300">
-                <li>• Rechtsklick auf eine Aufgabe öffnet das Kontextmenü</li>
-                <li>• Doppelklick öffnet das Aufgaben-Detail-Modal</li>
-                <li>• Drag & Drop zum Verschieben zwischen Spalten</li>
-                <li>• Timer starten durch Klick auf das Timer-Symbol</li>
+                <li>• {t('user_guide.tasks.edit_task.option1')}</li>
+                <li>• {t('user_guide.tasks.edit_task.option2')}</li>
+                <li>• {t('user_guide.tasks.edit_task.option3')}</li>
               </ul>
             </div>
 
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <div className="flex items-center space-x-2 mb-3">
                 <Eye className="w-5 h-5" style={getAccentColorStyles().text} />
-                <h3 className="font-semibold text-gray-900 dark:text-white">Aufgaben-Organisation</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-white">{t('user_guide.tasks.organize_tasks.title')}</h3>
               </div>
               <ul className="space-y-2 text-gray-700 dark:text-gray-300">
-                <li>• Organisiere Aufgaben in <strong>Spalten</strong> nach Datum oder Projekt</li>
-                <li>• Nutze <strong>Tags</strong> für Kategorisierung</li>
-                <li>• Setze <strong>Prioritäten</strong> für wichtige Aufgaben</li>
-                <li>• Verwende <strong>Zeitschätzungen</strong> für bessere Planung</li>
+                <li>• {t('user_guide.tasks.organize_tasks.option1')}</li>
+                <li>• {t('user_guide.tasks.organize_tasks.option2')}</li>
+                <li>• {t('user_guide.tasks.organize_tasks.option3')}</li>
               </ul>
             </div>
           </div>
@@ -184,14 +182,14 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
     },
     {
       id: 'smart-input',
-      title: 'Smart Input',
+      title: t('user_guide.smart_input.title'),
       icon: Zap,
       content: (
         <div className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">⚡ Smart Task Input</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">⚡ {t('user_guide.smart_input.title')}</h2>
             <p className="text-gray-700 dark:text-gray-300 mb-6">
-              Mit dem Smart Task Input kannst du Aufgaben blitzschnell mit allen Details in einer Zeile erstellen. Die KI erkennt automatisch Prioritäten, Tags, Zeiten und mehr.
+              {t('user_guide.smart_input.description')}
             </p>
           </div>
 
@@ -200,13 +198,13 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
             <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-4 border-2 border-dashed border-gray-300 dark:border-gray-600">
               <h4 className="font-medium text-gray-900 dark:text-white mb-3 flex items-center">
                 <span className="text-2xl mr-2">📝</span>
-                Beispiel:
+                {t('user_guide.smart_input.example.title')}
               </h4>
               <div className="font-mono text-lg p-3 bg-white dark:bg-gray-800 rounded-lg border" style={{ color: state.preferences.accentColor }}>
-                "Meeting vorbereiten #arbeit !! 1h30m @heute note Präsentation erstellen"
+                {t('user_guide.smart_input.example.input')}
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                → Titel: "Meeting vorbereiten", Tag: arbeit, Priorität: hoch, Zeit: 1.5h, Spalte: heute, Beschreibung: "Präsentation erstellen"
+                {t('user_guide.smart_input.example.result')}
               </div>
             </div>
 
@@ -214,36 +212,36 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
                 <span className="w-4 h-4 rounded-full bg-red-500 mr-3"></span>
-                Prioritäten
+                {t('user_guide.smart_input.priorities.title')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Niedrige Priorität</span>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.smart_input.priorities.low')}</span>
                   <div className="flex space-x-2">
-                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">!</kbd>
-                    <span className="text-gray-400">oder</span>
-                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">niedrig</kbd>
+                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.smart_input.priorities.low_shortcut')}</kbd>
+                    <span className="text-gray-400">{t('user_guide.smart_input.priorities.or')}</span>
+                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.smart_input.priorities.low_alt')}</kbd>
                   </div>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Mittlere Priorität</span>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.smart_input.priorities.medium')}</span>
                   <div className="flex space-x-2">
-                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">!!</kbd>
-                    <span className="text-gray-400">oder</span>
-                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">mittel</kbd>
+                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.smart_input.priorities.medium_shortcut')}</kbd>
+                    <span className="text-gray-400">{t('user_guide.smart_input.priorities.or')}</span>
+                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.smart_input.priorities.medium_alt')}</kbd>
                   </div>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Hohe Priorität</span>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.smart_input.priorities.high')}</span>
                   <div className="flex space-x-2">
-                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">!!!</kbd>
-                    <span className="text-gray-400">oder</span>
-                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">hoch</kbd>
+                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.smart_input.priorities.high_shortcut')}</kbd>
+                    <span className="text-gray-400">{t('user_guide.smart_input.priorities.or')}</span>
+                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.smart_input.priorities.high_alt')}</kbd>
                   </div>
                 </div>
               </div>
               <div className="text-sm text-gray-500 dark:text-gray-400 mt-3">
-                💡 <strong>Auch auf Englisch:</strong> "low", "medium", "high"
+                {t('user_guide.smart_input.priorities.english_tip')}
               </div>
             </div>
 
@@ -251,24 +249,24 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
                 <span className="w-4 h-4 rounded-full bg-blue-500 mr-3"></span>
-                Tags & Kategorien
+                {t('user_guide.smart_input.tags.title')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Einzelner Tag</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">#arbeit</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.smart_input.tags.single_tag')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.smart_input.tags.single_tag_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Mehrere Tags</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">#arbeit #wichtig</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.smart_input.tags.multiple_tags')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.smart_input.tags.multiple_tags_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Beliebte Tags</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">#privat #haushalt</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.smart_input.tags.popular_tags')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.smart_input.tags.popular_tags_shortcut')}</kbd>
                 </div>
               </div>
               <div className="text-sm text-red-600 dark:text-red-400 mt-3 p-2 bg-red-50 dark:bg-red-900/20 rounded">
-                ⚠️ <strong>Wichtig:</strong> Tags brauchen ein Leerzeichen davor: "Text #tag" ✓, "Text#tag" ✗
+                {t('user_guide.smart_input.tags.note')}
               </div>
             </div>
 
@@ -276,24 +274,24 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
                 <span className="w-4 h-4 rounded-full bg-green-500 mr-3"></span>
-                Zeitschätzungen
+                {t('user_guide.smart_input.time.title')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Minuten</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">30m, 45min</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.smart_input.time.minutes')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.smart_input.time.minutes_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Stunden</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">1h, 2h, 3h30m</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.smart_input.time.hours')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.smart_input.time.hours_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Gemischt</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">1h15m, 2h45min</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.smart_input.time.mixed')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.smart_input.time.mixed_shortcut')}</kbd>
                 </div>
               </div>
               <div className="text-sm text-gray-500 dark:text-gray-400 mt-3">
-                💡 <strong>Auch:</strong> "std", "stunden", "minuten" (Deutsch)
+                {t('user_guide.smart_input.time.english_tip')}
               </div>
             </div>
 
@@ -301,24 +299,24 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
                 <span className="w-4 h-4 rounded-full bg-purple-500 mr-3"></span>
-                Termine & Daten
+                {t('user_guide.smart_input.dates.title')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Relative Daten</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">heute, morgen</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.smart_input.dates.relative_dates')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.smart_input.dates.relative_dates_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Englisch</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">today, tomorrow</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.smart_input.dates.english')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.smart_input.dates.english_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Spezifische Daten</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">15.05.2024</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.smart_input.dates.specific_dates')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.smart_input.dates.specific_dates_shortcut')}</kbd>
                 </div>
               </div>
               <div className="text-sm text-gray-500 dark:text-gray-400 mt-3">
-                📅 <strong>Automatische Zuordnung</strong> zu entsprechenden Datumsspalten
+                {t('user_guide.smart_input.dates.calendar_assignment')}
               </div>
             </div>
 
@@ -326,24 +324,24 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
                 <span className="w-4 h-4 rounded-full bg-orange-500 mr-3"></span>
-                Spalten-Zuordnung
+                {t('user_guide.smart_input.columns.title')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Inbox</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">@inbox</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.smart_input.columns.inbox')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.smart_input.columns.inbox_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Heute</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">@heute</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.smart_input.columns.today')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.smart_input.columns.today_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Morgen</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">@morgen</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.smart_input.columns.tomorrow')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.smart_input.columns.tomorrow_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Backlog</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">@backlog</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.smart_input.columns.backlog')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.smart_input.columns.backlog_shortcut')}</kbd>
                 </div>
               </div>
             </div>
@@ -352,20 +350,20 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
                 <span className="w-4 h-4 rounded-full bg-cyan-500 mr-3"></span>
-                Beschreibungen & Notizen
+                {t('user_guide.smart_input.descriptions.title')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Beschreibung hinzufügen</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">note Text</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.smart_input.descriptions.add_description')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.smart_input.descriptions.add_description_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Alternative</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">n Text</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.smart_input.descriptions.alternative')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.smart_input.descriptions.alternative_shortcut')}</kbd>
                 </div>
               </div>
               <div className="text-sm text-gray-500 dark:text-gray-400 mt-3">
-                💡 <strong>Tipp:</strong> Alles nach "note " wird als Beschreibung gespeichert
+                {t('user_guide.smart_input.descriptions.tip')}
               </div>
             </div>
 
@@ -373,28 +371,28 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
                 <span className="w-4 h-4 rounded-full bg-pink-500 mr-3"></span>
-                Markdown & Links
+                {t('user_guide.smart_input.markdown.title')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Formatierungen</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">**fett** *kursiv*</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.smart_input.markdown.formatting')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.smart_input.markdown.formatting_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Durchgestrichen</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">~~text~~</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.smart_input.markdown.strikethrough')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.smart_input.markdown.strikethrough_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Links</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">[Text](url)</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.smart_input.markdown.links')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.smart_input.markdown.links_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Code</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">`code`</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.smart_input.markdown.code')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.smart_input.markdown.code_shortcut')}</kbd>
                 </div>
               </div>
               <div className="text-sm text-gray-500 dark:text-gray-400 mt-3">
-                🔗 <strong>Links</strong> werden automatisch in die Beschreibung eingefügt
+                {t('user_guide.smart_input.markdown.links_note')}
               </div>
             </div>
 
@@ -402,13 +400,13 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
             <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-lg p-4 border-2 border-dashed border-gray-300 dark:border-gray-600">
               <h4 className="font-medium text-gray-900 dark:text-white mb-3 flex items-center">
                 <span className="text-2xl mr-2">🚀</span>
-                Komplexes Beispiel:
+                {t('user_guide.smart_input.complex_example.title')}
               </h4>
               <div className="font-mono text-lg p-3 bg-white dark:bg-gray-800 rounded-lg border break-all" style={{ color: state.preferences.accentColor }}>
-                "**Wichtiges** Meeting #arbeit #kunde !!! 2h @heute note Präsentation vorbereiten und [Dokument](https://docs.com) überprüfen"
+                {t('user_guide.smart_input.complex_example.input')}
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                ✨ <strong>Ergebnis:</strong> Fetter Titel, Tags: arbeit+kunde, Priorität: hoch, 2 Stunden, heute-Spalte, Beschreibung mit Link
+                {t('user_guide.smart_input.complex_example.result')}
               </div>
             </div>
 
@@ -416,15 +414,15 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
             <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
               <h4 className="font-medium text-blue-900 dark:text-blue-200 mb-3 flex items-center">
                 <span className="text-2xl mr-2">💡</span>
-                Profi-Tipps:
+                {t('user_guide.smart_input.pro_tips.title')}
               </h4>
               <ul className="text-sm text-blue-800 dark:text-blue-300 space-y-2">
-                <li>• <strong>Reihenfolge ist egal:</strong> "#tag !!! 30m Titel" funktioniert genauso</li>
-                <li>• <strong>Leerzeichen sind wichtig:</strong> "#tag" ✓, aber "text#tag" ✗</li>
-                <li>• <strong>Mehrere Tags:</strong> "#tag1 #tag2 #tag3" - alle werden erkannt</li>
-                <li>• <strong>Auto-Vervollständigung:</strong> Die App schlägt passende Tags vor</li>
-                <li>• <strong>Kombinierbar:</strong> Alle Features können in einer Eingabe verwendet werden</li>
-                <li>• <strong>Chain-Input:</strong> In Projekten bleibt das Modal nach Erstellen offen für weitere Eingaben</li>
+                <li>• {t('user_guide.smart_input.pro_tips.order_is_irrelevant')}</li>
+                <li>• {t('user_guide.smart_input.pro_tips.space_is_important')}</li>
+                <li>• {t('user_guide.smart_input.pro_tips.multiple_tags')}</li>
+                <li>• {t('user_guide.smart_input.pro_tips.auto_completion')}</li>
+                <li>• {t('user_guide.smart_input.pro_tips.combinable')}</li>
+                <li>• {t('user_guide.smart_input.pro_tips.chain_input')}</li>
               </ul>
             </div>
           </div>
@@ -433,14 +431,14 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
     },
     {
       id: 'pins',
-      title: 'Pins',
+      title: t('user_guide.pins.important_tasks_overview'),
       icon: Pin,
       content: (
         <div className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('pins.important_tasks_overview')}</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('user_guide.pins.important_tasks_overview')}</h2>
             <p className="text-gray-700 dark:text-gray-300 mb-6">
-              {t('pins.pins_description')}
+              {t('user_guide.pins.pins_description')}
             </p>
           </div>
 
@@ -448,39 +446,39 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <div className="flex items-center space-x-2 mb-3">
                 <Pin className="w-5 h-5" style={getAccentColorStyles().text} />
-                <h3 className="font-semibold text-gray-900 dark:text-white">{t('pins.pinning_tasks')}</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-white">{t('user_guide.pins.pinning_tasks')}</h3>
               </div>
               <ul className="space-y-2 text-gray-700 dark:text-gray-300">
-                <li>• <strong>Im TaskModal:</strong> {t('pins.select_pin_column_dropdown')}</li>
-                <li>• <strong>Im Kontextmenü:</strong> {t('pins.right_click_pin_options')}</li>
-                <li>• <strong>Drag & Drop:</strong> Ziehe Aufgaben direkt ins Pins-Board</li>
-                <li>• <strong>Mehrfache Ansicht:</strong> Gepinnte Aufgaben bleiben in ihrer ursprünglichen Position</li>
+                <li>• {t('user_guide.pins.pinning_tasks.option1')}</li>
+                <li>• {t('user_guide.pins.pinning_tasks.option2')}</li>
+                <li>• {t('user_guide.pins.pinning_tasks.option3')}</li>
+                <li>• {t('user_guide.pins.pinning_tasks.option4')}</li>
               </ul>
             </div>
 
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <div className="flex items-center space-x-2 mb-3">
                 <Edit className="w-5 h-5" style={getAccentColorStyles().text} />
-                <h3 className="font-semibold text-gray-900 dark:text-white">Spalten verwalten</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-white">{t('user_guide.pins.manage_columns.title')}</h3>
               </div>
               <ul className="space-y-2 text-gray-700 dark:text-gray-300">
-                <li>• <strong>Neue Spalte:</strong> "Spalte hinzufügen" Button im Header</li>
-                <li>• <strong>Spalte umbenennen:</strong> Doppelklick auf den Spaltentitel</li>
-                <li>• <strong>Spalten sortieren:</strong> Drag & Drop der Spalten-Header</li>
-                <li>• <strong>Spaltenanzahl:</strong> 3, 5 oder 7 Spalten über die Buttons unten</li>
+                <li>• {t('user_guide.pins.manage_columns.option1')}</li>
+                <li>• {t('user_guide.pins.manage_columns.option2')}</li>
+                <li>• {t('user_guide.pins.manage_columns.option3')}</li>
+                <li>• {t('user_guide.pins.manage_columns.option4')}</li>
               </ul>
             </div>
 
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <div className="flex items-center space-x-2 mb-3">
                 <Target className="w-5 h-5" style={getAccentColorStyles().text} />
-                <h3 className="font-semibold text-gray-900 dark:text-white">Best Practices</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-white">{t('user_guide.pins.best_practices.title')}</h3>
               </div>
               <ul className="space-y-2 text-gray-700 dark:text-gray-300">
-                <li>• <strong>Kategorien erstellen:</strong> z.B. "Dringend", "Diese Woche", "Wichtige Projekte"</li>
-                <li>• <strong>Workflow optimieren:</strong> Nutze Pins für tägliche Review-Routine</li>
-                <li>• <strong>Fokus behalten:</strong> Maximal 5-7 Aufgaben pro Spalte</li>
-                <li>• <strong>Regelmäßig aufräumen:</strong> {t('pins.auto_unpin_completed_tasks')}</li>
+                <li>• {t('user_guide.pins.best_practices.option1')}</li>
+                <li>• {t('user_guide.pins.best_practices.option2')}</li>
+                <li>• {t('user_guide.pins.best_practices.option3')}</li>
+                <li>• {t('user_guide.pins.best_practices.option4')}</li>
               </ul>
             </div>
           </div>
@@ -489,15 +487,14 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
     },
     {
       id: 'emails',
-      title: 'E-Mails',
+      title: t('user_guide.emails.title'),
       icon: Mail,
       content: (
         <div className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">📧 E-Mail Integration</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">📧 {t('user_guide.emails.title')}</h2>
             <p className="text-gray-700 dark:text-gray-300 mb-6">
-              Importiere und verwalte wichtige E-Mails direkt in TaskFuchs. Perfekt für die Verknüpfung von 
-              E-Mail-Inhalten mit Aufgaben und Projekten.
+              {t('user_guide.emails.description')}
             </p>
           </div>
 
@@ -505,39 +502,38 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <div className="flex items-center space-x-2 mb-3">
                 <Download className="w-5 h-5" style={getAccentColorStyles().text} />
-                <h3 className="font-semibold text-gray-900 dark:text-white">E-Mails importieren</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-white">{t('user_guide.emails.import_emails.title')}</h3>
               </div>
               <ul className="space-y-2 text-gray-700 dark:text-gray-300">
-                <li>• <strong>EML-Dateien:</strong> Drag & Drop oder Datei-Upload im E-Mail-Modal</li>
-                <li>• <strong>Aus Webmail:</strong> E-Mail als .eml speichern und importieren</li>
-                <li>• <strong>Automatische Verarbeitung:</strong> MIME-Grenzen und Anhänge werden bereinigt</li>
-                <li>• <strong>Formatierung:</strong> E-Mails werden wie im E-Mail-Client dargestellt</li>
+                <li>• {t('user_guide.emails.import_emails.option1')}</li>
+                <li>• {t('user_guide.emails.import_emails.option2')}</li>
+                <li>• {t('user_guide.emails.import_emails.option3')}</li>
+                <li>• {t('user_guide.emails.import_emails.option4')}</li>
               </ul>
             </div>
 
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <div className="flex items-center space-x-2 mb-3">
                 <Edit className="w-5 h-5" style={getAccentColorStyles().text} />
-                <h3 className="font-semibold text-gray-900 dark:text-white">E-Mails verwalten</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-white">{t('user_guide.emails.manage_emails.title')}</h3>
               </div>
               <ul className="space-y-2 text-gray-700 dark:text-gray-300">
-                <li>• <strong>Im Mails-Tab:</strong> Alle importierten E-Mails chronologisch sortiert</li>
-                <li>• <strong>Titel bearbeiten:</strong> E-Mail-Titel für bessere Organisation anpassen</li>
-                <li>• <strong>Verknüpfungen:</strong> E-Mails mit Aufgaben und anderen Notizen verlinken</li>
-                <li>• <strong>Suche:</strong> Volltextsuche in E-Mail-Inhalten</li>
+                <li>• {t('user_guide.emails.manage_emails.option1')}</li>
+                <li>• {t('user_guide.emails.manage_emails.option2')}</li>
+                <li>• {t('user_guide.emails.manage_emails.option3')}</li>
               </ul>
             </div>
 
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <div className="flex items-center space-x-2 mb-3">
                 <Target className="w-5 h-5" style={getAccentColorStyles().text} />
-                <h3 className="font-semibold text-gray-900 dark:text-white">Anwendungsfälle</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-white">{t('user_guide.emails.use_cases.title')}</h3>
               </div>
               <ul className="space-y-2 text-gray-700 dark:text-gray-300">
-                <li>• <strong>Projektdokumentation:</strong> Wichtige Projekt-E-Mails archivieren</li>
-                <li>• <strong>Aufgaben erstellen:</strong> Aus E-Mail-Inhalten direkte Aufgaben ableiten</li>
-                <li>• <strong>Referenzen:</strong> Wichtige Informationen für später aufbewahren</li>
-                <li>• <strong>Follow-ups:</strong> E-Mails mit Aufgaben verknüpfen für Nachverfolgung</li>
+                <li>• {t('user_guide.emails.use_cases.option1')}</li>
+                <li>• {t('user_guide.emails.use_cases.option2')}</li>
+                <li>• {t('user_guide.emails.use_cases.option3')}</li>
+                <li>• {t('user_guide.emails.use_cases.option4')}</li>
               </ul>
             </div>
           </div>
@@ -546,14 +542,14 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
     },
     {
       id: 'shortcuts',
-      title: 'Shortcuts',
+      title: t('user_guide.shortcuts.title'),
       icon: Keyboard,
       content: (
         <div className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">⌨️ Tastatur-Shortcuts</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">⌨️ {t('user_guide.shortcuts.title')}</h2>
             <p className="text-gray-700 dark:text-gray-300 mb-6">
-              Arbeite effizienter mit diesen praktischen Tastenkombinationen. TaskFuchs unterstützt sowohl Windows/Linux (Strg) als auch macOS (⌘) Shortcuts.
+              {t('user_guide.shortcuts.description')}
             </p>
           </div>
 
@@ -562,56 +558,56 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
                 <span className="text-2xl mr-2">🧭</span>
-                Navigation
+                {t('user_guide.shortcuts.navigation.title')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Dashboard</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">1</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.navigation.dashboard')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.navigation.dashboard_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Inbox</span>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.navigation.inbox')}</span>
                   <div className="flex space-x-1">
-                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">2</kbd>
-                    <span className="text-gray-400">oder</span>
-                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">I</kbd>
+                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.navigation.inbox_shortcut')}</kbd>
+                    <span className="text-gray-400">{t('user_guide.shortcuts.navigation.or')}</span>
+                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.navigation.inbox_alt_shortcut')}</kbd>
                   </div>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Planer</span>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.navigation.planner')}</span>
                   <div className="flex space-x-1">
-                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">3</kbd>
-                    <span className="text-gray-400">oder</span>
-                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">T</kbd>
+                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.navigation.planner_shortcut')}</kbd>
+                    <span className="text-gray-400">{t('user_guide.shortcuts.navigation.or')}</span>
+                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.navigation.planner_alt_shortcut')}</kbd>
                   </div>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Projekte</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">4</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.navigation.projects')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.navigation.projects_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Notizen</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">5</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.navigation.notes')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.navigation.notes_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Pins</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">6</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.navigation.pins')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.navigation.pins_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Tags</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">7</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.navigation.tags')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.navigation.tags_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Statistiken</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">8</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.navigation.statistics')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.navigation.statistics_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Archiv</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">9</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.navigation.archive')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.navigation.archive_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Einstellungen</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">0</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.navigation.settings')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.navigation.settings_shortcut')}</kbd>
                 </div>
               </div>
             </div>
@@ -620,36 +616,36 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
                 <span className="text-2xl mr-2">⚡</span>
-                Schnellaktionen
+                {t('user_guide.shortcuts.quick_actions.title')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Neue Aufgabe</span>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.quick_actions.new_task')}</span>
                   <div className="flex space-x-1">
-                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">N</kbd>
-                    <span className="text-gray-400">oder</span>
-                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">⌘ N</kbd>
+                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.quick_actions.new_task_shortcut')}</kbd>
+                    <span className="text-gray-400">{t('user_guide.shortcuts.quick_actions.or')}</span>
+                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.quick_actions.new_task_alt_shortcut')}</kbd>
                   </div>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Suche öffnen</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">⌘ K</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.quick_actions.open_search')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.quick_actions.open_search_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Einstellungen</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">⌘ ,</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.quick_actions.open_settings')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.quick_actions.open_settings_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Theme wechseln</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">⌘ D</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.quick_actions.toggle_theme')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.quick_actions.toggle_theme_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Hilfe öffnen</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">?</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.quick_actions.open_help')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.quick_actions.open_help_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Modal schließen</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">Esc</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.quick_actions.close_modal')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.quick_actions.close_modal_shortcut')}</kbd>
                 </div>
               </div>
             </div>
@@ -658,24 +654,24 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
                 <span className="text-2xl mr-2">🎯</span>
-                Fokus & Timer
+                {t('user_guide.shortcuts.focus_and_timer.title')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Fokus-Modus</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">F</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.focus_and_timer.focus_mode')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.focus_and_timer.focus_mode_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Review-Modus</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">R</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.focus_and_timer.review_mode')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.focus_and_timer.review_mode_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Timer pausieren/fortsetzen</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">Leertaste</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.focus_and_timer.pause_resume_timer')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.focus_and_timer.pause_resume_timer_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Fokus verlassen</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">Esc</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.focus_and_timer.leave_focus')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.focus_and_timer.leave_focus_shortcut')}</kbd>
                 </div>
               </div>
             </div>
@@ -684,28 +680,28 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
                 <span className="text-2xl mr-2">📅</span>
-                Board-Navigation
+                {t('user_guide.shortcuts.board_navigation.title')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Vorheriger Tag</span>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.board_navigation.previous_day')}</span>
                   <div className="flex space-x-1">
-                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">←</kbd>
-                    <span className="text-gray-400">oder</span>
-                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">H</kbd>
+                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.board_navigation.previous_day_shortcut')}</kbd>
+                    <span className="text-gray-400">{t('user_guide.shortcuts.board_navigation.or')}</span>
+                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.board_navigation.previous_day_alt_shortcut')}</kbd>
                   </div>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Nächster Tag</span>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.board_navigation.next_day')}</span>
                   <div className="flex space-x-1">
-                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">→</kbd>
-                    <span className="text-gray-400">oder</span>
-                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">L</kbd>
+                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.board_navigation.next_day_shortcut')}</kbd>
+                    <span className="text-gray-400">{t('user_guide.shortcuts.board_navigation.or')}</span>
+                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.board_navigation.next_day_alt_shortcut')}</kbd>
                   </div>
                 </div>
               </div>
               <div className="mt-3 text-sm text-gray-600 dark:text-gray-400">
-                <strong>Hinweis:</strong> Funktioniert im Planer und Review-Modus
+                <strong>{t('user_guide.shortcuts.board_navigation.note')}</strong>
               </div>
             </div>
 
@@ -713,44 +709,44 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
                 <span className="text-2xl mr-2">🔍</span>
-                Review-Modus
+                {t('user_guide.shortcuts.review_mode.title')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Nächste Aufgabe</span>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.review_mode.next_task')}</span>
                   <div className="flex space-x-1">
-                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">Leertaste</kbd>
-                    <span className="text-gray-400">oder</span>
-                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">→</kbd>
+                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.review_mode.next_task_shortcut')}</kbd>
+                    <span className="text-gray-400">{t('user_guide.shortcuts.review_mode.or')}</span>
+                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.review_mode.next_task_alt_shortcut')}</kbd>
                   </div>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Vorherige Aufgabe</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">←</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.review_mode.previous_task')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.review_mode.previous_task_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Aufgabe überspringen</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">S</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.review_mode.skip_task')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.review_mode.skip_task_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Archivieren</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">A</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.review_mode.archive')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.review_mode.archive_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Bearbeiten</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">E</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.review_mode.edit')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.review_mode.edit_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Zeit schätzen</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">M</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.review_mode.estimate_time')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.review_mode.estimate_time_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Kalender öffnen</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">C</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.review_mode.open_calendar')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.review_mode.open_calendar_shortcut')}</kbd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">Review planen</span>
-                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">R</kbd>
+                  <span className="text-gray-700 dark:text-gray-300">{t('user_guide.shortcuts.review_mode.plan_review')}</span>
+                  <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">{t('user_guide.shortcuts.review_mode.plan_review_shortcut')}</kbd>
                 </div>
               </div>
             </div>
@@ -759,15 +755,15 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
             <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
                 <span className="text-2xl mr-2">💡</span>
-                Pro-Tipps
+                {t('user_guide.shortcuts.pro_tips.title')}
               </h3>
               <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-                <li>• <strong>Vim-Style Navigation:</strong> Nutze H/L für Board-Navigation</li>
-                <li>• <strong>Quick Switch:</strong> Drücke F um schnell in den Fokus-Modus zu wechseln</li>
-                <li>• <strong>Timer Control:</strong> Leertaste pausiert/startet Timer von überall</li>
-                <li>• <strong>Universal ESC:</strong> Escape schließt alle Modals und verlässt Modi</li>
-                <li>• <strong>Cross-Platform:</strong> ⌘ auf Mac, Strg auf Windows/Linux</li>
-                <li>• <strong>Smart Input:</strong> Alle Shortcuts funktionieren nicht in Eingabefeldern</li>
+                <li>• {t('user_guide.shortcuts.pro_tips.vim_style_navigation')}</li>
+                <li>• {t('user_guide.shortcuts.pro_tips.quick_switch')}</li>
+                <li>• {t('user_guide.shortcuts.pro_tips.timer_control')}</li>
+                <li>• {t('user_guide.shortcuts.pro_tips.universal_esc')}</li>
+                <li>• {t('user_guide.shortcuts.pro_tips.cross_platform')}</li>
+                <li>• {t('user_guide.shortcuts.pro_tips.smart_input_shortcuts')}</li>
               </ul>
             </div>
 
@@ -775,30 +771,30 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-800/50">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
                 <span className="text-2xl mr-2">⌨️</span>
-                Tastatur-Layout Referenz
+                {t('user_guide.shortcuts.keyboard_layout_reference.title')}
               </h3>
               <div className="grid grid-cols-10 gap-1 text-xs">
-                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">1<br/><span className="text-xs text-gray-500">Today</span></div>
-                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">2<br/><span className="text-xs text-gray-500">Inbox</span></div>
-                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">3<br/><span className="text-xs text-gray-500">Tasks</span></div>
-                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">4<br/><span className="text-xs text-gray-500">Kanban</span></div>
-                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">5<br/><span className="text-xs text-gray-500">Notes</span></div>
-                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">6<br/><span className="text-xs text-gray-500">Tags</span></div>
-                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">7<br/><span className="text-xs text-gray-500">Stats</span></div>
-                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">8<br/><span className="text-xs text-gray-500">Archive</span></div>
-                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">9<br/><span className="text-xs text-gray-500">Settings</span></div>
+                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">1<br/><span className="text-xs text-gray-500">{t('user_guide.shortcuts.keyboard_layout_reference.today')}</span></div>
+                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">2<br/><span className="text-xs text-gray-500">{t('user_guide.shortcuts.keyboard_layout_reference.inbox')}</span></div>
+                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">3<br/><span className="text-xs text-gray-500">{t('user_guide.shortcuts.keyboard_layout_reference.tasks')}</span></div>
+                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">4<br/><span className="text-xs text-gray-500">{t('user_guide.shortcuts.keyboard_layout_reference.kanban')}</span></div>
+                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">5<br/><span className="text-xs text-gray-500">{t('user_guide.shortcuts.keyboard_layout_reference.notes')}</span></div>
+                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">6<br/><span className="text-xs text-gray-500">{t('user_guide.shortcuts.keyboard_layout_reference.tags')}</span></div>
+                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">7<br/><span className="text-xs text-gray-500">{t('user_guide.shortcuts.keyboard_layout_reference.stats')}</span></div>
+                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">8<br/><span className="text-xs text-gray-500">{t('user_guide.shortcuts.keyboard_layout_reference.archive')}</span></div>
+                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">9<br/><span className="text-xs text-gray-500">{t('user_guide.shortcuts.keyboard_layout_reference.settings')}</span></div>
                 <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">0</div>
               </div>
               <div className="mt-2 grid grid-cols-10 gap-1 text-xs">
-                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">T<br/><span className="text-xs text-gray-500">Today</span></div>
-                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">R<br/><span className="text-xs text-gray-500">Review</span></div>
-                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">F<br/><span className="text-xs text-gray-500">Focus</span></div>
-                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">I<br/><span className="text-xs text-gray-500">Inbox</span></div>
-                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">N<br/><span className="text-xs text-gray-500">New</span></div>
-                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">H<br/><span className="text-xs text-gray-500">←</span></div>
-                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">L<br/><span className="text-xs text-gray-500">→</span></div>
-                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">?<br/><span className="text-xs text-gray-500">Help</span></div>
-                <div className="col-span-2 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-600 rounded p-1 text-center">Space<br/><span className="text-xs text-blue-600 dark:text-blue-400">Timer</span></div>
+                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">T<br/><span className="text-xs text-gray-500">{t('user_guide.shortcuts.keyboard_layout_reference.today')}</span></div>
+                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">R<br/><span className="text-xs text-gray-500">{t('user_guide.shortcuts.keyboard_layout_reference.review')}</span></div>
+                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">F<br/><span className="text-xs text-gray-500">{t('user_guide.shortcuts.keyboard_layout_reference.focus')}</span></div>
+                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">I<br/><span className="text-xs text-gray-500">{t('user_guide.shortcuts.keyboard_layout_reference.inbox')}</span></div>
+                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">N<br/><span className="text-xs text-gray-500">{t('user_guide.shortcuts.keyboard_layout_reference.new')}</span></div>
+                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">H<br/><span className="text-xs text-gray-500">{t('user_guide.shortcuts.keyboard_layout_reference.left')}</span></div>
+                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">L<br/><span className="text-xs text-gray-500">{t('user_guide.shortcuts.keyboard_layout_reference.right')}</span></div>
+                <div className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-1 text-center">?<br/><span className="text-xs text-gray-500">{t('user_guide.shortcuts.keyboard_layout_reference.help')}</span></div>
+                <div className="col-span-2 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-600 rounded p-1 text-center">Space<br/><span className="text-xs text-blue-600 dark:text-blue-400">{t('user_guide.shortcuts.keyboard_layout_reference.timer')}</span></div>
               </div>
             </div>
           </div>
@@ -807,14 +803,14 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
     },
     {
       id: 'settings',
-      title: 'Einstellungen',
+      title: t('user_guide.settings.title'),
       icon: Settings,
       content: (
         <div className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">App-Einstellungen</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('user_guide.settings.title')}</h2>
             <p className="text-gray-700 dark:text-gray-300 mb-6">
-              Passe TaskFuchs an deine Bedürfnisse an.
+              {t('user_guide.settings.description')}
             </p>
           </div>
 
@@ -822,39 +818,39 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <div className="flex items-center space-x-2 mb-3">
                 <Palette className="w-5 h-5" style={getAccentColorStyles().text} />
-                <h3 className="font-semibold text-gray-900 dark:text-white">Erscheinungsbild</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-white">{t('user_guide.settings.appearance.title')}</h3>
               </div>
               <ul className="space-y-2 text-gray-700 dark:text-gray-300">
-                <li>• Wähle zwischen hellem und dunklem Design</li>
-                <li>• Passe die Akzentfarbe an</li>
-                <li>• Konfiguriere Sidebar-Verhalten</li>
-                <li>• Anpassbare Widget-Layouts</li>
+                <li>• {t('user_guide.settings.appearance.option1')}</li>
+                <li>• {t('user_guide.settings.appearance.option2')}</li>
+                <li>• {t('user_guide.settings.appearance.option3')}</li>
+                <li>• {t('user_guide.settings.appearance.option4')}</li>
               </ul>
             </div>
 
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <div className="flex items-center space-x-2 mb-3">
                 <Bell className="w-5 h-5" style={getAccentColorStyles().text} />
-                <h3 className="font-semibold text-gray-900 dark:text-white">Benachrichtigungen</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-white">{t('user_guide.settings.notifications.title')}</h3>
               </div>
               <ul className="space-y-2 text-gray-700 dark:text-gray-300">
-                <li>• Konfiguriere Sound-Benachrichtigungen</li>
-                <li>• Erinnerungs-Verhalten anpassen</li>
-                <li>• Timer-Sounds und -Verhalten</li>
-                <li>• End-of-Day Zusammenfassungen</li>
+                <li>• {t('user_guide.settings.notifications.option1')}</li>
+                <li>• {t('user_guide.settings.notifications.option2')}</li>
+                <li>• {t('user_guide.settings.notifications.option3')}</li>
+                <li>• {t('user_guide.settings.notifications.option4')}</li>
               </ul>
             </div>
 
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <div className="flex items-center space-x-2 mb-3">
                 <Package className="w-5 h-5" style={getAccentColorStyles().text} />
-                <h3 className="font-semibold text-gray-900 dark:text-white">Datenmanagement</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-white">{t('user_guide.settings.data_management.title')}</h3>
               </div>
               <ul className="space-y-2 text-gray-700 dark:text-gray-300">
-                <li>• Exportiere alle Daten als JSON</li>
-                <li>• Importiere Daten aus anderen Apps</li>
-                <li>• Backup und Wiederherstellung</li>
-                <li>• Daten löschen und zurücksetzen</li>
+                <li>• {t('user_guide.settings.data_management.option1')}</li>
+                <li>• {t('user_guide.settings.data_management.option2')}</li>
+                <li>• {t('user_guide.settings.data_management.option3')}</li>
+                <li>• {t('user_guide.settings.data_management.option4')}</li>
               </ul>
             </div>
           </div>
@@ -865,77 +861,136 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
 
   if (!isOpen) return null;
 
+  const getBackgroundImagePath = () => {
+    return '/backgrounds/bg12.png';
+  };
+
   return createPortal(
     <div 
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[99999] flex items-center justify-center p-4"
-      style={{ isolation: 'isolate' }}
+      className="fixed inset-0 flex items-center justify-center z-[999999] p-4"
+      style={{ 
+        isolation: 'isolate',
+        backgroundImage: `url(${getBackgroundImagePath()})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed'
+      }}
       onClick={onClose}
     >
+      {/* Background Overlay */}
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" style={{ zIndex: -1 }} />
+      
       <div 
-        className="w-full max-w-6xl h-[85vh] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden flex relative my-auto"
+        className="bg-white/10 dark:bg-gray-800/20 backdrop-blur-3xl rounded-3xl shadow-2xl border border-white/30 dark:border-gray-600/25 max-w-5xl w-full flex flex-col relative"
+        style={{
+          background: 'linear-gradient(145deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.2))',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+          height: '85vh',
+          minHeight: '600px',
+          maxHeight: '85vh',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column'
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button - Top Right */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+          className="absolute top-4 right-4 z-10 p-2 hover:bg-white/20 backdrop-blur-xl rounded-lg border border-white/25 hover:border-white/40 transition-all duration-300"
+          style={{
+            background: 'linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))',
+            textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
+          }}
         >
-          <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+          <X className="w-6 h-6 text-white" />
         </button>
 
-        {/* Sidebar with Tabs */}
-        <div className="w-72 bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
-          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex items-center space-x-3">
-              <div 
-                className="p-2 rounded-lg"
-                style={getAccentColorStyles().bgLight}
-              >
-                <Target className="w-6 h-6" style={getAccentColorStyles().text} />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-                  Benutzeranleitung
-                </h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  TaskFuchs Hilfe
-                </p>
-              </div>
+        {/* Header */}
+        <div className="flex-shrink-0 border-b border-white/20 p-6">
+          <div className="flex items-center space-x-3">
+            <div 
+              className="p-2 rounded-lg"
+              style={getAccentColorStyles().bgLight}
+            >
+              <Target className="w-6 h-6" style={getAccentColorStyles().text} />
             </div>
-          </div>
-          
-          <div className="p-4 space-y-2 overflow-y-auto h-[calc(100%-120px)]">
-            {guideSections.map((section) => {
-              const Icon = section.icon;
-              const isActive = activeSection === section.id;
-              
-              return (
-                <button
-                  key={section.id}
-                  onClick={() => setActiveSection(section.id)}
-                  className={`w-full flex items-center space-x-3 p-3 rounded-lg text-left transition-all duration-200 ${
-                    isActive
-                      ? 'text-white shadow-sm'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-                  }`}
-                  style={isActive ? getAccentColorStyles().bg : {}}
-                >
-                  <Icon className="w-5 h-5 flex-shrink-0" />
-                  <span className="font-medium">{section.title}</span>
-                  {isActive && <ChevronRight className="w-4 h-4 ml-auto" />}
-                </button>
-              );
-            })}
+            <div>
+              <h1 className="text-2xl font-bold text-white" style={{ 
+                textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)',
+                color: state.preferences.accentColor 
+              }}>
+                {t('user_guide.header_title')}
+              </h1>
+              <p className="text-sm text-white/70" style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)' }}>
+                {t('user_guide.header_subtitle')}
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Content Area */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex-1 overflow-y-auto">
-            <div className="p-8">
-              {guideSections.find(section => section.id === activeSection)?.content}
+        {/* Main Content Area */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* Sidebar with Tabs */}
+          <div className="w-56 bg-gradient-to-b from-gray-900/40 to-gray-800/50 dark:from-gray-900/40 dark:to-gray-800/50 border-r border-white/20 overflow-y-auto"
+               style={{
+                 background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3))'
+               }}>
+            <div className="p-3 space-y-1">
+              {guideSections.map((section) => {
+                const Icon = section.icon;
+                const isActive = activeSection === section.id;
+                
+                return (
+                  <button
+                    key={section.id}
+                    onClick={() => setActiveSection(section.id)}
+                    className={`w-full flex items-center space-x-3 p-3 rounded-lg text-left transition-all duration-200 ${
+                      isActive
+                        ? 'text-white shadow-sm'
+                        : 'text-white/70 hover:text-white hover:bg-white/10'
+                    }`}
+                    style={isActive ? getAccentColorStyles().bg : {}}
+                  >
+                    <Icon className="w-5 h-5 flex-shrink-0" />
+                    <span className="font-medium text-sm">{section.title}</span>
+                    {isActive && <ChevronRight className="w-4 h-4 ml-auto" />}
+                  </button>
+                );
+              })}
             </div>
           </div>
+
+          {/* Content Area */}
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 overflow-y-auto">
+              <div className="p-8">
+                <div className="text-white" style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)' }}>
+                  {guideSections.find(section => section.id === activeSection)?.content}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex-shrink-0 border-t border-white/20 p-4 flex justify-between items-center">
+          <p className="text-sm text-white/70" style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)' }}>
+            💡 {t('user_guide.tip_text')} <kbd className="px-2 py-1 bg-white/10 rounded text-xs ml-1">?</kbd> {t('user_guide.tip_to_open')}
+          </p>
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-white rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 backdrop-blur-xl"
+            style={{
+              backgroundColor: state.preferences.accentColor,
+              border: `1px solid ${state.preferences.accentColor}33`,
+              boxShadow: `0 6px 24px ${state.preferences.accentColor}4d, inset 0 1px 0 rgba(255, 255, 255, 0.2)`,
+              textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
+            }}
+          >
+            {t('user_guide.close')}
+          </button>
         </div>
       </div>
     </div>,

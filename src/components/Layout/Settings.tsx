@@ -67,6 +67,7 @@ import {
   Zap,
   MoreHorizontal
 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import { DeleteConfirmationModal } from '../Common/DeleteConfirmationModal';
 import { PerformanceDashboard } from '../Common/PerformanceDashboard';
 import { ImageStorageManager } from '../Common/ImageStorageManager';
@@ -88,20 +89,20 @@ import { syncManager, SyncLogEntry, SyncStats } from '../../utils/syncUtils';
 
 import type { KanbanBoard, Tag, SyncStatus } from '../../types';
 
-const gradientDirections = [
-  { value: 'to bottom right', label: 'Nach unten rechts', icon: ArrowDownRight },
-  { value: 'to right', label: 'Nach rechts', icon: MoveRight },
-  { value: 'to bottom', label: 'Nach unten', icon: ArrowDown },
-  { value: 'to left', label: 'Nach links', icon: ArrowLeft },
-  { value: 'to top', label: 'Nach oben', icon: ArrowUp },
-  { value: 'to top right', label: 'Nach oben rechts', icon: ArrowUpRight },
-  { value: 'to bottom left', label: 'Nach unten links', icon: ArrowDownLeft },
-  { value: 'to top left', label: 'Nach oben links', icon: ArrowUpLeft }
+const getGradientDirections = (t) => [
+  { value: 'to bottom right', label: t('settings_appearance.gradients.bottomRight'), icon: ArrowDownRight },
+  { value: 'to right', label: t('settings_appearance.gradients.right'), icon: MoveRight },
+  { value: 'to bottom', label: t('settings_appearance.gradients.bottom'), icon: ArrowDown },
+  { value: 'to left', label: t('settings_appearance.gradients.left'), icon: ArrowLeft },
+  { value: 'to top', label: t('settings_appearance.gradients.top'), icon: ArrowUp },
+  { value: 'to top right', label: t('settings_appearance.gradients.topRight'), icon: ArrowUpRight },
+  { value: 'to bottom left', label: t('settings_appearance.gradients.bottomLeft'), icon: ArrowDownLeft },
+  { value: 'to top left', label: t('settings_appearance.gradients.topLeft'), icon: ArrowUpLeft }
 ];
 
 const Settings = React.memo(() => {
   const { t, i18n } = useTranslation();
-  const { actions, forms, titles, messages } = useAppTranslation();
+  const { actions, forms, titles, messages, settings_appearance, settings_notes, settings_sidebar, settings_notifications, settings_timer, settings_information, settings_data, settings_sync } = useAppTranslation();
   const { state, dispatch } = useApp();
 
   // Settings sections configuration with i18n
@@ -579,7 +580,6 @@ const Settings = React.memo(() => {
       try { localStorage.setItem('taskfuchs_dropbox_passphrase', dropboxPassphrase); } catch {}
     }
   }, [dropboxRememberPassphrase, dropboxPassphrase]);
-
   // --- UI Section Renderer ---
   const renderDropboxSection = () => (
     <div className="mt-10 p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
@@ -1154,7 +1154,6 @@ const Settings = React.memo(() => {
       },
     });
   };
-
   const handleCalDAVConnectionTest = async () => {
     if (!caldavServerUrl.trim() || !caldavUsername.trim() || !caldavPassword.trim()) {
       setCaldavConnectionStatus('error');
@@ -1448,8 +1447,8 @@ const Settings = React.memo(() => {
               <div>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">Toggl Integration</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Status: {togglConnectionStatus === 'success' ? 'Verbunden' : 
-                           togglConnectionStatus === 'error' ? 'Fehler' : 
+                  Status: {togglConnectionStatus === 'success' ? t('common.connected') : 
+                           togglConnectionStatus === 'error' ? t('common.error') : 
                            togglConnectionStatus === 'testing' ? 'Wird getestet...' : 'Nicht konfiguriert'}
                 </p>
               </div>
@@ -1745,8 +1744,8 @@ const Settings = React.memo(() => {
               <div>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">CalDAV Integration</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Status: {caldavConnectionStatus === 'success' ? 'Verbunden' : 
-                           caldavConnectionStatus === 'error' ? 'Fehler' : 
+                  Status: {caldavConnectionStatus === 'success' ? t('common.connected') : 
+                           caldavConnectionStatus === 'error' ? t('common.error') : 
                            caldavConnectionStatus === 'testing' ? 'Wird getestet...' : 'Nicht konfiguriert'}
                 </p>
               </div>
@@ -3711,16 +3710,16 @@ const Settings = React.memo(() => {
               <div className="space-y-6">
                 <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <div>
-                    <div className="font-medium text-gray-900 dark:text-white">Dunkler Modus</div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">Schaltet zwischen hellem und dunklem Design um</div>
+                    <div className="font-medium text-gray-900 dark:text-white">{settings_appearance.darkMode()}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">{settings_appearance.darkModeDesc()}</div>
                   </div>
                   <Toggle enabled={isDarkMode} onChange={handleDarkModeToggle} />
                 </div>
                 
                 <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <div>
-                    <div className="font-medium text-gray-900 dark:text-white">Minimalistisches Design</div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">Reduziertes Design ohne Glaseffekte und Schatten</div>
+                    <div className="font-medium text-gray-900 dark:text-white">{settings_appearance.minimalistDesign()}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">{settings_appearance.minimalistDesignDesc()}</div>
                   </div>
                   <Toggle 
                     enabled={state.preferences.minimalDesign || false} 
@@ -3763,14 +3762,14 @@ const Settings = React.memo(() => {
 
             <div className="settings-card p-6 border">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Farben</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">{settings_appearance.colors()}</h3>
               </div>
               <div className="space-y-4">
                 <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <div className="font-medium text-gray-900 dark:text-white">Hauptfarbe</div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">Primäre Akzentfarbe der App</div>
+                      <div className="font-medium text-gray-900 dark:text-white">{settings_appearance.primaryColor()}</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">{settings_appearance.primaryColorDesc()}</div>
                     </div>
                     <div className="flex items-center space-x-3">
                       <input
@@ -3796,7 +3795,7 @@ const Settings = React.memo(() => {
                   
                   {/* Color Palette Grid */}
                   <div className="mb-4">
-                    <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Farbpalette</div>
+                    <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{settings_appearance.colorPalette()}</div>
                     <div className="grid grid-cols-3 gap-3">
                       {accentColors.map((colorOption, index) => (
                         <div 
@@ -3819,7 +3818,7 @@ const Settings = React.memo(() => {
                           <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity flex items-center justify-center">
                             {customAccentColor === colorOption && (
                               <div className="bg-white dark:bg-gray-800 bg-opacity-90 px-2 py-1 rounded text-xs font-medium text-gray-900 dark:text-white">
-                                Aktiv
+                                {settings_appearance.active()}
                               </div>
                             )}
                           </div>
@@ -3830,10 +3829,10 @@ const Settings = React.memo(() => {
                   
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {[
-                      { type: 'success', color: customSuccessColor, label: 'Erfolg' },
-                      { type: 'warning', color: customWarningColor, label: 'Warnung' },
-                      { type: 'danger', color: customDangerColor, label: 'Fehler' },
-                      { type: 'secondary', color: customSecondaryColor, label: 'Sekundär' }
+                      { type: 'success', color: customSuccessColor, label: settings_appearance.success() },
+                      { type: 'warning', color: customWarningColor, label: settings_appearance.warning() },
+                      { type: 'danger', color: customDangerColor, label: settings_appearance.error() },
+                      { type: 'secondary', color: customSecondaryColor, label: settings_appearance.secondary() }
                     ].map(({ type, color, label }) => (
                       <div key={type} className="text-center">
                         <input
@@ -3854,7 +3853,7 @@ const Settings = React.memo(() => {
 
             <div className={`settings-card p-6 border ${state.preferences.minimalDesign ? 'opacity-50 pointer-events-none' : ''}`}>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Hintergrund-Effekte</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">{settings_appearance.backgroundEffects()}</h3>
               </div>
               {state.preferences.minimalDesign && (
                 <div className="text-sm font-normal text-gray-500 dark:text-gray-400 mb-4">(Im minimalistischen Design nicht verfügbar)</div>
@@ -3951,7 +3950,7 @@ const Settings = React.memo(() => {
 
             <div className={`settings-card p-6 border ${state.preferences.minimalDesign ? 'opacity-50 pointer-events-none' : ''}`}>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Hintergrund</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">{settings_appearance.background()}</h3>
               </div>
               {state.preferences.minimalDesign && (
                 <div className="text-sm font-normal text-gray-500 dark:text-gray-400 mb-4">(Im minimalistischen Design nicht verfügbar)</div>
@@ -3959,12 +3958,12 @@ const Settings = React.memo(() => {
               <div className="space-y-6">
                 {/* Background Type Selector */}
                 <div>
-                  <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Hintergrundtyp</div>
+                  <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{settings_appearance.backgroundType()}</div>
                   <div className="flex space-x-2">
                     {[
-                      { type: 'image', label: 'Bild' },
-                      { type: 'color', label: 'Farbe' },
-                      { type: 'gradient', label: 'Farbverlauf' }
+                      { type: 'image', label: settings_appearance.backgroundImage() },
+                      { type: 'color', label: settings_appearance.backgroundColor() },
+                      { type: 'gradient', label: settings_appearance.backgroundGradient() }
                     ].map(({ type, label }) => (
                       <button
                         key={type}
@@ -3989,14 +3988,14 @@ const Settings = React.memo(() => {
                 {(!state.preferences.backgroundType || state.preferences.backgroundType === 'image') && (
                   <div>
                     <div className="flex items-center justify-between mb-3">
-                      <div className="text-sm font-medium text-gray-700 dark:text-gray-300">Hintergrundbilder</div>
+                      <div className="text-sm font-medium text-gray-700 dark:text-gray-300">{settings_appearance.backgroundImages()}</div>
                       <button
                         type="button"
                         onClick={() => setShowPhotoCreditsModal(true)}
                         className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/60 transition-colors"
                         title="Photo credentials"
                       >
-                        Credentials
+                        {settings_appearance.credentials()}
                       </button>
                     </div>
                     <div className="grid grid-cols-3 gap-4">
@@ -4043,7 +4042,7 @@ const Settings = React.memo(() => {
                             <div className="absolute bottom-1 left-1 right-1">
                               <div className="text-white text-xs px-1 py-0.5 rounded text-center truncate font-medium" 
                                    style={{ backgroundColor: getAccentColorStyles().bg.backgroundColor }}>
-                                Aktuell
+                                {settings_appearance.current()}
                               </div>
                             </div>
                           )}
@@ -4056,7 +4055,7 @@ const Settings = React.memo(() => {
                         className="w-full h-20 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 transition-colors group"
                       >
                         <Plus className="w-5 h-5 mb-1 group-hover:scale-110 transition-transform" />
-                        <span className="text-xs text-center px-1 leading-tight">Link zu einer<br/>Bilddatei hinzufügen</span>
+                        <span className="text-xs text-center px-1 leading-tight">{settings_appearance.addImageLink()}<br/>{settings_appearance.addImageFile()}</span>
                       </button>
                       
                       {/* Picsum Photos Button */}
@@ -4099,12 +4098,12 @@ const Settings = React.memo(() => {
                         }}
                         className="w-full h-20 border-2 border-dashed rounded-lg flex flex-col items-center justify-center hover:scale-105 transition-all group"
                         style={{ borderColor: getAccentColorStyles().bg.backgroundColor }}
-                        title="Standardbilder wiederherstellen"
+                        title={settings_appearance.restoreDefaultImages()}
                       >
                         <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 mb-1" style={getAccentColorStyles().text as any}>
                           <path d="M12 5v4l5-5-5-5v4C6.48 3 2 7.48 2 13c0 1.64.4 3.19 1.1 4.56l1.48-1.48A7.965 7.965 0 014 13c0-4.42 3.58-8 8-8zm8.9 1.44L19.42 7.9A7.965 7.965 0 0120 13c0 4.42-3.58 8-8 8v-4l-5 5 5 5v-4c5.52 0 10-4.48 10-10 0-1.64-.4-3.19-1.1-4.56z" />
                         </svg>
-                        <span className="text-xs text-center px-1 leading-tight" style={getAccentColorStyles().text}>Standardbilder</span>
+                        <span className="text-xs text-center px-1 leading-tight" style={getAccentColorStyles().text}>{settings_appearance.defaultImages()}</span>
                       </button>
                     </div>
                   </div>
@@ -4142,7 +4141,7 @@ const Settings = React.memo(() => {
                     
                     {/* Background Color Palette */}
                     <div className="mt-4">
-                      <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Farbpalette</div>
+                      <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{settings_appearance.colorPalette()}</div>
                       <div className="grid grid-cols-3 gap-3">
                         {backgroundColors.map((colorOption, index) => (
                           <div 
@@ -4165,7 +4164,7 @@ const Settings = React.memo(() => {
                             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity flex items-center justify-center">
                               {backgroundColorTemp === colorOption && (
                                 <div className="bg-white dark:bg-gray-800 bg-opacity-90 px-2 py-1 rounded text-xs font-medium text-gray-900 dark:text-white">
-                                  Aktiv
+                                  {settings_appearance.active()}
                                 </div>
                               )}
                             </div>
@@ -4231,7 +4230,7 @@ const Settings = React.memo(() => {
                       <div>
                         <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Richtung</div>
                         <div className="grid grid-cols-4 gap-2">
-                          {gradientDirections.map(({ value, label, icon: Icon }) => (
+                          {getGradientDirections(t).map(({ value, label, icon: Icon }) => (
                             <button
                               key={value}
                               onClick={() => handleTempGradientDirectionChange(value)}
@@ -4370,9 +4369,9 @@ const Settings = React.memo(() => {
               </div>
               <div className="space-y-6">
                 <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <div className="font-medium text-gray-900 dark:text-white mb-3">Template für neue Daily Notes</div>
+                  <div className="font-medium text-gray-900 dark:text-white mb-3">{settings_notes.dailyNoteTemplate()}</div>
                   <div className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                    Definiere eine Vorlage für neue Daily Notes. Verwende <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">{'{date}'}</code> als Platzhalter für das Datum.
+                    {settings_notes.defineTemplate()} <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">{'{date}'}</code> {settings_notes.asDatePlaceholder()}
                   </div>
                   <textarea
                     value={state.preferences.dailyNoteTemplate || ''}
@@ -4380,23 +4379,12 @@ const Settings = React.memo(() => {
                       type: 'UPDATE_PREFERENCES',
                       payload: { dailyNoteTemplate: e.target.value }
                     })}
-                    placeholder="# {date}
-
-## Ziele für heute
-- 
-
-## Notizen
-
-
-## Reflexion
-- Was lief gut?
-- Was könnte besser werden?
-- Nächste Schritte:"
+                    placeholder={settings_notes.templatePlaceholder()}
                     rows={12}
                     className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono text-sm resize-vertical"
                   />
                   <div className="mt-3 text-xs text-gray-500 dark:text-gray-400">
-                    Tipp: Verwende Markdown-Syntax für Formatierung (z.B. # für Überschriften, - für Listen)
+                    {settings_notes.markdownTip()}
                   </div>
                 </div>
               </div>
@@ -4588,9 +4576,7 @@ const Settings = React.memo(() => {
                   {t('settings.sections.sidebar.title')}
                 </h2>
                 <p className="text-gray-600 dark:text-gray-400">
-                  {t('settings.sections.sidebar.description_long', {
-                    defaultValue: 'Menü anpassen und Festlegen, welche Einträge hinter "... Mehr" erscheinen sollen.'
-                  })}
+                  {settings_sidebar.description()}
                 </p>
               </div>
               
@@ -4622,7 +4608,7 @@ const Settings = React.memo(() => {
                       <div className="flex items-center space-x-3">
                         <div
                           className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-grab active:cursor-grabbing"
-                          title="Ziehen zum Sortieren"
+                          title={settings_sidebar.dragToSort()}
                         >
                           <GripVertical className="w-4 h-4" />
                         </div>
@@ -4637,7 +4623,7 @@ const Settings = React.memo(() => {
                           onClick={() => index > 0 && handleSidebarItemReorder(index, index - 1)}
                           disabled={index === 0}
                           className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                          title="Nach oben"
+                          title={settings_sidebar.moveUp()}
                         >
                           <ArrowUp className="w-4 h-4" />
                         </button>
@@ -4645,7 +4631,7 @@ const Settings = React.memo(() => {
                           onClick={() => index < sidebarItems.length - 1 && handleSidebarItemReorder(index, index + 1)}
                           disabled={index === sidebarItems.length - 1}
                           className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                          title="Nach unten"
+                          title={settings_sidebar.moveDown()}
                         >
                           <ArrowDown className="w-4 h-4" />
                         </button>
@@ -4670,7 +4656,7 @@ const Settings = React.memo(() => {
                               ? 'text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
                               : 'text-gray-400 border-gray-300 dark:border-gray-700'
                           }`}
-                          title={t('settings.sections.sidebar.place_in_more_tooltip', { defaultValue: 'Im Mehr-Menü anzeigen' })}
+                          title={settings_sidebar.placeInMoreMenu()}
                         >
                           <MoreHorizontal className="w-4 h-4" />
                           <span>{t('common.more', { defaultValue: 'Mehr' })}</span>
@@ -4678,7 +4664,7 @@ const Settings = React.memo(() => {
                         {['inbox', 'tasks'].includes(item.id) ? (
                           <div 
                             className="p-1 text-gray-300 dark:text-gray-600 cursor-not-allowed"
-                            title="Dieser Menüpunkt kann nicht ausgeblendet werden"
+                            title={settings_sidebar.cannotHideThisItem()}
                           >
                             <Eye className="w-4 h-4" />
                           </div>
@@ -4690,7 +4676,7 @@ const Settings = React.memo(() => {
                                 ? 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200' 
                                 : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
                             }`}
-                            title={item.visible ? 'Ausblenden' : 'Einblenden'}
+                            title={item.visible ? settings_sidebar.hide() : settings_sidebar.show()}
                           >
                             {item.visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                           </button>
@@ -4708,9 +4694,9 @@ const Settings = React.memo(() => {
                 <div className="flex items-start space-x-3">
                   <Bell className="w-5 h-5 mt-0.5" style={{ color: state.preferences.accentColor }} />
                   <div>
-                    <h4 className="text-sm font-medium" style={{ color: state.preferences.accentColor }}>Hinweis</h4>
+                    <h4 className="text-sm font-medium" style={{ color: state.preferences.accentColor }}>{settings_sidebar.hint()}</h4>
                     <p className="text-sm opacity-75 mt-1" style={{ color: state.preferences.accentColor }}>
-                      Die Punkte "Inbox" und "Tagesplaner" können nicht ausgeblendet werden, da sie für die Grundfunktion der App erforderlich sind.
+                      {settings_sidebar.hintText()}
                     </p>
                   </div>
                 </div>
@@ -4731,14 +4717,14 @@ const Settings = React.memo(() => {
             </div>
             {/* Browser Notifications Section */}
             <div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Browser-Benachrichtigungen</h3>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{settings_notifications.browserNotifications()}</h3>
               <div className="space-y-4">
                 <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <div className="font-medium text-gray-900 dark:text-white">Desktop-Benachrichtigungen</div>
+                      <div className="font-medium text-gray-900 dark:text-white">{settings_notifications.desktopNotifications()}</div>
                       <div className="text-sm text-gray-500 dark:text-gray-400">
-                        Erhalten Sie Erinnerungen auch wenn die App im Hintergrund läuft
+                        {settings_notifications.remindersInBackground()}
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -4751,7 +4737,7 @@ const Settings = React.memo(() => {
                           return (
                             <div className="flex items-center space-x-2">
                               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                              <span className="text-sm text-green-600 dark:text-green-400">Aktiviert</span>
+                              <span className="text-sm text-green-600 dark:text-green-400">{t('settings.sections.notifications.enabled')}</span>
                             </div>
                           );
                         } else if (permission === 'denied') {
@@ -4786,10 +4772,10 @@ const Settings = React.memo(() => {
                               <Bell className="w-5 h-5 text-green-600 dark:text-green-400" />
                               <div>
                                 <div className="text-sm font-medium text-green-900 dark:text-green-100">
-                                  Benachrichtigungen sind aktiviert
+                                  {settings_notifications.notificationsEnabled()}
                                 </div>
                                 <div className="text-xs text-green-600 dark:text-green-400">
-                                  Sie erhalten Erinnerungen für Ihre Aufgaben
+                                  {settings_notifications.receiveTaskReminders()}
                                 </div>
                               </div>
                             </div>
@@ -4960,12 +4946,12 @@ const Settings = React.memo(() => {
 
             {/* Audio Notifications Section */}
             <div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Audio-Benachrichtigungen</h3>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{settings_notifications.audioNotifications()}</h3>
               <div className="space-y-6">
                 <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <div>
-                    <div className="font-medium text-gray-900 dark:text-white">Sounds aktiviert</div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">Aktiviert Audio-Benachrichtigungen</div>
+                    <div className="font-medium text-gray-900 dark:text-white">{settings_notifications.soundsEnabled()}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">{settings_notifications.enablesAudioNotifications()}</div>
                   </div>
                   <Toggle 
                     enabled={state.preferences.sounds} 
@@ -4980,7 +4966,7 @@ const Settings = React.memo(() => {
                   <>
                     <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                       <div className="flex items-center justify-between mb-4">
-                        <div className="font-medium text-gray-900 dark:text-white">Lautstärke</div>
+                        <div className="font-medium text-gray-900 dark:text-white">{settings_notifications.volume()}</div>
                         <div className="text-sm text-gray-500 dark:text-gray-400">
                           {Math.round(state.preferences.soundVolume * 100)}%
                         </div>
@@ -5001,7 +4987,7 @@ const Settings = React.memo(() => {
 
                     <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                       <div className="flex items-center justify-between mb-4">
-                        <div className="font-medium text-gray-900 dark:text-white">Erfolgsklang</div>
+                        <div className="font-medium text-gray-900 dark:text-white">{settings_notifications.successSound()}</div>
                         <Toggle 
                           enabled={state.preferences.completionSoundEnabled !== false}
                           onChange={() => dispatch({
@@ -5063,12 +5049,12 @@ const Settings = React.memo(() => {
             </div>
 
             <div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Verhalten</h3>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{settings_notifications.behavior()}</h3>
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <div>
-                    <div className="font-medium text-gray-900 dark:text-white">Aufgaben-Prioritäten anzeigen</div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">Zeigt Prioritäts-Indikatoren in Aufgaben</div>
+                    <div className="font-medium text-gray-900 dark:text-white">{settings_notifications.showTaskPriorities()}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">{settings_notifications.showsPriorityIndicators()}</div>
                   </div>
                   <Toggle 
                     enabled={state.preferences.showPriorities} 
@@ -5118,21 +5104,21 @@ const Settings = React.memo(() => {
           <div className="space-y-8">
             <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                Zeiterfassung & Pomodoro
+                {settings_timer.title()}
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
-                Stelle die Timer-Anzeige ein, konfiguriere Pomodoro-Intervalle und verbinde optionale Zeit-Integrationen.
+                {settings_timer.description()}
               </p>
             </div>
             <div className="settings-card p-6 border">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Timer-Anzeige</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">{settings_timer.timerDisplay()}</h3>
               </div>
               <div className="space-y-4">
                 {/* Timer Display Mode Selection */}
                 <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <div className="font-medium text-gray-900 dark:text-white mb-2">Timer-Anzeigemodus</div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400 mb-4">Wählen Sie, wie der Timer angezeigt werden soll</div>
+                  <div className="font-medium text-gray-900 dark:text-white mb-2">{settings_timer.timerDisplayMode()}</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400 mb-4">{settings_timer.chooseTimerDisplay()}</div>
                   <div className="grid grid-cols-1 gap-3">
                     <label className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
                            style={{ 
@@ -5152,8 +5138,8 @@ const Settings = React.memo(() => {
                         style={{ accentColor: state.preferences.accentColor }}
                       />
                   <div>
-                        <div className="font-medium text-gray-900 dark:text-white">Timer-Leiste (oben)</div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">Zeigt den Timer in einer festen Leiste am oberen Bildschirmrand</div>
+                        <div className="font-medium text-gray-900 dark:text-white">{settings_timer.topBar()}</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">{settings_timer.topBarDesc()}</div>
                   </div>
                     </label>
                     <label className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
@@ -5174,8 +5160,8 @@ const Settings = React.memo(() => {
                         style={{ accentColor: state.preferences.accentColor }}
                       />
                       <div>
-                        <div className="font-medium text-gray-900 dark:text-white">Schwebendes Widget</div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">Verschiebares Timer-Widget mit minimaler Anzeige</div>
+                        <div className="font-medium text-gray-900 dark:text-white">{settings_timer.floatingWidget()}</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">{settings_timer.floatingWidgetDesc()}</div>
                       </div>
                     </label>
                   </div>
@@ -5185,13 +5171,13 @@ const Settings = React.memo(() => {
 
             <div className="settings-card p-6 border">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Pomodoro-Technik</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">{settings_timer.pomodoroTechnique()}</h3>
               </div>
               <div className="space-y-6">
                 <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <div>
-                    <div className="font-medium text-gray-900 dark:text-white">Pomodoro aktiviert</div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">Aktiviert strukturierte Arbeits- und Pausenzeiten</div>
+                    <div className="font-medium text-gray-900 dark:text-white">{settings_timer.pomodoroEnabled()}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">{settings_timer.pomodoroDesc()}</div>
                   </div>
                   <Toggle 
                     enabled={state.preferences.pomodoro.enabled} 
@@ -5451,8 +5437,8 @@ const Settings = React.memo(() => {
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <div>
-                    <div className="font-medium text-gray-900 dark:text-white">Fokusmodus aktivieren</div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">Ermöglicht die Nutzung des Fokusmodus für konzentriertes Arbeiten</div>
+                    <div className="font-medium text-gray-900 dark:text-white">{settings_timer.focusModeEnable()}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">{settings_timer.focusModeDesc()}</div>
                   </div>
                   <Toggle 
                     enabled={state.preferences.enableFocusMode || false} 
@@ -5494,8 +5480,8 @@ const Settings = React.memo(() => {
                   <div>
                     <h3 className="text-lg font-medium text-gray-900 dark:text-white">Toggl Integration</h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Status: {togglConnectionStatus === 'success' ? 'Verbunden' : 
-                               togglConnectionStatus === 'error' ? 'Fehler' : 
+                      Status: {togglConnectionStatus === 'success' ? t('common.connected') : 
+                               togglConnectionStatus === 'error' ? t('common.error') : 
                                togglConnectionStatus === 'testing' ? 'Wird getestet...' : 'Nicht konfiguriert'}
                     </p>
                   </div>
@@ -5940,7 +5926,7 @@ const Settings = React.memo(() => {
                           ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
                           : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400'
                       }`}>
-                        {caldavConnectionStatus === 'success' ? 'Verbunden' : 
+                        {caldavConnectionStatus === 'success' ? t('common.connected') : 
                          caldavConnectionStatus === 'testing' ? 'Teste...' : 'Nicht verbunden'}
                       </span>
                       {state.preferences.caldav?.lastSync && (
@@ -6995,9 +6981,7 @@ const Settings = React.memo(() => {
                                     setIcalSources(prev => prev.map(s => s.id === source.id ? updatedSource : s));
                                     dispatch({ type: 'UPDATE_CALENDAR_SOURCE', payload: updatedSource });
                                   } catch (error) {
-                                    setIcalErrors({ [source.id]: error.message });
-                                  } finally {
-                                    setIcalSyncingSource(null);
+                                    setIcalErrors(prev => ({ ...prev, [source.id]: error.message }));
                                   }
                                 }}
                                 disabled={icalSyncingSource === source.id}
@@ -7099,16 +7083,16 @@ const Settings = React.memo(() => {
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                 {t('settings.sections.sync.title')}
               </h2>
-              <p className="text-gray-600 dark:text-gray-400">Sync & Onlinebackups</p>
+              <p className="text-gray-600 dark:text-gray-400">{t('settings_sync.description')}</p>
             </div>
 
             {/* Sync Tabs */}
             <div className="border-b border-gray-200 dark:border-gray-700">
               <nav className="-mb-px flex space-x-8" aria-label="Tabs">
                 {[
-                  { id: 'sync-nextcloud', title: 'Nextcloud' },
-                  { id: 'sync-caldav', title: 'CalDAV' },
-                  { id: 'sync-ical', title: 'iCal Import' }
+                  { id: 'sync-nextcloud', title: t('settings_sync.nextcloud') },
+                  { id: 'sync-caldav', title: t('settings_sync.caldav') },
+                  { id: 'sync-ical', title: t('settings_sync.icalImport') }
                 ].map((tab) => (
                   <button
                     key={tab.id}
@@ -7156,11 +7140,11 @@ const Settings = React.memo(() => {
             <div className="border-b border-gray-200 dark:border-gray-700">
               <nav className="-mb-px flex space-x-8" aria-label="Tabs">
                 {[
-                  { id: 'data-export', title: 'Export-Optionen' },
-                  { id: 'data-import', title: 'Import-Optionen' },
-                  { id: 'data-images', title: 'Bildspeicher' },
-                  { id: 'data-backup', title: 'Backup' },
-                  { id: 'data-danger', title: 'Gefahrenzone' }
+                  { id: 'data-export', title: t('settings_data.exportOptions') },
+                  { id: 'data-import', title: t('settings_data.importOptions') },
+                  { id: 'data-images', title: t('settings_data.imageStorage') },
+                  { id: 'data-backup', title: t('common.backup') },
+                  { id: 'data-danger', title: t('settings_data.dangerZone') }
                 ].map((tab) => (
                   <button
                     key={tab.id}
@@ -7180,8 +7164,8 @@ const Settings = React.memo(() => {
             {/* Backup Tab */}
               {activeDataTab === 'data-backup' && (
               <div>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Automatisches Backup</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Regelmäßige lokale JSON‑Sicherung in ein ausgewähltes Verzeichnis.</p>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{t('settings_data.automaticBackup')}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{t('settings_data.regularBackupDesc')}</p>
 
                 <div className="flex items-center gap-3 mb-3">
                   <label className="inline-flex items-center gap-2">
@@ -7190,12 +7174,12 @@ const Settings = React.memo(() => {
                       checked={!!state.preferences.backup?.enabled}
                       onChange={(e) => dispatch({ type: 'UPDATE_PREFERENCES', payload: { backup: { ...(state.preferences.backup||{ intervalMinutes: 60, notify: true }), enabled: e.target.checked } } })}
                     />
-                    <span>Automatische Backups aktivieren</span>
+                    <span>{t('settings_data.enableAutoBackup')}</span>
                   </label>
                 </div>
 
                 <div className="flex items-center gap-3 mb-3">
-                  <label className="text-sm w-48">Intervall (Minuten)</label>
+                  <label className="text-sm w-48">{t('settings_data.intervalMinutes')}</label>
                   <input
                     type="number"
                     min={1}
@@ -7223,16 +7207,16 @@ const Settings = React.memo(() => {
                           }
                         } catch {}
                       } else {
-                        alert('Dieser Browser unterstützt die Verzeichnis‑Auswahl nicht.');
+                        alert(t('settings_data.browserNoSupport'));
                       }
                     }}
-                  >Backup‑Verzeichnis wählen</button>
+                  >{t('settings_data.selectBackupDir')}</button>
 
                   <button
                     className="px-3 py-1.5 rounded-md border"
                     onClick={async () => {
                       const handle = (window as any).__taskfuchs_backup_dir__ as FileSystemDirectoryHandle | undefined;
-                      if (!handle) { alert('Kein Backup‑Verzeichnis gewählt.'); return; }
+                      if (!handle) { alert(t('settings_data.noBackupDirSelected')); return; }
                       const { exportToJSON, writeBackupToDirectory } = await import('../../utils/importExport');
                       const data: any = {
                         tasks: state.tasks,
@@ -7256,11 +7240,11 @@ const Settings = React.memo(() => {
                       const prev = state.preferences.backup || { enabled: true, intervalMinutes: 60, notify: true };
                       dispatch({ type: 'UPDATE_PREFERENCES', payload: { backup: { enabled: prev.enabled, intervalMinutes: prev.intervalMinutes, notify: prev.notify, lastSuccess: new Date().toISOString() } } });
                     }}
-                  >Jetzt sichern</button>
+                  >{t('settings_data.backupNow')}</button>
                 </div>
 
                 {state.preferences.backup?.lastSuccess && (
-                  <div className="text-xs text-gray-500 dark:text-gray-400">Letztes Backup: {new Date(state.preferences.backup.lastSuccess).toLocaleString()}</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">{t('settings_data.lastBackup')}: {new Date(state.preferences.backup.lastSuccess).toLocaleString()}</div>
                 )}
 
                 {/* Restore row */}
@@ -7304,7 +7288,7 @@ const Settings = React.memo(() => {
                         if (!jsonContent) return;
                         const { importFromJSON } = await import('../../utils/importExport');
                         const data = importFromJSON(jsonContent);
-                        if (!data) { alert('Ungültige Backup-Datei.'); return; }
+                        if (!data) { alert(t('settings_data.invalidBackupFile')); return; }
                         dispatch({ type: 'IMPORT_DATA_REPLACE', payload: {
                           tasks: data.tasks,
                           archivedTasks: data.archivedTasks as any,
@@ -7324,22 +7308,22 @@ const Settings = React.memo(() => {
                         alert('Wiederherstellen fehlgeschlagen.');
                       }
                     }}
-                  >Wiederherstellen</button>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">Standard: letztes Backup im gewählten Ordner. Ohne Ordner erscheint ein Dateiauswahldialog.</div>
+                  >{t('settings_data.restore')}</button>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">{t('settings_data.restoreDesc')}</div>
                 </div>
 
                 {/* Reset backups */}
                 <div className="mt-4 p-3 rounded-lg border border-red-300/50 dark:border-red-800/50 bg-red-50/40 dark:bg-red-900/10">
                   <div className="flex items-center justify-between gap-3">
-                    <div className="text-sm text-red-700 dark:text-red-300">Backups komplett zurücksetzen</div>
+                    <div className="text-sm text-red-700 dark:text-red-300">{t('settings_data.resetBackups')}</div>
                     <button
                       className="px-3 py-1.5 rounded-md text-white bg-red-600 hover:bg-red-700"
                       onClick={async () => {
-                        const confirmReset = confirm('Alle Backup-Einstellungen zurücksetzen? Optional kannst du im nächsten Schritt auch TaskFuchs-Backupdateien aus dem gewählten Ordner entfernen.');
+                        const confirmReset = confirm(t('settings_data.confirmResetBackup'));
                         if (!confirmReset) return;
                         // Try to delete TaskFuchs_*.json files if user agrees and a directory handle exists
                         try {
-                          const alsoDelete = confirm('TaskFuchs-Backupdateien (TaskFuchs_*.json) im gewählten Ordner löschen?');
+                          const alsoDelete = confirm(t('settings_data.confirmDeleteBackupFiles'));
                           const dir: any = (window as any).__taskfuchs_backup_dir__;
                           if (alsoDelete && dir && dir.values) {
                             const entries: any[] = [];
@@ -7362,11 +7346,11 @@ const Settings = React.memo(() => {
                         dispatch({ type: 'UPDATE_PREFERENCES', payload: { backup: { enabled: false, intervalMinutes: prev.intervalMinutes, notify: prev.notify } } });
                         // Open reminder modal immediately
                         try { window.dispatchEvent(new CustomEvent('open-backup-setup')); } catch {}
-                        alert('Backup-Einstellungen zurückgesetzt.');
+                        alert(t('settings_data.backupResetSuccess'));
                       }}
-                    >Zurücksetzen</button>
+                    >{t('settings_data.reset')}</button>
                   </div>
-                  <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">Dies deaktiviert automatische Backups, entfernt den gewählten Ordner aus TaskFuchs und (optional) löscht TaskFuchs_*.json im Ordner.</div>
+                  <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">{t('settings_data.resetDesc')}</div>
                 </div>
               </div>
             )}
@@ -7374,16 +7358,14 @@ const Settings = React.memo(() => {
             {/* Export Tab */}
             {activeDataTab === 'data-export' && (
             <div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Export-Optionen</h3>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{t('settings_data.exportOptions')}</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 flex flex-col">
                   <div className="flex items-center mb-3">
                     <Download className="w-5 h-5 mr-2" style={{ color: 'var(--accent-color)' }} />
-                    <h4 className="font-medium text-gray-900 dark:text-white">JSON (Vollständig)</h4>
+                    <h4 className="font-medium text-gray-900 dark:text-white">{t('settings_data.jsonComplete')}</h4>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 flex-1">
-                    Alle Daten, Einstellungen und Boards
-                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 flex-1">{t('settings_data.jsonCompleteDesc')}</p>
                   <button
                     onClick={() => {
                       // Vollständiger Export aller App-Daten
@@ -7932,7 +7914,7 @@ const Settings = React.memo(() => {
             {activeInfoTab === 'privacy' && (
               <div className="space-y-8">
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Datenschutz & Sicherheit</h3>
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{settings_information.privacyTitle()}</h3>
                   <div className="space-y-6">
                     <div 
                       className="p-4 rounded-lg border"
@@ -7941,22 +7923,22 @@ const Settings = React.memo(() => {
                         borderColor: 'color-mix(in srgb, var(--accent-color) 25%, transparent)'
                       }}
                     >
-                      <h4 className="font-medium mb-2" style={{ color: 'var(--accent-color)' }}>🔒 Ihre Daten bleiben lokal</h4>
+                      <h4 className="font-medium mb-2" style={{ color: 'var(--accent-color)' }}>{settings_information.yourDataStaysLocal()}</h4>
                       <ul className="text-sm space-y-1" style={{ color: 'color-mix(in srgb, var(--accent-color) 80%, #4b5563)' }}>
-                        <li>• Alle Daten werden nur in Ihrem Browser gespeichert (localStorage)</li>
-                        <li>• Keine Datenübertragung an externe Server (außer gewählte Sync-Optionen)</li>
-                        <li>• Vollständige Kontrolle über Ihre Aufgaben und Notizen</li>
-                        <li>• Open Source - transparenter Code</li>
+                        <li>• {settings_information.dataStoredLocally()}</li>
+                        <li>• {settings_information.noDataTransfer()}</li>
+                        <li>• {settings_information.completeControl()}</li>
+                        <li>• {settings_information.openSource()}</li>
                       </ul>
                     </div>
 
                     <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                      <h4 className="font-medium text-gray-900 dark:text-white mb-3">Lokaler Speicher</h4>
+                      <h4 className="font-medium text-gray-900 dark:text-white mb-3">{settings_information.localStorage()}</h4>
                       <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                        <div>Aufgaben: {state.tasks.length} Einträge</div>
-                        <div>Boards: {state.kanbanBoards.length} Einträge</div>
-                        <div>Tags: {state.tags.length} Einträge</div>
-                        <div>Notizen: {state.notes.notes.length} Einträge</div>
+                        <div>{settings_information.tasks()}: {state.tasks.length} {settings_information.entries()}</div>
+                        <div>{settings_information.boards()}: {state.kanbanBoards.length} {settings_information.entries()}</div>
+                        <div>{settings_information.tags()}: {state.tags.length} {settings_information.entries()}</div>
+                        <div>{settings_information.notes()}: {state.notes.notes.length} {settings_information.entries()}</div>
                       </div>
                     </div>
                   </div>
@@ -8229,13 +8211,13 @@ const Settings = React.memo(() => {
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center space-x-2">
                 <SettingsIcon className="w-8 h-8" style={{ color: 'var(--accent-color)' }} />
-                <span>Einstellungen</span>
+                <span>{t('settings.title')}</span>
               </h1>
               {showSaved && (
                 <div className="flex items-center space-x-2 px-3 py-1.5 text-white rounded-lg animate-pulse text-sm"
                      style={getAccentColorStyles().bg}>
                   <Check className="w-3 h-3" />
-                  <span>Gespeichert!</span>
+                  <span>{t('settings.saved')}</span>
                 </div>
               )}
             </div>
@@ -8243,7 +8225,7 @@ const Settings = React.memo(() => {
             {/* Description */}
             <div className="flex items-center justify-end">
               <span className="text-xs text-gray-500 dark:text-gray-400">
-                Konfiguriere deine TaskFuchs-Erfahrung
+                {t('settings.description')}
               </span>
             </div>
           </div>
@@ -8314,8 +8296,8 @@ const Settings = React.memo(() => {
               window.location.reload();
             }, 1500);
           }}
-          title="Alle Daten unwiderruflich löschen"
-          message="⚠️ WARNUNG: Diese Aktion setzt TaskFuchs komplett auf den Werkzustand zurück!\n\nGelöscht werden:\n• Alle Aufgaben und archivierte Aufgaben\n• Alle Projekte, Spalten und Boards\n• Alle Tags und Notizen\n• Alle Einstellungen und Präferenzen\n• Alle Bilder und Dateien\n• Alle Integrationen (Microsoft To-Do, Toggl, etc.)\n• Alle Timer-Daten\n• Alle Sync-Einstellungen\n\nDiese Aktion kann NICHT rückgängig gemacht werden!"
+          title={t('settings.clearDataModal.title')}
+          message={t('settings.clearDataModal.message')}
         />
       )}
 
@@ -8328,8 +8310,8 @@ const Settings = React.memo(() => {
             setImageToDelete('');
           }}
           onConfirm={confirmDeleteImage}
-          title="Hintergrundbild löschen"
-          message="Möchten Sie dieses Hintergrundbild wirklich aus der Galerie entfernen?\n\nWenn es aktuell als Hintergrund verwendet wird, wird es durch den Standard-Hintergrund ersetzt."
+          title={t('settings.deleteImageModal.title')}
+          message={t('settings.deleteImageModal.message')}
           simple={true}
         />
       )}
@@ -8339,7 +8321,7 @@ const Settings = React.memo(() => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">Hintergrundbild hinzufügen</h3>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white">{t('settings.addBackgroundImage')}</h3>
               <button
                 onClick={() => setShowImageUrlModal(false)}
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
@@ -8351,7 +8333,7 @@ const Settings = React.memo(() => {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Bild-URL
+                  {t('settings.imageUrl')}
                 </label>
                 <input
                   type="url"
@@ -8367,12 +8349,12 @@ const Settings = React.memo(() => {
                     backgroundColor: `${state.preferences.accentColor}15`,
                     borderColor: `${state.preferences.accentColor}40`
                   }}>
-                                        <h4 className="text-sm font-medium mb-2" style={{ color: state.preferences.accentColor }}>💡 So finden Sie Bild-URLs:</h4>
+                                        <h4 className="text-sm font-medium mb-2" style={{ color: state.preferences.accentColor }}>💡 {t('settings.findImageUrls')}:</h4>
                     <ul className="text-xs space-y-1 opacity-75" style={{ color: state.preferences.accentColor }}>
-                    <li>• Rechtsklick auf ein Bild → "Bildadresse kopieren"</li>
-                    <li>• Unsplash.com: Foto öffnen → "Download" → Link kopieren</li>
-                  <li>• Pexels.com: Foto wählen → "Original Size" → Link kopieren</li>
-                  <li>• Eigene Bilder: In Cloud-Dienst hochladen und Link teilen</li>
+                    <li>• {t('settings.rightClickImage')}</li>
+                    <li>• {t('settings.unsplash')}</li>
+                  <li>• {t('settings.pexels')}</li>
+                  <li>• {t('settings.uploadToCloud')}</li>
                 </ul>
               </div>
             </div>
@@ -8382,7 +8364,7 @@ const Settings = React.memo(() => {
                 onClick={() => setShowImageUrlModal(false)}
                 className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
-                Abbrechen
+                {t('settings.cancel')}
               </button>
               <button
                 onClick={handleSaveImageUrl}
@@ -8400,7 +8382,7 @@ const Settings = React.memo(() => {
                   }
                 }}
               >
-                Hinzufügen
+                {t('settings.add')}
               </button>
             </div>
           </div>
@@ -8413,9 +8395,9 @@ const Settings = React.memo(() => {
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-sm mx-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                {colorPickerType === 'background' ? 'Hintergrundfarbe' 
-                : colorPickerType === 'gradientFrom' ? 'Startfarbe' 
-                : 'Endfarbe'} wählen
+                {colorPickerType === 'background' ? settings_appearance.backgroundColor() 
+                : colorPickerType === 'gradientFrom' ? t('settings.startColor') 
+                : t('settings.endColor')} {t('settings.choose')}
               </h3>
               <button
                 onClick={() => setShowColorPickerModal(false)}
@@ -8435,7 +8417,7 @@ const Settings = React.memo(() => {
                 />
                 <div className="flex-1">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Hex-Code
+                    {t('settings.hexCode')}
                   </label>
                   <input
                     type="text"
@@ -8460,7 +8442,7 @@ const Settings = React.memo(() => {
             
             <div className="flex items-center justify-between mt-6">
               <div className="text-xs text-gray-500 dark:text-gray-400">
-                Änderungen werden sofort übernommen
+                {t('settings.changesAppliedImmediately')}
               </div>
               <button
                 onClick={() => setShowColorPickerModal(false)}
@@ -8473,7 +8455,7 @@ const Settings = React.memo(() => {
                   e.currentTarget.style.backgroundColor = getAccentColorStyles().bg.backgroundColor;
                 }}
               >
-                Schließen
+                {t('common.close')}
               </button>
             </div>
           </div>
@@ -8512,29 +8494,35 @@ const Settings = React.memo(() => {
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowPhotoCreditsModal(false)} />
           <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-lg w-full mx-4 p-5 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Photo credentials</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('settings_appearance.photoCredentials')}</h3>
               <button onClick={() => setShowPhotoCreditsModal(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white">✕</button>
             </div>
             <div className="prose prose-sm dark:prose-invert max-h-80 overflow-y-auto">
-              <p>
-                Foto von <a href="https://unsplash.com/de/@rayhennessy?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">Ray Hennessy</a> auf <a href="https://unsplash.com/de/fotos/brown-fox-on-snow-field-xUUZcpQlqpM?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">Unsplash</a><br/>
-                Foto von <a href="https://unsplash.com/de/@dariojud_?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">Dario Jud</a> auf <a href="https://unsplash.com/de/fotos/neblige-baume-die-in-einen-nebligen-dunst-gehullt-sind-4EvreRzmq44?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">Unsplash</a><br/>
-                Foto von <a href="https://pixabay.com/de/users/dehaar-8454267/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=3250275" target="_blank" rel="noreferrer">Christoph de Haar</a> auf <a href="https://pixabay.com/de//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=3250275" target="_blank" rel="noreferrer">Pixabay</a><br/>
-                Foto von <a href="https://unsplash.com/de/@john_artifexfilm?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">John Lee</a> auf <a href="https://unsplash.com/de/fotos/landschaft-der-berge-oMneOBYhJxY?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">Unsplash</a><br/>
-                Foto von <a href="https://unsplash.com/de/@neom?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">NEOM</a> auf <a href="https://unsplash.com/de/fotos/die-sonne-geht-uber-einer-wustenlandschaft-unter-va9218QJFAk?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">Unsplash</a><br/>
-                Foto von <a href="https://unsplash.com/de/@luckybeanz?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">Mark Harpur</a> auf <a href="https://unsplash.com/de/fotos/brauner-holzsteg-zwischen-lavendelblumenfeld-in-der-nahe-eines-gewassers-wahrend-der-goldenen-stunde-K2s_YE031CA?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noreferrer">Unsplash</a><br/>
-                Foto von <a href="https://pixabay.com/de/users/onatee-27254887/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=8650151" target="_blank" rel="noreferrer">Abubakr Abdelatif</a> auf <a href="https://pixabay.com/de//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=8650151" target="_blank" rel="noreferrer">Pixabay</a><br/>
-                Foto von <a href="https://pixabay.com/de/users/orcatec-2164300/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=4335571" target="_blank" rel="noreferrer">Jonathan Reichel</a> auf <a href="https://pixabay.com/de//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=4335571" target="_blank" rel="noreferrer">Pixabay</a><br/>
-                Bild von <a href="https://pixabay.com/de/users/angi128-22878334/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=6553345" target="_blank" rel="noreferrer">Angi128</a> auf <a href="https://pixabay.com/de//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=6553345" target="_blank" rel="noreferrer">Pixabay</a><br/>
-                Bild von <a href="https://pixabay.com/de/users/danfador-55851/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=190055" target="_blank" rel="noreferrer">Dan Fador</a> auf <a href="https://pixabay.com/de//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=190055" target="_blank" rel="noreferrer">Pixabay</a>
-              </p>
+              <ReactMarkdown
+                components={{
+                  a: ({ href, children }) => (
+                    <a 
+                      href={href} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      {children}
+                    </a>
+                  ),
+                  p: ({ children }) => <p className="mb-2">{children}</p>,
+                  br: () => <br />
+                }}
+              >
+                {t('settings_appearance.photoCredits')}
+              </ReactMarkdown>
             </div>
             <div className="mt-4 text-right">
               <button
                 onClick={() => setShowPhotoCreditsModal(false)}
                 className="px-3 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/60"
               >
-                Schließen
+                {t('common.close')}
               </button>
             </div>
           </div>

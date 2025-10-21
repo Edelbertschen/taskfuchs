@@ -514,6 +514,8 @@ export interface ParsedTask {
   priority?: TaskPriority;
   tags: string[];
   columnId?: string;
+  projectId?: string; // NEW: Project assignment via smart parsing
+  openProjectSelector?: boolean; // NEW: Signal to open project selector when @ is used alone
 }
 
 export interface ParseResult {

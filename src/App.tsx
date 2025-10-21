@@ -32,6 +32,7 @@ import { FloatingTimerModal } from './components/Timer/FloatingTimerModal';
 import { NotificationManager } from './components/Common/NotificationManager';
 import { BackupSetupModal } from './components/Common/BackupSetupModal';
 import { OnboardingTour } from './components/Common/OnboardingTour';
+import { UserGuide } from './components/Common/UserGuide';
 import { LanguageSelectionModal } from './components/Common/LanguageSelectionModal';
 import { useTranslation } from 'react-i18next';
 import { BulkActionsBar } from './components/Common/BulkActionsBar';
@@ -213,14 +214,15 @@ function MainApp() {
   const [userExitedFocus, setUserExitedFocus] = React.useState(false); // Track if user manually exited focus mode
   const [showFocusPrompt, setShowFocusPrompt] = React.useState<{visible: boolean; taskId?: string}>({ visible: false });
   const [showBackupSetup, setShowBackupSetup] = React.useState(false);
+  const [showUserGuide, setShowUserGuide] = React.useState(false);
   
   const { state, dispatch } = useApp();
   const { t, i18n } = useTranslation();
 
   React.useEffect(() => {
-    // Show briefly, then fade out
-    const t1 = setTimeout(() => setSplashOpacity(0), 400);
-    const t2 = setTimeout(() => setShowSplash(false), 1200);
+    // Show splash screen for longer to see the animation
+    const t1 = setTimeout(() => setSplashOpacity(0), 2000);
+    const t2 = setTimeout(() => setShowSplash(false), 2700);
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, []);
 
@@ -344,10 +346,15 @@ function MainApp() {
     // Handle Onboarding start from anywhere
     const handleStartOnboarding = () => setShowOnboarding(true);
     window.addEventListener('start-onboarding', handleStartOnboarding as EventListener);
+    
+    // Handle User Guide open from anywhere
+    const handleOpenUserGuide = () => setShowUserGuide(true);
+    window.addEventListener('open-user-guide', handleOpenUserGuide as EventListener);
 
     return () => {
       window.removeEventListener('navigate-to-focus', handleNavigateToFocus as EventListener);
       window.removeEventListener('start-onboarding', handleStartOnboarding as EventListener);
+      window.removeEventListener('open-user-guide', handleOpenUserGuide as EventListener);
     };
   }, [currentView, dispatch]);
 
@@ -500,7 +507,7 @@ function MainApp() {
       if (e.key === '?' || (e.shiftKey && e.key === '/')) {
         e.preventDefault();
         // Dispatch custom event to open user guide
-        window.dispatchEvent(new CustomEvent('openUserGuide'));
+        window.dispatchEvent(new CustomEvent('open-user-guide'));
       }
 
       // Escape key always closes current modal or exits focus mode
@@ -784,20 +791,127 @@ function MainApp() {
       style={backgroundStyles}
     >
       {showSplash && (
-        <div className="fixed inset-0 z-[200000000] flex items-center justify-center pointer-events-none"
-             style={{ background: 'transparent', opacity: splashOpacity, transition: 'opacity 700ms ease' }}>
-          <img
-            src="/3d_fox.png"
-            alt="TaskFuchs"
+        <div 
+          className="fixed inset-0 z-[1000] flex flex-col items-center justify-center pointer-events-none overflow-hidden"
+          data-version="splash-v3-20251021-120000"
+          style={{ 
+            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #0f1729 50%, #1a2332 75%, #0f172a 100%)',
+            opacity: splashOpacity, 
+            transition: 'opacity 700ms ease',
+            backdropFilter: 'blur(10px)'
+          }}>
+          
+          {/* Animated background elements */}
+          <div 
+            className="absolute inset-0 pointer-events-none"
             style={{
-              width: '360px',
-              height: '360px',
-              objectFit: 'contain',
-              filter: 'drop-shadow(0 12px 28px rgba(0,0,0,0.35))',
+              background: 'radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%)',
+              animation: 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+            }}
+          />
+          <div 
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'radial-gradient(circle at 80% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%)',
+              animation: 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite 2s'
+            }}
+          />
+          
+          {/* Main content */}
+          <div className="relative z-10 flex flex-col items-center justify-center space-y-6">
+            {/* Fox image with glow effect */}
+            <div className="relative">
+              <div 
+                className="absolute inset-0 rounded-full blur-3xl pointer-events-none"
+                style={{
+                  background: 'radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%)',
+                  width: '500px',
+                  height: '500px',
+                  left: '-50px',
+                  top: '-50px'
+                }}
+              />
+              <img
+                src="/3d_fox.png"
+                alt="TaskFuchs"
+                style={{
+                  width: '400px',
+                  height: '400px',
+                  minWidth: '400px',
+                  minHeight: '400px',
+                  maxWidth: '400px',
+                  maxHeight: '400px',
+                  flexShrink: 0,
+                  flexGrow: 0,
+                  filter: 'drop-shadow(0 20px 40px rgba(59, 130, 246, 0.3)) drop-shadow(0 0px 20px rgba(139, 92, 246, 0.2))',
+                  opacity: 1,
+                  position: 'relative',
+                  zIndex: 10
+                }}
+              />
+            </div>
+            
+            {/* Text - TaskFuchs */}
+            <div className="text-center space-y-3 mt-8">
+              <h1 
+                className="text-5xl font-bold tracking-tight"
+                style={{
+                  background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #3b82f6 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  letterSpacing: '0.05em',
+                  textShadow: 'none',
+                  fontSize: '3.5rem',
+                  fontWeight: '700',
+                  marginTop: '2rem'
+                }}
+              >
+                TaskFuchs
+              </h1>
+              
+              {/* Subtitle with animation */}
+              <p 
+                className="text-base font-light tracking-widest"
+                style={{
+                  color: 'rgba(148, 163, 184, 0.8)',
+                  animation: 'fadeInUp 1s ease-out 0.5s both',
+                  letterSpacing: '0.15em',
+                  textTransform: 'uppercase'
+                }}
+              >
+                Smart Task Management
+              </p>
+            </div>
+          </div>
+          
+          {/* Bottom accent line */}
+          <div 
+            className="absolute bottom-0 left-0 right-0 h-1"
+            style={{
+              background: 'linear-gradient(90deg, transparent, #3b82f6, #8b5cf6, transparent)',
+              opacity: 0.5
             }}
           />
         </div>
       )}
+      
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 0.5; }
+          50% { opacity: 1; }
+        }
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
       
       {/* Background Image with optional Blur - Behind everything */}
       {!isMinimalDesign && shouldShowBackground && backgroundType === 'image' && resolvedBackgroundImage && (
@@ -1200,6 +1314,12 @@ function MainApp() {
       <OnboardingTour
         isOpen={showOnboarding}
         onClose={() => setShowOnboarding(false)}
+      />
+      
+      {/* User Guide */}
+      <UserGuide
+        isOpen={showUserGuide}
+        onClose={() => setShowUserGuide(false)}
       />
       
       {/* 🚀 Performance Monitor - temporär deaktiviert wegen useEffect-Loop */}

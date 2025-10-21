@@ -563,7 +563,8 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                     {item.id === 'inbox' && (() => {
                       const inboxCount = (state.tasks || []).filter(t => t.columnId === 'inbox').length;
                       return inboxCount > 0 ? (
-                        <span className="absolute top-[5px] right-[5px] text-[10px] min-w-[16px] h-[16px] px-1 rounded-full flex items-center justify-center bg-red-500 text-white shadow">
+                        <span className="absolute top-[2px] right-[2px] text-[11px] min-w-[20px] h-[20px] px-1.5 rounded-full flex items-center justify-center text-white shadow font-semibold"
+                          style={{ backgroundColor: state.preferences.accentColor }}>
                           {inboxCount}
                         </span>
                       ) : null;
@@ -572,9 +573,11 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                     {/* Planner (Today) count badge */}
                     {item.id === 'tasks' && (() => {
                       const today = new Date().toISOString().split('T')[0];
-                      const todayCount = (state.tasks || []).filter(t => t.columnId === today && !t.completed).length;
+                      const todayColumnId = `date-${today}`;
+                      const todayCount = (state.tasks || []).filter(t => t.columnId === todayColumnId && !t.completed).length;
                       return todayCount > 0 ? (
-                        <span className="absolute top-[5px] right-[5px] text-[10px] min-w-[16px] h-[16px] px-1 rounded-full flex items-center justify-center bg-blue-500 text-white shadow">
+                        <span className="absolute top-[2px] right-[2px] text-[11px] min-w-[20px] h-[20px] px-1.5 rounded-full flex items-center justify-center text-white shadow font-semibold"
+                          style={{ backgroundColor: state.preferences.accentColor }}>
                           {todayCount}
                         </span>
                       ) : null;

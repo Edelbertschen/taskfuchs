@@ -159,7 +159,7 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
       window.removeEventListener('open-user-guide', handleOpenUserGuide);
       window.removeEventListener('start-onboarding', handleStartOnboarding);
     };
-  }, [isFilterOpen, isSearchOpen, showMoreMenu]);
+  }, []);
 
   // Close filter panel when leaving tasks or notes view
   useEffect(() => {

@@ -33,9 +33,8 @@ export function OnboardingTour({ isOpen, onClose }: OnboardingTourProps) {
 
   // Helper function to get the correct path for both web and Electron
   const getBackgroundImagePath = () => {
-    // Use relative path which should work in both environments
-    // Vite copies the file to dist/, so this should resolve correctly
-    return 'onboarding.jpg';
+    // Use bg12.png as background
+    return '/backgrounds/bg12.png';
   };
 
   const steps: OnboardingStep[] = [
@@ -256,7 +255,7 @@ export function OnboardingTour({ isOpen, onClose }: OnboardingTourProps) {
 
   if (isCompleted) {
     return createPortal(
-      <div className="fixed inset-0 flex items-center justify-center z-[999999]" 
+      <div className="fixed inset-0 flex items-center justify-center z-[99998]" 
            style={{ 
              isolation: 'isolate',
              backgroundImage: `url(${getBackgroundImagePath()})`,
@@ -274,11 +273,11 @@ export function OnboardingTour({ isOpen, onClose }: OnboardingTourProps) {
                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
              }}>
           <div className="relative mb-6">
-            <div className="w-24 h-24 mx-auto mb-4 transform animate-pulse">
+            <div className="flex justify-center mb-4 transform animate-pulse">
               <img 
-                src={getFoxImage(1)} 
+                src="/3d_fox.png" 
                 alt="TaskFuchs" 
-                className="w-full h-full object-contain"
+                className="w-32 h-32 object-contain drop-shadow-lg"
               />
             </div>
             <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center animate-ping">
@@ -347,7 +346,7 @@ export function OnboardingTour({ isOpen, onClose }: OnboardingTourProps) {
 
   return createPortal(
     <div 
-      className="fixed inset-0 flex items-center justify-center z-[999999] p-4"
+      className="fixed inset-0 flex items-center justify-center z-[99998] p-4"
       style={{ 
         isolation: 'isolate',
         backgroundImage: `url(${getBackgroundImagePath()})`,
@@ -364,7 +363,7 @@ export function OnboardingTour({ isOpen, onClose }: OnboardingTourProps) {
       <div 
         className="bg-white/20 dark:bg-gray-800/25 backdrop-blur-3xl rounded-3xl shadow-2xl border border-white/30 dark:border-gray-600/25 max-w-4xl w-full overflow-hidden relative my-auto"
         style={{
-          background: 'linear-gradient(145deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05))',
+          background: 'linear-gradient(145deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.2))',
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
           height: '420px',
           minHeight: '420px',
@@ -398,17 +397,17 @@ export function OnboardingTour({ isOpen, onClose }: OnboardingTourProps) {
             >
               {steps.map((step, index) => (
                 <div key={step.id} className="flex flex-col md:flex-row h-full flex-shrink-0" style={{ width: `${100 / steps.length}%` }}>
-                  {/* Fox Side */}
-                  <div className="md:w-1/2 bg-gradient-to-br from-orange-100/20 to-orange-200/25 dark:from-orange-900/15 dark:to-orange-800/20 backdrop-blur-xl p-6 flex flex-col justify-center relative"
+                  {/* Fox Side - Dark Mode Only */}
+                  <div className="md:w-1/2 bg-gradient-to-br from-gray-900/40 to-gray-800/50 dark:from-gray-900/40 dark:to-gray-800/50 backdrop-blur-xl p-6 flex flex-col justify-center relative"
                        style={{
-                         background: 'linear-gradient(135deg, rgba(251, 146, 60, 0.1), rgba(251, 191, 36, 0.08))',
+                         background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3))',
                          borderRight: '1px solid rgba(255, 255, 255, 0.1)'
                        }}>
                     {/* Fox Message Speech Bubble - Compact & Elegant */}
                     <div className="speech-bubble-container max-w-xs mx-auto mb-3">
                       <div className="backdrop-blur-2xl p-4 relative speech-bubble"
                             style={{
-                              background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.1))',
+                              background: 'linear-gradient(145deg, rgba(30, 30, 30, 0.5), rgba(20, 20, 20, 0.4))',
                               borderRadius: '16px 16px 16px 4px',
                               boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
                               border: '1px solid rgba(255, 255, 255, 0.2)',
@@ -420,24 +419,23 @@ export function OnboardingTour({ isOpen, onClose }: OnboardingTourProps) {
                         <p className="text-white text-base leading-relaxed font-normal text-center"
                            style={{
                              textShadow: '0 2px 4px rgba(0, 0, 0, 0.7)',
-                             fontFamily: "'Just Me Again Down Here', 'Caveat', 'Kalam', 'DynaPuff', 'Comic Sans MS', cursive",
-                             fontSize: '22px',
+                             fontSize: '16px',
                              fontWeight: '500',
                              textAlign: 'center',
-                             letterSpacing: '0.3px'
+                             letterSpacing: '0px'
                            }}>
                           {step.foxMessage}
                         </p>
                       </div>
                     </div>
                     
-                    {/* Fox Character - Compact */}
+                    {/* Fox Icon - Modern Lucide Icon */}
                     <div className={`transform transition-all duration-300 ${foxAnimating && index === currentStep ? 'scale-110 rotate-12' : 'scale-100'}`}>
-                      <div className="w-20 h-20 mx-auto">
+                      <div className="flex justify-center">
                         <img 
-                          src={getFoxImage(step.foxImageIndex)} 
+                          src="/3d_fox.png" 
                           alt="TaskFuchs" 
-                          className="w-full h-full object-contain filter drop-shadow-lg"
+                          className="w-32 h-32 object-contain drop-shadow-lg"
                         />
                       </div>
                     </div>
