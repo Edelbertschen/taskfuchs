@@ -1995,7 +1995,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
           )}
 
           {/* Header with editable title, date, and project */}
-          <div className="relative p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="relative p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
             {/* Close button */}
             <div className="absolute top-4 right-4 z-10">
               <button
