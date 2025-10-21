@@ -2791,7 +2791,12 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                 </div>
 
                 {/* Description */}
-                <div>
+                <div onClick={(e) => {
+                  // Close editor if clicking in description area but outside the editor
+                  if (!isDescriptionPreviewMode && e.currentTarget === e.target) {
+                    setIsDescriptionPreviewMode(true);
+                  }
+                }}>
                   {/* Title and Buttons on same line */}
                   <div className="flex items-center justify-between mb-3">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -2879,12 +2884,16 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                    ) : (
                     <div 
                       className="relative transition-none w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-accent overflow-y-auto group"
-                      style={{
-                        height: `${descriptionHeight}px`
+                      onClick={(e) => {
+                        // Only close if clicking on the background, not on content
+                        if (e.currentTarget === e.target || e.target === e.currentTarget) {
+                          setIsDescriptionPreviewMode(true);
+                        }
                       }}
-                    style={{
-                      animation: 'fadeInEditMode 0.3s ease-out'
-                    }}>
+                      style={{
+                        height: `${descriptionHeight}px`,
+                        animation: 'fadeInEditMode 0.3s ease-out'
+                      }}>
                       <div 
                         onKeyDown={(e) => {
                           if (e.key === 'Escape') {
