@@ -8,7 +8,7 @@ import {
   CalendarDays, FolderOpen, ChevronDown, Target, Zap, Search, GripHorizontal,
   Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Code, Quote, 
   Minus, CheckSquare, HelpCircle, EyeOff, Pin, Edit2, ChevronLeft, ChevronRight,
-  ArrowLeftRight, Inbox, Bell
+  ArrowLeftRight, Inbox, Bell, Maximize, Minimize, ChevronUp
 } from 'lucide-react';
 import { MarkdownRenderer } from '../Common/MarkdownRenderer';
 import type { Task, Subtask, Column, RecurrenceRule, TaskReminder } from '../../types';
