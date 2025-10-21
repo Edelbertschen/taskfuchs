@@ -38,7 +38,7 @@ import { parseTaskInput } from '../../utils/taskParser';
 import { Header } from '../Layout/Header';
 import type { Task, Column, ParseResult } from '../../types';
 import { format, addDays, startOfDay, isSameDay, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isAfter, isBefore } from 'date-fns';
-import { de } from 'date-fns/locale';
+import { de, enUS } from 'date-fns/locale';
 import { getBackgroundStyles, getDarkModeBackgroundStyles } from '../../utils/backgroundUtils';
 import { MobilePullToRefresh } from '../Common/MobilePullToRefresh';
 import { SwipeableTaskCard } from './SwipeableTaskCard';
@@ -46,9 +46,10 @@ import { MobileSnackbar } from '../Common/MobileSnackbar';
 
 export function InboxView() {
   const { state, dispatch } = useApp();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { actions, forms, titles, messages, inboxView } = useAppTranslation();
   const isMinimalDesign = state.preferences.minimalDesign;
+  const dateLocale = i18n.language === 'de' ? de : enUS;
   const [showSmartTaskModal, setShowSmartTaskModal] = useState(false);
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
   const [showBulkActions, setShowBulkActions] = useState(false);
@@ -259,10 +260,10 @@ export function InboxView() {
 
     return sortedDates.map(date => ({
       date,
-      displayDate: format(new Date(date), 'EEEE, d. MMMM yyyy', { locale: de }),
+      displayDate: format(new Date(date), i18n.language === 'de' ? 'EEEE, d. MMMM yyyy' : 'EEEE, MMMM d, yyyy', { locale: dateLocale }),
       tasks: groups[date]
     }));
-  }, [inboxTasks]);
+  }, [inboxTasks, dateLocale, i18n.language]);
 
   // Get unique dates for sidebar filter
   const availableDates = useMemo(() => {
@@ -997,7 +998,7 @@ export function InboxView() {
                               </button>
                               
                               <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                                {format(currentMonth, 'MMMM yyyy', { locale: de })}
+                                {format(currentMonth, 'MMMM yyyy', { locale: dateLocale })}
                               </h3>
                               
                               <button
