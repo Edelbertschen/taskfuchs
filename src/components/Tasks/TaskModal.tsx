@@ -1902,6 +1902,28 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
 
   if (!isOpen || !task) return null;
 
+  // Handle description resize
+  const handleDescriptionResize = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const startY = e.clientY;
+    const startHeight = descriptionHeight;
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      const delta = e.clientY - startY;
+      const newHeight = Math.max(200, Math.min(800, startHeight + delta));
+      setDescriptionHeight(newHeight);
+    };
+    
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+    
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  }, [descriptionHeight]);
+
   const modalContent = (
     <>
       {/* Backdrop */}
