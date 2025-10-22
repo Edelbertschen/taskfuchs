@@ -1996,13 +1996,14 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
 
           {/* Header with editable title, date, and project */}
           <div className="relative p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-            {/* Close button */}
+            {/* Close button - Large, prominent */}
             <div className="absolute top-4 right-4 z-10">
               <button
                 onClick={handleClose}
-                className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                className="p-2.5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-all hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg hover:scale-110 shadow-sm hover:shadow-md"
+                title="Close modal"
               >
-                <X className="w-5 h-5" />
+                <X className="w-6 h-6" />
               </button>
             </div>
 
@@ -2155,10 +2156,10 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                     {formData.reminderDate && (
                       <button
                         onClick={handleRemoveDate}
-                        className="w-8 h-8 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-300 dark:hover:border-red-600 transition-colors flex items-center justify-center"
-                        title="Datumszuordnung entfernen"
+                        className="p-1.5 rounded transition-all flex items-center justify-center hover:scale-110 opacity-60 hover:opacity-100"
+                        title="Remove date assignment"
                       >
-                        <X className="w-4 h-4 text-gray-500 hover:text-red-500" />
+                        <X className="w-3.5 h-3.5 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 transition-colors" />
                       </button>
                     )}
                   </div>
@@ -2344,10 +2345,10 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                     {formData.projectId && (
                       <button
                         onClick={handleRemoveProject}
-                        className="w-8 h-8 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-300 dark:hover:border-red-600 transition-colors flex items-center justify-center"
+                        className="p-1.5 rounded transition-all flex items-center justify-center hover:scale-110 opacity-60 hover:opacity-100"
                         title="Remove project assignment"
                       >
-                        <X className="w-4 h-4 text-gray-500 hover:text-red-500" />
+                        <X className="w-3.5 h-3.5 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 transition-colors" />
                       </button>
                     )}
                   </div>
