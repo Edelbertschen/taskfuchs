@@ -17,10 +17,24 @@ export default defineConfig({
       workbox: {
         skipWaiting: true,
         clientsClaim: true,
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,json,woff2}'],
-        globIgnores: ['**/screenshots/**', '**/node_modules/**'],
+        // IMPORTANT: Exclude HTML to ensure fresh scripts are loaded on each visit
+        globPatterns: ['**/*.{js,css,ico,png,svg,json,woff2}'],
+        globIgnores: ['**/screenshots/**', '**/node_modules/**', '**/index.html'],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
         runtimeCaching: [
+          // HTML: Always try network first to get fresh app
+          {
+            urlPattern: /.*\.html$/,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'html-cache',
+              expiration: {
+                maxEntries: 5,
+                maxAgeSeconds: 0 // No caching of HTML
+              },
+              networkTimeoutSeconds: 3
+            }
+          },
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',
