@@ -6,7 +6,11 @@ import {
   pointerWithin,
   rectIntersection,
   useDroppable,
-  useDndMonitor
+  useDndMonitor,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors
 } from '@dnd-kit/core';
 import type { DragEndEvent, DragStartEvent, DragOverEvent } from '@dnd-kit/core';
 import { 
@@ -1083,6 +1087,21 @@ export function ListView({ onTaskEdit, onTaskView, onTaskPlay }: ListViewProps) 
   const [editingProject, setEditingProject] = useState<{id: string, title: string} | null>(null);
   const [showProjectTimebudgetModal, setShowProjectTimebudgetModal] = useState<any>(null);
 
+  // ✨ DnD Sensors for precise cursor tracking (fixes huge offset issue)
+  const sensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 4,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 180,
+        tolerance: 8,
+      },
+    }),
+  );
+
   // Initialize collapsed sections
   useEffect(() => {
     const initializeCollapsedSections = () => {
@@ -1414,6 +1433,7 @@ export function ListView({ onTaskEdit, onTaskView, onTaskPlay }: ListViewProps) 
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
       collisionDetection={rectIntersection}
+      sensors={sensors}
     >
     <div className="h-full w-full relative overflow-hidden">
       {/* Project Tasks Sidebar */}
