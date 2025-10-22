@@ -2595,7 +2595,7 @@ export function ProjectKanbanBoard() {
             className="fixed pointer-events-none z-[9999]"
             style={{
               left: `${dragOffset.x}px`,
-              top: `${dragOffset.y}px`,
+              top: `${dragOffset.y - 100}px`,
             }}
           >
             <TaskCard task={activeTask} isInDragOverlay />
