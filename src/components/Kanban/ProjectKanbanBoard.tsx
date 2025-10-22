@@ -2577,7 +2577,6 @@ export function ProjectKanbanBoard() {
           {activeTask && (
             <div 
               className="rotate-3 opacity-95"
-              style={{ transform: 'translateY(-100px)' }}
             >
               <TaskCard
                 task={activeTask}
