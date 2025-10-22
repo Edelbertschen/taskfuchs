@@ -1426,6 +1426,26 @@ export function ListView({ onTaskEdit, onTaskView, onTaskPlay }: ListViewProps) 
     setEditingProject(null);
   }, []);
 
+  const [dragOffset, setDragOffset] = useState<{ x: number; y: number } | null>(null);
+
+  // Track mouse position for custom drag preview
+  useEffect(() => {
+    if (!activeTask) {
+      setDragOffset(null);
+      return;
+    }
+
+    const handleMouseMove = (e: MouseEvent) => {
+      setDragOffset({
+        x: e.clientX - 100, // Center the preview (rough estimate)
+        y: e.clientY - 30,
+      });
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    return () => document.removeEventListener('mousemove', handleMouseMove);
+  }, [activeTask]);
+
   return (
     <DndContext
       onDragStart={handleDragStart}
@@ -1639,15 +1659,15 @@ export function ListView({ onTaskEdit, onTaskView, onTaskPlay }: ListViewProps) 
             </div>
         </div>
 
-      {/* ✨ DragOverlay at top-level (outside scroll container) - styled like TaskCard for consistency */}
-      <DragOverlay
-        dropAnimation={{
-          duration: 400,
-          easing: 'cubic-bezier(0.23, 1, 0.320, 1)',
-        }}
-        style={{ zIndex: 9999 }}
-      >
-        {activeTask ? (
+      {/* ✨ Custom drag preview using portal - bypasses DragOverlay positioning issues */}
+      {activeTask && dragOffset && createPortal(
+        <div
+          className="fixed pointer-events-none z-[9999]"
+          style={{
+            left: `${dragOffset.x}px`,
+            top: `${dragOffset.y}px`,
+          }}
+        >
           <div 
             className="flex items-center space-x-3 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
             style={{
@@ -1662,8 +1682,9 @@ export function ListView({ onTaskEdit, onTaskView, onTaskPlay }: ListViewProps) 
               {activeTask.title}
             </span>
           </div>
-        ) : null}
-      </DragOverlay>
+        </div>,
+        document.body
+      )}
     </div>
     </DndContext>
     

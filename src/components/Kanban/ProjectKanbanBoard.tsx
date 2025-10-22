@@ -2319,7 +2319,7 @@ export function ProjectKanbanBoard() {
           {activeTask && (
             <div style={{
               // ✨ SAME FIX: Apply -76px offset to inner element (same as TaskBoard)
-              transform: 'translateX(-76px)',
+              transform: 'translateX(-76px) translateY(-60px)',
               filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',
             }}>
               <TaskCard task={activeTask} isInDragOverlay />
