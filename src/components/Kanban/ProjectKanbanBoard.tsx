@@ -2583,7 +2583,6 @@ export function ProjectKanbanBoard() {
             </div>
           )}
         </DragOverlay>
-        )}
       </div>
     </DndContext>
   );
