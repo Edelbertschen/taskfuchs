@@ -1776,9 +1776,6 @@ export function ProjectKanbanBoard() {
   }, [activeTask]);
 
 
-  ];
-
-
   return (
     <DndContext 
       onDragStart={handleDragStart} 
