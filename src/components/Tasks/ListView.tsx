@@ -1658,7 +1658,7 @@ export function ListView({ onTaskEdit, onTaskView, onTaskPlay }: ListViewProps) 
           <div 
             className="flex items-center space-x-3 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
             style={{
-              transform: 'scale(1.02) rotate(1deg)',
+              transform: 'scale(1.02) rotate(1deg) translateY(-100px)',
               filter: 'drop-shadow(0 8px 25px rgba(0, 0, 0, 0.15))',
               opacity: 0.95,
               backdropFilter: 'blur(8px)',
