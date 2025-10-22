@@ -1755,6 +1755,8 @@ export function ProjectKanbanBoard() {
     { value: 'low', label: 'Niedrig' },
     { value: 'medium', label: 'Mittel' },
     { value: 'high', label: 'Hoch' }
+  ];
+
   // ✨ Track mouse position for drag overlay (replaces DragOverlay)
   useEffect(() => {
     if (!activeTask) {
