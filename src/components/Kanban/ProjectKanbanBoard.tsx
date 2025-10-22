@@ -2599,6 +2599,7 @@ export function ProjectKanbanBoard() {
               position: 'fixed',
               top: dragOffset.y - 40,
               left: dragOffset.x - 75,
+              width: '320px',
               pointerEvents: 'none',
               zIndex: 9999,
               transform: 'rotate(3deg) scale(1.02)',
