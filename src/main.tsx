@@ -18,7 +18,7 @@ if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   // @ts-ignore
   import('virtual:pwa-register').then(({ registerSW }) => {
     const updateSW = registerSW({
-      immediate: false,
+      immediate: true,
       onNeedRefresh() {
         try { (window as any).__taskfuchs_applyUpdate = () => updateSW(true); } catch {}
         window.dispatchEvent(new CustomEvent('pwa-update-available'));
