@@ -3,7 +3,6 @@ import { useAppTranslation } from '../../utils/i18nHelpers';
 import { useTranslation } from 'react-i18next';
 import { 
   DndContext, 
-  DragOverlay, 
   DragStartEvent, 
   DragEndEvent, 
   DragOverEvent,
@@ -2327,24 +2326,6 @@ export function ProjectKanbanBoard() {
         </div>
             </div>
 
-        {/* Drag Overlay */}
-        <DragOverlay
-          dropAnimation={null}
-          style={{
-            zIndex: 9999,
-            pointerEvents: 'none',
-          }}
-        >
-          {activeTask && (
-            <div style={{
-              // ✨ SAME FIX: Apply -76px offset to inner element (same as TaskBoard)
-              transform: 'translateX(-76px) translateY(-100px)',
-              filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',
-            }}>
-              <TaskCard task={activeTask} isInDragOverlay />
-            </div>
-          )}
-        </DragOverlay>
 
         {/* Modals */}
         {/* Task modal is opened globally via the 'open-task-modal' event */}
