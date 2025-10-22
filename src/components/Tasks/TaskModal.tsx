@@ -2772,11 +2772,11 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                       <button
                         key={priority.value}
                         onClick={() => setFormData(prev => ({ ...prev, priority: priority.value as any }))}
-                        className="relative group px-2.5 py-1.5 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer hover:scale-110 border-2"
+                        className="relative group px-2.5 py-1.5 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer hover:scale-110"
                         style={{
                           backgroundColor: formData.priority === priority.value ? priority.colorBg : 'transparent',
-                          borderColor: formData.priority === priority.value ? priority.colorBorder : 'rgba(0,0,0,0.1)',
-                          opacity: formData.priority === priority.value ? '1' : '0.5',
+                          borderLeft: `2px solid ${formData.priority === priority.value ? priority.colorBorder : 'transparent'}`,
+                          opacity: formData.priority === priority.value ? '1' : '0.4',
                           paddingLeft: formData.priority === priority.value ? '10px' : '12px',
                           fontFamily: 'monospace',
                           letterSpacing: '-1px'
