@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback, createPortal } from 'react';
 import { useAppTranslation } from '../../utils/i18nHelpers';
 import { useTranslation } from 'react-i18next';
 import { 
@@ -66,6 +66,7 @@ export function ProjectKanbanBoard() {
   const isMinimalDesign = state.preferences.minimalDesign;
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
+  const [dragOffset, setDragOffset] = useState<{ x: number; y: number } | null>(null);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showSmartTaskModal, setShowSmartTaskModal] = useState(false);
@@ -1755,6 +1756,24 @@ export function ProjectKanbanBoard() {
     { value: 'high', label: 'Hoch' }
   ];
 
+  // ✨ Track mouse position for drag preview (bypasses dnd-kit coordinate issues)
+  useEffect(() => {
+    if (!activeTask) {
+      setDragOffset(null);
+      return;
+    }
+
+    const handleMouseMove = (e: MouseEvent) => {
+      setDragOffset({
+        x: e.clientX - 120, // Center preview (TaskCard width ~240px)
+        y: e.clientY - 60,  // Center preview vertically
+      });
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    return () => document.removeEventListener('mousemove', handleMouseMove);
+  }, [activeTask]);
+
   return (
     <DndContext 
       onDragStart={handleDragStart} 
@@ -2319,7 +2338,7 @@ export function ProjectKanbanBoard() {
           {activeTask && (
             <div style={{
               // ✨ SAME FIX: Apply -76px offset to inner element (same as TaskBoard)
-              transform: 'translateX(-76px) translateY(-60px)',
+              transform: 'translateX(-76px) translateY(-100px)',
               filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',
             }}>
               <TaskCard task={activeTask} isInDragOverlay />
@@ -2587,6 +2606,20 @@ export function ProjectKanbanBoard() {
               </div>
             </div>
           </div>
+        )}
+
+        {/* ✨ Custom drag preview using portal - tracks cursor directly */}
+        {activeTask && dragOffset && createPortal(
+          <div
+            className="fixed pointer-events-none z-[9999]"
+            style={{
+              left: `${dragOffset.x}px`,
+              top: `${dragOffset.y}px`,
+            }}
+          >
+            <TaskCard task={activeTask} isInDragOverlay />
+          </div>,
+          document.body
         )}
       </div>
     </DndContext>
