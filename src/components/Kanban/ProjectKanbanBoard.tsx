@@ -1765,11 +1765,11 @@ export function ProjectKanbanBoard() {
               // ✨ REMOVED: Using default collision detection for smoother drag & drop
       sensors={sensors}
     >
-      <div className={`h-full w-full relative overflow-hidden ${
+      <div className={`h-full w-full flex overflow-hidden ${
         isMinimalDesign ? 'bg-white dark:bg-[#111827]' : ''
       }`}>
-        {/* Projects Sidebar - Full height, positioned from top to bottom */}
-        <div className={`absolute top-0 left-0 bottom-0 w-80 flex flex-col overflow-hidden ${
+        {/* Projects Sidebar - Now using flexbox instead of absolute positioning */}
+        <div className={`flex-shrink-0 flex flex-col overflow-hidden transition-all duration-300 ${
           isMinimalDesign
             ? 'border-r border-gray-200 dark:border-gray-800'
             : 'backdrop-blur-xl bg-black/50 border-r border-white/15'
@@ -1783,10 +1783,9 @@ export function ProjectKanbanBoard() {
                     }
                   : {}),
               boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-            // Always render; slide in/out for smooth animation
-            transform: sidebarMinimized ? 'translateX(-100%)' : 'translateX(0)',
-            transition: 'transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-            pointerEvents: sidebarMinimized ? 'none' : 'auto',
+            // Flexbox sizing
+            width: sidebarMinimized ? '0px' : '320px',
+            marginLeft: sidebarMinimized ? '-320px' : '0px',
             }}
           >
                 {/* Header */}
