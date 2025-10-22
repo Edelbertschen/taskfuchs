@@ -1435,17 +1435,16 @@ export function ListView({ onTaskEdit, onTaskView, onTaskPlay }: ListViewProps) 
       collisionDetection={rectIntersection}
       sensors={sensors}
     >
-    <div className="h-full w-full relative overflow-hidden">
-      {/* Project Tasks Sidebar */}
+    <div className="h-full w-full relative overflow-hidden flex">
+      {/* Project Tasks Sidebar - Now with position relative, not absolute */}
       <div 
-        className="absolute top-0 left-0 bottom-0 w-80 z-20 flex flex-col overflow-hidden"
+        className="flex-shrink-0 w-80 z-20 flex flex-col overflow-hidden transition-all duration-300"
         style={{
           backgroundColor: '#23262A',
           borderRight: '1px solid #1f2937',
           boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-          transform: sidebarVisible ? 'translateX(0)' : 'translateX(-100%)',
-          transition: mounted ? 'transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none',
-          visibility: !mounted && !sidebarVisible ? 'hidden' : 'visible',
+          width: sidebarVisible ? '320px' : '0px',
+          marginLeft: sidebarVisible ? '0px' : '-320px',
         }}
       >
         {/* Sidebar Header */}
@@ -1602,13 +1601,9 @@ export function ListView({ onTaskEdit, onTaskView, onTaskPlay }: ListViewProps) 
 
       {/* Main Content Area */}
       <div 
-        className="absolute top-0 right-0 bottom-0 flex flex-col overflow-hidden"
-        style={{
-          left: sidebarVisible ? '320px' : '0px',
-          transition: 'left 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-        }}
+        className="flex-1 overflow-y-auto"
+        style={{ maxHeight: 'calc(100vh - 100px)' }}
       >
-        <div className="h-full overflow-y-auto" style={{ maxHeight: 'calc(100vh - 100px)' }}>
             <div className="p-6 max-w-4xl mx-auto">
               <div className="space-y-6">
                 {/* Date Groups */}
@@ -1644,21 +1639,20 @@ export function ListView({ onTaskEdit, onTaskView, onTaskPlay }: ListViewProps) 
               </div>
             </div>
         </div>
-      </div>
 
-      {/* ✨ DragOverlay at top-level (outside scroll container) to fix offset from header/sidebar */}
+      {/* ✨ DragOverlay at top-level (outside scroll container) - styled like TaskCard for consistency */}
       <DragOverlay
         dropAnimation={{
           duration: 400,
           easing: 'cubic-bezier(0.23, 1, 0.320, 1)',
         }}
-        style={{ zIndex: 9999, pointerEvents: 'none' }}
+        style={{ zIndex: 9999 }}
       >
         {activeTask ? (
           <div 
             className="flex items-center space-x-3 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
             style={{
-              transform: 'scale(1.02) rotate(1deg) translateY(-100px)',
+              transform: 'scale(1.02) rotate(1deg)',
               filter: 'drop-shadow(0 8px 25px rgba(0, 0, 0, 0.15))',
               opacity: 0.95,
               backdropFilter: 'blur(8px)',
