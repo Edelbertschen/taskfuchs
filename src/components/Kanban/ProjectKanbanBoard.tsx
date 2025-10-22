@@ -2575,7 +2575,10 @@ export function ProjectKanbanBoard() {
         {/* Drag Overlay - Like Pins, using proper dnd-kit DragOverlay */}
         <DragOverlay>
           {activeTask && (
-            <div className="rotate-3 opacity-95">
+            <div 
+              className="rotate-3 opacity-95"
+              style={{ transform: 'translateY(-100px)' }}
+            >
               <TaskCard
                 task={activeTask}
                 isInDragOverlay={true}
