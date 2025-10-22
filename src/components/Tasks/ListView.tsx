@@ -1432,7 +1432,6 @@ export function ListView({ onTaskEdit, onTaskView, onTaskPlay }: ListViewProps) 
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
-      collisionDetection={rectIntersection}
       sensors={sensors}
     >
     <div className="h-full w-full relative overflow-hidden flex">
