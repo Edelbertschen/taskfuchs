@@ -332,6 +332,7 @@ export function TaskBoard() {
   const sensors = useSensors(mouseSensor, touchSensor);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
+  const [dragOffset, setDragOffset] = useState<{ x: number; y: number } | null>(null);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showSmartTaskModal, setShowSmartTaskModal] = useState(false);
@@ -2148,7 +2149,7 @@ export function TaskBoard() {
               {activeTask && (
                 <div style={{
                   // ✨ PERFECT: Apply offset to inner element to compensate springing
-                  transform: 'translateX(-76px)',
+                  transform: 'translateX(-76px) translateY(-100px)',
                   filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',
                 }}>
                         <TaskCard task={activeTask} isInDragOverlay />
