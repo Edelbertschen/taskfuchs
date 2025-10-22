@@ -1623,34 +1623,36 @@ export function ListView({ onTaskEdit, onTaskView, onTaskPlay }: ListViewProps) 
                 )}
               </div>
             </div>
-
-            <DragOverlay
-              dropAnimation={{
-                duration: 400,
-                easing: 'cubic-bezier(0.23, 1, 0.320, 1)',
-              }}
-              style={{ zIndex: 9999 }}
-            >
-              {activeTask ? (
-                <div 
-                  className="flex items-center space-x-3 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
-                  style={{
-                    transform: 'scale(1.02) rotate(1deg)',
-                    filter: 'drop-shadow(0 8px 25px rgba(0, 0, 0, 0.15))',
-                    opacity: 0.95,
-                    backdropFilter: 'blur(8px)',
-                  }}
-                >
-                  <GripVertical className="w-4 h-4 text-gray-400" />
-                  <span className="font-medium text-gray-900 dark:text-white">
-                    {activeTask.title}
-                  </span>
-                </div>
-              ) : null}
-            </DragOverlay>
         </div>
       </div>
+
+      {/* ✨ DragOverlay at top-level (outside scroll container) to fix offset from header/sidebar */}
+      <DragOverlay
+        dropAnimation={{
+          duration: 400,
+          easing: 'cubic-bezier(0.23, 1, 0.320, 1)',
+        }}
+        style={{ zIndex: 9999, pointerEvents: 'none' }}
+      >
+        {activeTask ? (
+          <div 
+            className="flex items-center space-x-3 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+            style={{
+              transform: 'scale(1.02) rotate(1deg)',
+              filter: 'drop-shadow(0 8px 25px rgba(0, 0, 0, 0.15))',
+              opacity: 0.95,
+              backdropFilter: 'blur(8px)',
+            }}
+          >
+            <GripVertical className="w-4 h-4 text-gray-400" />
+            <span className="font-medium text-gray-900 dark:text-white">
+              {activeTask.title}
+            </span>
+          </div>
+        ) : null}
+      </DragOverlay>
     </div>
+    </DndContext>
     
     {/* Project Rename Modal */}
     {editingProject && (
@@ -1701,6 +1703,5 @@ export function ListView({ onTaskEdit, onTaskView, onTaskPlay }: ListViewProps) 
       </div>
     )}
     
-    </DndContext>
   );
 } 
