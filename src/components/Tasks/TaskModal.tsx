@@ -2772,14 +2772,26 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                       <button
                         key={priority.value}
                         onClick={() => setFormData(prev => ({ ...prev, priority: priority.value as any }))}
-                        className="relative group px-2.5 py-1.5 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer hover:scale-110"
+                        className="relative group px-2.5 py-1.5 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer hover:scale-105 border-l-2"
                         style={{
                           backgroundColor: formData.priority === priority.value ? priority.colorBg : 'transparent',
-                          borderLeft: `2px solid ${formData.priority === priority.value ? priority.colorBorder : 'transparent'}`,
-                          opacity: formData.priority === priority.value ? '1' : '0.4',
+                          borderColor: formData.priority === priority.value ? priority.colorBorder : priority.colorBorder + '30',
+                          opacity: formData.priority === priority.value ? '1' : '0.5',
                           paddingLeft: formData.priority === priority.value ? '10px' : '12px',
                           fontFamily: 'monospace',
                           letterSpacing: '-1px'
+                        }}
+                        onMouseEnter={(e) => {
+                          if (formData.priority !== priority.value) {
+                            e.currentTarget.style.backgroundColor = priority.colorBg;
+                            e.currentTarget.style.opacity = '0.7';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (formData.priority !== priority.value) {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                            e.currentTarget.style.opacity = '0.5';
+                          }
                         }}
                         title={priority.label}
                       >
