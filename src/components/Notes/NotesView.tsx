@@ -452,7 +452,7 @@ export function NotesView() {
               <div className={`rounded-lg p-1 flex ${
                 state.preferences.minimalDesign
                   ? 'bg-gray-100 dark:bg-gray-700'
-                  : 'bg-gray-800'
+                  : (document.documentElement.classList.contains('dark') ? 'bg-gray-800' : 'bg-gray-200')
               }`}>
                 <button
                   onClick={() => {
@@ -464,10 +464,10 @@ export function NotesView() {
                     !dailyNotesMode
                       ? state.preferences.minimalDesign
                         ? 'text-white shadow-sm'
-                        : 'text-white shadow-sm'
+                        : (document.documentElement.classList.contains('dark') ? 'text-white shadow-sm' : 'text-white shadow-sm')
                       : state.preferences.minimalDesign
                         ? 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-600'
-                        : 'text-gray-400 hover:text-gray-300 hover:bg-gray-700'
+                        : (document.documentElement.classList.contains('dark') ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:text-gray-900 hover:bg-gray-300')
                   }`}
                   style={!dailyNotesMode 
                     ? state.preferences.minimalDesign 
@@ -489,10 +489,10 @@ export function NotesView() {
                     dailyNotesMode
                       ? state.preferences.minimalDesign
                         ? 'text-white shadow-sm'
-                        : 'text-white shadow-sm'
+                        : (document.documentElement.classList.contains('dark') ? 'text-white shadow-sm' : 'text-white shadow-sm')
                       : state.preferences.minimalDesign
                         ? 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-600'
-                        : 'text-gray-400 hover:text-gray-300 hover:bg-gray-700'
+                        : (document.documentElement.classList.contains('dark') ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:text-gray-900 hover:bg-gray-300')
                   }`}
                   style={dailyNotesMode 
                     ? state.preferences.minimalDesign 
@@ -511,7 +511,7 @@ export function NotesView() {
               <span className={`text-xs ${
                 state.preferences.minimalDesign
                   ? 'text-gray-500 dark:text-gray-400'
-                  : 'text-gray-400'
+                  : (document.documentElement.classList.contains('dark') ? 'text-gray-400' : 'text-gray-700')
               }`}>
                 {filteredNotes.length === 1 
                   ? t('notes_view.notes_count', { count: filteredNotes.length })

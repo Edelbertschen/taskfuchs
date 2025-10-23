@@ -698,7 +698,7 @@ export function InboxView() {
               <span>{inboxView.title()}</span>
               {inboxCount > 0 && (
                 <span
-                  className={`${isMinimalDesign ? 'text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600' : 'text-white/90 bg-white/10 border-white/20'} inline-flex items-center justify-center text-xs px-2 py-0.5 rounded-full border`}
+                  className={`${isMinimalDesign ? 'text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600' : (document.documentElement.classList.contains('dark') ? 'text-white/90 bg-white/10 border-white/20' : 'text-white bg-gray-700 border-gray-600')} inline-flex items-center justify-center text-xs px-2 py-0.5 rounded-full border`}
                   style={{ lineHeight: '1' }}
                 >
                   {inboxCount}

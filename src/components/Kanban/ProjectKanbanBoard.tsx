@@ -1893,7 +1893,7 @@ export function ProjectKanbanBoard() {
                     ? 'border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900'
                     : state.preferences.glassEffects?.enabled && state.preferences.glassEffects?.secondarySidebar
                       ? (document.documentElement.classList.contains('dark') ? 'border-white/15 bg-transparent' : 'border-gray-300/50 bg-white/30')
-                      : 'border-gray-800 bg-[#1a1d21]'
+                      : (document.documentElement.classList.contains('dark') ? 'border-gray-800 bg-[#1a1d21]' : 'border-gray-300 bg-gray-100')
                 }`}>
                   <div className="flex items-center justify-between">
                     <span className={`text-sm font-medium ${
