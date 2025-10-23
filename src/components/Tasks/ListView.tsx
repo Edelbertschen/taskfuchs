@@ -1664,8 +1664,8 @@ export function ListView({ onTaskEdit, onTaskView, onTaskPlay }: ListViewProps) 
         <div
           className="fixed pointer-events-none z-[9999]"
           style={{
-            left: `${dragOffset.x}px`,
-            top: `${dragOffset.y}px`,
+            left: `${dragOffset.x - 75}px`,
+            top: `${dragOffset.y - 40}px`,
           }}
         >
           <div 
