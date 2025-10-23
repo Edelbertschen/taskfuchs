@@ -411,13 +411,15 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
   
   const glassClasses = isMinimalDesign
     ? "border-r border-gray-200 dark:border-gray-800"
-    : "backdrop-blur-md bg-black/60 border-white/10";
+    : "border-r border-gray-200 dark:border-gray-800";
   
   const sidebarStyle = isMinimalDesign
     ? document.documentElement.classList.contains('dark')
       ? { backgroundColor: '#111827' }
-      : { backgroundColor: '#1c1f23' }
-    : {};
+      : { backgroundColor: '#FFFFFF' }
+    : document.documentElement.classList.contains('dark')
+      ? { backgroundColor: '#111827' }
+      : { backgroundColor: '#FFFFFF' };
 
   // Create exact accent color logo using CSS mask technique
   const getLogoMaskStyle = (accentColor: string) => {
