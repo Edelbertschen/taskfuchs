@@ -540,11 +540,11 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                         ? 'bg-[var(--accent-color)] text-white active'
                         : isMinimalDesign
                           ? (document.documentElement.classList.contains('dark')
-                              ? 'text-gray-300 hover:bg-gray-900 hover:text-white'
-                              : 'text-gray-300 hover:bg-gray-800')
+                              ? 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-white'
+                              : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800')
                           : (glassEffectEnabled 
                               ? 'text-gray-200 hover:bg-white/20' 
-                              : 'text-gray-300 hover:bg-gray-800')
+                              : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800')
                     } ${
                       isDropActive 
                         ? 'transform scale-105 shadow-xl' 
@@ -627,11 +627,11 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                   className={`w-full flex flex-col items-center justify-center rounded-lg text-xs font-medium sidebar-item py-3 px-1 gap-1 btn-hover smooth-transform transition-all duration-200 min-h-[60px] ${
                     isMinimalDesign
                       ? (document.documentElement.classList.contains('dark')
-                          ? 'text-gray-300 hover:bg-gray-900 hover:text-white'
-                          : 'text-gray-300 hover:bg-gray-800')
+                          ? 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-white'
+                          : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800')
                       : (glassEffectEnabled 
                           ? 'text-gray-200 hover:bg-white/20' 
-                          : 'text-gray-300 hover:bg-gray-800')
+                          : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800')
                   }`}
                 >
                   <MoreHorizontal className="w-5 h-5 flex-shrink-0" />
@@ -753,7 +753,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
               </svg>
             </div>
             <div>
-              <p className="font-medium text-gray-900 dark:text-white text-sm">
+              <p className="font-medium text-gray-900 dark:text-gray-100 dark:text-white text-sm">
                 {t('actions.task_assigned')}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400">
