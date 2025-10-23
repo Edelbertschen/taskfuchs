@@ -1566,9 +1566,12 @@ export function ProjectKanbanBoard() {
             }}
               className={`w-full flex flex-col items-center justify-center min-h-[120px] rounded-lg transition-all duration-200 group ${
               isMinimalDesign
-                ? 'bg-gray-50 hover:bg-gray-100 border-2 border-dashed border-gray-300 hover:border-gray-400'
+                ? 'border-2 border-dashed border-gray-300 hover:border-gray-400'
                 : 'bg-gray-100 bg-opacity-20 hover:bg-opacity-35 dark:bg-gray-700 dark:bg-opacity-20 dark:hover:bg-opacity-35 border border-dashed border-gray-300 border-opacity-40 dark:border-gray-600 dark:border-opacity-40'
             }`}
+            style={isMinimalDesign ? {
+              backgroundColor: document.documentElement.classList.contains('dark') ? '#111827' : '#FFFFFF'
+            } : undefined}
             title={actions.add_column()}
           >
             <Plus className={`w-6 h-6 mb-1 transition-colors ${
