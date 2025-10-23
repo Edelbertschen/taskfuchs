@@ -445,13 +445,13 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
       <div className={`sidebar ${glassClasses} flex flex-col h-full relative z-30 sidebar-container w-20 sidebar-slide-in smooth-scroll`} style={{...sidebarStyle, textRendering: 'optimizeLegibility', WebkitFontSmoothing: 'antialiased', MozOsxFontSmoothing: 'grayscale', transform: 'translateZ(0)'}}>
         {/* Logo */}
         <div 
-          className={`flex items-center justify-center sidebar-content relative`}
+          className={`flex items-center justify-center sidebar-content relative border-b-2`}
           style={{ 
             height: '68px',
             minHeight: '68px',
             maxHeight: '68px',
             boxSizing: 'border-box',
-            borderBottom: `1px solid ${
+            borderBottomColor: `${
               isMinimalDesign 
                 ? (document.documentElement.classList.contains('dark') ? '#4b5563' : '#000000')
                 : 'rgba(255, 255, 255, 0.2)'
