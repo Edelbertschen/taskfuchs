@@ -692,7 +692,7 @@ export function InboxView() {
         >
           {/* Main header content - centered */}
           <div className="flex items-center justify-between w-full">
-            <h1 className={`text-lg font-semibold flex items-center space-x-2 ${isMinimalDesign ? 'text-black dark:text-white' : 'text-white'}`}
+            <h1 className={`text-lg font-semibold flex items-center space-x-2 ${isMinimalDesign ? 'text-black dark:text-white' : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`}`}
                 style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.6)', lineHeight: '1.5' }}>
               <Inbox className="w-5 h-5" style={{ color: accentColor }} />
               <span>{inboxView.title()}</span>
@@ -742,7 +742,7 @@ export function InboxView() {
             }}>
               <div className="flex items-center space-x-2">
                 <Calendar className="w-4 h-4" style={{ color: accentColor }} />
-                <h2 className={`text-sm font-medium flex items-center ${isMinimalDesign ? 'text-gray-800 dark:text-gray-300' : (document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900')}`}
+                <h2 className={`text-sm font-medium flex items-center ${isMinimalDesign ? 'text-gray-800 dark:text-gray-300' : (document.documentElement.classList.contains('dark') ? `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'` : 'text-gray-900')}`}
                     style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.5)', lineHeight: '1.5', minHeight: '20px' }}>
                   {inboxView.filterByDate()}
                 </h2>
@@ -767,13 +767,13 @@ export function InboxView() {
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2 flex-1 min-w-0">
-                  <List className={`w-4 h-4 flex-shrink-0 ${isMinimalDesign ? 'text-gray-600 dark:text-gray-400' : 'text-white/70'}`} />
-                  <h3 className={`font-medium text-sm flex items-center ${isMinimalDesign ? 'text-gray-800 dark:text-white' : 'text-white'}`}
+                  <List className={`w-4 h-4 flex-shrink-0 ${isMinimalDesign ? 'text-gray-600 dark:text-gray-400' : `document.documentElement.classList.contains('dark') ? (document.documentElement.classList.contains('dark') ? 'text-white/70' : 'text-gray-70') : 'text-gray-700'`}`} />
+                  <h3 className={`font-medium text-sm flex items-center ${isMinimalDesign ? 'text-gray-800 dark:text-white' : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`}`}
                       style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.5)', lineHeight: '1.5', minHeight: '20px' }}>
                     {inboxView.allTasks()}
                   </h3>
                 </div>
-                <span className={`text-sm ml-2 font-medium ${isMinimalDesign ? 'text-gray-500 dark:text-gray-400' : 'text-white/60'}`}
+                <span className={`text-sm ml-2 font-medium ${isMinimalDesign ? 'text-gray-500 dark:text-gray-400' : (document.documentElement.classList.contains('dark') ? (document.documentElement.classList.contains('dark') ? 'text-white/60' : 'text-gray-60') : 'text-gray-600')}`}
                       style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.5)', lineHeight: '1.5' }}>
                   {inboxTasks.length}
                 </span>
@@ -800,13 +800,13 @@ export function InboxView() {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2 flex-1 min-w-0">
-                    <Calendar className={`w-4 h-4 flex-shrink-0 ${isMinimalDesign ? 'text-gray-600 dark:text-gray-400' : 'text-white/70'}`} />
-                                    <h3 className={`font-medium text-sm truncate ${isMinimalDesign ? 'text-gray-800 dark:text-white' : 'text-white'}`}
+                    <Calendar className={`w-4 h-4 flex-shrink-0 ${isMinimalDesign ? 'text-gray-600 dark:text-gray-400' : `document.documentElement.classList.contains('dark') ? (document.documentElement.classList.contains('dark') ? 'text-white/70' : 'text-gray-70') : 'text-gray-700'`}`} />
+                                    <h3 className={`font-medium text-sm truncate ${isMinimalDesign ? 'text-gray-800 dark:text-white' : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`}`}
                     style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.5)', lineHeight: '1.5' }}>
                       {dateOption.label}
                     </h3>
                   </div>
-                  <span className={`text-sm ml-2 font-medium ${isMinimalDesign ? 'text-gray-500 dark:text-gray-400' : 'text-white/60'}`}
+                  <span className={`text-sm ml-2 font-medium ${isMinimalDesign ? 'text-gray-500 dark:text-gray-400' : (document.documentElement.classList.contains('dark') ? (document.documentElement.classList.contains('dark') ? 'text-white/60' : 'text-gray-60') : 'text-gray-600')}`}
                         style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.5)', lineHeight: '1.5' }}>
                     {dateOption.count}
                   </span>
@@ -866,7 +866,7 @@ export function InboxView() {
           <div className="mb-6 flex items-center justify-end">
             <button
               onClick={() => setShowSmartTaskModal(true)}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200 hover:shadow-lg active:scale-95 ${isMinimalDesign ? 'text-white' : 'text-white backdrop-blur-xl border border-white/20'}`}
+              className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200 hover:shadow-lg active:scale-95 ${isMinimalDesign ? `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'` : 'text-white backdrop-blur-xl border border-white/20'}`}
               style={{ 
                 backgroundColor: `${accentColor}E6`,
                 boxShadow: isMinimalDesign ? 'none' : '0 4px 16px rgba(0, 0, 0, 0.15)',
@@ -934,7 +934,7 @@ export function InboxView() {
               }}
             >
                               <div className="flex items-center justify-between mb-3">
-                                  <span className={`text-sm font-medium ${isMinimalDesign ? 'text-gray-700 dark:text-gray-200' : 'text-white/80'}`}
+                                  <span className={`text-sm font-medium ${isMinimalDesign ? 'text-gray-700 dark:text-gray-200' : (document.documentElement.classList.contains('dark') ? (document.documentElement.classList.contains('dark') ? 'text-white/80' : 'text-gray-80') : 'text-gray-800')}`}
                    style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.5)', lineHeight: '1.5' }}>
                   {selectedTasks.size} {actions.tasksSelected()}
                 </span>
@@ -1391,7 +1391,7 @@ export function InboxView() {
                     <Archive className={`w-8 h-8 ${
                       isMinimalDesign
                         ? 'text-gray-600 dark:text-gray-300'
-                        : 'text-white'
+                        : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`
                     }`} />
                 </div>
                   <h3 className={`text-lg font-semibold mb-2 relative z-10 ${
@@ -1434,7 +1434,7 @@ export function InboxView() {
                   <div key={group.date} className={groupIndex > 0 ? 'mt-8' : ''}>
                     {/* Date Header */}
                     <div className="mb-6">
-                      <h2 className={`text-lg font-semibold mb-3 flex items-center ${isMinimalDesign ? 'text-gray-800 dark:text-white' : 'text-white'}`}
+                      <h2 className={`text-lg font-semibold mb-3 flex items-center ${isMinimalDesign ? 'text-gray-800 dark:text-white' : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`}`}
                           style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.6)', lineHeight: '1.5', minHeight: '28px' }}>
                         {group.displayDate}
                       </h2>
@@ -1714,8 +1714,8 @@ function InboxTaskCard({
                 <span 
                   className={`flex-1 text-sm font-medium ${
                     task.completed 
-                      ? `line-through ${isMinimalDesign ? 'text-gray-400 dark:text-gray-500' : (document.documentElement.classList.contains('dark') ? 'text-white/70' : 'text-gray-500')}` 
-                      : isMinimalDesign ? 'text-black dark:text-white' : (document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900')
+                      ? `line-through ${isMinimalDesign ? 'text-gray-400 dark:text-gray-500' : (document.documentElement.classList.contains('dark') ? `document.documentElement.classList.contains('dark') ? (document.documentElement.classList.contains('dark') ? 'text-white/70' : 'text-gray-70') : 'text-gray-700'` : 'text-gray-500')}` 
+                      : isMinimalDesign ? 'text-black dark:text-white' : (document.documentElement.classList.contains('dark') ? `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'` : 'text-gray-900')
                   }`}
                   style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.6)' }}
                   

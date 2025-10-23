@@ -268,7 +268,7 @@ function DroppableProjectHeader({ project, tasks, isExpanded, onToggle, accentCo
           <div className={`font-medium text-sm truncate text-left ${
             isMinimalDesign
               ? (isExpanded ? 'text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-300')
-              : 'text-white'
+              : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`
           }`}>
             {project.title}
           </div>
@@ -1786,7 +1786,7 @@ export function TaskBoard() {
               }}
             >
               <h1 className={`text-lg font-semibold flex items-center space-x-2 min-w-0 ${
-                isMinimalDesign ? 'text-black' : 'text-white'
+                isMinimalDesign ? 'text-black' : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`
               }`}>
                 <Folder className="w-5 h-5 flex-shrink-0" style={{ color: state.preferences.accentColor }} />
                 <span className="truncate">{t('navigation.planner')}</span>
@@ -1817,8 +1817,8 @@ export function TaskBoard() {
                   }}
                 >
                   <div className="flex items-center space-x-2">
-                    <Filter className={`w-4 h-4 ${isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900')}`} />
-                    <span className={`text-sm font-medium ${isMinimalDesign ? 'text-gray-900 dark:text-white' : (document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900')}`}>Filter</span>
+                    <Filter className={`w-4 h-4 ${isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (document.documentElement.classList.contains('dark') ? `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'` : 'text-gray-900')}`} />
+                    <span className={`text-sm font-medium ${isMinimalDesign ? 'text-gray-900 dark:text-white' : (document.documentElement.classList.contains('dark') ? `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'` : 'text-gray-900')}`}>Filter</span>
                     {(priorityFilter !== 'all' || state.activeTagFilters.length > 0) && (
                       <div 
                         className="w-2 h-2 rounded-full animate-pulse"
@@ -1838,7 +1838,7 @@ export function TaskBoard() {
                     <ChevronDown 
                       className={`w-4 h-4 transition-transform duration-300 ${
                         showFilters ? 'rotate-180' : ''
-                      } ${isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900')}`} 
+                      } ${isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (document.documentElement.classList.contains('dark') ? `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'` : 'text-gray-900')}`} 
                     />
                   </div>
                 </button>

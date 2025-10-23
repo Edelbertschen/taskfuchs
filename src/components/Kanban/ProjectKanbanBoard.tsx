@@ -758,8 +758,8 @@ export function ProjectKanbanBoard() {
                       ? 'text-gray-900 dark:text-white' 
                       : 'text-gray-700 dark:text-gray-300')
                   : (isSelected 
-                      ? 'text-white' 
-                      : 'text-gray-200')
+                      ? `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'` 
+                      : `document.documentElement.classList.contains('dark') ? 'text-gray-200' : 'text-gray-900'`)
               }`}>
                 {project.title}
               </h3>
@@ -788,7 +788,7 @@ export function ProjectKanbanBoard() {
               <span className={`text-xs font-medium ${
                 isMinimalDesign
                   ? 'text-gray-700'
-                  : 'text-white'
+                  : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`
               }`}>
                 {projectTaskCount}
               </span>
@@ -1842,9 +1842,9 @@ export function ProjectKanbanBoard() {
                         <h1 className={`text-lg font-semibold flex items-center space-x-2 ${
                           isMinimalDesign 
                             ? (document.documentElement.classList.contains('dark')
-                                ? 'text-white'
+                                ? `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`
                                 : 'text-black')
-                            : 'text-white'
+                            : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`
                         }`}>
                           <Columns className="w-5 h-5" style={getAccentColorStyles().text} />
                           <span>{t('projects.title')}</span>
@@ -1877,7 +1877,7 @@ export function ProjectKanbanBoard() {
                       </>
                     ) : (
                       <h1 className={`text-lg font-semibold flex items-center space-x-2 ${
-                        isMinimalDesign ? 'text-black' : 'text-white'
+                        isMinimalDesign ? 'text-black' : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`
                       }`}>
                         <Columns className="w-5 h-5" style={getAccentColorStyles().text} />
                         <span>{t('projects.title')}</span>
@@ -1945,7 +1945,7 @@ export function ProjectKanbanBoard() {
                       <h3 className={`text-base font-medium mb-2 ${
                         isMinimalDesign 
                           ? 'text-gray-900 dark:text-white' 
-                          : 'text-white'
+                          : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`
                       }`}>
                         {t('projects.no_projects_title')}
                       </h3>
@@ -2313,13 +2313,13 @@ export function ProjectKanbanBoard() {
                   <Columns className={`w-8 h-8 ${
                     isMinimalDesign
                       ? 'text-white dark:text-white'
-                      : 'text-white'
+                      : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`
                   }`} />
                 </div>
                 <h3 className={`text-lg font-semibold mb-2 relative z-10 ${
                   isMinimalDesign
                     ? 'text-white dark:text-white'
-                    : 'text-white'
+                    : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`
                 } drop-shadow-lg`}>
                   {t('projects.no_project_selected')}
                 </h3>
