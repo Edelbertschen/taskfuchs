@@ -1778,18 +1778,24 @@ export function ProjectKanbanBoard() {
     }
 
     const handleMouseMove = (e: MouseEvent) => {
-      // Calculate sidebar width (320px when visible, 0px when minimized)
-      const sidebarWidth = (sidebarVisible && !sidebarMinimized) ? 320 : 0;
+      // Get the main content container's position
+      const mainContainer = document.querySelector('[data-kanban-main]');
+      let offsetX = 0;
+      
+      if (mainContainer) {
+        const rect = mainContainer.getBoundingClientRect();
+        offsetX = rect.left;
+      }
       
       setDragOffset({
-        x: e.clientX - sidebarWidth,
+        x: e.clientX - offsetX,
         y: e.clientY
       });
     };
 
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [activeTask, sidebarVisible, sidebarMinimized]);
+  }, [activeTask]);
 
 
   return (
@@ -2130,6 +2136,7 @@ export function ProjectKanbanBoard() {
             {selectedProject ? (
               <div 
                 className="relative h-full flex flex-col"
+                data-kanban-main
                       style={{
                   overflow: 'hidden'
                 }}
