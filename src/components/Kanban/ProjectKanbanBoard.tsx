@@ -1768,15 +1768,18 @@ export function ProjectKanbanBoard() {
     }
 
     const handleMouseMove = (e: MouseEvent) => {
+      // Calculate sidebar width (320px when visible, 0px when minimized)
+      const sidebarWidth = (sidebarVisible && !sidebarMinimized) ? 320 : 0;
+      
       setDragOffset({
-        x: e.clientX,
+        x: e.clientX - sidebarWidth,
         y: e.clientY
       });
     };
 
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [activeTask]);
+  }, [activeTask, sidebarVisible, sidebarMinimized]);
 
 
   return (

@@ -2149,7 +2149,8 @@ export function TaskBoard() {
               {activeTask && (
                 <div style={{
                   // ✨ PERFECT: Apply offset to inner element to compensate springing
-                  transform: 'translateX(-76px) translateY(-100px)',
+                  // Adjust X offset based on sidebar visibility (320px sidebar width)
+                  transform: `translateX(${sidebarVisible ? 'calc(-76px - 320px)' : '-76px'}) translateY(-100px)`,
                   filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',
                 }}>
                         <TaskCard task={activeTask} isInDragOverlay />
