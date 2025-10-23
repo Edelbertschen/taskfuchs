@@ -2138,24 +2138,24 @@ export function TaskBoard() {
 
             </div>
 
-            {/* ✨ Elegant Minimalist DragOverlay */}
-            <DragOverlay
-              dropAnimation={null}
-              style={{
-                zIndex: 9999,
-                pointerEvents: 'none',
-              }}
-            >
-              {activeTask && (
-                <div style={{
-                  // ✨ PERFECT: Apply offset to inner element to compensate springing
-                  transform: 'translateX(-76px) translateY(-100px)',
-                  filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',
-                }}>
-                        <TaskCard task={activeTask} isInDragOverlay />
-                        </div>
-              )}
-            </DragOverlay>
+            {/* ✨ Custom Drag Preview using Portal - Direct Mouse Tracking */}
+            {activeTask && dragOffset && createPortal(
+              <div
+                style={{
+                  position: 'fixed',
+                  top: dragOffset.y - 40,
+                  left: dragOffset.x - 75,
+                  width: '320px',
+                  pointerEvents: 'none',
+                  zIndex: 9999,
+                  transform: 'rotate(3deg) scale(1.02)',
+                  filter: 'drop-shadow(0 12px 30px rgba(0,0,0,0.2))',
+                }}
+              >
+                <TaskCard task={activeTask} isInDragOverlay={true} />
+              </div>,
+              document.body
+            )}
             
             {/* ✨ Butter-Smooth Apple-Style Animations */}
             <style>

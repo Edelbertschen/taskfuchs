@@ -73,6 +73,7 @@ export function PinsView() {
   // Horizontal scroll container ref (for wheel/arrow navigation like Planner/Projects)
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [pinOffset, setPinOffset] = useState(0);
+  const [dragOffset, setDragOffset] = useState<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -635,23 +636,27 @@ export function PinsView() {
           );
         })()}
 
-        {/* Drag Overlay */}
-        <DragOverlay>
-          {activeTask && (
-            <div 
-              className="rotate-3 opacity-95"
-              style={{ 
-                transform: 'translateX(-76px)',
-                pointerEvents: 'none'
-              }}
-            >
-              <TaskCard
-                task={activeTask}
-                isInDragOverlay={true}
-              />
-            </div>
-          )}
-        </DragOverlay>
+        {/* ✨ Custom Drag Preview using Portal - Direct Mouse Tracking */}
+        {activeTask && dragOffset && createPortal(
+          <div
+            style={{
+              position: 'fixed',
+              top: dragOffset.y - 40,
+              left: dragOffset.x - 75,
+              width: '320px',
+              pointerEvents: 'none',
+              zIndex: 9999,
+              transform: 'rotate(3deg) scale(1.02)',
+              filter: 'drop-shadow(0 12px 30px rgba(0,0,0,0.2))',
+            }}
+          >
+            <TaskCard
+              task={activeTask}
+              isInDragOverlay={true}
+            />
+          </div>,
+          document.body
+        )}
 
         {/* Task Modal (rendered via portal to avoid container interference) */}
         {isTaskModalOpen && selectedTask && createPortal(
