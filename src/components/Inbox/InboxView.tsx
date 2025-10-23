@@ -1752,7 +1752,7 @@ function InboxTaskCard({
               background: task.completed 
                 ? 'rgba(34, 197, 94, 0.8)' 
                 : 'rgba(255, 255, 255, 0.1)',
-              color: 'white'
+              color: task.completed ? 'white' : (document.documentElement.classList.contains('dark') ? 'rgba(255, 255, 255, 0.7)' : 'rgb(17, 24, 39)')
             }}
             title="Aufgabe abhaken"
           >
@@ -1766,7 +1766,9 @@ function InboxTaskCard({
                 e.stopPropagation();
                 onDateSelect();
               }}
-              className="p-2 text-white/70 hover:text-white rounded-lg backdrop-blur-xl border border-white/20 transition-all duration-200 hover:scale-110"
+              className={`p-2 rounded-lg backdrop-blur-xl border border-white/20 transition-all duration-200 hover:scale-110 ${
+                document.documentElement.classList.contains('dark') ? 'text-white/70 hover:text-white' : 'text-gray-900 hover:text-gray-900/80'
+              }`}
               style={{ background: 'rgba(255, 255, 255, 0.1)' }}
               title="Termin setzen"
             >
@@ -1777,7 +1779,9 @@ function InboxTaskCard({
                 e.stopPropagation();
                 onProjectSelect();
               }}
-              className="p-2 text-white/70 hover:text-white rounded-lg backdrop-blur-xl border border-white/20 transition-all duration-200 hover:scale-110"
+              className={`p-2 rounded-lg backdrop-blur-xl border border-white/20 transition-all duration-200 hover:scale-110 ${
+                document.documentElement.classList.contains('dark') ? 'text-white/70 hover:text-white' : 'text-gray-900 hover:text-gray-900/80'
+              }`}
               style={{ background: 'rgba(255, 255, 255, 0.1)' }}
               title="Zu Projekt zuweisen"
             >
@@ -1788,7 +1792,7 @@ function InboxTaskCard({
                 e.stopPropagation();
                 handleDelete();
               }}
-              className="p-2 text-white/70 hover:text-red-400 rounded-lg backdrop-blur-xl border border-white/20 transition-all duration-200 hover:scale-110"
+              className={`p-2 rounded-lg backdrop-blur-xl border border-white/20 transition-all duration-200 hover:scale-110 ${document.documentElement.classList.contains('dark') ? 'text-white/70 hover:text-red-400' : 'text-gray-900 hover:text-red-600'}`}
               style={{ background: 'rgba(255, 255, 255, 0.1)' }}
                               title={actions.delete()}
             >

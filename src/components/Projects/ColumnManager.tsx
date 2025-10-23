@@ -794,7 +794,11 @@ export function ColumnManager({ isOpen, onClose, projectId, projectTitle }: Colu
               <button
                 onClick={handleAddColumnClick}
                 disabled={projectColumns.length >= 10}
-                className="flex items-center space-x-2 px-6 py-3 text-white font-medium rounded-xl transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                className={`flex items-center space-x-2 px-6 py-3 font-medium rounded-xl transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg ${
+                  projectColumns.length >= 10 
+                    ? 'text-gray-500 dark:text-gray-400' 
+                    : (document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900')
+                }`}
                 style={{ backgroundColor: projectColumns.length >= 10 ? '#9ca3af' : accentColor }}
               >
                 <Plus className="w-5 h-5" />

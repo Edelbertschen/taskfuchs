@@ -2710,8 +2710,8 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                         'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800'
                       }`}>
                         <AlertTriangle className="w-3 h-3 mr-1" />
-                        {parseResult.task.priority === 'high' ? High : 
-                         parseResult.task.priority === 'medium' ? Medium : Low}
+                        {parseResult.task.priority === 'high' ? 'High' : 
+                         parseResult.task.priority === 'medium' ? 'Medium' : 'Low'}
                       </div>
                     )}
                     

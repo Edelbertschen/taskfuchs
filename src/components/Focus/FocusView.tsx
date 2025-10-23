@@ -130,9 +130,12 @@ export function FocusView({ onExit }: FocusViewProps) {
     const minutes = Math.floor((absoluteSeconds % 3600) / 60);
     const secs = absoluteSeconds % 60;
     
+    const paddedMinutes = minutes.toString().padStart(2, '0');
+    const paddedSecs = secs.toString().padStart(2, '0');
+    
     const timeString = hours > 0 
-      ? `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
-      : `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      ? `${hours.toString().padStart(2, '0')}:${paddedMinutes}:${paddedSecs}`
+      : `${paddedMinutes}:${paddedSecs}`;
     
     return isNegative ? `-${timeString}` : timeString;
   };
