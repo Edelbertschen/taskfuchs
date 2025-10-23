@@ -453,7 +453,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
             boxSizing: 'border-box',
             borderBottom: `1px solid ${
               isMinimalDesign 
-                ? (document.documentElement.classList.contains('dark') ? '#374151' : '#a3a3a3')
+                ? (document.documentElement.classList.contains('dark') ? '#4b5563' : '#6b7280')
                 : 'rgba(255, 255, 255, 0.2)'
             }`
           }}
