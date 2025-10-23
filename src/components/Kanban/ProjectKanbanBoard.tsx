@@ -2599,8 +2599,8 @@ export function ProjectKanbanBoard() {
         >
           {activeTask && (
             <div style={{
-              // Precision tuning: -100px left, -10px up to perfectly center on cursor
-              transform: 'translateX(-100px) translateY(-10px)',
+              // Final precision: -70px left, +10px down to perfectly center on cursor
+              transform: 'translateX(-70px) translateY(10px)',
               filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',
             }}>
               <TaskCard
