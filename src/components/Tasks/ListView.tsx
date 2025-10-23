@@ -370,6 +370,7 @@ function ModernTaskItem({
           {/* Checkbox */}
           <button
             onClick={handleToggleComplete}
+            onPointerDown={(e) => e.stopPropagation()}
             className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
               task.completed 
                 ? 'bg-green-500 border-green-500 text-white' 
@@ -495,6 +496,7 @@ function ModernTaskItem({
           {/* Checkbox */}
           <button
             onClick={handleToggleComplete}
+            onPointerDown={(e) => e.stopPropagation()}
             className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 ${
               task.completed 
                 ? 'bg-green-500 border-green-500 text-white' 
@@ -662,6 +664,7 @@ function ModernTaskItem({
         {/* Checkbox */}
         <button
           onClick={handleToggleComplete}
+          onPointerDown={(e) => e.stopPropagation()}
           className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 ${
             task.completed 
               ? 'bg-green-500 border-green-500 text-white' 

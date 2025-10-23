@@ -1747,6 +1747,7 @@ function InboxTaskCard({
               e.stopPropagation();
               handleComplete();
             }}
+            onPointerDown={(e) => e.stopPropagation()}
             className="flex-shrink-0 w-8 h-8 flex items-center justify-center transition-all duration-200 rounded-lg backdrop-blur-xl border border-white/20 opacity-0 group-hover:opacity-100 hover:scale-110"
             style={{
               background: task.completed 
@@ -1766,6 +1767,7 @@ function InboxTaskCard({
                 e.stopPropagation();
                 onDateSelect();
               }}
+              onPointerDown={(e) => e.stopPropagation()}
               className={`p-2 rounded-lg backdrop-blur-xl border border-white/20 transition-all duration-200 hover:scale-110 ${
                 document.documentElement.classList.contains('dark') ? 'text-white/70 hover:text-white' : 'text-gray-900 hover:text-gray-900/80'
               }`}
@@ -1779,6 +1781,7 @@ function InboxTaskCard({
                 e.stopPropagation();
                 onProjectSelect();
               }}
+              onPointerDown={(e) => e.stopPropagation()}
               className={`p-2 rounded-lg backdrop-blur-xl border border-white/20 transition-all duration-200 hover:scale-110 ${
                 document.documentElement.classList.contains('dark') ? 'text-white/70 hover:text-white' : 'text-gray-900 hover:text-gray-900/80'
               }`}
@@ -1792,6 +1795,7 @@ function InboxTaskCard({
                 e.stopPropagation();
                 handleDelete();
               }}
+              onPointerDown={(e) => e.stopPropagation()}
               className={`p-2 rounded-lg backdrop-blur-xl border border-white/20 transition-all duration-200 hover:scale-110 ${document.documentElement.classList.contains('dark') ? 'text-white/70 hover:text-red-400' : 'text-gray-900 hover:text-red-600'}`}
               style={{ background: 'rgba(255, 255, 255, 0.1)' }}
                               title={actions.delete()}
