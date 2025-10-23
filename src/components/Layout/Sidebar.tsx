@@ -441,14 +441,21 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
   return (
     <>
       <div className={`sidebar ${glassClasses} flex flex-col h-full relative z-30 sidebar-container w-20 sidebar-slide-in smooth-scroll`} style={{...sidebarStyle, textRendering: 'optimizeLegibility', WebkitFontSmoothing: 'antialiased', MozOsxFontSmoothing: 'grayscale', transform: 'translateZ(0)'}}>
-        {/* Logo */}
+        {/* Logo - Matches Header styling */}
         <div 
-          className={`${glassEffectEnabled ? 'border-b border-white/20' : 'border-b border-gray-800'} flex items-center justify-center sidebar-content relative`}
+          className={`${glassEffectEnabled ? 'border-b border-white/10 backdrop-blur-lg' : 'border-b border-gray-800'} flex items-center justify-center sidebar-content relative`}
           style={{ 
             height: '68px',
             minHeight: '68px',
             maxHeight: '68px',
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
+            backgroundColor: isMinimalDesign
+              ? (document.documentElement.classList.contains('dark') ? '#111827' : '#ffffff')
+              : (document.documentElement.classList.contains('dark') 
+                  ? 'rgba(17, 24, 39, 0.8)'
+                  : 'rgba(255, 255, 255, 0.8)'),
+            backdropFilter: !isMinimalDesign && glassEffectEnabled ? 'blur(16px)' : 'none',
+            WebkitBackdropFilter: !isMinimalDesign && glassEffectEnabled ? 'blur(16px)' : 'none'
           }}
         >
           <button
