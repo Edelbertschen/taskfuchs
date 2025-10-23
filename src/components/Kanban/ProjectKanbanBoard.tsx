@@ -1892,7 +1892,7 @@ export function ProjectKanbanBoard() {
                   isMinimalDesign
                     ? 'border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900'
                     : state.preferences.glassEffects?.enabled && state.preferences.glassEffects?.secondarySidebar
-                      ? 'border-white/15 bg-transparent'
+                      ? (document.documentElement.classList.contains('dark') ? 'border-white/15 bg-transparent' : 'border-gray-300/50 bg-white/30')
                       : 'border-gray-800 bg-[#1a1d21]'
                 }`}>
                   <div className="flex items-center justify-between">
@@ -1901,7 +1901,7 @@ export function ProjectKanbanBoard() {
                         ? (document.documentElement.classList.contains('dark')
                             ? 'text-gray-300'
                             : 'text-gray-700')
-                        : 'text-gray-300'
+                        : (document.documentElement.classList.contains('dark') ? 'text-gray-300' : 'text-gray-900')
                     }`}>
                       {selectedProject ? (t('tasks.title') + `: ${filteredTasks.length}`) : (t('projects.no_project_selected'))}
                     </span>
@@ -1910,7 +1910,7 @@ export function ProjectKanbanBoard() {
                         ? (document.documentElement.classList.contains('dark')
                             ? 'text-gray-300'
                             : 'text-gray-700')
-                        : 'text-gray-300'
+                        : (document.documentElement.classList.contains('dark') ? 'text-gray-300' : 'text-gray-900')
                     }`}>
                       {t('projects.title') + `: ${projects.length}`}
                     </span>
@@ -1934,25 +1934,25 @@ export function ProjectKanbanBoard() {
                       <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 ${
                         isMinimalDesign 
                           ? 'bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600' 
-                          : 'bg-gray-700 dark:bg-gray-700'
+                          : (document.documentElement.classList.contains('dark') ? 'bg-gray-700 dark:bg-gray-700' : 'bg-gray-200')
                       }`}>
                         <Columns className={`w-6 h-6 ${
                           isMinimalDesign 
                             ? 'text-gray-500 dark:text-gray-400' 
-                            : 'text-gray-400 dark:text-gray-500'
+                            : (document.documentElement.classList.contains('dark') ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600')
                         }`} />
                       </div>
                       <h3 className={`text-base font-medium mb-2 ${
                         isMinimalDesign 
                           ? 'text-gray-900 dark:text-white' 
-                          : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`
+                          : (document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900')
                       }`}>
                         {t('projects.no_projects_title')}
                       </h3>
                       <p className={`text-sm mb-6 max-w-md ${
                         isMinimalDesign 
                           ? 'text-gray-600 dark:text-gray-300' 
-                          : 'text-gray-400'
+                          : (document.documentElement.classList.contains('dark') ? 'text-gray-400' : 'text-gray-700')
                       }`}>
                         {t('projects.no_projects_description')}
                       </p>

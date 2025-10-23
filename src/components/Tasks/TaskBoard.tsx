@@ -1999,7 +1999,7 @@ export function TaskBoard() {
               {/* Stats */}
               <div className="flex items-center justify-end mt-4">
                 <span className={`text-xs ${
-                  isMinimalDesign ? 'text-gray-600 dark:text-gray-300' : 'text-gray-400'
+                  isMinimalDesign ? 'text-gray-600 dark:text-gray-300' : (document.documentElement.classList.contains('dark') ? 'text-gray-400' : 'text-gray-900')
                 }`}>
                   {(() => {
                     const totalTasks = getProjectTasks.reduce((total, group) => total + group.tasks.length, 0);
@@ -2023,11 +2023,11 @@ export function TaskBoard() {
               </div>
               {getProjectTasks.length === 0 ? (
                 <div className={`p-4 mt-4 text-center ${
-                  isMinimalDesign ? 'text-gray-600 dark:text-gray-300' : 'text-gray-400'
+                  isMinimalDesign ? 'text-gray-600 dark:text-gray-300' : (document.documentElement.classList.contains('dark') ? 'text-gray-400' : 'text-gray-900')
                 }`}>
                   <Folder className={`w-8 h-8 mx-auto mb-2 ${
-                    isMinimalDesign ? 'opacity-60' : 'opacity-50'
-                  }`} />
+                    isMinimalDesign ? 'opacity-60' : (document.documentElement.classList.contains('dark') ? 'opacity-50' : 'opacity-70')
+                  }`} style={{ color: isMinimalDesign ? undefined : (document.documentElement.classList.contains('dark') ? undefined : '#111827') }} />
                   <p className="text-sm">{t('planner.no_project_tasks')}</p>
                 </div>
               ) : (

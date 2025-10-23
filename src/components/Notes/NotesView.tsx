@@ -402,7 +402,7 @@ export function NotesView() {
               <h1 className={`text-lg font-semibold flex items-center space-x-2 ${
                 state.preferences.minimalDesign
                   ? 'text-gray-900 dark:text-white'
-                  : 'text-white'
+                  : (document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900')
               }`}>
                 <FileText className="w-5 h-5" style={getAccentColorStyles().text} />
                 <span>{notesView.notes()}</span>
@@ -954,20 +954,30 @@ export function NotesView() {
             
             {filteredNotes.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full text-center p-8">
-                <div className="w-12 h-12 bg-gray-700 dark:bg-gray-700 rounded-full flex items-center justify-center mb-3">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 ${
+                  state.preferences.minimalDesign ? 'bg-gray-100 dark:bg-gray-700' : (document.documentElement.classList.contains('dark') ? 'bg-gray-700 dark:bg-gray-700' : 'bg-gray-200')
+                }`}>
                   {dailyNotesMode ? (
-                    <Calendar className="w-6 h-6 text-gray-400 dark:text-gray-500" />
+                    <Calendar className={`w-6 h-6 ${
+                      state.preferences.minimalDesign ? 'text-gray-500 dark:text-gray-400' : (document.documentElement.classList.contains('dark') ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600')
+                    }`} />
                   ) : (
-                    <FileText className="w-6 h-6 text-gray-400 dark:text-gray-500" />
+                    <FileText className={`w-6 h-6 ${
+                      state.preferences.minimalDesign ? 'text-gray-500 dark:text-gray-400' : (document.documentElement.classList.contains('dark') ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600')
+                    }`} />
                   )}
                 </div>
-                <h3 className="text-base font-medium text-white mb-2">
+                <h3 className={`text-base font-medium mb-2 ${
+                  state.preferences.minimalDesign ? 'text-gray-900 dark:text-white' : (document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900')
+                }`}>
                   {searchQuery || selectedTags.length > 0 
                                 ? notesView.noNotesFound()
             : (dailyNotesMode ? notesView.noDailyNotes() : notesView.noNotesAvailable())
                   }
                 </h3>
-                <p className="text-sm text-gray-400 mb-4 max-w-md">
+                <p className={`text-sm mb-4 max-w-md ${
+                  state.preferences.minimalDesign ? 'text-gray-600 dark:text-gray-300' : (document.documentElement.classList.contains('dark') ? 'text-gray-400' : 'text-gray-700')
+                }`}>
                   {searchQuery || selectedTags.length > 0 
                     ? notesView.noNotesMatchFilter() 
                     : (dailyNotesMode 

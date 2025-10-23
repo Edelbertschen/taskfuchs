@@ -693,7 +693,7 @@ export function InboxView() {
           {/* Main header content - centered */}
           <div className="flex items-center justify-between w-full">
             <h1 className={`text-lg font-semibold flex items-center space-x-2 ${isMinimalDesign ? 'text-black dark:text-white' : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`}`}
-                style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.6)', lineHeight: '1.5' }}>
+                style={{ textShadow: 'none', lineHeight: '1.5' }}>
               <Inbox className="w-5 h-5" style={{ color: accentColor }} />
               <span>{inboxView.title()}</span>
               {inboxCount > 0 && (
@@ -743,7 +743,7 @@ export function InboxView() {
               <div className="flex items-center space-x-2">
                 <Calendar className="w-4 h-4" style={{ color: accentColor }} />
                 <h2 className={`text-sm font-medium flex items-center ${isMinimalDesign ? 'text-gray-800 dark:text-gray-300' : (document.documentElement.classList.contains('dark') ? `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'` : 'text-gray-900')}`}
-                    style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.5)', lineHeight: '1.5', minHeight: '20px' }}>
+                    style={{ textShadow: 'none', lineHeight: '1.5', minHeight: '20px' }}>
                   {inboxView.filterByDate()}
                 </h2>
               </div>
@@ -769,12 +769,12 @@ export function InboxView() {
                 <div className="flex items-center space-x-2 flex-1 min-w-0">
                   <List className={`w-4 h-4 flex-shrink-0 ${isMinimalDesign ? 'text-gray-600 dark:text-gray-400' : `document.documentElement.classList.contains('dark') ? (document.documentElement.classList.contains('dark') ? 'text-white/70' : 'text-gray-70') : 'text-gray-700'`}`} />
                   <h3 className={`font-medium text-sm flex items-center ${isMinimalDesign ? 'text-gray-800 dark:text-white' : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`}`}
-                      style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.5)', lineHeight: '1.5', minHeight: '20px' }}>
+                      style={{ textShadow: 'none', lineHeight: '1.5', minHeight: '20px' }}>
                     {inboxView.allTasks()}
                   </h3>
                 </div>
                 <span className={`text-sm ml-2 font-medium ${isMinimalDesign ? 'text-gray-500 dark:text-gray-400' : (document.documentElement.classList.contains('dark') ? (document.documentElement.classList.contains('dark') ? 'text-white/60' : 'text-gray-60') : 'text-gray-600')}`}
-                      style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.5)', lineHeight: '1.5' }}>
+                      style={{ textShadow: 'none', lineHeight: '1.5' }}>
                   {inboxTasks.length}
                 </span>
               </div>
@@ -802,12 +802,12 @@ export function InboxView() {
                   <div className="flex items-center space-x-2 flex-1 min-w-0">
                     <Calendar className={`w-4 h-4 flex-shrink-0 ${isMinimalDesign ? 'text-gray-600 dark:text-gray-400' : `document.documentElement.classList.contains('dark') ? (document.documentElement.classList.contains('dark') ? 'text-white/70' : 'text-gray-70') : 'text-gray-700'`}`} />
                                     <h3 className={`font-medium text-sm truncate ${isMinimalDesign ? 'text-gray-800 dark:text-white' : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`}`}
-                    style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.5)', lineHeight: '1.5' }}>
+                    style={{ textShadow: 'none', lineHeight: '1.5' }}>
                       {dateOption.label}
                     </h3>
                   </div>
                   <span className={`text-sm ml-2 font-medium ${isMinimalDesign ? 'text-gray-500 dark:text-gray-400' : (document.documentElement.classList.contains('dark') ? (document.documentElement.classList.contains('dark') ? 'text-white/60' : 'text-gray-60') : 'text-gray-600')}`}
-                        style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.5)', lineHeight: '1.5' }}>
+                        style={{ textShadow: 'none', lineHeight: '1.5' }}>
                     {dateOption.count}
                   </span>
                 </div>
@@ -824,7 +824,7 @@ export function InboxView() {
                 style={{ lineHeight: '1.5', minHeight: '36px' }}
               >
                 <X className="w-4 h-4" />
-                <span style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.5)' }}>
+                <span style={{ textShadow: 'none' }}>
                   {t('inbox_view.remove_filter', { defaultValue: 'Filter entfernen' })}
                 </span>
               </button>
@@ -870,7 +870,7 @@ export function InboxView() {
               style={{ 
                 backgroundColor: `${accentColor}E6`,
                 boxShadow: isMinimalDesign ? 'none' : '0 4px 16px rgba(0, 0, 0, 0.15)',
-                textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.3)'
+                textShadow: 'none'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = accentColor;
@@ -901,7 +901,7 @@ export function InboxView() {
               }`}
               style={{ 
                 backgroundColor: multiSelectMode ? `${accentColor}E6` : 'transparent',
-                textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.5)', 
+                textShadow: 'none', 
                 lineHeight: '1.5', 
                 minHeight: '32px' 
               }}
@@ -916,7 +916,7 @@ export function InboxView() {
               <button
                 onClick={handleSelectAll}
                 className={`transition-colors px-3 py-2 rounded-lg text-sm font-medium flex items-center ${isMinimalDesign ? 'text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700' : 'text-white/70 hover:text-white hover:bg-white/10 backdrop-blur-xl'}`}
-                style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.5)', lineHeight: '1.5', minHeight: '32px' }}
+                style={{ textShadow: 'none', lineHeight: '1.5', minHeight: '32px' }}
               >
                 {selectedTasks.size === inboxTasks.length ? t('inbox_view.deselect_all') : t('inbox_view.select_all')}
               </button>
@@ -935,7 +935,7 @@ export function InboxView() {
             >
                               <div className="flex items-center justify-between mb-3">
                                   <span className={`text-sm font-medium ${isMinimalDesign ? 'text-gray-700 dark:text-gray-200' : (document.documentElement.classList.contains('dark') ? (document.documentElement.classList.contains('dark') ? 'text-white/80' : 'text-gray-80') : 'text-gray-800')}`}
-                   style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.5)', lineHeight: '1.5' }}>
+                   style={{ textShadow: 'none', lineHeight: '1.5' }}>
                   {selectedTasks.size} {actions.tasksSelected()}
                 </span>
                 
@@ -1414,7 +1414,7 @@ export function InboxView() {
                     style={{ 
                       backgroundColor: `${accentColor}E6`,
                       boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
-                      textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)'
+                      textShadow: 'none'
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.backgroundColor = accentColor;
@@ -1435,7 +1435,7 @@ export function InboxView() {
                     {/* Date Header */}
                     <div className="mb-6">
                       <h2 className={`text-lg font-semibold mb-3 flex items-center ${isMinimalDesign ? 'text-gray-800 dark:text-white' : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`}`}
-                          style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.6)', lineHeight: '1.5', minHeight: '28px' }}>
+                          style={{ textShadow: 'none', lineHeight: '1.5', minHeight: '28px' }}>
                         {group.displayDate}
                       </h2>
                       <div className={`h-px ${isMinimalDesign ? 'bg-gray-200 dark:bg-gray-700' : 'bg-white/20'} backdrop-blur-xl`}></div>
@@ -1704,7 +1704,7 @@ function InboxTaskCard({
                 className="w-full px-3 py-2 border border-white/30 rounded-lg text-sm text-white placeholder-white/50 focus:outline-none focus:ring-2 backdrop-blur-xl"
                 style={{
                   background: document.documentElement.classList.contains('dark') ? 'rgba(17, 24, 39, 0.8)' : 'rgba(255, 255, 255, 0.1)',
-                  textShadow: '0 1px 2px rgba(0, 0, 0, 0.6)',
+                  textShadow: 'none',
                   '--tw-ring-color': `${accentColor}66`
                 } as React.CSSProperties}
                 autoFocus
@@ -1717,7 +1717,7 @@ function InboxTaskCard({
                       ? `line-through ${isMinimalDesign ? 'text-gray-400 dark:text-gray-500' : (document.documentElement.classList.contains('dark') ? `document.documentElement.classList.contains('dark') ? (document.documentElement.classList.contains('dark') ? 'text-white/70' : 'text-gray-70') : 'text-gray-700'` : 'text-gray-500')}` 
                       : isMinimalDesign ? 'text-black dark:text-white' : (document.documentElement.classList.contains('dark') ? `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'` : 'text-gray-900')
                   }`}
-                  style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.6)' }}
+                  style={{ textShadow: 'none' }}
                   
                 >
                   {task.title}
@@ -1730,7 +1730,7 @@ function InboxTaskCard({
                                  task.priority === 'medium' ? 'rgba(245, 158, 11, 0.8)' :
                                  'rgba(34, 197, 94, 0.8)',
                       color: 'white',
-                      textShadow: '0 1px 2px rgba(0, 0, 0, 0.6)',
+                      textShadow: 'none',
                       border: '1px solid rgba(255, 255, 255, 0.3)'
                     }}
                   >
