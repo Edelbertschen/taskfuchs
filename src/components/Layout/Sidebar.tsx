@@ -468,7 +468,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
             className="w-14 h-14 rounded-lg flex items-center justify-center hover:scale-105 transition-transform"
             title={t('header.settings')}
           >
-            <User className="w-6 h-6 text-white" />
+            <User className="w-6 h-6 text-gray-700 dark:text-white" />
           </button>
 
           {showPlannerUserMenu && createPortal(
@@ -639,7 +639,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                           : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800')
                   }`}
                 >
-                  <MoreHorizontal className="w-5 h-5 flex-shrink-0" />
+                  <MoreHorizontal className="w-5 h-5 flex-shrink-0 text-gray-700 dark:text-gray-300" />
                   <span className="text-xs leading-none text-center whitespace-nowrap text-gray-700 dark:text-gray-300">{t('common.more', { defaultValue: 'Mehr' })}</span>
                 </button>
                 {showMoreMenu && createPortal(
