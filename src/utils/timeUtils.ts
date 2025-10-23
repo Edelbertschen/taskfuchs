@@ -3,37 +3,42 @@
 
 export function formatTimeWithSecondsExact(minutes: number): string {
   try {
-    if (typeof minutes !== 'number' || isNaN(minutes)) return '00:00';
-    
-    const negative = minutes < 0;
-    let totalSeconds = Math.floor(Math.abs(minutes) * 60 + 1e-6);
-    
-    const hours = Math.floor(totalSeconds / 3600);
-    totalSeconds = totalSeconds % 3600;
-    const mins = Math.floor(totalSeconds / 60);
-    const secs = Math.floor(totalSeconds % 60);
-    
-    // Ensure values are in valid range
-    const validMins = Math.max(0, Math.min(59, mins));
-    const validSecs = Math.max(0, Math.min(59, secs));
-    
-    const sign = negative ? '-' : '';
-    
-    if (hours > 0) {
-      const h = String(Math.max(0, Math.min(99, hours))).padStart(2, '0');
-      const m = String(validMins).padStart(2, '0');
-      const s = String(validSecs).padStart(2, '0');
-      // Verify format: should be exactly HH:MM:SS (8 chars + sign)
-      const result = `${sign}${h}:${m}:${s}`;
-      return result.length === (sign ? 9 : 8) ? result : '00:00:00';
+    // Safeguard: ensure input is valid
+    if (typeof minutes !== 'number' || isNaN(minutes) || !isFinite(minutes)) {
+      return '00:00';
     }
     
-    const m = String(validMins).padStart(2, '0');
-    const s = String(validSecs).padStart(2, '0');
-    // Verify format: should be exactly MM:SS (5 chars + sign)
-    const result = `${sign}${m}:${s}`;
-    return result.length === (sign ? 6 : 5) ? result : '00:00';
-  } catch {
+    // Work with positive value
+    const isNegative = minutes < 0;
+    const absMinutes = Math.abs(minutes);
+    
+    // Convert to total seconds (no floating point math)
+    let totalSeconds = Math.round(absMinutes * 60);
+    
+    // Safety: cap at reasonable max (99:59:59)
+    if (totalSeconds > 359999) totalSeconds = 359999;
+    
+    // Calculate components
+    const hours = Math.floor(totalSeconds / 3600);
+    let remaining = totalSeconds % 3600;
+    const mins = Math.floor(remaining / 60);
+    const secs = remaining % 60;
+    
+    // Format with strict 2-digit padding
+    const formatPart = (n: number) => {
+      const str = Math.floor(Math.max(0, Math.min(99, n))).toString();
+      return str.length === 1 ? `0${str}` : str;
+    };
+    
+    const sign = isNegative ? '-' : '';
+    
+    if (hours > 0) {
+      return `${sign}${formatPart(hours)}:${formatPart(mins)}:${formatPart(secs)}`;
+    }
+    
+    return `${sign}${formatPart(mins)}:${formatPart(secs)}`;
+  } catch (e) {
+    console.error('formatTimeWithSecondsExact error:', e);
     return '00:00';
   }
 }
