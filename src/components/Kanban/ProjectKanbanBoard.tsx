@@ -2615,7 +2615,7 @@ export function ProjectKanbanBoard() {
             style={{
               position: 'fixed',
               top: dragOffset.y - 30,
-              left: dragOffset.x - 100,
+              left: dragOffset.x - 30,
               width: '320px',
               pointerEvents: 'none',
               zIndex: 9999,
