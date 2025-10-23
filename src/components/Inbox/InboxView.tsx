@@ -915,7 +915,7 @@ export function InboxView() {
             {multiSelectMode && (
               <button
                 onClick={handleSelectAll}
-                className={`transition-colors px-3 py-2 rounded-lg text-sm font-medium flex items-center ${isMinimalDesign ? 'text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700' : (document.documentElement.classList.contains('dark') ? 'text-white/70 hover:text-white hover:bg-white/10 backdrop-blur-xl' : 'text-gray-700 hover:text-gray-900 hover:bg-gray-200 backdrop-blur-xl')}`}
+                className={`transition-colors px-3 py-2 rounded-lg text-sm font-medium flex items-center ${isMinimalDesign ? 'text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700' : (document.documentElement.classList.contains('dark') ? 'text-white/70 hover:text-white hover:bg-white/10 backdrop-blur-xl' : 'text-gray-900 bg-gray-100/80 hover:text-white hover:bg-gray-800')}`}
                 style={{ textShadow: 'none', lineHeight: '1.5', minHeight: '32px' }}
               >
                 {selectedTasks.size === inboxTasks.length ? t('inbox_view.deselect_all') : t('inbox_view.select_all')}

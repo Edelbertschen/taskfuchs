@@ -183,6 +183,26 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
     return Math.min((elapsedTime / totalTime) * 100, 100);
   };
 
+  // Pomodoro progress percentage (0-100)
+  const getPomodoroProgress = () => {
+    if (!pomodoroSession) return 0;
+    const total = pomodoroSession.sessionRemainingTime + pomodoroSession.sessionElapsedTime;
+    if (total <= 0) return 0;
+    return Math.min(100, (pomodoroSession.sessionElapsedTime / total) * 100);
+  };
+
+  // Get Pomodoro color based on type and progress
+  const getPomodoroColor = () => {
+    if (!pomodoroSession) return state.preferences.accentColor;
+    if (pomodoroSession.type === 'work') {
+      // Work phase: Red for normal, Orange for overtime
+      return pomodoroSession.sessionRemainingTime <= 0 ? '#f97316' : '#ef4444';
+    } else {
+      // Break phase: Green
+      return '#10b981';
+    }
+  };
+
   // Helpers for tooltips
   const getPomodoroPhaseLabel = () => {
     if (!pomodoroSession) return '';
@@ -382,29 +402,65 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
               {pomodoroSession && (
                 <>
                   <div className="w-px h-6 bg-gray-300 dark:bg-gray-600" />
-                  <div className="flex items-center space-x-2" title={getPomodoroTooltip()}>
-                    {pomodoroSession.type === 'work' ? (
-                      <Target className="w-3.5 h-3.5" style={{ color: state.preferences.accentColor }} />
-                    ) : (
-                      <Coffee className="w-3.5 h-3.5 text-red-500" />
-                    )}
-                    <span className="text-lg font-mono font-semibold text-red-500">
-                      {formatTimeWithSecondsExact(Math.max(0, pomodoroSession.sessionRemainingTime || 0))}
-                    </span>
-                    <span className="text-xs text-gray-400">
+                  <div className="flex items-center space-x-3" title={getPomodoroTooltip()}>
+                    {/* Elegant Pomodoro Progress Ring */}
+                    <div className="relative w-10 h-10 flex items-center justify-center">
+                      {/* Background ring */}
+                      <svg className="absolute w-full h-full" viewBox="0 0 40 40" style={{ transform: 'rotate(-90deg)' }}>
+                        <circle
+                          cx="20"
+                          cy="20"
+                          r="16"
+                          fill="none"
+                          stroke={isDarkMode ? '#374151' : '#e5e7eb'}
+                          strokeWidth="2"
+                        />
+                        {/* Progress ring */}
+                        <circle
+                          cx="20"
+                          cy="20"
+                          r="16"
+                          fill="none"
+                          stroke={getPomodoroColor()}
+                          strokeWidth="2"
+                          strokeDasharray={`${(getPomodoroProgress() / 100) * 100.53} 100.53`}
+                          style={{
+                            transition: 'stroke-dasharray 1s linear, stroke 0.3s ease',
+                          }}
+                        />
+                      </svg>
+                      {/* Center tomato icon */}
+                      <div className="relative z-10 text-lg" style={{ opacity: 0.9 }}>
+                        {pomodoroSession.type === 'work' ? '🍅' : '☕'}
+                      </div>
+                    </div>
+                    
+                    {/* Time display */}
+                    <div className="flex flex-col">
+                      <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                        {pomodoroSession.type === 'work' ? 'Work' : 'Break'}
+                      </span>
+                      <span className="text-sm font-mono font-semibold" style={{ color: getPomodoroColor() }}>
+                        {formatTimeWithSecondsExact(Math.max(0, pomodoroSession.sessionRemainingTime || 0))}
+                      </span>
+                    </div>
+                    
+                    {/* Session number */}
+                    <span className="text-xs px-2 py-1 rounded-full" style={{ 
+                      backgroundColor: `${getPomodoroColor()}20`,
+                      color: getPomodoroColor()
+                    }}>
                       #{pomodoroSession.sessionNumber}
                     </span>
-                    {/* Contextual Pomodoro action: Skip work or End break */}
+                    
+                    {/* Skip/End button */}
                     <button
                       onClick={handlePomodoroSkipOrEnd}
-                      className="ml-1 px-2 py-0.5 rounded-md text-xs font-medium transition-all duration-200 hover:opacity-90 border"
-                      style={{ backgroundColor: 'transparent', color: state.preferences.accentColor, borderColor: state.preferences.accentColor }}
+                      className="ml-1 px-2 py-0.5 rounded-md text-xs font-medium transition-all duration-200 hover:scale-110 border"
+                      style={{ backgroundColor: 'transparent', color: getPomodoroColor(), borderColor: getPomodoroColor() }}
                       title={pomodoroSession.type === 'work' ? 'Phase überspringen' : 'Pause beenden'}
                     >
-                      <div className="flex items-center space-x-1">
-                        <SkipForward className="w-3 h-3" />
-                        <span>{pomodoroSession.type === 'work' ? 'Skip' : 'Ende'}</span>
-                      </div>
+                      <SkipForward className="w-3 h-3" />
                     </button>
                   </div>
                 </>
