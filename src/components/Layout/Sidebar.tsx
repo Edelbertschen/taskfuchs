@@ -556,9 +556,11 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                     } : {}}
                   >
                     <Icon className={`w-5 h-5 flex-shrink-0 transition-all duration-200 ${
-                      isDropActive ? 'animate-pulse' : ''
+                      isActive ? "text-white" : isMinimalDesign ? "text-gray-900 dark:text-gray-300" : "text-gray-200"
+                    } ${
+                      isDropActive ? "animate-pulse" : ""
                     }`} />
-                    <span className="text-xs leading-none text-center whitespace-nowrap text-gray-700 dark:text-gray-300">
+                    <span className={`text-xs leading-none text-center whitespace-nowrap ${isActive ? "text-white" : "text-gray-900 dark:text-gray-300"}`}>
                       {item.label}
                     </span>
                     {/* Inbox count badge */}
