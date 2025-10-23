@@ -143,7 +143,15 @@ export function ProjectKanbanBoard() {
 
   // Close project menu dropdown when clicking outside
   useEffect(() => {
-    const handleClickOutside = () => {
+    const handleClickOutside = (e: MouseEvent) => {
+      // Check if click is on the menu button or its children - if so, don't close
+      const menuButton = document.querySelector('[data-menu-button="project"]');
+      const menuContainer = document.querySelector('[data-menu-container="project"]');
+      
+      if (menuButton?.contains(e.target as Node) || menuContainer?.contains(e.target as Node)) {
+        return; // Don't close if clicking inside menu or button
+      }
+      
       setProjectMenuDropdown(null);
     };
 
@@ -807,6 +815,7 @@ export function ProjectKanbanBoard() {
                     : 'hover:bg-gray-600'
                 }`}
                 title="Projekt-Optionen"
+                data-menu-button="project"
               >
                 <MoreVertical className={`w-4 h-4 ${
                   isMinimalDesign
@@ -824,6 +833,7 @@ export function ProjectKanbanBoard() {
                       : 'bg-gray-800 border-gray-600'
                   }`}
                   onClick={(e) => e.stopPropagation()}
+                  data-menu-container="project"
                 >
                   <div className="py-1">
                     <button
