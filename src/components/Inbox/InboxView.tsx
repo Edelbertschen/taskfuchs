@@ -837,7 +837,7 @@ export function InboxView() {
       <div 
         className={`absolute top-0 right-0 bottom-0 flex flex-col overflow-hidden ${
           isMinimalDesign
-            ? 'bg-white dark:bg-[#111827]'
+            ? ''
             : 'bg-transparent'
         }`}
         style={{
