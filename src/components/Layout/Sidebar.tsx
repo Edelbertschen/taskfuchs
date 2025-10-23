@@ -556,10 +556,13 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                     } : {}}
                   >
                     <Icon className={`w-5 h-5 flex-shrink-0 transition-all duration-200 ${
-                      isActive ? "text-white" : isMinimalDesign ? "text-gray-900 dark:text-gray-300" : "text-gray-200"
-                    } ${
                       isDropActive ? "animate-pulse" : ""
-                    }`} />
+                    }`}
+                    style={{
+                      color: isActive 
+                        ? 'white'
+                        : (document.documentElement.classList.contains('dark') ? '#9ca3af' : '#111827')
+                    }} />
                     <span className={`text-xs leading-none text-center whitespace-nowrap ${isActive ? "text-white" : "text-gray-900 dark:text-gray-300"}`}>
                       {item.label}
                     </span>
