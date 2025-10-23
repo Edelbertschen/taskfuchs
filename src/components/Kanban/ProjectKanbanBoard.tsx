@@ -2599,7 +2599,7 @@ export function ProjectKanbanBoard() {
         >
           {activeTask && (
             <div style={{
-              transform: `translateX(${sidebarVisible ? 'calc(-76px - 320px)' : '-76px'}) translateY(-100px)`,
+              // Test: NO transform at all - see where it actually appears
               filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',
             }}>
               <TaskCard
