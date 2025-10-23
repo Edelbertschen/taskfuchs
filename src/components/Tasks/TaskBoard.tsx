@@ -703,21 +703,7 @@ export function TaskBoard() {
     if (task) {
       setActiveTask(task);
       
-      // ✨ Set initial dragOffset from active element position
-      const active = event.active;
-      if (active.rect?.initial?.pointerOverlay) {
-        const rect = active.rect.initial.pointerOverlay;
-        setDragOffset({
-          x: rect.x + rect.width / 2,
-          y: rect.y + rect.height / 2
-        });
-      } else {
-        // Fallback: use center of screen
-        setDragOffset({
-          x: window.innerWidth / 2,
-          y: window.innerHeight / 2
-        });
-      }
+      // ✨ Removed manual positioning system
       
       // Add slight haptic feedback if available
       if (navigator.vibrate) {
@@ -2152,24 +2138,24 @@ export function TaskBoard() {
 
             </div>
 
-            {/* ✨ Custom Drag Preview using Portal - Direct Mouse Tracking */}
-            {activeTask && dragOffset && createPortal(
-              <div
-                style={{
-                  position: 'fixed',
-                  top: dragOffset.y - 40,
-                  left: dragOffset.x - 75,
-                  width: '320px',
-                  pointerEvents: 'none',
-                  zIndex: 9999,
-                  transform: 'rotate(3deg) scale(1.02)',
-                  filter: 'drop-shadow(0 12px 30px rgba(0,0,0,0.2))',
-                }}
-              >
-                <TaskCard task={activeTask} isInDragOverlay={true} />
-              </div>,
-              document.body
-            )}
+            {/* ✨ Elegant Minimalist DragOverlay */}
+            <DragOverlay
+              dropAnimation={null}
+              style={{
+                zIndex: 9999,
+                pointerEvents: 'none',
+              }}
+            >
+              {activeTask && (
+                <div style={{
+                  // ✨ PERFECT: Apply offset to inner element to compensate springing
+                  transform: 'translateX(-76px) translateY(-100px)',
+                  filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',
+                }}>
+                        <TaskCard task={activeTask} isInDragOverlay />
+                        </div>
+              )}
+            </DragOverlay>
             
             {/* ✨ Butter-Smooth Apple-Style Animations */}
             <style>

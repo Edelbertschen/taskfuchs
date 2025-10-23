@@ -73,7 +73,6 @@ export function PinsView() {
   // Horizontal scroll container ref (for wheel/arrow navigation like Planner/Projects)
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [pinOffset, setPinOffset] = useState(0);
-  const [dragOffset, setDragOffset] = useState<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -170,23 +169,7 @@ export function PinsView() {
       setActiveColumn(column || null);
     } else {
       const task = state.tasks.find(t => t.id === active.id);
-      if (task) {
-        setActiveTask(task);
-        // ✨ Set initial dragOffset from active element position
-        if (active.rect?.initial?.pointerOverlay) {
-          const rect = active.rect.initial.pointerOverlay;
-          setDragOffset({
-            x: rect.x + rect.width / 2,
-            y: rect.y + rect.height / 2
-          });
-        } else {
-          // Fallback: use center of screen
-          setDragOffset({
-            x: window.innerWidth / 2,
-            y: window.innerHeight / 2
-          });
-        }
-      }
+      setActiveTask(task || null);
     }
   };
 
@@ -652,27 +635,23 @@ export function PinsView() {
           );
         })()}
 
-        {/* ✨ Custom Drag Preview using Portal - Direct Mouse Tracking */}
-        {activeTask && dragOffset && createPortal(
-          <div
-            style={{
-              position: 'fixed',
-              top: dragOffset.y - 40,
-              left: dragOffset.x - 75,
-              width: '320px',
-              pointerEvents: 'none',
-              zIndex: 9999,
-              transform: 'rotate(3deg) scale(1.02)',
-              filter: 'drop-shadow(0 12px 30px rgba(0,0,0,0.2))',
-            }}
-          >
-            <TaskCard
-              task={activeTask}
-              isInDragOverlay={true}
-            />
-          </div>,
-          document.body
-        )}
+        {/* Drag Overlay */}
+        <DragOverlay>
+          {activeTask && (
+            <div 
+              className="rotate-3 opacity-95"
+              style={{ 
+                transform: 'translateX(-76px)',
+                pointerEvents: 'none'
+              }}
+            >
+              <TaskCard
+                task={activeTask}
+                isInDragOverlay={true}
+              />
+            </div>
+          )}
+        </DragOverlay>
 
         {/* Task Modal (rendered via portal to avoid container interference) */}
         {isTaskModalOpen && selectedTask && createPortal(

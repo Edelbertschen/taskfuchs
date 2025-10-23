@@ -416,7 +416,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
   const sidebarStyle = isMinimalDesign
     ? document.documentElement.classList.contains('dark')
       ? { backgroundColor: '#111827' }
-      : { backgroundColor: '#1c1f23' }
+      : { backgroundColor: '#111827' }
     : {};
 
   // Create exact accent color logo using CSS mask technique
