@@ -623,18 +623,20 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
       <header 
         className={isMinimalDesign 
           ? "border-b border-gray-200 dark:border-gray-800 px-6 py-3 relative z-[99999]"
-          : "backdrop-blur-md border-b border-gray-200/60 dark:border-gray-700/60 px-6 py-3 relative z-[99999] shadow-sm"
+          : "backdrop-blur-lg border-b border-gray-200/20 dark:border-gray-700/20 px-6 py-3 relative z-[99999] shadow-sm"
         }
               style={isMinimalDesign 
         ? {
             backgroundColor: document.documentElement.classList.contains('dark')
-              ? '#111827'  // Elegant dark blue-gray for dark mode
+              ? '#111827'
               : '#ffffff'
           }
         : { 
               backgroundColor: document.documentElement.classList.contains('dark')
-                  ? 'rgba(17, 24, 39, 0.95)'
-                  : 'rgba(255, 255, 255, 0.95)'
+                  ? 'rgba(17, 24, 39, 0.8)'
+                  : 'rgba(255, 255, 255, 0.8)',
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)'
             }
         }
       >

@@ -411,7 +411,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
   
   const glassClasses = isMinimalDesign
     ? "border-r border-gray-200 dark:border-gray-800"
-    : "backdrop-blur-md bg-black/60 border-white/10";
+    : "backdrop-blur-lg bg-black/50 border-white/10";
   
   const sidebarStyle = isMinimalDesign
     ? document.documentElement.classList.contains('dark')

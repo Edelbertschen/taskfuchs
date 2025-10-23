@@ -1792,7 +1792,7 @@ export function ProjectKanbanBoard() {
         <div className={`flex-shrink-0 flex flex-col overflow-hidden transition-all duration-300 ${
           isMinimalDesign
             ? 'border-r border-gray-200 dark:border-gray-800'
-            : 'backdrop-blur-xl bg-black/50 border-r border-white/15'
+            : 'backdrop-blur-lg bg-black/50 border-r border-white/10'
         }`}
         style={{ 
               ...(isMinimalDesign 
