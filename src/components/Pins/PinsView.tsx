@@ -170,7 +170,23 @@ export function PinsView() {
       setActiveColumn(column || null);
     } else {
       const task = state.tasks.find(t => t.id === active.id);
-      setActiveTask(task || null);
+      if (task) {
+        setActiveTask(task);
+        // ✨ Set initial dragOffset from active element position
+        if (active.rect?.initial?.pointerOverlay) {
+          const rect = active.rect.initial.pointerOverlay;
+          setDragOffset({
+            x: rect.x + rect.width / 2,
+            y: rect.y + rect.height / 2
+          });
+        } else {
+          // Fallback: use center of screen
+          setDragOffset({
+            x: window.innerWidth / 2,
+            y: window.innerHeight / 2
+          });
+        }
+      }
     }
   };
 

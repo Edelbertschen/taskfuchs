@@ -703,7 +703,21 @@ export function TaskBoard() {
     if (task) {
       setActiveTask(task);
       
-      // ✨ Removed manual positioning system
+      // ✨ Set initial dragOffset from active element position
+      const active = event.active;
+      if (active.rect?.initial?.pointerOverlay) {
+        const rect = active.rect.initial.pointerOverlay;
+        setDragOffset({
+          x: rect.x + rect.width / 2,
+          y: rect.y + rect.height / 2
+        });
+      } else {
+        // Fallback: use center of screen
+        setDragOffset({
+          x: window.innerWidth / 2,
+          y: window.innerHeight / 2
+        });
+      }
       
       // Add slight haptic feedback if available
       if (navigator.vibrate) {
