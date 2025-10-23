@@ -2177,7 +2177,7 @@ export function ProjectKanbanBoard() {
                                   className={`px-3 py-1.5 text-sm rounded-full transition-all duration-200 ${
                                     isActive
                                       ? 'text-white shadow-sm'
-                                      : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                                      : (isMinimalDesign ? 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700' : (document.documentElement.classList.contains('dark') ? 'bg-gray-700/40 text-gray-300 hover:bg-gray-600/40' : 'bg-white/40 text-gray-900 hover:bg-white/50'))
                                   }`}
                                   style={isActive ? { backgroundColor: state.preferences.accentColor } : {}}
                                 >
@@ -2308,7 +2308,7 @@ export function ProjectKanbanBoard() {
                 <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 backdrop-blur-xl ${
                   isMinimalDesign
                     ? 'bg-white/15 dark:bg-gray-700/15 border border-white/25 dark:border-gray-600/25 shadow-lg'
-                    : 'bg-white/15 border border-white/25 shadow-lg'
+                    : (document.documentElement.classList.contains('dark') ? 'bg-white/15 border border-white/25 shadow-lg' : 'bg-gray-200/60 border border-gray-300/40 shadow-lg')
                 } relative z-10`}>
                   <Columns className={`w-8 h-8 ${
                     isMinimalDesign
@@ -2326,7 +2326,7 @@ export function ProjectKanbanBoard() {
                 <p className={`mb-6 relative z-10 ${
                   isMinimalDesign
                     ? 'text-white/90 dark:text-white/90'
-                    : 'text-white/90'
+                    : (document.documentElement.classList.contains('dark') ? 'text-white/90' : 'text-gray-700')
                 } drop-shadow-lg`}>
                   {t('projects.select_project_sidebar')}
                 </p>

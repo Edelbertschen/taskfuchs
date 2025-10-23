@@ -1847,11 +1847,17 @@ export function TaskBoard() {
                 <div className={`overflow-hidden transition-all duration-300 ${
                   showFilters ? 'max-h-96 opacity-100 mt-3' : 'max-h-0 opacity-0'
                 }`}>
-                  <div className="p-4 rounded-lg bg-black/20 backdrop-blur-sm border border-gray-600/30 space-y-4">
+                  <div className={`p-4 rounded-lg backdrop-blur-sm border space-y-4 ${
+                    isMinimalDesign
+                      ? 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+                      : (document.documentElement.classList.contains('dark') ? 'bg-black/20 border-gray-600/30' : 'bg-white/30 border-gray-300/30')
+                  }`}>
                     
                     {/* Priority Filters */}
                     <div>
-                      <label className="block text-xs font-medium text-gray-300 mb-2 flex items-center space-x-2">
+                      <label className={`block text-xs font-medium mb-2 flex items-center space-x-2 ${
+                        isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (document.documentElement.classList.contains('dark') ? 'text-gray-300' : 'text-gray-900')
+                      }`}>
                         <AlertCircle className="w-3 h-3" />
                         <span>Prioritäten</span>
                       </label>
@@ -1900,7 +1906,9 @@ export function TaskBoard() {
 
                     {/* Tag Filters */}
                     <div>
-                      <label className="block text-xs font-medium text-gray-300 mb-2 flex items-center space-x-2">
+                      <label className={`block text-xs font-medium mb-2 flex items-center space-x-2 ${
+                        isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (document.documentElement.classList.contains('dark') ? 'text-gray-300' : 'text-gray-900')
+                      }`}>
                         <Tag className="w-3 h-3" />
                         <span>Tags</span>
                       </label>
@@ -2016,7 +2024,7 @@ export function TaskBoard() {
               {/* Projektaufgaben Überschrift */}
               <div className="px-4 pt-2 pb-3 border-b border-gray-600/20">
                 <h2 className={`text-sm font-medium flex items-center space-x-2 ${
-                  isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : 'text-gray-300'
+                  isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (document.documentElement.classList.contains('dark') ? 'text-gray-300' : 'text-gray-900')
                 }`}>
                   <span>{t('planner.project_tasks')}</span>
                 </h2>
