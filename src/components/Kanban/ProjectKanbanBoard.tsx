@@ -2599,8 +2599,8 @@ export function ProjectKanbanBoard() {
         >
           {activeTask && (
             <div style={{
-              // Simple translate like ListView - just offset Y
-              transform: 'translateY(-100px)',
+              // Adjust: translateX to move left, reduce Y offset
+              transform: 'translateX(-160px) translateY(-50px)',
               filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',
             }}>
               <TaskCard
