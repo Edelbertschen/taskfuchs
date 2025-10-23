@@ -666,7 +666,7 @@ export function InboxView() {
         className={`absolute top-0 left-0 bottom-0 w-full sm:w-80 flex flex-col overflow-hidden z-20 ${
           isMinimalDesign
             ? 'bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700'
-            : `backdrop-blur-xl ${document.documentElement.classList.contains('dark') ? 'bg-black/50' : 'bg-white/90'} border-r ${document.documentElement.classList.contains('dark') ? 'border-white/15' : 'border-gray-200'}`
+            : `backdrop-blur-xl ${document.documentElement.classList.contains('dark') ? 'bg-black/50' : 'bg-white/30'} border-r ${document.documentElement.classList.contains('dark') ? 'border-white/15' : 'border-gray-200'}`
         }`}
         style={{
           boxShadow: isMinimalDesign 
