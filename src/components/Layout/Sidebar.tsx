@@ -558,14 +558,14 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                     <Icon className={`w-5 h-5 flex-shrink-0 transition-all duration-200 ${
                       isDropActive ? 'animate-pulse' : ''
                     }`} />
-                    <span className="text-xs leading-none text-center whitespace-nowrap">
+                    <span className="text-xs leading-none text-center whitespace-nowrap text-gray-700 dark:text-gray-300">
                       {item.label}
                     </span>
                     {/* Inbox count badge */}
                     {item.id === 'inbox' && (() => {
                       const inboxCount = (state.tasks || []).filter(t => t.columnId === 'inbox').length;
                       return inboxCount > 0 ? (
-                        <span className="absolute top-[2px] right-[2px] text-[11px] min-w-[20px] h-[20px] px-1.5 rounded-full flex items-center justify-center text-white shadow font-semibold"
+                        <span className="absolute top-[2px] right-[2px] text-[11px] min-w-[20px] h-[20px] px-1.5 rounded-full flex items-center justify-center text-white shadow font-semibold dark:text-white"
                           style={{ backgroundColor: state.preferences.accentColor }}>
                           {inboxCount}
                         </span>
@@ -578,7 +578,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                       const todayColumnId = `date-${today}`;
                       const todayCount = (state.tasks || []).filter(t => t.columnId === todayColumnId && !t.completed).length;
                       return todayCount > 0 ? (
-                        <span className="absolute top-[2px] right-[2px] text-[11px] min-w-[20px] h-[20px] px-1.5 rounded-full flex items-center justify-center text-white shadow font-semibold"
+                        <span className="absolute top-[2px] right-[2px] text-[11px] min-w-[20px] h-[20px] px-1.5 rounded-full flex items-center justify-center text-white shadow font-semibold dark:text-white"
                           style={{ backgroundColor: state.preferences.accentColor }}>
                           {todayCount}
                         </span>
@@ -635,7 +635,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                   }`}
                 >
                   <MoreHorizontal className="w-5 h-5 flex-shrink-0" />
-                  <span className="text-xs leading-none text-center whitespace-nowrap">{t('common.more', { defaultValue: 'Mehr' })}</span>
+                  <span className="text-xs leading-none text-center whitespace-nowrap text-gray-700 dark:text-gray-300">{t('common.more', { defaultValue: 'Mehr' })}</span>
                 </button>
                 {showMoreMenu && createPortal(
                   <div className="fixed w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl" style={{ left: moreMenuPos.left, top: moreMenuPos.top, zIndex: 100000 }} onMouseDown={(e) => e.stopPropagation()}>
