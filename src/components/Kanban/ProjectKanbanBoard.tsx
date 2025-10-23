@@ -1778,18 +1778,11 @@ export function ProjectKanbanBoard() {
     }
 
     const handleMouseMove = (e: MouseEvent) => {
-      // Get the main content container's position
-      const mainContainer = document.querySelector('[data-kanban-main]');
-      let offsetX = 0;
-      
-      if (mainContainer) {
-        const rect = mainContainer.getBoundingClientRect();
-        offsetX = rect.left;
-      }
-      
+      // Simple direct approach: just use mouse position minus fixed offset
+      // The offset accounts for where the drag started on the card
       setDragOffset({
-        x: e.clientX - offsetX,
-        y: e.clientY
+        x: e.clientX - 75,    // Half of card width (320/2 ≈ 160, minus 85 for left align)
+        y: e.clientY - 40     // Top offset
       });
     };
 
@@ -2136,7 +2129,6 @@ export function ProjectKanbanBoard() {
             {selectedProject ? (
               <div 
                 className="relative h-full flex flex-col"
-                data-kanban-main
                       style={{
                   overflow: 'hidden'
                 }}
