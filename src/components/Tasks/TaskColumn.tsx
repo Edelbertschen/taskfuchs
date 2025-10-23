@@ -622,8 +622,8 @@ const TaskColumn = React.memo(({
         className={`group flex-1 min-w-0 h-auto flex flex-col relative ${
           isMinimalDesign
             ? (document.documentElement.classList.contains('dark')
-                ? 'bg-[#111827] px-4'
-                : 'bg-white px-4')
+                ? 'px-4'
+                : 'px-4')
             : 'glass-effect rounded-lg'
         } overflow-hidden ${
           isFocusMode
@@ -633,6 +633,10 @@ const TaskColumn = React.memo(({
               : 'border border-white/20 dark:border-gray-600/20'
         }`}
                   style={{
+            // ✨ Column background - use style instead of className for guaranteed color
+            backgroundColor: isMinimalDesign
+              ? (document.documentElement.classList.contains('dark') ? '#111827' : '#FFFFFF')
+              : undefined,
             // ✨ ULTRA-STABLE: No transitions during any drag for projects
             transition: (activeTask && isProjectColumn) ? 'none' : activeTask ? 'none' : 'border-color 200ms cubic-bezier(0.16, 1, 0.3, 1)',
             transform: 'translateZ(0)', // GPU acceleration
