@@ -374,7 +374,7 @@ export function NotesView() {
         <div className={`absolute top-0 left-0 bottom-0 w-80 z-20 flex flex-col overflow-hidden ${
           state.preferences.minimalDesign
             ? 'bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700'
-            : 'backdrop-blur-xl bg-black/50 border-r border-white/15'
+            : `backdrop-blur-xl ${document.documentElement.classList.contains('dark') ? 'bg-black/50' : 'bg-white/90'} border-r ${document.documentElement.classList.contains('dark') ? 'border-white/15' : 'border-gray-200'}`
         }`}
                   style={{
           boxShadow: state.preferences.minimalDesign 
