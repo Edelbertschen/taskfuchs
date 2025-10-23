@@ -242,7 +242,9 @@
     "collapse": "Zuklappen",
     "expand": "Aufklappen",
     "edit": "Bearbeiten",
-    "preview": "Vorschau"
+    "preview": "Vorschau",
+    "placeholder_only_im_planer": "Nur im Planer",
+    "placeholder_im_eingang": "Im Posteingang"
   },
   "tags": {
     "filter_by_tags": "Nach Tags filtern",
