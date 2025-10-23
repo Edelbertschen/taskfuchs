@@ -2599,7 +2599,7 @@ export function ProjectKanbanBoard() {
         >
           {activeTask && (
             <div style={{
-              transform: `translateX(${sidebarVisible ? 'calc(-75px - 320px)' : '-75px'}) translateY(-40px)`,
+              transform: `translateX(${sidebarVisible ? 'calc(-76px - 320px)' : '-76px'}) translateY(-100px)`,
               filter: 'drop-shadow(0 12px 30px rgba(0,0,0,0.2))',
               rotate: '3deg',
               scale: 1.02,
