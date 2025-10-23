@@ -742,7 +742,7 @@ export function InboxView() {
             }}>
               <div className="flex items-center space-x-2">
                 <Calendar className="w-4 h-4" style={{ color: accentColor }} />
-                <h2 className={`text-sm font-medium flex items-center ${isMinimalDesign ? 'text-gray-800 dark:text-gray-300' : 'text-white'}`}
+                <h2 className={`text-sm font-medium flex items-center ${isMinimalDesign ? 'text-gray-800 dark:text-gray-300' : (document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900')}`}
                     style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.5)', lineHeight: '1.5', minHeight: '20px' }}>
                   {inboxView.filterByDate()}
                 </h2>
@@ -1714,8 +1714,8 @@ function InboxTaskCard({
                 <span 
                   className={`flex-1 text-sm font-medium ${
                     task.completed 
-                      ? `line-through ${isMinimalDesign ? 'text-gray-400 dark:text-gray-500' : 'text-white/70'}` 
-                      : isMinimalDesign ? 'text-black dark:text-white' : (document.documentElement.classList.contains('dark') ? 'text-white' : 'text-white')
+                      ? `line-through ${isMinimalDesign ? 'text-gray-400 dark:text-gray-500' : (document.documentElement.classList.contains('dark') ? 'text-white/70' : 'text-gray-500')}` 
+                      : isMinimalDesign ? 'text-black dark:text-white' : (document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900')
                   }`}
                   style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.6)' }}
                   

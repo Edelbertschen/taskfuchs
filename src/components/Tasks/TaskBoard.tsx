@@ -1813,8 +1813,8 @@ export function TaskBoard() {
                   }}
                 >
                   <div className="flex items-center space-x-2">
-                    <Filter className={`w-4 h-4 ${isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : 'text-white'}`} />
-                    <span className={`text-sm font-medium ${isMinimalDesign ? 'text-gray-900 dark:text-white' : 'text-white'}`}>Filter</span>
+                    <Filter className={`w-4 h-4 ${isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900')}`} />
+                    <span className={`text-sm font-medium ${isMinimalDesign ? 'text-gray-900 dark:text-white' : (document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900')}`}>Filter</span>
                     {(priorityFilter !== 'all' || state.activeTagFilters.length > 0) && (
                       <div 
                         className="w-2 h-2 rounded-full animate-pulse"
@@ -1834,7 +1834,7 @@ export function TaskBoard() {
                     <ChevronDown 
                       className={`w-4 h-4 transition-transform duration-300 ${
                         showFilters ? 'rotate-180' : ''
-                      } ${isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : 'text-white'}`} 
+                      } ${isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900')}`} 
                     />
                   </div>
                 </button>
