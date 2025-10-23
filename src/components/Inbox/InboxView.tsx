@@ -714,17 +714,32 @@ export function InboxView() {
         </div>
 
         {/* Date Filter List */}
-        <div className="flex-1 overflow-y-auto sidebar-content">
+        <div className="flex-1 overflow-y-auto sidebar-content"
+        style={{
+          backgroundColor: isMinimalDesign
+            ? (document.documentElement.classList.contains('dark') ? '#111827' : '#FFFFFF')
+            : undefined
+        }}>
           <div className={`border-b ${
             isMinimalDesign
-              ? 'border-gray-200 dark:border-gray-700'
+              ? 'border-gray-200 dark:border-gray-800'
               : 'border-white/15'
-          }`}>
+          }`}
+          style={{
+            backgroundColor: isMinimalDesign
+              ? (document.documentElement.classList.contains('dark') ? '#111827' : '#FFFFFF')
+              : undefined
+          }}>
             <div className={`px-4 py-3 ${
               isMinimalDesign
-                ? 'bg-gray-50 dark:bg-gray-800'
+                ? ''
                 : 'bg-white/10'
-            }`}>
+            }`}
+            style={{
+              backgroundColor: isMinimalDesign
+                ? (document.documentElement.classList.contains('dark') ? '#111827' : '#FFFFFF')
+                : undefined
+            }}>
               <div className="flex items-center space-x-2">
                 <Calendar className="w-4 h-4" style={{ color: accentColor }} />
                 <h2 className={`text-sm font-medium flex items-center ${isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : 'text-white'}`}
