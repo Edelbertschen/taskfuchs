@@ -3,8 +3,15 @@
 
 export function formatTimeWithSecondsExact(minutes: number): string {
   try {
+    // Debug: Log the input to understand what we're receiving
+    if (typeof minutes === 'string') {
+      console.warn('⚠️ formatTimeWithSecondsExact received STRING instead of number:', minutes);
+      minutes = parseFloat(minutes);
+    }
+    
     // Safeguard: ensure input is valid
     if (typeof minutes !== 'number' || isNaN(minutes) || !isFinite(minutes)) {
+      console.warn('⚠️ formatTimeWithSecondsExact received invalid input:', minutes);
       return '00:00';
     }
     
@@ -33,10 +40,16 @@ export function formatTimeWithSecondsExact(minutes: number): string {
     const sign = isNegative ? '-' : '';
     
     if (hours > 0) {
-      return `${sign}${formatPart(hours)}:${formatPart(mins)}:${formatPart(secs)}`;
+      const result = `${sign}${formatPart(hours)}:${formatPart(mins)}:${formatPart(secs)}`;
+      // Debug if result looks wrong
+      if (result.includes('00') && result.length > 8) {
+        console.warn('⚠️ Unusual result format:', result, 'from input:', minutes);
+      }
+      return result;
     }
     
-    return `${sign}${formatPart(mins)}:${formatPart(secs)}`;
+    const result = `${sign}${formatPart(mins)}:${formatPart(secs)}`;
+    return result;
   } catch (e) {
     console.error('formatTimeWithSecondsExact error:', e);
     return '00:00';
