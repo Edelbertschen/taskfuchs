@@ -714,10 +714,10 @@ export function InboxView() {
         </div>
 
         {/* Date Filter List */}
-        <div className="flex-1 overflow-y-auto sidebar-content"
+        <div className="flex-1 overflow-y-auto sidebar-content backdrop-blur-md"
         style={{
           backgroundColor: isMinimalDesign
-            ? (document.documentElement.classList.contains('dark') ? '#111827' : 'rgba(255, 255, 255, 0.7)')
+            ? (document.documentElement.classList.contains('dark') ? '#111827' : 'rgba(255, 255, 255, 0.5)')
             : undefined
         }}>
           <div className={`border-b ${
@@ -727,7 +727,7 @@ export function InboxView() {
           }`}
           style={{
             backgroundColor: isMinimalDesign
-            ? (document.documentElement.classList.contains('dark') ? '#111827' : 'rgba(255, 255, 255, 0.7)')
+            ? (document.documentElement.classList.contains('dark') ? '#111827' : 'rgba(255, 255, 255, 0.5)')
             : undefined
           }}>
             <div className={`px-4 py-3 ${
@@ -737,7 +737,7 @@ export function InboxView() {
             }`}
             style={{
               backgroundColor: isMinimalDesign
-            ? (document.documentElement.classList.contains('dark') ? '#111827' : 'rgba(255, 255, 255, 0.7)')
+            ? (document.documentElement.classList.contains('dark') ? '#111827' : 'rgba(255, 255, 255, 0.5)')
             : undefined
             }}>
               <div className="flex items-center space-x-2">
