@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { createPortal } from 'react-dom';
+
 import { useAppTranslation } from '../../utils/i18nHelpers';
 import { useTranslation } from 'react-i18next';
 import { 
@@ -67,7 +67,6 @@ export function ProjectKanbanBoard() {
   const isMinimalDesign = state.preferences.minimalDesign;
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
-  const [dragOffset, setDragOffset] = useState<{ x: number; y: number } | null>(null);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showSmartTaskModal, setShowSmartTaskModal] = useState(false);
@@ -1770,26 +1769,6 @@ export function ProjectKanbanBoard() {
     { value: 'high', label: 'Hoch' }
   ];
 
-  // ✨ Track mouse position for drag overlay (replaces DragOverlay)
-  useEffect(() => {
-    if (!activeTask) {
-      setDragOffset(null);
-      return;
-    }
-
-    const handleMouseMove = (e: MouseEvent) => {
-      // Simple direct approach: just use mouse position minus fixed offset
-      // The offset accounts for where the drag started on the card
-      setDragOffset({
-        x: e.clientX - 75,    // Half of card width (320/2 ≈ 160, minus 85 for left align)
-        y: e.clientY - 40     // Top offset
-      });
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [activeTask]);
-
 
   return (
     <DndContext 
@@ -2609,27 +2588,29 @@ export function ProjectKanbanBoard() {
         )}
 
 
-        {/* ✨ Custom Drag Preview using Portal - Direct Mouse Tracking (No Offset!) */}
-        {activeTask && dragOffset && createPortal(
-          <div
-            style={{
-              position: 'fixed',
-              top: dragOffset.y - 30,
-              left: dragOffset.x - 30,
-              width: '320px',
-              pointerEvents: 'none',
-              zIndex: 9999,
-              transform: 'rotate(3deg) scale(1.02)',
+
+        {/* ✨ Elegant Minimalist DragOverlay - Same as TaskBoard */}
+        <DragOverlay
+          dropAnimation={null}
+          style={{
+            zIndex: 9999,
+            pointerEvents: 'none',
+          }}
+        >
+          {activeTask && (
+            <div style={{
+              transform: `translateX(${sidebarVisible ? 'calc(-75px - 320px)' : '-75px'}) translateY(-40px)`,
               filter: 'drop-shadow(0 12px 30px rgba(0,0,0,0.2))',
-            }}
-          >
-            <TaskCard
-              task={activeTask}
-              isInDragOverlay={true}
-            />
-          </div>,
-          document.body
-        )}
+              rotate: '3deg',
+              scale: 1.02,
+            }}>
+              <TaskCard
+                task={activeTask}
+                isInDragOverlay={true}
+              />
+            </div>
+          )}
+        </DragOverlay>
       </div>
     </DndContext>
   );
