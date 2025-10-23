@@ -717,7 +717,7 @@ export function InboxView() {
         <div className="flex-1 overflow-y-auto sidebar-content"
         style={{
           backgroundColor: isMinimalDesign
-            ? (document.documentElement.classList.contains('dark') ? '#111827' : '#FFFFFF')
+            ? (document.documentElement.classList.contains('dark') ? '#111827' : 'rgba(255, 255, 255, 0.7)')
             : undefined
         }}>
           <div className={`border-b ${
@@ -727,8 +727,8 @@ export function InboxView() {
           }`}
           style={{
             backgroundColor: isMinimalDesign
-              ? (document.documentElement.classList.contains('dark') ? '#111827' : '#FFFFFF')
-              : undefined
+            ? (document.documentElement.classList.contains('dark') ? '#111827' : 'rgba(255, 255, 255, 0.7)')
+            : undefined
           }}>
             <div className={`px-4 py-3 ${
               isMinimalDesign
@@ -737,12 +737,12 @@ export function InboxView() {
             }`}
             style={{
               backgroundColor: isMinimalDesign
-                ? (document.documentElement.classList.contains('dark') ? '#111827' : '#FFFFFF')
-                : undefined
+            ? (document.documentElement.classList.contains('dark') ? '#111827' : 'rgba(255, 255, 255, 0.7)')
+            : undefined
             }}>
               <div className="flex items-center space-x-2">
                 <Calendar className="w-4 h-4" style={{ color: accentColor }} />
-                <h2 className={`text-sm font-medium flex items-center ${isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : 'text-white'}`}
+                <h2 className={`text-sm font-medium flex items-center ${isMinimalDesign ? 'text-gray-800 dark:text-gray-300' : 'text-white'}`}
                     style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.5)', lineHeight: '1.5', minHeight: '20px' }}>
                   {inboxView.filterByDate()}
                 </h2>
@@ -754,7 +754,7 @@ export function InboxView() {
               onClick={() => setSelectedDateFilter(null)}
               className={`p-4 cursor-pointer transition-colors relative ${
                 isMinimalDesign
-                  ? 'border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  ? 'border-b border-gray-200 dark:border-gray-700 hover:bg-white/30 dark:hover:bg-gray-700'
                   : 'border-b border-white/15 hover:bg-white/10'
               }`}
               style={!selectedDateFilter 
@@ -768,7 +768,7 @@ export function InboxView() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2 flex-1 min-w-0">
                   <List className={`w-4 h-4 flex-shrink-0 ${isMinimalDesign ? 'text-gray-600 dark:text-gray-400' : 'text-white/70'}`} />
-                  <h3 className={`font-medium text-sm flex items-center ${isMinimalDesign ? 'text-gray-900 dark:text-white' : 'text-white'}`}
+                  <h3 className={`font-medium text-sm flex items-center ${isMinimalDesign ? 'text-gray-800 dark:text-white' : 'text-white'}`}
                       style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.5)', lineHeight: '1.5', minHeight: '20px' }}>
                     {inboxView.allTasks()}
                   </h3>
@@ -787,7 +787,7 @@ export function InboxView() {
                 onClick={() => setSelectedDateFilter(dateOption.id)}
                 className={`p-4 cursor-pointer transition-colors relative ${
                   isMinimalDesign
-                    ? 'border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    ? 'border-b border-gray-200 dark:border-gray-700 hover:bg-white/30 dark:hover:bg-gray-700'
                     : 'border-b border-white/15 hover:bg-white/10'
                 }`}
                 style={selectedDateFilter === dateOption.id 
@@ -801,7 +801,7 @@ export function InboxView() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2 flex-1 min-w-0">
                     <Calendar className={`w-4 h-4 flex-shrink-0 ${isMinimalDesign ? 'text-gray-600 dark:text-gray-400' : 'text-white/70'}`} />
-                                    <h3 className={`font-medium text-sm truncate ${isMinimalDesign ? 'text-gray-900 dark:text-white' : 'text-white'}`}
+                                    <h3 className={`font-medium text-sm truncate ${isMinimalDesign ? 'text-gray-800 dark:text-white' : 'text-white'}`}
                     style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.5)', lineHeight: '1.5' }}>
                       {dateOption.label}
                     </h3>
@@ -1434,7 +1434,7 @@ export function InboxView() {
                   <div key={group.date} className={groupIndex > 0 ? 'mt-8' : ''}>
                     {/* Date Header */}
                     <div className="mb-6">
-                      <h2 className={`text-lg font-semibold mb-3 flex items-center ${isMinimalDesign ? 'text-gray-900 dark:text-white' : 'text-white'}`}
+                      <h2 className={`text-lg font-semibold mb-3 flex items-center ${isMinimalDesign ? 'text-gray-800 dark:text-white' : 'text-white'}`}
                           style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.6)', lineHeight: '1.5', minHeight: '28px' }}>
                         {group.displayDate}
                       </h2>
