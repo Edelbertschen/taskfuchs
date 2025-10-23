@@ -1675,13 +1675,13 @@ function InboxTaskCard({
           ? `${accentColor}26`
           : (document.documentElement.classList.contains('dark')
               ? 'rgba(17, 24, 39, 0.75)'
-              : 'rgba(255, 255, 255, 0.15)'),
+              : '#FFFFFF'),
         borderColor: isSelected
           ? `${accentColor}66`
-          : (document.documentElement.classList.contains('dark') ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.2)'),
+          : (document.documentElement.classList.contains('dark') ? 'rgba(255, 255, 255, 0.15)' : '#E5E7EB'),
         boxShadow: isSelected
           ? (document.documentElement.classList.contains('dark') ? '0 10px 36px rgba(0, 0, 0, 0.5)' : '0 8px 32px rgba(0, 0, 0, 0.2)')
-          : (document.documentElement.classList.contains('dark') ? '0 6px 20px rgba(0, 0, 0, 0.45)' : '0 4px 16px rgba(0, 0, 0, 0.1)')
+          : (document.documentElement.classList.contains('dark') ? '0 6px 20px rgba(0, 0, 0, 0.45)' : '0 2px 8px rgba(0, 0, 0, 0.1)')
       }}
       onClick={onTaskClick}
       onMouseEnter={() => setIsHovered(true)}

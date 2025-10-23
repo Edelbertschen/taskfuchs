@@ -9,12 +9,17 @@ export function formatTimeWithSecondsExact(minutes: number): string {
     const hours = Math.floor(totalSeconds / 3600);
     totalSeconds = totalSeconds % 3600;
     const mins = Math.floor(totalSeconds / 60);
-    const secs = totalSeconds % 60;
+    const secs = Math.floor(totalSeconds % 60);
     const sign = negative ? '-' : '';
     if (hours > 0) {
-      return `${sign}${hours}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      const h = String(hours).padStart(2, '0');
+      const m = String(mins).padStart(2, '0');
+      const s = String(secs).padStart(2, '0');
+      return `${sign}${h}:${m}:${s}`;
     }
-    return `${sign}${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    const m = String(mins).padStart(2, '0');
+    const s = String(secs).padStart(2, '0');
+    return `${sign}${m}:${s}`;
   } catch {
     return '00:00';
   }

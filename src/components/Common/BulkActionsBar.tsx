@@ -495,7 +495,7 @@ export function BulkActionsBar({ className = '' }: BulkActionsBarProps) {
               {showPinMenu && (
                 <div className="absolute bottom-full mb-2 left-0 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-2 min-w-44 max-h-56 overflow-y-auto">
                   {state.pinColumns.map((pinCol) => {
-                    const count = (state.tasks || []).filter(t => t.pinColumnId === pinCol.id).length;
+                    const count = (state.tasks || []).filter(t => t.pinColumnId === pinCol.id && !t.completed && !t.archived).length;
                     return (
                       <button
                         key={pinCol.id}
