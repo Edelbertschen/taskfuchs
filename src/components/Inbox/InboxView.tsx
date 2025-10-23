@@ -706,54 +706,7 @@ export function InboxView() {
               )}
             </h1>
             <div className="flex items-center gap-2">
-              {/* Open top inbox task */}
-              <button
-                onClick={openFirstInboxTask}
-                className={`px-3 py-2 rounded-md transition-all duration-200 text-white shadow-sm ${
-                  isMinimalDesign 
-                    ? 'border border-gray-200 dark:border-gray-600' 
-                    : 'backdrop-blur-xl border border-white/20'
-                }`}
-                style={{ 
-                  backgroundColor: `${accentColor}E6`,
-                  boxShadow: isMinimalDesign 
-                    ? '0 1px 3px rgba(0, 0, 0, 0.1)' 
-                    : '0 2px 8px rgba(0, 0, 0, 0.15)'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = accentColor;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = `${accentColor}E6`;
-                }}
-                title={t('inbox_view.open_first_task', { defaultValue: 'Oberste Aufgabe öffnen' })}
-              >
-                <FolderOpen className="w-4 h-4" />
-              </button>
-              {/* Create new task */}
-              <button
-                onClick={() => setShowSmartTaskModal(true)}
-                className={`p-2 rounded-md transition-colors duration-200 text-white shadow-sm ${
-                  isMinimalDesign 
-                    ? 'border border-gray-200 dark:border-gray-600' 
-                    : 'backdrop-blur-xl border border-white/20'
-                }`}
-                style={{ 
-                  backgroundColor: `${accentColor}E6`,
-                  boxShadow: isMinimalDesign 
-                    ? '0 1px 3px rgba(0, 0, 0, 0.1)' 
-                    : '0 2px 8px rgba(0, 0, 0, 0.15)'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = accentColor;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = `${accentColor}E6`;
-                }}
-                title={inboxView.newTaskTooltip()}
-              >
-                <Plus className="w-4 h-4" />
-              </button>
+              {/* Buttons removed - they were irritating */}
             </div>
           </div>
 

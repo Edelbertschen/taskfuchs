@@ -411,12 +411,12 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
   
   const glassClasses = isMinimalDesign
     ? "border-r border-gray-200 dark:border-gray-800"
-    : "backdrop-blur-lg bg-black/50 border-white/10";
+    : "backdrop-blur-md bg-black/60 border-white/10";
   
   const sidebarStyle = isMinimalDesign
     ? document.documentElement.classList.contains('dark')
       ? { backgroundColor: '#111827' }
-      : { backgroundColor: '#111827' }
+      : { backgroundColor: '#1c1f23' }
     : {};
 
   // Create exact accent color logo using CSS mask technique
@@ -441,21 +441,14 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
   return (
     <>
       <div className={`sidebar ${glassClasses} flex flex-col h-full relative z-30 sidebar-container w-20 sidebar-slide-in smooth-scroll`} style={{...sidebarStyle, textRendering: 'optimizeLegibility', WebkitFontSmoothing: 'antialiased', MozOsxFontSmoothing: 'grayscale', transform: 'translateZ(0)'}}>
-        {/* Logo - Matches Header styling */}
+        {/* Logo */}
         <div 
-          className={`${glassEffectEnabled ? 'border-b border-white/10 backdrop-blur-lg' : 'border-b border-gray-800'} flex items-center justify-center sidebar-content relative`}
+          className={`${glassEffectEnabled ? 'border-b border-white/20' : 'border-b border-gray-800'} flex items-center justify-center sidebar-content relative`}
           style={{ 
             height: '68px',
             minHeight: '68px',
             maxHeight: '68px',
-            boxSizing: 'border-box',
-            backgroundColor: isMinimalDesign
-              ? (document.documentElement.classList.contains('dark') ? '#111827' : '#ffffff')
-              : (document.documentElement.classList.contains('dark') 
-                  ? 'rgba(17, 24, 39, 0.8)'
-                  : 'rgba(255, 255, 255, 0.8)'),
-            backdropFilter: !isMinimalDesign && glassEffectEnabled ? 'blur(16px)' : 'none',
-            WebkitBackdropFilter: !isMinimalDesign && glassEffectEnabled ? 'blur(16px)' : 'none'
+            boxSizing: 'border-box'
           }}
         >
           <button
