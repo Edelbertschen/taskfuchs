@@ -35,6 +35,19 @@ export default defineConfig({
               networkTimeoutSeconds: 3
             }
           },
+          // JS/CSS: Try network first for updates
+          {
+            urlPattern: /.*\.(js|css)$/,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'assets-cache',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 // 1 hour - then refresh from network
+              },
+              networkTimeoutSeconds: 3
+            }
+          },
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',
