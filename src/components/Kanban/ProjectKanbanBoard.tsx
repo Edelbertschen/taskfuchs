@@ -2301,7 +2301,9 @@ export function ProjectKanbanBoard() {
               <div className={`flex flex-col items-center justify-center text-center p-8 rounded-3xl shadow-2xl max-w-md mx-4 backdrop-blur-3xl ${
                 isMinimalDesign
                   ? 'bg-white/5 dark:bg-gray-900/5 border border-white/10 dark:border-gray-700/10 shadow-[0_16px_40px_rgba(0,0,0,0.12)]'
-                  : 'bg-white/5 border border-white/10 shadow-[0_16px_40px_rgba(31,38,135,0.2)]'
+                  : (document.documentElement.classList.contains('dark')
+                      ? 'bg-white/5 border border-white/10 shadow-[0_16px_40px_rgba(31,38,135,0.2)]'
+                      : 'bg-white/40 border border-white/30 shadow-[0_16px_40px_rgba(31,38,135,0.1)]')
               } before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none relative overflow-hidden`}>
                 <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 backdrop-blur-xl ${
                   isMinimalDesign

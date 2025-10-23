@@ -1803,9 +1803,13 @@ export function TaskBoard() {
                       ? (showFilters || priorityFilter !== 'all' || state.activeTagFilters.length > 0
                           ? 'bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600'
                           : 'bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700')
-                      : (showFilters || priorityFilter !== 'all' || state.activeTagFilters.length > 0
-                          ? 'bg-gray-600/40 border border-gray-500/50'
-                          : 'bg-gray-700/40 hover:bg-gray-600/40 border border-gray-600/40')
+                      : (document.documentElement.classList.contains('dark') 
+                          ? (showFilters || priorityFilter !== 'all' || state.activeTagFilters.length > 0
+                              ? 'bg-gray-600/40 border border-gray-500/50'
+                              : 'bg-gray-700/40 hover:bg-gray-600/40 border border-gray-600/40')
+                          : (showFilters || priorityFilter !== 'all' || state.activeTagFilters.length > 0
+                              ? 'bg-white/40 border border-gray-300/50'
+                              : 'bg-white/30 hover:bg-white/40 border border-gray-300/40'))
                   }`}
                   style={{ 
                     backdropFilter: isMinimalDesign ? 'none' : 'blur(8px)',

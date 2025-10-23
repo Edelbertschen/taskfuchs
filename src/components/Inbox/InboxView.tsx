@@ -728,7 +728,7 @@ export function InboxView() {
           style={{
             backgroundColor: isMinimalDesign
             ? (document.documentElement.classList.contains('dark') ? '#111827' : 'rgba(255, 255, 255, 0.5)')
-            : undefined
+            : (document.documentElement.classList.contains('dark') ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.4)')
           }}>
             <div className={`px-4 py-3 ${
               isMinimalDesign
@@ -738,7 +738,7 @@ export function InboxView() {
             style={{
               backgroundColor: isMinimalDesign
             ? (document.documentElement.classList.contains('dark') ? '#111827' : 'rgba(255, 255, 255, 0.5)')
-            : undefined
+            : (document.documentElement.classList.contains('dark') ? undefined : 'rgba(255, 255, 255, 0.2)')
             }}>
               <div className="flex items-center space-x-2">
                 <Calendar className="w-4 h-4" style={{ color: accentColor }} />
