@@ -359,6 +359,48 @@ function MainApp() {
     return () => window.removeEventListener('show-focus-prompt', handler as EventListener);
   }, []);
 
+  // Handle separate timer window (Electron only)
+  useEffect(() => {
+    const isElectron = !!(window as any).require;
+    if (!isElectron) return;
+
+    const { ipcRenderer } = (window as any).require('electron');
+
+    // Open separate window when mode is set to separateWindow and timer is active
+    if (state.preferences.timerDisplayMode === 'separateWindow' && state.activeTimer?.isActive) {
+      // Request to open timer window
+      ipcRenderer.send('open-timer-window', {
+        timer: state.activeTimer,
+        preferences: state.preferences,
+        task: state.tasks?.find(t => t.id === state.activeTimer?.taskId),
+        pomodoro: state.pomodoroSession
+      });
+    } else {
+      // Close window when timer stops or mode changes
+      ipcRenderer.send('close-timer-window');
+    }
+
+    // Listen for timer actions from separate window
+    const handleTimerAction = (event: any, action: string) => {
+      if (action === 'pause') {
+        if (state.activeTimer?.isPaused) {
+          dispatch({ type: 'RESUME_TIMER' });
+        } else {
+          dispatch({ type: 'PAUSE_TIMER' });
+        }
+      } else if (action === 'stop') {
+        dispatch({ type: 'STOP_TIMER' });
+      }
+    };
+
+    ipcRenderer.on('timer-action', handleTimerAction);
+
+    return () => {
+      ipcRenderer.removeListener('timer-action', handleTimerAction);
+    };
+  }, [state.preferences.timerDisplayMode, state.activeTimer, state.tasks, state.pomodoroSession, dispatch]);
+
+
   // Listen for PWA update notifications from SW bridge
   useEffect(() => {
     const onUpdate = () => setPwaUpdateAvailable(true);

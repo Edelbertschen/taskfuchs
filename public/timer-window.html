@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskFuchs Timer</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+      background: linear-gradient(135deg, rgba(249, 115, 22, 0.95) 0%, rgba(251, 146, 60, 0.95) 100%);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+      user-select: none;
+      -webkit-app-region: drag;
+    }
+
+    .timer-container {
+      text-align: center;
+      padding: 20px;
+      -webkit-app-region: no-drag;
+    }
+
+    .task-title {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .timer-display {
+      font-size: 48px;
+      font-weight: bold;
+      font-family: 'Courier New', monospace;
+      margin: 10px 0;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .timer-display.overtime {
+      color: #ef4444;
+      animation: pulse 1s ease-in-out infinite;
+    }
+
+    .estimated-time {
+      font-size: 12px;
+      opacity: 0.8;
+      margin-bottom: 16px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 12px;
+    }
+
+    button {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s;
+      backdrop-filter: blur(10px);
+    }
+
+    button:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+
+    button:active {
+      transform: scale(0.95);
+    }
+
+    .pomodoro-ring {
+      margin: 16px auto;
+    }
+
+    .pomodoro-info {
+      font-size: 12px;
+      opacity: 0.9;
+      margin-top: 8px;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.7;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="timer-container">
+    <div class="task-title" id="taskTitle">Timer läuft...</div>
+    <div class="timer-display" id="timerDisplay">00:00</div>
+    <div class="estimated-time" id="estimatedTime"></div>
+    
+    <div id="pomodoroContainer" style="display: none;">
+      <svg class="pomodoro-ring" width="80" height="80" viewBox="0 0 80 80">
+        <circle cx="40" cy="40" r="35" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="6"/>
+        <circle id="pomodoroProgress" cx="40" cy="40" r="35" fill="none" stroke="white" stroke-width="6" 
+                stroke-dasharray="220" stroke-dashoffset="220" 
+                transform="rotate(-90 40 40)" stroke-linecap="round"/>
+      </svg>
+      <div class="pomodoro-info" id="pomodoroInfo"></div>
+    </div>
+
+    <div class="controls">
+      <button id="pauseBtn">Pause</button>
+      <button id="stopBtn">Stop</button>
+    </div>
+  </div>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+
+    let timerInterval;
+
+    // Receive timer data from main process
+    ipcRenderer.on('timer-update', (event, data) => {
+      updateTimerDisplay(data);
+    });
+
+    function updateTimerDisplay(data) {
+      const { timer, task, pomodoro } = data;
+
+      // Update task title
+      if (task) {
+        document.getElementById('taskTitle').textContent = task.title;
+      }
+
+      // Update timer display
+      const elapsedMinutes = timer.elapsedTime || 0;
+      const hours = Math.floor(Math.abs(elapsedMinutes) / 60);
+      const mins = Math.floor(Math.abs(elapsedMinutes) % 60);
+      const secs = Math.floor((Math.abs(elapsedMinutes) * 60) % 60);
+      
+      let timeString;
+      if (hours > 0) {
+        timeString = `${hours}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      } else {
+        timeString = `${mins}:${String(secs).padStart(2, '0')}`;
+      }
+
+      const timerEl = document.getElementById('timerDisplay');
+      timerEl.textContent = timeString;
+
+      // Check if overtime
+      const isOvertime = timer.estimatedTime && elapsedMinutes > timer.estimatedTime;
+      if (isOvertime) {
+        timerEl.classList.add('overtime');
+      } else {
+        timerEl.classList.remove('overtime');
+      }
+
+      // Update estimated time
+      if (timer.estimatedTime) {
+        const estHours = Math.floor(timer.estimatedTime / 60);
+        const estMins = Math.floor(timer.estimatedTime % 60);
+        document.getElementById('estimatedTime').textContent = 
+          `Geschätzt: ${estHours > 0 ? estHours + 'h ' : ''}${estMins}m`;
+      }
+
+      // Update pomodoro
+      if (pomodoro && pomodoro.sessionActive) {
+        const pomodoroContainer = document.getElementById('pomodoroContainer');
+        pomodoroContainer.style.display = 'block';
+
+        const progress = pomodoro.elapsed / pomodoro.duration;
+        const circumference = 220;
+        const offset = circumference * (1 - progress);
+        document.getElementById('pomodoroProgress').style.strokeDashoffset = offset;
+
+        const type = pomodoro.isWorkSession ? 'Arbeit' : 'Pause';
+        document.getElementById('pomodoroInfo').textContent = 
+          `${type} ${pomodoro.currentSession}/${pomodoro.totalSessions}`;
+      }
+
+      // Update pause button
+      const pauseBtn = document.getElementById('pauseBtn');
+      pauseBtn.textContent = timer.isPaused ? 'Fortsetzen' : 'Pause';
+    }
+
+    // Button handlers
+    document.getElementById('pauseBtn').addEventListener('click', () => {
+      ipcRenderer.send('timer-action', 'pause');
+    });
+
+    document.getElementById('stopBtn').addEventListener('click', () => {
+      ipcRenderer.send('timer-action', 'stop');
+    });
+
+    // Request initial data
+    ipcRenderer.send('timer-request-data');
+  </script>
+</body>
+</html>
+

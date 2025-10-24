@@ -9,6 +9,7 @@ const isDev = process.env.NODE_ENV === 'development' ||
 
 // Keep a global reference of the window object
 let mainWindow;
+let timerWindow = null;
 
 // Comprehensive Windows fixes for white window issue
 if (process.platform === 'win32') {
@@ -745,6 +746,71 @@ ipcMain.on('show-notification', (event, options) => {
 // Request notification permission (for consistency with web)
 ipcMain.handle('request-notification-permission', () => {
   return Notification.isSupported() ? 'granted' : 'denied';
+});
+
+// Timer Window Functions
+function createTimerWindow() {
+  if (timerWindow) {
+    timerWindow.focus();
+    return;
+  }
+
+  timerWindow = new BrowserWindow({
+    width: 300,
+    height: 350,
+    resizable: false,
+    frame: false,
+    alwaysOnTop: true,
+    skipTaskbar: false,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true
+    }
+  });
+
+  const timerHtmlPath = isDev
+    ? path.join(__dirname, 'timer-window.html')
+    : path.join(__dirname, 'timer-window.html');
+
+  timerWindow.loadFile(timerHtmlPath);
+
+  timerWindow.on('closed', () => {
+    timerWindow = null;
+  });
+}
+
+function closeTimerWindow() {
+  if (timerWindow) {
+    timerWindow.close();
+    timerWindow = null;
+  }
+}
+
+// Timer Window IPC Handlers
+ipcMain.on('open-timer-window', (event, data) => {
+  createTimerWindow();
+  if (timerWindow) {
+    timerWindow.webContents.send('timer-update', data);
+  }
+});
+
+ipcMain.on('close-timer-window', () => {
+  closeTimerWindow();
+});
+
+ipcMain.on('timer-request-data', (event) => {
+  // Timer window requests initial data
+  if (mainWindow) {
+    mainWindow.webContents.send('timer-data-request');
+  }
+});
+
+ipcMain.on('timer-action', (event, action) => {
+  // Forward timer actions to main window
+  if (mainWindow) {
+    mainWindow.webContents.send('timer-action', action);
+  }
 });
 
 // Debug information
