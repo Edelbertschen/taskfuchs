@@ -391,6 +391,12 @@ function MainApp() {
           }
         } else if (action === 'stop') {
           dispatch({ type: 'STOP_TIMER' });
+        } else if (action === 'skip-pomodoro') {
+          if (state.pomodoroSession?.type === 'work') {
+            dispatch({ type: 'SKIP_POMODORO_SESSION' });
+          } else {
+            dispatch({ type: 'END_POMODORO_BREAK' });
+          }
         }
       };
 
@@ -456,6 +462,12 @@ function MainApp() {
             }
           } else if (action === 'stop') {
             dispatch({ type: 'STOP_TIMER' });
+          } else if (action === 'skip-pomodoro') {
+            if (state.pomodoroSession?.type === 'work') {
+              dispatch({ type: 'SKIP_POMODORO_SESSION' });
+            } else {
+              dispatch({ type: 'END_POMODORO_BREAK' });
+            }
           }
         }
       };
