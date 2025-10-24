@@ -22,7 +22,8 @@ import {
   Upload,
   Download,
   User,
-  MoreHorizontal
+  MoreHorizontal,
+  HardDrive
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { EndOfDayModal } from '../Common/EndOfDayModal';
@@ -52,6 +53,8 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const moreButtonRef = useRef<HTMLButtonElement | null>(null);
   const [moreMenuPos, setMoreMenuPos] = useState<{ left: number; top: number }>({ left: 0, top: 0 });
+  const [backupButtonPressed, setBackupButtonPressed] = useState(false);
+  const [showBackupSuccess, setShowBackupSuccess] = useState(false);
   
   // Detect if running in Electron
   const isElectron = !!(window as any).require;
@@ -101,6 +104,46 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
       setDownloadLed('error');
     }
   }, [canDropbox, state, dispatch]);
+
+  const handleManualBackup = useCallback(async () => {
+    // Visual feedback: button press
+    setBackupButtonPressed(true);
+    setTimeout(() => setBackupButtonPressed(false), 200);
+    
+    try {
+      const dir: any = (window as any).__taskfuchs_backup_dir__;
+      if (!dir) { 
+        alert(t('backup.no_folder_selected') || 'Kein Backup-Ordner gewählt.'); 
+        return; 
+      }
+      
+      const { exportToJSON, writeBackupToDirectory } = await import('../../utils/importExport');
+      const data: any = {
+        tasks: state.tasks,
+        archivedTasks: state.archivedTasks,
+        columns: state.columns,
+        tags: state.tags,
+        notes: state.notes?.notes || state.notes || [],
+        noteLinks: state.noteLinks || [],
+        preferences: state.preferences,
+        viewState: state.viewState || {},
+        projectKanbanColumns: state.viewState?.projectKanban?.columns || [],
+        projectKanbanState: state.viewState?.projectKanban || {},
+        exportDate: new Date().toISOString(),
+        version: '2.3'
+      };
+      const json = exportToJSON(data);
+      const filename = `TaskFuchs_${new Date().toISOString().replace(/[:]/g,'-').slice(0,19)}.json`;
+      await writeBackupToDirectory(dir, filename, json);
+      
+      // Show success notification
+      setShowBackupSuccess(true);
+      setTimeout(() => setShowBackupSuccess(false), 3000);
+    } catch (e) {
+      console.error('Manual backup failed', e);
+      alert(t('backup.failed') || 'Backup fehlgeschlagen.');
+    }
+  }, [state, t]);
 
   // Drop target for planner
   const {
@@ -682,35 +725,25 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
           )}
           {canLocalBackup && (
             <div className="mt-2 flex items-center justify-center px-1">
-              <button onClick={async () => {
-                try {
-                  const dir: any = (window as any).__taskfuchs_backup_dir__;
-                  if (!dir) { alert('Kein Backup‑Ordner gewählt.'); return; }
-                  const { exportToJSON, writeBackupToDirectory } = await import('../../utils/importExport');
-                  const data: any = {
-                    tasks: state.tasks,
-                    archivedTasks: state.archivedTasks,
-                    columns: state.columns,
-                    tags: state.tags,
-                    notes: state.notes?.notes || state.notes || [],
-                    noteLinks: state.noteLinks || [],
-                    preferences: state.preferences,
-                    viewState: state.viewState || {},
-                    projectKanbanColumns: state.viewState?.projectKanban?.columns || [],
-                    projectKanbanState: state.viewState?.projectKanban || {},
-                    exportDate: new Date().toISOString(),
-                    version: '2.3'
-                  };
-                  const json = exportToJSON(data);
-                  const filename = `TaskFuchs_${new Date().toISOString().replace(/[:]/g,'-').slice(0,19)}.json`;
-                  await writeBackupToDirectory(dir, filename, json);
-                  (window as any).__taskfuchs_backup_toast__ = true;
-                } catch (e) {
-                  console.error('Manual backup failed', e);
-                  alert('Backup fehlgeschlagen.');
-                }
-              }} className="relative w-10 h-10 rounded-full flex items-center justify-center hover:opacity-90 focus:outline-none" title="Backup jetzt sichern" aria-label="Backup jetzt sichern">
-                <Download className="w-5 h-5 text-white" />
+              <button 
+                onClick={handleManualBackup}
+                className={`
+                  relative w-10 h-10 rounded-full flex items-center justify-center 
+                  transition-all duration-200
+                  ${backupButtonPressed ? 'scale-90' : 'scale-100'}
+                  ${state.preferences.design?.mode === 'minimal'
+                    ? 'bg-orange-500 hover:bg-orange-600 text-white'
+                    : document.documentElement.classList.contains('dark')
+                      ? 'bg-orange-500/20 hover:bg-orange-500/30 text-orange-400'
+                      : 'bg-orange-500/10 hover:bg-orange-500/20 text-orange-600'
+                  }
+                  focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2
+                  dark:focus:ring-offset-gray-900
+                `}
+                title={t('backup.manual_backup') || 'Backup jetzt sichern'} 
+                aria-label={t('backup.manual_backup') || 'Backup jetzt sichern'}
+              >
+                <HardDrive className="w-5 h-5" />
               </button>
             </div>
           )}
@@ -773,6 +806,55 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
           </div>
         </div>
       )}
+
+      {/* Backup Success Notification */}
+      {showBackupSuccess && (
+        <div className="fixed top-20 right-4 z-50 animate-slide-in-right">
+          <div 
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-4 border-l-4 border-green-500 flex items-center space-x-3 min-w-[280px]"
+          >
+            <div 
+              className="w-8 h-8 rounded-full flex items-center justify-center bg-green-500/20"
+            >
+              <svg 
+                className="w-5 h-5 text-green-500"
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <div>
+              <p className="font-medium text-gray-900 dark:text-white text-sm">
+                {t('backup.success_title') || 'Backup erfolgreich'}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {t('backup.success_message') || 'Deine Daten wurden sicher gespeichert'}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <style>
+        {`
+          @keyframes slide-in-right {
+            from {
+              transform: translateX(100%);
+              opacity: 0;
+            }
+            to {
+              transform: translateX(0);
+              opacity: 1;
+            }
+          }
+          
+          .animate-slide-in-right {
+            animation: slide-in-right 0.3s ease-out;
+          }
+        `}
+      </style>
     </>
   );
 }); 

@@ -1692,5 +1692,12 @@
     "unsplash": "Unsplash",
     "pixabay": "Pixabay",
     "footer": "© 2025 TaskFuchs. All rights reserved."
+  },
+  "backup": {
+    "manual_backup": "Backup now",
+    "no_folder_selected": "No backup folder selected",
+    "failed": "Backup failed",
+    "success_title": "Backup successful",
+    "success_message": "Your data has been saved securely"
   }
 }

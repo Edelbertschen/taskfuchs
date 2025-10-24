@@ -2244,5 +2244,12 @@
     "unsplash": "Unsplash",
     "pixabay": "Pixabay",
     "footer": "© 2025 TaskFuchs. Alle Rechte vorbehalten."
+  },
+  "backup": {
+    "manual_backup": "Backup jetzt sichern",
+    "no_folder_selected": "Kein Backup-Ordner gewählt",
+    "failed": "Backup fehlgeschlagen",
+    "success_title": "Backup erfolgreich",
+    "success_message": "Deine Daten wurden sicher gespeichert"
   }
 }
