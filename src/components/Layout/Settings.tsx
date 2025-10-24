@@ -5164,28 +5164,31 @@ const Settings = React.memo(() => {
                         <div className="text-sm text-gray-500 dark:text-gray-400">{settings_timer.floatingWidgetDesc()}</div>
                       </div>
                     </label>
-                    <label className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
-                           style={{ 
-                             borderColor: state.preferences.timerDisplayMode === 'separateWindow' ? state.preferences.accentColor : undefined,
-                             backgroundColor: state.preferences.timerDisplayMode === 'separateWindow' ? `${state.preferences.accentColor}10` : undefined
-                           }}>
-                      <input
-                        type="radio"
-                        name="timerDisplayMode"
-                        value="separateWindow"
-                        checked={state.preferences.timerDisplayMode === 'separateWindow'}
-                        onChange={() => dispatch({
-                          type: 'UPDATE_PREFERENCES',
-                          payload: { timerDisplayMode: 'separateWindow' }
-                        })}
-                        className="mr-3"
-                        style={{ accentColor: state.preferences.accentColor }}
-                      />
-                      <div>
-                        <div className="font-medium text-gray-900 dark:text-white">{settings_timer.separateWindow()}</div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">{settings_timer.separateWindowDesc()}</div>
-                      </div>
-                    </label>
+                    {/* Separate Window option - Only show in Electron */}
+                    {!!(window as any).require && (
+                      <label className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
+                             style={{ 
+                               borderColor: state.preferences.timerDisplayMode === 'separateWindow' ? state.preferences.accentColor : undefined,
+                               backgroundColor: state.preferences.timerDisplayMode === 'separateWindow' ? `${state.preferences.accentColor}10` : undefined
+                             }}>
+                        <input
+                          type="radio"
+                          name="timerDisplayMode"
+                          value="separateWindow"
+                          checked={state.preferences.timerDisplayMode === 'separateWindow'}
+                          onChange={() => dispatch({
+                            type: 'UPDATE_PREFERENCES',
+                            payload: { timerDisplayMode: 'separateWindow' }
+                          })}
+                          className="mr-3"
+                          style={{ accentColor: state.preferences.accentColor }}
+                        />
+                        <div>
+                          <div className="font-medium text-gray-900 dark:text-white">{settings_timer.separateWindow()}</div>
+                          <div className="text-sm text-gray-500 dark:text-gray-400">{settings_timer.separateWindowDesc()}</div>
+                        </div>
+                      </label>
+                    )}
                   </div>
                 </div>
               </div>
