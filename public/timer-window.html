@@ -13,7 +13,7 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-      background: linear-gradient(135deg, rgba(249, 115, 22, 0.95) 0%, rgba(251, 146, 60, 0.95) 100%);
+      background: linear-gradient(135deg, rgba(17, 24, 39, 0.98) 0%, rgba(31, 41, 55, 0.98) 100%);
       color: white;
       display: flex;
       flex-direction: column;
@@ -21,6 +21,11 @@
       overflow: hidden;
       user-select: none;
       -webkit-app-region: drag;
+    }
+
+    body.light {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 251, 0.98) 100%);
+      color: #111827;
     }
 
     .timer-container {
@@ -31,29 +36,65 @@
       -webkit-app-region: no-drag;
     }
 
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 16px;
+      -webkit-app-region: drag;
+    }
+
+    body.light .header {
+      border-bottom-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .header-title {
+      font-size: 12px;
+      font-weight: 500;
+      opacity: 0.7;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
     .task-title {
       font-size: 13px;
-      opacity: 0.95;
-      margin-bottom: 12px;
       font-weight: 500;
+      margin-bottom: 16px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      opacity: 0.95;
     }
 
-    .main-timer {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    .timer-section {
       margin-bottom: 16px;
     }
 
+    .timer-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .timer-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     .timer-display {
-      font-size: 42px;
+      font-size: 32px;
       font-weight: bold;
       font-family: 'Courier New', monospace;
-      margin-bottom: 4px;
-      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    body.light .timer-display {
+      color: #111827;
     }
 
     .timer-display.overtime {
@@ -62,42 +103,34 @@
     }
 
     .estimated-time {
-      font-size: 11px;
-      opacity: 0.8;
-    }
-
-    .overtime-warning {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 10px;
-      background: rgba(239, 68, 68, 0.2);
-      border-radius: 6px;
-      font-size: 11px;
-      margin: 8px 0;
+      font-size: 10px;
+      opacity: 0.6;
     }
 
     .controls {
       display: flex;
       gap: 6px;
-      justify-content: center;
-      margin-top: 8px;
     }
 
     button {
       background: rgba(255, 255, 255, 0.15);
       border: none;
-      border-radius: 8px;
+      border-radius: 50%;
       color: white;
-      padding: 8px 12px;
+      width: 32px;
+      height: 32px;
       cursor: pointer;
-      font-size: 12px;
-      font-weight: 500;
       transition: all 0.2s;
       backdrop-filter: blur(10px);
       display: flex;
       align-items: center;
-      gap: 4px;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    body.light button {
+      background: rgba(0, 0, 0, 0.08);
+      color: #111827;
     }
 
     button:hover {
@@ -105,21 +138,53 @@
       transform: scale(1.05);
     }
 
+    body.light button:hover {
+      background: rgba(0, 0, 0, 0.12);
+    }
+
     button:active {
       transform: scale(0.95);
     }
 
+    button.primary {
+      /* Will be set via style with accentColor */
+    }
+
+    button.stop {
+      background: rgba(156, 163, 175, 0.5);
+    }
+
+    body.light button.stop {
+      background: rgba(156, 163, 175, 0.3);
+    }
+
+    .overtime-warning {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      background: rgba(239, 68, 68, 0.15);
+      border-radius: 6px;
+      font-size: 11px;
+      margin-top: 8px;
+      color: #ef4444;
+    }
+
     .pomodoro-section {
-      border-top: 1px solid rgba(255, 255, 255, 0.2);
-      padding-top: 16px;
-      margin-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 12px;
+      margin-top: 12px;
+    }
+
+    body.light .pomodoro-section {
+      border-top-color: rgba(0, 0, 0, 0.1);
     }
 
     .pomodoro-container {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      gap: 8px;
     }
 
     .pomodoro-left {
@@ -130,8 +195,9 @@
 
     .pomodoro-ring-container {
       position: relative;
-      width: 48px;
-      height: 48px;
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
     }
 
     .pomodoro-icon {
@@ -139,8 +205,9 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 20px;
+      font-size: 18px;
       z-index: 10;
+      opacity: 0.9;
     }
 
     .pomodoro-info {
@@ -151,26 +218,38 @@
 
     .pomodoro-type {
       font-size: 10px;
-      opacity: 0.8;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      font-weight: 500;
+      opacity: 0.7;
+    }
+
+    body.light .pomodoro-type {
+      opacity: 0.6;
     }
 
     .pomodoro-time {
-      font-size: 18px;
-      font-weight: bold;
+      font-size: 14px;
+      font-weight: 600;
       font-family: 'Courier New', monospace;
     }
 
     .pomodoro-session {
       font-size: 10px;
-      opacity: 0.8;
+      padding: 2px 6px;
+      border-radius: 10px;
+      display: inline-block;
     }
 
     .skip-btn {
-      padding: 6px 10px;
-      font-size: 11px;
-      border: 1px solid rgba(255, 255, 255, 0.5);
+      width: auto;
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid;
+      background: transparent;
+    }
+
+    .icon {
+      width: 14px;
+      height: 14px;
     }
 
     @keyframes pulse {
@@ -181,66 +260,72 @@
         opacity: 0.7;
       }
     }
-
-    /* Icons as SVG */
-    .icon {
-      width: 14px;
-      height: 14px;
-      fill: currentColor;
-    }
   </style>
 </head>
 <body>
   <div class="timer-container">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-title">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 6v6l4 2"/>
+        </svg>
+        TaskFuchs Timer
+      </div>
+    </div>
+
+    <!-- Task Title -->
     <div class="task-title" id="taskTitle">Timer läuft...</div>
     
-    <div class="main-timer">
-      <div class="timer-display" id="timerDisplay">00:00</div>
-      <div class="estimated-time" id="estimatedTime"></div>
+    <!-- Timer Section -->
+    <div class="timer-section">
+      <div class="timer-row">
+        <div class="timer-left">
+          <div class="timer-display" id="timerDisplay">00:00</div>
+          <div class="estimated-time" id="estimatedTime"></div>
+          <svg id="overtimeIcon" class="icon" style="display: none; color: #ef4444;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+        </div>
+
+        <div class="controls">
+          <button id="pauseBtn" class="primary" title="Pause/Fortsetzen">
+            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+              <path id="pauseIcon" d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+            </svg>
+          </button>
+          <button id="stopBtn" class="stop" title="Stop">
+            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="6" width="12" height="12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
     </div>
 
-    <div id="overtimeWarning" class="overtime-warning" style="display: none;">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-      </svg>
-      <span>Über geschätzter Zeit</span>
-    </div>
-
-    <div class="controls">
-      <button id="pauseBtn">
-        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
-        </svg>
-        <span id="pauseText">Pause</span>
-      </button>
-      <button id="stopBtn">
-        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
-          <rect x="6" y="6" width="12" height="12"/>
-        </svg>
-        Stop
-      </button>
-    </div>
-
+    <!-- Pomodoro Section -->
     <div id="pomodoroSection" class="pomodoro-section" style="display: none;">
       <div class="pomodoro-container">
         <div class="pomodoro-left">
           <div class="pomodoro-ring-container">
-            <svg width="48" height="48" viewBox="0 0 48 48" style="transform: rotate(-90deg);">
-              <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="3"/>
-              <circle id="pomodoroProgress" cx="24" cy="24" r="20" fill="none" stroke="white" stroke-width="3" 
-                      stroke-dasharray="125.66 125.66" stroke-dashoffset="0" stroke-linecap="round"/>
+            <svg width="40" height="40" viewBox="0 0 40 40" style="transform: rotate(-90deg);">
+              <circle cx="20" cy="20" r="16" fill="none" id="pomodoroRingBg" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+              <circle id="pomodoroProgress" cx="20" cy="20" r="16" fill="none" stroke="#ef4444" stroke-width="2" 
+                      stroke-dasharray="100.53 100.53" stroke-dashoffset="0" stroke-linecap="round"
+                      style="transition: stroke-dasharray 1s linear, stroke 0.3s ease;"/>
             </svg>
             <div class="pomodoro-icon" id="pomodoroIcon">🍅</div>
           </div>
           <div class="pomodoro-info">
-            <div class="pomodoro-type" id="pomodoroType">ARBEIT</div>
+            <div class="pomodoro-type" id="pomodoroType">Work</div>
             <div class="pomodoro-time" id="pomodoroTime">25:00</div>
-            <div class="pomodoro-session" id="pomodoroSession">Session #1</div>
           </div>
+          <span class="pomodoro-session" id="pomodoroSession">#1</span>
         </div>
-        <button id="skipBtn" class="skip-btn">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
+        <button id="skipBtn" class="skip-btn" title="Phase überspringen">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
           </svg>
         </button>
       </div>
@@ -254,12 +339,10 @@
     
     if (isElectron) {
       ipcRenderer = require('electron').ipcRenderer;
-      // Receive timer data from main process
       ipcRenderer.on('timer-update', (event, data) => {
         updateTimerDisplay(data);
       });
     } else {
-      // PWA: Listen for postMessage
       window.addEventListener('message', (event) => {
         if (event.data.type === 'timer-update') {
           updateTimerDisplay(event.data.data);
@@ -268,19 +351,32 @@
     }
 
     function formatTimeWithSeconds(minutes) {
+      if (!minutes || minutes === 0) return '00:00';
       const totalSeconds = Math.round(Math.abs(minutes * 60));
       const hours = Math.floor(totalSeconds / 3600);
       const mins = Math.floor((totalSeconds % 3600) / 60);
       const secs = totalSeconds % 60;
 
+      const formatPart = (n) => {
+        const str = Math.floor(Math.max(0, Math.min(99, n))).toString();
+        return str.length === 1 ? '0' + str : str;
+      };
+
       if (hours > 0) {
-        return `${hours}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        return `${formatPart(hours)}:${formatPart(mins)}:${formatPart(secs)}`;
       }
-      return `${mins}:${String(secs).padStart(2, '0')}`;
+      return `${formatPart(mins)}:${formatPart(secs)}`;
     }
 
     function updateTimerDisplay(data) {
       const { timer, task, pomodoro } = data;
+
+      // Update theme
+      if (data.preferences?.theme === 'light') {
+        document.body.classList.add('light');
+      } else {
+        document.body.classList.remove('light');
+      }
 
       // Update task title
       if (task) {
@@ -295,39 +391,37 @@
 
       // Check if overtime
       const isOvertime = timer.estimatedTime && elapsedMinutes > timer.estimatedTime;
-      if (isOvertime) {
-        timerEl.classList.add('overtime');
-        document.getElementById('overtimeWarning').style.display = 'flex';
-      } else {
-        timerEl.classList.remove('overtime');
-        document.getElementById('overtimeWarning').style.display = 'none';
-      }
+      timerEl.classList.toggle('overtime', isOvertime);
+      document.getElementById('overtimeIcon').style.display = isOvertime ? 'block' : 'none';
 
       // Update estimated time
       if (timer.estimatedTime) {
         const estHours = Math.floor(timer.estimatedTime / 60);
         const estMins = Math.floor(timer.estimatedTime % 60);
         document.getElementById('estimatedTime').textContent = 
-          `Geschätzt: ${estHours > 0 ? estHours + 'h ' : ''}${estMins}m`;
+          `/ ${estHours > 0 ? estHours + 'h ' : ''}${estMins}m`;
       } else {
         document.getElementById('estimatedTime').textContent = '';
       }
 
-      // Update pause button text
-      const pauseBtn = document.getElementById('pauseBtn');
-      const pauseText = document.getElementById('pauseText');
-      const pauseIcon = pauseBtn.querySelector('.icon');
-      
+      // Update pause button
+      const pauseIcon = document.getElementById('pauseIcon');
       if (timer.isPaused) {
-        pauseText.textContent = 'Fortsetzen';
-        pauseIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+        pauseIcon.setAttribute('d', 'M8 5v14l11-7z');
+        document.getElementById('pauseBtn').title = 'Fortsetzen';
       } else {
-        pauseText.textContent = 'Pause';
-        pauseIcon.innerHTML = '<path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>';
+        pauseIcon.setAttribute('d', 'M6 4h4v16H6V4zm8 0h4v16h-4V4z');
+        document.getElementById('pauseBtn').title = 'Pause';
       }
 
-      // Update Pomodoro
-      if (pomodoro && pomodoro.sessionActive) {
+      // Set button accent color
+      if (data.preferences?.accentColor) {
+        document.getElementById('pauseBtn').style.backgroundColor = data.preferences.accentColor;
+        document.getElementById('pauseBtn').style.color = 'white';
+      }
+
+      // Update Pomodoro section
+      if (pomodoro && pomodoro.isActive) {
         const pomodoroSection = document.getElementById('pomodoroSection');
         pomodoroSection.style.display = 'block';
 
@@ -335,25 +429,36 @@
         document.getElementById('pomodoroIcon').textContent = pomodoro.type === 'work' ? '🍅' : '☕';
 
         // Update type
-        document.getElementById('pomodoroType').textContent = pomodoro.type === 'work' ? 'ARBEIT' : 'PAUSE';
+        document.getElementById('pomodoroType').textContent = pomodoro.type === 'work' ? 'Work' : 'Break';
 
         // Update time (remaining time, counting down)
         const remaining = pomodoro.sessionRemainingTime || 0;
         document.getElementById('pomodoroTime').textContent = formatTimeWithSeconds(Math.max(0, remaining));
 
         // Update session
-        document.getElementById('pomodoroSession').textContent = `Session #${pomodoro.sessionNumber}`;
+        document.getElementById('pomodoroSession').textContent = '#' + pomodoro.sessionNumber;
 
         // Update progress ring
-        const progress = pomodoro.sessionElapsedTime / pomodoro.sessionDuration;
-        const circumference = 125.66;
-        const offset = circumference * (1 - progress);
-        document.getElementById('pomodoroProgress').style.strokeDashoffset = offset;
+        const total = pomodoro.sessionRemainingTime + pomodoro.sessionElapsedTime;
+        const progress = total > 0 ? (pomodoro.sessionElapsedTime / total) : 0;
+        const circumference = 100.53;
+        const dashArray = (progress * circumference).toFixed(2) + ' ' + circumference;
+        document.getElementById('pomodoroProgress').style.strokeDasharray = dashArray;
 
         // Update color
-        const color = pomodoro.type === 'work' ? '#f97316' : '#10b981';
+        const color = pomodoro.type === 'work' 
+          ? (pomodoro.sessionRemainingTime <= 0 ? '#f97316' : '#ef4444')
+          : '#10b981';
         document.getElementById('pomodoroProgress').style.stroke = color;
         document.getElementById('pomodoroTime').style.color = color;
+        document.getElementById('pomodoroSession').style.backgroundColor = color + '33';
+        document.getElementById('pomodoroSession').style.color = color;
+        document.getElementById('skipBtn').style.borderColor = color;
+        document.getElementById('skipBtn').style.color = color;
+
+        // Update background ring color for light mode
+        const isDark = !document.body.classList.contains('light');
+        document.getElementById('pomodoroRingBg').style.stroke = isDark ? '#374151' : '#e5e7eb';
       } else {
         document.getElementById('pomodoroSection').style.display = 'none';
       }

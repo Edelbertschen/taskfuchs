@@ -116,7 +116,7 @@
         "inbox_only_desc": "This task is only visible in inbox (no project or date assigned)"
       },
       "linked_tasks": "Linked Tasks",
-      "linked_projects": "Linked Projects",
+      "linked_projects": "Linked Projects", 
       "linked_notes": "Linked Notes",
       "linked_notes_more": "more",
       "remove_link": "Remove link",
@@ -189,7 +189,7 @@
   },
   "task_modal": {
     "description_expand": "Expand description",
-    "description_collapse": "Collapse description",
+    "description_collapse": "Collapse description", 
     "description_edit": "Edit description",
     "description_preview": "Show preview",
     "descriptionPlaceholder": "Enter description...",
@@ -297,7 +297,7 @@
     "includes_all_planned_tasks": "Includes all planned tasks with remaining time",
     "under_budget": "Under budget",
     "yearly_progress": "Yearly Progress",
-    "expected_progress": "Expected Progress",
+    "expected_progress": "Expected Progress", 
     "actual_progress": "Actual Progress",
     "expected_vs_actual": "Expected vs. Actual",
     "expected_label": "Expected",
@@ -365,8 +365,8 @@
     "close": "Close",
     "loading": "Loading...",
     "error": "Error",
-    "success": "Success",
-    "confirm": "Confirm",
+          "success": "Success",
+          "confirm": "Confirm",
     "yes": "Yes",
     "no": "No",
     "completed": "completed",
@@ -569,14 +569,14 @@
     "enter_delete_to_confirm": "Type 'DELETE' to confirm:",
     "placeholder_tag": "Add tag...",
     "custom_time_input": "Enter custom time",
-    "column_name_placeholder": "Enter column name...",
-    "placeholder_smart_task": "Enter new task...",
-    "placeholder_new_task": "Enter new task...",
-    "placeholder_quick_mode": "Enter next task... (ESC to exit)",
-    "quick_mode": "Quick Mode",
-    "parsing_error": "Parsing error",
-    "create_task_for_inbox": "Create task for Inbox...",
-    "create_task_for": "Create task for {{title}}...",
+          "column_name_placeholder": "Enter column name...",
+      "placeholder_smart_task": "Enter new task...",
+      "placeholder_new_task": "Enter new task...",
+      "placeholder_quick_mode": "Enter next task... (ESC to exit)",
+      "quick_mode": "Quick Mode",
+      "parsing_error": "Parsing error",
+      "create_task_for_inbox": "Create task for Inbox...",
+      "create_task_for": "Create task for {{title}}...",
     "create_new_task_for": "Create new task for {{title}}...",
     "set_reminder": "Set Reminder",
     "time_optional": "Time (optional)"
@@ -634,7 +634,7 @@
   },
   "headings": {
     "heading_1": "Heading 1",
-    "heading_2": "Heading 2",
+    "heading_2": "Heading 2", 
     "heading_3": "Heading 3"
   },
   "focus": {
@@ -685,11 +685,11 @@
             "title": "Email Integration",
             "description": "Import emails directly as tasks and stay organized."
           }
+          }
         }
-      }
-    },
+      },
     "tasks": {
-      "title": "Tasks",
+        "title": "Tasks",
       "description": "Master the art of task management in TaskFuchs with these comprehensive guides.",
       "create_task": {
         "title": "Creating Tasks",
@@ -709,9 +709,9 @@
         "option1": "Use columns to organize tasks",
         "option2": "Filter tasks by tags or priority",
         "option3": "Archive completed tasks"
-      }
-    },
-    "smart_input": {
+        }
+      },
+      "smart_input": {
       "title": "Smart Parsing",
       "description": "Quickly create feature-rich tasks using simple text patterns.",
       "example": {
@@ -719,8 +719,8 @@
         "input": "Buy groceries !2 #shopping @tomorrow",
         "result": "Creates a task with priority 2, tag 'shopping', and tomorrow's date"
       },
-      "priorities": {
-        "title": "Priorities",
+        "priorities": {
+          "title": "Priorities",
         "low": "Low Priority",
         "low_shortcut": "!1 or -",
         "medium": "Medium Priority",
@@ -732,8 +732,8 @@
         "medium_alt": "o",
         "high_alt": "+",
         "english_tip": "You can use symbols instead of German equivalents"
-      },
-      "tags": {
+        },
+        "tags": {
         "title": "Tags",
         "single_tag": "Add a single tag",
         "single_tag_shortcut": "#tagname",
@@ -742,18 +742,18 @@
         "popular_tags": "Use popular tags",
         "popular_tags_shortcut": "Start typing # to see tags",
         "note": "Tags help organize and filter tasks"
-      },
-      "time": {
+        },
+        "time": {
         "title": "Time Estimates",
-        "minutes": "Minutes",
+          "minutes": "Minutes",
         "minutes_shortcut": "30m",
-        "hours": "Hours",
+          "hours": "Hours",
         "hours_shortcut": "2h",
         "mixed": "Mixed time",
         "mixed_shortcut": "1h30m",
         "english_tip": "Use 'm' for minutes and 'h' for hours"
-      },
-      "dates": {
+        },
+        "dates": {
         "title": "Dates",
         "relative_dates": "Relative dates",
         "relative_dates_shortcut": "@today, @tomorrow, @nextweek",
@@ -762,8 +762,8 @@
         "specific_dates": "Specific dates",
         "specific_dates_shortcut": "@2024-12-25 or @25.12.2024",
         "calendar_assignment": "These assign to the date column"
-      },
-      "columns": {
+        },
+        "columns": {
         "title": "Column Assignment",
         "inbox": "Move to Inbox",
         "inbox_shortcut": "@inbox",
@@ -773,20 +773,20 @@
         "tomorrow_shortcut": "@tomorrow",
         "backlog": "Move to Backlog",
         "backlog_shortcut": "@backlog"
-      },
-      "descriptions": {
+        },
+        "descriptions": {
         "title": "Descriptions",
         "add_description": "Add description",
         "add_description_shortcut": ":: Your description",
         "alternative": "Alternative format",
         "alternative_shortcut": "-- Your description",
         "tip": "Description separated by :: or --"
-      },
-      "markdown": {
+        },
+        "markdown": {
         "title": "Markdown Formatting",
         "formatting": "Italics or emphasis",
         "formatting_shortcut": "*text* or **bold**",
-        "strikethrough": "Strikethrough",
+          "strikethrough": "Strikethrough",
         "strikethrough_shortcut": "~~text~~",
         "links": "Add links",
         "links_shortcut": "[text](url)",
@@ -824,9 +824,9 @@
         "option2": "View all pins in Pins section",
         "option3": "Filter pins by project",
         "option4": "Archive when no longer needed"
-      },
-      "best_practices": {
-        "title": "Best Practices",
+        },
+        "best_practices": {
+          "title": "Best Practices",
         "option1": "Keep top 3-5 tasks pinned",
         "option2": "Review pins weekly",
         "option3": "Use for critical work",
@@ -848,8 +848,8 @@
         "option1": "Email tasks marked with icon",
         "option2": "Reply from task",
         "option3": "Archive when complete"
-      },
-      "use_cases": {
+        },
+        "use_cases": {
         "title": "Use Cases",
         "option1": "Convert meeting notes",
         "option2": "Turn requests into tasks",
@@ -860,8 +860,8 @@
     "shortcuts": {
       "title": "Keyboard Shortcuts",
       "description": "Master TaskFuchs with keyboard shortcuts.",
-      "navigation": {
-        "title": "Navigation",
+        "navigation": {
+          "title": "Navigation",
         "dashboard": "Go to Today",
         "dashboard_shortcut": "1",
         "inbox": "Go to Inbox",
@@ -885,8 +885,8 @@
         "settings": "Go to Settings",
         "settings_shortcut": "0",
         "or": "or"
-      },
-      "quick_actions": {
+        },
+        "quick_actions": {
         "title": "Quick Actions",
         "new_task": "Create new task",
         "new_task_shortcut": "N",
@@ -904,7 +904,7 @@
         "or": "or"
       },
       "focus_and_timer": {
-        "title": "Focus & Timer",
+          "title": "Focus & Timer",
         "focus_mode": "Enter Focus mode",
         "focus_mode_shortcut": "F",
         "review_mode": "Enter Review mode",
@@ -927,7 +927,7 @@
       },
       "review_mode": {
         "title": "Review Mode",
-        "next_task": "Next task",
+          "next_task": "Next task",
         "next_task_shortcut": "J",
         "next_task_alt_shortcut": "↓",
         "previous_task": "Previous task",
@@ -945,9 +945,9 @@
         "plan_review": "Plan review",
         "plan_review_shortcut": "P",
         "or": "or"
-      },
-      "pro_tips": {
-        "title": "Pro Tips",
+        },
+        "pro_tips": {
+          "title": "Pro Tips",
         "vim_style_navigation": "Vim-style navigation",
         "quick_switch": "Number keys switch sections",
         "timer_control": "Space pauses timer",
@@ -976,17 +976,17 @@
       }
     },
     "settings": {
-      "title": "Settings",
+        "title": "Settings",
       "description": "Customize your TaskFuchs experience.",
-      "appearance": {
-        "title": "Appearance",
+        "appearance": {
+          "title": "Appearance",
         "option1": "Customize colors",
         "option2": "Set backgrounds",
         "option3": "Choose dark/light mode",
         "option4": "Adjust UI density"
-      },
-      "notifications": {
-        "title": "Notifications",
+        },
+        "notifications": {
+          "title": "Notifications",
         "option1": "Browser notifications",
         "option2": "Sound alerts",
         "option3": "Notification timing",
@@ -1039,7 +1039,7 @@
     "no_notes_found": "No notes found",
     "try_other_search": "Try different search terms or remove filters.",
     "all_notes_linked": "All available notes are already linked or archived.",
-    "filter": "Filter",
+    "filter": "Filter", 
     "type": "Type",
     "notes_count": "{{count}} note",
     "notes_count_plural": "{{count}} notes",
@@ -1341,7 +1341,7 @@
   },
   "recurring_tasks_widget": {
     "daily": "Daily",
-    "weekly": "Weekly",
+    "weekly": "Weekly", 
     "monthly": "Monthly",
     "yearly": "Yearly",
     "skip": "Skip",
@@ -1366,7 +1366,7 @@
   },
   "time": {
     "minutes": "{minutes} minutes",
-    "hours": "{hours} hours",
+    "hours": "{hours} hours", 
     "hours_minutes": "{hours} hours {minutes} minutes"
   },
   "projects": {
@@ -1407,7 +1407,7 @@
   "planner": {
     "export_tasks": "Export tasks",
     "archive_completed": "Archive completed tasks",
-    "focus_column": "Focus column",
+    "focus_column": "Focus column", 
     "deadline_reached": "Deadline reached!",
     "visible_in_project_and_planner": "Visible in project and planner",
     "day_planner": "Day Planner",
@@ -1425,7 +1425,7 @@
     "weekdays": {
       "mo": "Mo",
       "tu": "Tu",
-      "we": "We",
+      "we": "We", 
       "th": "Th",
       "fr": "Fr",
       "sa": "Sa",
@@ -1702,4 +1702,4 @@
     "success_title": "Backup successful",
     "success_message": "Your data has been saved securely"
   }
-}
+} 
