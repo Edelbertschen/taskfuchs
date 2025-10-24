@@ -129,14 +129,26 @@
   </div>
 
   <script>
-    const { ipcRenderer } = require('electron');
+    // Detect if running in Electron or browser
+    const isElectron = typeof require !== 'undefined';
+    let ipcRenderer;
+    
+    if (isElectron) {
+      ipcRenderer = require('electron').ipcRenderer;
+      // Receive timer data from main process
+      ipcRenderer.on('timer-update', (event, data) => {
+        updateTimerDisplay(data);
+      });
+    } else {
+      // PWA: Listen for postMessage
+      window.addEventListener('message', (event) => {
+        if (event.data.type === 'timer-update') {
+          updateTimerDisplay(event.data.data);
+        }
+      });
+    }
 
     let timerInterval;
-
-    // Receive timer data from main process
-    ipcRenderer.on('timer-update', (event, data) => {
-      updateTimerDisplay(data);
-    });
 
     function updateTimerDisplay(data) {
       const { timer, task, pomodoro } = data;
@@ -200,15 +212,31 @@
 
     // Button handlers
     document.getElementById('pauseBtn').addEventListener('click', () => {
-      ipcRenderer.send('timer-action', 'pause');
+      if (isElectron) {
+        ipcRenderer.send('timer-action', 'pause');
+      } else {
+        // PWA: Send message to opener window
+        if (window.opener) {
+          window.opener.postMessage({ type: 'timer-action', action: 'pause' }, '*');
+        }
+      }
     });
 
     document.getElementById('stopBtn').addEventListener('click', () => {
-      ipcRenderer.send('timer-action', 'stop');
+      if (isElectron) {
+        ipcRenderer.send('timer-action', 'stop');
+      } else {
+        // PWA: Send message to opener window
+        if (window.opener) {
+          window.opener.postMessage({ type: 'timer-action', action: 'stop' }, '*');
+        }
+      }
     });
 
     // Request initial data
-    ipcRenderer.send('timer-request-data');
+    if (isElectron) {
+      ipcRenderer.send('timer-request-data');
+    }
   </script>
 </body>
 </html>

@@ -1601,7 +1601,7 @@
     "focusModeEnable": "Enable Focus Mode",
     "focusModeDesc": "Enables the use of Focus Mode for concentrated work",
     "separateWindow": "Separate Window",
-    "separateWindowDesc": "Opens the timer in its own window (Electron)"
+    "separateWindowDesc": "Opens the timer in a separate window"
   },
   "settings_data": {
     "exportOptions": "Export Options",

@@ -359,45 +359,113 @@ function MainApp() {
     return () => window.removeEventListener('show-focus-prompt', handler as EventListener);
   }, []);
 
-  // Handle separate timer window (Electron only)
+  // Handle separate timer window (Electron + PWA)
   useEffect(() => {
     const isElectron = !!(window as any).require;
-    if (!isElectron) return;
 
-    const { ipcRenderer } = (window as any).require('electron');
+    if (isElectron) {
+      // Electron: Use IPC for native window
+      const { ipcRenderer } = (window as any).require('electron');
 
-    // Open separate window when mode is set to separateWindow and timer is active
-    if (state.preferences.timerDisplayMode === 'separateWindow' && state.activeTimer?.isActive) {
-      // Request to open timer window
-      ipcRenderer.send('open-timer-window', {
-        timer: state.activeTimer,
-        preferences: state.preferences,
-        task: state.tasks?.find(t => t.id === state.activeTimer?.taskId),
-        pomodoro: state.pomodoroSession
-      });
-    } else {
-      // Close window when timer stops or mode changes
-      ipcRenderer.send('close-timer-window');
-    }
-
-    // Listen for timer actions from separate window
-    const handleTimerAction = (event: any, action: string) => {
-      if (action === 'pause') {
-        if (state.activeTimer?.isPaused) {
-          dispatch({ type: 'RESUME_TIMER' });
-        } else {
-          dispatch({ type: 'PAUSE_TIMER' });
-        }
-      } else if (action === 'stop') {
-        dispatch({ type: 'STOP_TIMER' });
+      // Open separate window when mode is set to separateWindow and timer is active
+      if (state.preferences.timerDisplayMode === 'separateWindow' && state.activeTimer?.isActive) {
+        // Request to open timer window
+        ipcRenderer.send('open-timer-window', {
+          timer: state.activeTimer,
+          preferences: state.preferences,
+          task: state.tasks?.find(t => t.id === state.activeTimer?.taskId),
+          pomodoro: state.pomodoroSession
+        });
+      } else {
+        // Close window when timer stops or mode changes
+        ipcRenderer.send('close-timer-window');
       }
-    };
 
-    ipcRenderer.on('timer-action', handleTimerAction);
+      // Listen for timer actions from separate window
+      const handleTimerAction = (event: any, action: string) => {
+        if (action === 'pause') {
+          if (state.activeTimer?.isPaused) {
+            dispatch({ type: 'RESUME_TIMER' });
+          } else {
+            dispatch({ type: 'PAUSE_TIMER' });
+          }
+        } else if (action === 'stop') {
+          dispatch({ type: 'STOP_TIMER' });
+        }
+      };
 
-    return () => {
-      ipcRenderer.removeListener('timer-action', handleTimerAction);
-    };
+      ipcRenderer.on('timer-action', handleTimerAction);
+
+      return () => {
+        ipcRenderer.removeListener('timer-action', handleTimerAction);
+      };
+    } else {
+      // PWA: Use window.open() for browser window
+      // Store window reference globally
+      if (state.preferences.timerDisplayMode === 'separateWindow' && state.activeTimer?.isActive) {
+        if (!(window as any).__timerWindow || (window as any).__timerWindow.closed) {
+          // Open new window
+          const timerWindow = window.open(
+            '/timer-window.html',
+            'TaskFuchs Timer',
+            'width=300,height=350,resizable=no,scrollbars=no,status=no,location=no,toolbar=no,menubar=no'
+          );
+          (window as any).__timerWindow = timerWindow;
+
+          // Send initial data when window loads
+          if (timerWindow) {
+            timerWindow.addEventListener('load', () => {
+              timerWindow.postMessage({
+                type: 'timer-update',
+                data: {
+                  timer: state.activeTimer,
+                  task: state.tasks?.find(t => t.id === state.activeTimer?.taskId),
+                  pomodoro: state.pomodoroSession
+                }
+              }, '*');
+            });
+          }
+        } else {
+          // Update existing window
+          (window as any).__timerWindow.postMessage({
+            type: 'timer-update',
+            data: {
+              timer: state.activeTimer,
+              task: state.tasks?.find(t => t.id === state.activeTimer?.taskId),
+              pomodoro: state.pomodoroSession
+            }
+          }, '*');
+        }
+      } else {
+        // Close window when timer stops or mode changes
+        if ((window as any).__timerWindow && !(window as any).__timerWindow.closed) {
+          (window as any).__timerWindow.close();
+          (window as any).__timerWindow = null;
+        }
+      }
+
+      // Listen for messages from timer window
+      const handleMessage = (event: MessageEvent) => {
+        if (event.data.type === 'timer-action') {
+          const action = event.data.action;
+          if (action === 'pause') {
+            if (state.activeTimer?.isPaused) {
+              dispatch({ type: 'RESUME_TIMER' });
+            } else {
+              dispatch({ type: 'PAUSE_TIMER' });
+            }
+          } else if (action === 'stop') {
+            dispatch({ type: 'STOP_TIMER' });
+          }
+        }
+      };
+
+      window.addEventListener('message', handleMessage);
+
+      return () => {
+        window.removeEventListener('message', handleMessage);
+      };
+    }
   }, [state.preferences.timerDisplayMode, state.activeTimer, state.tasks, state.pomodoroSession, dispatch]);
 
 

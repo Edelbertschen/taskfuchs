@@ -2158,7 +2158,7 @@
     "focusModeEnable": "Fokusmodus aktivieren",
     "focusModeDesc": "Ermöglicht die Nutzung des Fokusmodus für konzentriertes Arbeiten",
     "separateWindow": "Separates Fenster",
-    "separateWindowDesc": "Öffnet den Timer in einem eigenen Fenster (Electron)"
+    "separateWindowDesc": "Öffnet den Timer in einem separaten Fenster"
   },
   "settings_data": {
     "exportOptions": "Export-Optionen",
