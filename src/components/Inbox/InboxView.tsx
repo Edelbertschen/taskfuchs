@@ -1668,7 +1668,7 @@ function InboxTaskCard({
 
   return (
     <div 
-      className="group rounded-xl border transition-all duration-200 cursor-pointer backdrop-blur-2xl hover:scale-[1.02]"
+      className="group rounded-xl border transition-all duration-200 cursor-pointer backdrop-blur-2xl"
       style={{
         // Dark mode: use much darker glass so text is readable over backgrounds
         background: isSelected
