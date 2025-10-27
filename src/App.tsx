@@ -408,15 +408,32 @@ function MainApp() {
       // Listen for timer actions from separate window
       const handleTimerAction = (event: any, action: string) => {
         if (action === 'pause') {
+          // Pause BOTH timers
           if (state.activeTimer?.isPaused) {
             dispatch({ type: 'RESUME_TIMER' });
           } else {
             dispatch({ type: 'PAUSE_TIMER' });
           }
-        } else if (action === 'stop') {
+        } else if (action === 'complete-task') {
+          // Complete task, Pomodoro continues
+          if (state.activeTimer?.taskId) {
+            const task = state.tasks?.find(t => t.id === state.activeTimer.taskId);
+            if (task) {
+              dispatch({
+                type: 'UPDATE_TASK',
+                payload: { ...task, completed: true }
+              });
+            }
+          }
+        } else if (action === 'stop-task') {
+          // Stop task timer only, Pomodoro continues
           dispatch({ type: 'STOP_TIMER' });
+        } else if (action === 'stop-all') {
+          // Stop task timer AND reset Pomodoro
+          dispatch({ type: 'STOP_TIMER' });
+          timerService.stopPomodoroSession();
         } else if (action === 'skip-pomodoro') {
-          // Use timerService to skip pomodoro phase
+          // Skip pomodoro phase
           timerService.skipPomodoroPhase();
         }
       };
@@ -509,15 +526,32 @@ function MainApp() {
         if (event.data.type === 'timer-action') {
           const action = event.data.action;
           if (action === 'pause') {
+            // Pause BOTH timers
             if (state.activeTimer?.isPaused) {
               dispatch({ type: 'RESUME_TIMER' });
             } else {
               dispatch({ type: 'PAUSE_TIMER' });
             }
-          } else if (action === 'stop') {
+          } else if (action === 'complete-task') {
+            // Complete task, Pomodoro continues
+            if (state.activeTimer?.taskId) {
+              const task = state.tasks?.find(t => t.id === state.activeTimer.taskId);
+              if (task) {
+                dispatch({
+                  type: 'UPDATE_TASK',
+                  payload: { ...task, completed: true }
+                });
+              }
+            }
+          } else if (action === 'stop-task') {
+            // Stop task timer only, Pomodoro continues
             dispatch({ type: 'STOP_TIMER' });
+          } else if (action === 'stop-all') {
+            // Stop task timer AND reset Pomodoro
+            dispatch({ type: 'STOP_TIMER' });
+            timerService.stopPomodoroSession();
           } else if (action === 'skip-pomodoro') {
-            // Use timerService to skip pomodoro phase
+            // Skip pomodoro phase
             timerService.skipPomodoroPhase();
           }
         }

@@ -155,6 +155,34 @@
       background: var(--accent-color, #f97316);
     }
 
+    button.success {
+      background: #dcfce7;
+      color: #16a34a;
+    }
+
+    body.dark button.success {
+      background: #14532d;
+      color: #86efac;
+    }
+
+    button.success:hover {
+      background: #bbf7d0;
+    }
+
+    button.warning {
+      background: #fef3c7;
+      color: #d97706;
+    }
+
+    body.dark button.warning {
+      background: #78350f;
+      color: #fcd34d;
+    }
+
+    button.warning:hover {
+      background: #fde68a;
+    }
+
     button.danger {
       background: #fef2f2;
       color: #dc2626;
@@ -302,14 +330,25 @@
       </div>
 
       <div class="controls">
+        <button id="completeBtn" class="success" title="Aufgabe abhaken" style="display: none;">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+          </svg>
+        </button>
         <button id="pauseBtn" class="primary" title="Pause">
           <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
             <path id="pauseIcon" d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
           </svg>
         </button>
-        <button id="stopBtn" class="danger" title="Stop">
+        <button id="stopTaskBtn" class="warning" title="Task-Timer stoppen">
           <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
             <rect x="6" y="6" width="12" height="12"/>
+          </svg>
+        </button>
+        <button id="stopAllBtn" class="danger" title="Alles stoppen & Pomodoro zurücksetzen">
+          <svg class="icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5">
+            <rect x="6" y="6" width="12" height="12"/>
+            <circle cx="18" cy="6" r="3" fill="#ef4444"/>
           </svg>
         </button>
       </div>
@@ -322,7 +361,7 @@
           <svg width="56" height="56" viewBox="0 0 56 56" style="transform: rotate(-90deg);">
             <circle cx="28" cy="28" r="24" fill="none" id="pomodoroRingBg" stroke="#f4f4f5" stroke-width="2"/>
             <circle id="pomodoroProgress" cx="28" cy="28" r="24" fill="none" stroke="#ef4444" stroke-width="2" 
-                    stroke-dasharray="87.96 87.96" stroke-dashoffset="0" stroke-linecap="round"
+                    stroke-dasharray="150.80 150.80" stroke-dashoffset="0" stroke-linecap="round"
                     style="transition: stroke-dasharray 0.3s ease, stroke 0.2s ease;"/>
           </svg>
           <div class="pomodoro-icon" id="pomodoroIcon">🍅</div>
@@ -428,9 +467,13 @@
         document.documentElement.style.setProperty('--accent-color', preferences.accentColor);
       }
 
-      // Update task title
+      // Update task title and complete button visibility
       if (task) {
         document.getElementById('taskTitle').textContent = task.title;
+        // Show complete button only if task is not completed
+        document.getElementById('completeBtn').style.display = task.completed ? 'none' : 'flex';
+      } else {
+        document.getElementById('completeBtn').style.display = 'none';
       }
 
       // Update main timer tracking
@@ -544,11 +587,30 @@
       }
     });
 
-    document.getElementById('stopBtn').addEventListener('click', () => {
+    // Complete task button
+    document.getElementById('completeBtn').addEventListener('click', () => {
       if (isElectron) {
-        ipcRenderer.send('timer-action', 'stop');
+        ipcRenderer.send('timer-action', 'complete-task');
       } else if (window.opener) {
-        window.opener.postMessage({ type: 'timer-action', action: 'stop' }, '*');
+        window.opener.postMessage({ type: 'timer-action', action: 'complete-task' }, '*');
+      }
+    });
+
+    // Stop task timer (Pomodoro continues)
+    document.getElementById('stopTaskBtn').addEventListener('click', () => {
+      if (isElectron) {
+        ipcRenderer.send('timer-action', 'stop-task');
+      } else if (window.opener) {
+        window.opener.postMessage({ type: 'timer-action', action: 'stop-task' }, '*');
+      }
+    });
+
+    // Stop ALL (Task + Pomodoro reset)
+    document.getElementById('stopAllBtn').addEventListener('click', () => {
+      if (isElectron) {
+        ipcRenderer.send('timer-action', 'stop-all');
+      } else if (window.opener) {
+        window.opener.postMessage({ type: 'timer-action', action: 'stop-all' }, '*');
       }
     });
 
