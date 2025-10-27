@@ -3838,7 +3838,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                 className="flex items-center space-x-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
               >
                 <Trash2 className="w-4 h-4" />
-                <span>Delete</span>
+                <span>{t('common.delete')}</span>
               </button>
 
               {/* Action Buttons - Right Side */}
@@ -3847,7 +3847,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   onClick={handleClose}
                   className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 
                 {/* Task Completed Button */}
@@ -3855,10 +3855,10 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   onClick={task?.completed ? handleToggleComplete : handleCompleteAndClose}
                   className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white rounded-lg transition-all duration-200 hover:opacity-90"
                   style={{ backgroundColor: state.preferences.accentColor }}
-                  title={task?.completed ? 'Mark as incomplete' : 'Mark task completed'}
+                  title={task?.completed ? t('tasks.mark_incomplete') : t('tasks.mark_complete')}
                 >
                   <CheckSquare className="w-4 h-4" />
-                  <span>{task?.completed ? 'Incomplete' : 'Task completed'}</span>
+                  <span>{task?.completed ? t('tasks.mark_incomplete') : t('tasks.mark_complete')}</span>
                 </button>
                 
                 <button
@@ -3868,7 +3868,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   style={hasUnsavedChanges ? getAccentColorStyles().bg : {}}
                 >
                   <Save className="w-4 h-4" />
-                  <span>Save</span>
+                  <span>{t('common.save')}</span>
                 </button>
               </div>
             </div>
