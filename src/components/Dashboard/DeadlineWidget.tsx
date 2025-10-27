@@ -107,16 +107,16 @@ export function DeadlineWidget({ onTaskClick }: DeadlineWidgetProps = {}) {
   if (sortedTasks.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-center">
-        <p className={`${WIDGET_TEXT_STYLES.emptyTitle} ${isMinimalDesign ? 'text-gray-900 dark:text-white' : 'text-white'}`} 
+        <p className={`${WIDGET_TEXT_STYLES.emptyTitle} text-gray-900 dark:text-white`} 
            style={{ 
-             textShadow: isMinimalDesign ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.6)',
+             textShadow: isMinimalDesign ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.3)',
              fontFamily: WIDGET_TEXT_STYLES.fontFamily
            }}>
           {simpleTodayView.noUpcomingDeadlines()}
         </p>
-        <p className={`${WIDGET_TEXT_STYLES.emptySubtext} ${isMinimalDesign ? 'text-gray-600 dark:text-gray-300' : 'text-white/90'}`} 
+        <p className={`${WIDGET_TEXT_STYLES.emptySubtext} text-gray-600 dark:text-gray-300`} 
            style={{ 
-             textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.6)',
+             textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.3)',
              fontFamily: WIDGET_TEXT_STYLES.fontFamily
            }}>
           {simpleTodayView.allTasksOnSchedule()}
@@ -167,10 +167,10 @@ export function DeadlineWidget({ onTaskClick }: DeadlineWidgetProps = {}) {
                     
                     {/* Task Title */}
                     <p className={`flex-1 truncate ${WIDGET_TEXT_STYLES.itemTitle} ${
-                      isMinimalDesign ? 'text-gray-900 dark:text-white' : 'text-white'
-                    } ${isOverdue ? 'text-red-600 dark:text-red-400' : ''}`} 
+                      isOverdue ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'
+                    }`} 
                        style={{ 
-                         textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.6)',
+                         textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.3)',
                          fontFamily: WIDGET_TEXT_STYLES.fontFamily
                        }}>
                       {task.title}
@@ -179,10 +179,10 @@ export function DeadlineWidget({ onTaskClick }: DeadlineWidgetProps = {}) {
                   
                   {/* Deadline Date */}
                   <p className={`${WIDGET_TEXT_STYLES.itemSubtext} ${
-                    isMinimalDesign ? 'text-gray-500 dark:text-gray-400' : 'text-white/80'
-                  } ${isOverdue ? 'text-red-500 dark:text-red-400 font-medium' : ''}`}
+                    isOverdue ? 'text-red-500 dark:text-red-400 font-medium' : 'text-gray-500 dark:text-gray-400'
+                  }`}
                      style={{ 
-                       textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.4)',
+                       textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.3)',
                        fontFamily: WIDGET_TEXT_STYLES.fontFamily
                      }}>
                     {isOverdue 

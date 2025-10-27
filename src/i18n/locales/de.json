@@ -1971,6 +1971,16 @@
     "select_all": "Alle auswählen",
     "deselect_all": "Auswahl aufheben",
     "delete_button": "Löschen",
+    "projectSelect": "Projekt auswählen",
+    "columnSelect": "Spalte auswählen",
+    "searchProjects": "Projekte durchsuchen...",
+    "noProjectsFound": "Keine Projekte gefunden",
+    "noProjectsAvailable": "Keine Projekte verfügbar",
+    "noColumnsInProject": "Noch keine Spalten in diesem Projekt",
+    "createColumn": "Spalte erstellen",
+    "newColumn": "Neue Spalte",
+    "create": "Erstellen",
+    "cancel": "Abbrechen",
     "placeholders": {
       "new_task": "Neue Aufgabe für Inbox erstellen..."
     },

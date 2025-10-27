@@ -352,6 +352,7 @@ export class NextcloudSyncService {
       viewState: appData.viewState || {},
       projectKanbanColumns: appData.projectKanbanColumns || [],
       projectKanbanState: appData.projectKanbanState || {},
+      pinColumns: appData.pinColumns || [],
       
       // Metadaten
       exportDate: new Date().toISOString(),

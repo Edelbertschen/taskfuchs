@@ -158,10 +158,10 @@ const StandardWidget = ({
       }`}>
         <MaterialIcon name={icon} size={32} style={{ color: accentColor }} />
       </div>
-      <h3 className={`${WIDGET_STYLES.title} ${isMinimalDesign ? 'text-gray-900 dark:text-white' : 'text-white'}`} 
+      <h3 className={`${WIDGET_STYLES.title} text-gray-900 dark:text-white`} 
           style={{ 
             fontFamily: "'Roboto', sans-serif", 
-            textShadow: isMinimalDesign ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.5)' 
+            textShadow: isMinimalDesign ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.3)' 
           }}>
         {title}
       </h3>
@@ -183,16 +183,16 @@ const EmptyState = ({
   isMinimalDesign: boolean;
 }) => (
   <div className="flex flex-col items-center justify-center h-full text-center">
-    <p className={`${WIDGET_STYLES.emptyTitle} ${isMinimalDesign ? 'text-gray-900 dark:text-white' : 'text-white'}`} 
+    <p className={`${WIDGET_STYLES.emptyTitle} text-gray-900 dark:text-white`} 
        style={{ 
-         textShadow: isMinimalDesign ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.6)',
+         textShadow: isMinimalDesign ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.3)',
          fontFamily: "'Roboto', sans-serif"
        }}>
       {title}
     </p>
-    <p className={`${WIDGET_STYLES.emptySubtext} ${isMinimalDesign ? 'text-gray-600 dark:text-gray-300' : 'text-white/90'}`} 
+    <p className={`${WIDGET_STYLES.emptySubtext} text-gray-600 dark:text-gray-300`} 
        style={{ 
-         textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.6)',
+         textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.3)',
          fontFamily: "'Roboto', sans-serif"
        }}>
       {subtitle}
@@ -227,29 +227,23 @@ const TaskItem = ({
           e.stopPropagation();
           onComplete(task.id);
         }}
-        className={`flex-shrink-0 ${WIDGET_STYLES.actionButton} ${
-          isMinimalDesign ? 'text-gray-400 hover:text-green-500' : 'text-white/70 hover:text-white'
-        }`}
+        className={`flex-shrink-0 ${WIDGET_STYLES.actionButton} text-gray-400 hover:text-green-500`}
       >
         <Circle className="w-4 h-4" />
       </button>
       )}
       <div className="flex-1 min-w-0">
-        <span className={`block ${WIDGET_STYLES.itemTitle} truncate ${
-          isMinimalDesign ? 'text-gray-900 dark:text-white' : 'text-white'
-        }`}
+        <span className={`block ${WIDGET_STYLES.itemTitle} truncate text-gray-900 dark:text-white`}
               style={{ 
-                textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.6)',
+                textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.3)',
                 fontFamily: "'Roboto', sans-serif"
               }}>
           {task.title}
         </span>
         {showDeadline && task.dueDate && (
-          <span className={`block ${WIDGET_STYLES.itemSubtext} ${
-            isMinimalDesign ? 'text-gray-500 dark:text-gray-400' : 'text-white/70'
-          }`}
+          <span className={`block ${WIDGET_STYLES.itemSubtext} text-gray-500 dark:text-gray-400`}
                 style={{ 
-                  textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.5)',
+                  textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.3)',
                   fontFamily: "'Roboto', sans-serif"
                 }}>
             {format(new Date(task.dueDate), 'dd.MM.yyyy')}

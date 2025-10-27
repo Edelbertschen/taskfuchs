@@ -244,7 +244,8 @@ export const NextcloudSettings: React.FC<NextcloudSettingsProps> = ({ onClose })
           preferences: restoredData.preferences || {},
           viewState: (restoredData as any).viewState || {},
           projectKanbanColumns: (restoredData as any).projectKanbanColumns || [],
-          projectKanbanState: (restoredData as any).projectKanbanState || {}
+          projectKanbanState: (restoredData as any).projectKanbanState || {},
+          pinColumns: (restoredData as any).pinColumns || []
         } as any
       });
 

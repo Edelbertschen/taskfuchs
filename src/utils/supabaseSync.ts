@@ -31,6 +31,7 @@ export async function uploadInitialBackupIfNeeded(userId: string): Promise<boole
     viewState: readJson('taskfuchs-view-state') || {},
     events: readJson('taskfuchs-events') || [],
     calendarSources: readJson('taskfuchs-calendar-sources') || [],
+    pinColumns: readJson('taskfuchs-pin-columns') || [],
     showCompleted: readJson('taskfuchs-show-completed') ?? true,
   };
 
@@ -89,6 +90,7 @@ export async function tryRestoreFromBackup(userId: string): Promise<boolean> {
     if (snapshot.viewState) localStorage.setItem('taskfuchs-view-state', JSON.stringify(snapshot.viewState));
     if (snapshot.events) localStorage.setItem('taskfuchs-events', JSON.stringify(snapshot.events));
     if (snapshot.calendarSources) localStorage.setItem('taskfuchs-calendar-sources', JSON.stringify(snapshot.calendarSources));
+    if (snapshot.pinColumns) localStorage.setItem('taskfuchs-pin-columns', JSON.stringify(snapshot.pinColumns));
     if (typeof snapshot.showCompleted !== 'undefined') localStorage.setItem('taskfuchs-show-completed', JSON.stringify(snapshot.showCompleted));
     localStorage.setItem(flagKey, 'true');
     return true;

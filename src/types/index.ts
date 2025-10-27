@@ -242,7 +242,7 @@ export interface UserPreferences {
   completionSound: 'bell' | 'chime' | 'yeah' | 'none';
   completionSoundEnabled?: boolean;
   enableCelebration: boolean; // Fuchs-Animation und Konfetti beim Abhaken
-  timerDisplayMode: 'topBar' | 'floatingWidget';
+  timerDisplayMode: 'topBar' | 'floatingWidget' | 'separateWindow';
   celebrationText: string; // Text der bei der Celebration angezeigt wird
   celebrationDuration: number; // Dauer der Animation in Millisekunden
   columns: {

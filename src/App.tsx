@@ -49,6 +49,7 @@ import { initializeAudioOnUserInteraction } from './utils/soundUtils';
 import { isMobilePWAEnvironment } from './utils/device';
 import { getBackgroundStyles, getDarkModeBackgroundStyles } from './utils/backgroundUtils';
 import { format } from 'date-fns';
+import { timerService } from './utils/timerService';
 import PerformanceMonitor from './components/Common/PerformanceMonitor';
 
 // Color generation functions
@@ -235,9 +236,9 @@ function MainApp() {
     } catch {}
   }, []);
 
-  // Temporarily hold back mobile app: show Coming Soon screen on mobile viewports/PWA
+  // Mobile PWA: Show minimalistic mobile shell
   if (isMobilePWAEnvironment()) {
-    return <MobileComingSoon />;
+    return <MobileShell />;
   }
 
   // View order for navigation direction
@@ -369,16 +370,39 @@ function MainApp() {
 
       // Open separate window when mode is set to separateWindow and timer is active
       if (state.preferences.timerDisplayMode === 'separateWindow' && state.activeTimer?.isActive) {
+        // Get Pomodoro session from timerService
+        const pomodoroSession = timerService.getGlobalPomodoroSession();
+        
         // Request to open timer window
         ipcRenderer.send('open-timer-window', {
           timer: state.activeTimer,
           preferences: state.preferences,
           task: state.tasks?.find(t => t.id === state.activeTimer?.taskId),
-          pomodoro: state.pomodoroSession
+          pomodoro: pomodoroSession
         });
+        
+        // Setup interval to send updates every second for smooth counting
+        if (!(window as any).__electronTimerUpdateInterval) {
+          const updateInterval = setInterval(() => {
+            const updatedPomodoro = timerService.getGlobalPomodoroSession();
+            ipcRenderer.send('update-timer-window', {
+              timer: state.activeTimer,
+              preferences: state.preferences,
+              task: state.tasks?.find(t => t.id === state.activeTimer?.taskId),
+              pomodoro: updatedPomodoro
+            });
+          }, 1000);
+          (window as any).__electronTimerUpdateInterval = updateInterval;
+        }
       } else {
         // Close window when timer stops or mode changes
         ipcRenderer.send('close-timer-window');
+        
+        // Clear update interval
+        if ((window as any).__electronTimerUpdateInterval) {
+          clearInterval((window as any).__electronTimerUpdateInterval);
+          (window as any).__electronTimerUpdateInterval = null;
+        }
       }
 
       // Listen for timer actions from separate window
@@ -392,11 +416,8 @@ function MainApp() {
         } else if (action === 'stop') {
           dispatch({ type: 'STOP_TIMER' });
         } else if (action === 'skip-pomodoro') {
-          if (state.pomodoroSession?.type === 'work') {
-            dispatch({ type: 'SKIP_POMODORO_SESSION' });
-          } else {
-            dispatch({ type: 'END_POMODORO_BREAK' });
-          }
+          // Use timerService to skip pomodoro phase
+          timerService.skipPomodoroPhase();
         }
       };
 
@@ -404,49 +425,82 @@ function MainApp() {
 
       return () => {
         ipcRenderer.removeListener('timer-action', handleTimerAction);
+        // Clear update interval on cleanup
+        if ((window as any).__electronTimerUpdateInterval) {
+          clearInterval((window as any).__electronTimerUpdateInterval);
+          (window as any).__electronTimerUpdateInterval = null;
+        }
       };
     } else {
       // PWA: Use window.open() for browser window
       // Store window reference globally
       if (state.preferences.timerDisplayMode === 'separateWindow' && state.activeTimer?.isActive) {
         if (!(window as any).__timerWindow || (window as any).__timerWindow.closed) {
-          // Open new window
+          // Open new window - compact size
           const timerWindow = window.open(
             '/timer-window.html',
             'TaskFuchs Timer',
-            'width=300,height=350,resizable=no,scrollbars=no,status=no,location=no,toolbar=no,menubar=no'
+            'width=240,height=200,resizable=no,scrollbars=no,status=no,location=no,toolbar=no,menubar=no'
           );
           (window as any).__timerWindow = timerWindow;
 
           // Send initial data when window loads
           if (timerWindow) {
             timerWindow.addEventListener('load', () => {
-              timerWindow.postMessage({
-                type: 'timer-update',
-                data: {
-                  timer: state.activeTimer,
-                  task: state.tasks?.find(t => t.id === state.activeTimer?.taskId),
-                  pomodoro: state.pomodoroSession
+              const sendUpdate = () => {
+                const pomodoroSession = timerService.getGlobalPomodoroSession();
+                if (timerWindow && !timerWindow.closed) {
+                  timerWindow.postMessage({
+                    type: 'timer-update',
+                    data: {
+                      timer: state.activeTimer,
+                      task: state.tasks?.find(t => t.id === state.activeTimer?.taskId),
+                      pomodoro: pomodoroSession,
+                      preferences: {
+                        theme: state.preferences.theme,
+                        accentColor: state.preferences.accentColor
+                      }
+                    }
+                  }, '*');
                 }
-              }, '*');
+              };
+              
+              // Send initial update
+              sendUpdate();
+              
+              // Setup interval for regular updates (every second)
+              const updateInterval = setInterval(sendUpdate, 1000);
+              (window as any).__timerUpdateInterval = updateInterval;
             });
           }
         } else {
           // Update existing window
-          (window as any).__timerWindow.postMessage({
-            type: 'timer-update',
-            data: {
-              timer: state.activeTimer,
-              task: state.tasks?.find(t => t.id === state.activeTimer?.taskId),
-              pomodoro: state.pomodoroSession
-            }
-          }, '*');
+          const pomodoroSession = timerService.getGlobalPomodoroSession();
+          if ((window as any).__timerWindow && !(window as any).__timerWindow.closed) {
+            (window as any).__timerWindow.postMessage({
+              type: 'timer-update',
+              data: {
+                timer: state.activeTimer,
+                task: state.tasks?.find(t => t.id === state.activeTimer?.taskId),
+                pomodoro: pomodoroSession,
+                preferences: {
+                  theme: state.preferences.theme,
+                  accentColor: state.preferences.accentColor
+                }
+              }
+            }, '*');
+          }
         }
       } else {
         // Close window when timer stops or mode changes
         if ((window as any).__timerWindow && !(window as any).__timerWindow.closed) {
           (window as any).__timerWindow.close();
           (window as any).__timerWindow = null;
+        }
+        // Clear update interval
+        if ((window as any).__timerUpdateInterval) {
+          clearInterval((window as any).__timerUpdateInterval);
+          (window as any).__timerUpdateInterval = null;
         }
       }
 
@@ -463,11 +517,8 @@ function MainApp() {
           } else if (action === 'stop') {
             dispatch({ type: 'STOP_TIMER' });
           } else if (action === 'skip-pomodoro') {
-            if (state.pomodoroSession?.type === 'work') {
-              dispatch({ type: 'SKIP_POMODORO_SESSION' });
-            } else {
-              dispatch({ type: 'END_POMODORO_BREAK' });
-            }
+            // Use timerService to skip pomodoro phase
+            timerService.skipPomodoroPhase();
           }
         }
       };
@@ -476,9 +527,14 @@ function MainApp() {
 
       return () => {
         window.removeEventListener('message', handleMessage);
+        // Clear update interval on cleanup
+        if ((window as any).__timerUpdateInterval) {
+          clearInterval((window as any).__timerUpdateInterval);
+          (window as any).__timerUpdateInterval = null;
+        }
       };
     }
-  }, [state.preferences.timerDisplayMode, state.activeTimer, state.tasks, state.pomodoroSession, dispatch]);
+  }, [state.preferences.timerDisplayMode, state.activeTimer, state.tasks, state.preferences.theme, state.preferences.accentColor, dispatch]);
 
 
   // Listen for PWA update notifications from SW bridge
@@ -1238,6 +1294,7 @@ function MainApp() {
           viewState: (state as any).viewState || {},
           projectKanbanColumns: (state as any).viewState?.projectKanban?.columns || [],
           projectKanbanState: (state as any).viewState?.projectKanban || {},
+          pinColumns: (state as any).pinColumns || [],
           exportDate: new Date().toISOString(),
           version: '2.3'
         };

@@ -1481,6 +1481,16 @@
     "select": "Select",
     "remove_filter": "Remove filter",
     "delete_button": "Delete",
+    "projectSelect": "Select project",
+    "columnSelect": "Select column",
+    "searchProjects": "Search projects...",
+    "noProjectsFound": "No projects found",
+    "noProjectsAvailable": "No projects available",
+    "noColumnsInProject": "No columns in this project yet",
+    "createColumn": "Create column",
+    "newColumn": "New column",
+    "create": "Create",
+    "cancel": "Cancel",
     "placeholders": {
       "new_task": "Create new task for inbox..."
     },

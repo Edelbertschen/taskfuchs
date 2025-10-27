@@ -953,7 +953,7 @@ export function InboxView() {
 
                     {/* Kalender Pseudo-Overlay */}
                     {showBulkCalendar && (
-                      <div className="absolute left-0 top-full mt-2 z-30 animate-in slide-in-from-top-2 duration-200">
+                      <div className="absolute left-0 top-full mt-2 z-[9999] animate-in slide-in-from-top-2 duration-200">
                         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden w-80">
                           {/* Header */}
                           <div className="bg-gray-50 dark:bg-gray-750 px-3 py-2 border-b border-gray-200 dark:border-gray-700">
@@ -1088,7 +1088,7 @@ export function InboxView() {
 
                     {/* Projekt Slider */}
                     {showBulkProjectModal && (
-                      <div className="absolute right-0 top-full mt-2 z-30 animate-in slide-in-from-top-2 duration-200">
+                      <div className="absolute right-0 top-full mt-2 z-[9999] animate-in slide-in-from-top-2 duration-200">
                         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden w-[480px] h-[600px]">
                           {/* Header */}
                           <div className="bg-gray-50 dark:bg-gray-750 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
@@ -1324,7 +1324,7 @@ export function InboxView() {
 
                     {/* Tag Slider */}
                     {showBulkTagModal && (
-                      <div className="absolute right-0 top-full mt-2 z-30 animate-in slide-in-from-top-2 duration-200">
+                      <div className="absolute right-0 top-full mt-2 z-[9999] animate-in slide-in-from-top-2 duration-200">
                         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden w-64">
                           {/* Header */}
                           <div className="bg-gray-50 dark:bg-gray-750 px-3 py-2 border-b border-gray-200 dark:border-gray-700">
@@ -1668,16 +1668,16 @@ function InboxTaskCard({
 
   return (
     <div 
-      className="group rounded-xl border transition-all duration-200 cursor-pointer backdrop-blur-2xl"
+      className="group rounded-xl transition-all duration-200 cursor-pointer backdrop-blur-2xl"
       style={{
         // Dark mode: use much darker glass so text is readable over backgrounds
-        background: isSelected
-          ? `${accentColor}26`
-          : (document.documentElement.classList.contains('dark')
-              ? 'rgba(17, 24, 39, 0.75)'
-              : '#FFFFFF'),
+        background: document.documentElement.classList.contains('dark')
+            ? 'rgba(17, 24, 39, 0.75)'
+            : '#FFFFFF',
+        borderWidth: isSelected ? '2px' : '1px',
+        borderStyle: 'solid',
         borderColor: isSelected
-          ? `${accentColor}66`
+          ? accentColor
           : (document.documentElement.classList.contains('dark') ? 'rgba(255, 255, 255, 0.15)' : '#E5E7EB'),
         boxShadow: isSelected
           ? (document.documentElement.classList.contains('dark') ? '0 10px 36px rgba(0, 0, 0, 0.5)' : '0 8px 32px rgba(0, 0, 0, 0.2)')

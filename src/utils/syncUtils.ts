@@ -741,6 +741,9 @@ class NextcloudSyncManager {
         // Bilder-Speicher
         imageStorage: appState.imageStorage || { images: [], currentSize: 0, maxSize: 104857600 },
         
+        // 🎯 PIN SYSTEM
+        pinColumns: appState.pinColumns || [],
+        
         // Zusätzliche Daten
         searchQuery: appState.searchQuery || '',
         activeTagFilters: appState.activeTagFilters || [],

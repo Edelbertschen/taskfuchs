@@ -296,9 +296,13 @@ class TimerService {
     return this.activeTimer;
   }
 
-  // Stop the active task timer (but preserve Pomodoro session)
+  // Stop the active task timer and Pomodoro session
   stopTimer(reason: 'completed' | 'overtime' | 'stopped' = 'stopped'): void {
     this.stopTaskTimer(reason);
+    // Also stop Pomodoro when user explicitly stops timer
+    if (reason === 'stopped') {
+      this.stopPomodoroSession();
+    }
   }
 
   // Private method to stop only the task timer

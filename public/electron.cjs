@@ -756,12 +756,14 @@ function createTimerWindow() {
   }
 
   timerWindow = new BrowserWindow({
-    width: 300,
-    height: 350,
+    width: 240,
+    height: 200,
     resizable: false,
     frame: false,
     alwaysOnTop: true,
     skipTaskbar: false,
+    transparent: false,
+    backgroundColor: '#ffffff',
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -797,6 +799,13 @@ ipcMain.on('open-timer-window', (event, data) => {
 
 ipcMain.on('close-timer-window', () => {
   closeTimerWindow();
+});
+
+ipcMain.on('update-timer-window', (event, data) => {
+  // Update existing timer window
+  if (timerWindow && !timerWindow.isDestroyed()) {
+    timerWindow.webContents.send('timer-update', data);
+  }
 });
 
 ipcMain.on('timer-request-data', (event) => {

@@ -305,7 +305,7 @@ export function ChecklistWidget() {
                   onClick={() => handleToggleItem(item.id)}
                   className="flex-shrink-0 hover:scale-110 transition-transform"
                 >
-                  <Circle className={`w-4 h-4 ${isMinimalDesign ? 'text-gray-400 hover:text-green-500' : 'text-white/70 hover:text-white'}`} />
+                  <Circle className="w-4 h-4 text-gray-400 hover:text-green-500" />
                 </button>
                 
                 {editingItemId === item.id ? (
@@ -326,8 +326,8 @@ export function ChecklistWidget() {
                 ) : (
                   <div className="flex-1 flex items-center justify-between">
                     <span 
-                      className={`text-sm ${isMinimalDesign ? 'text-gray-900 dark:text-white' : 'text-white'}`} 
-                      style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.5)' }}
+                      className="text-sm text-gray-900 dark:text-white" 
+                      style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.3)' }}
                     >
                       {item.text}
                     </span>
@@ -363,7 +363,7 @@ export function ChecklistWidget() {
         {completedItems.length > 0 && (
           <div className="mt-4">
             <div className="flex items-center justify-between mb-2">
-              <h4 className={`text-xs font-medium ${isMinimalDesign ? 'text-gray-500 dark:text-gray-400' : 'text-white/70'}`}>
+              <h4 className="text-xs font-medium text-gray-500 dark:text-gray-400">
                 {t('dashboard.checklist.completed')} ({completedItems.length})
               </h4>
             </div>
@@ -386,8 +386,8 @@ export function ChecklistWidget() {
                   </button>
                   
                   <span 
-                    className={`flex-1 text-sm line-through ${isMinimalDesign ? 'text-gray-400 dark:text-gray-500' : 'text-white/50'}`} 
-                    style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.5)' }}
+                    className="flex-1 text-sm line-through text-gray-400 dark:text-gray-500" 
+                    style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.3)' }}
                   >
                     {item.text}
                   </span>
@@ -405,12 +405,12 @@ export function ChecklistWidget() {
                 ? 'bg-gray-100 dark:bg-gray-700' 
                 : 'bg-white/10 backdrop-blur-sm border border-white/20'
             }`}>
-              <CheckSquare className={`w-6 h-6 ${isMinimalDesign ? 'text-gray-400' : 'text-white/70'}`} />
+              <CheckSquare className="w-6 h-6 text-gray-400 dark:text-gray-300" />
             </div>
-            <p className={`font-medium mb-1 text-sm ${isMinimalDesign ? 'text-gray-900 dark:text-white' : 'text-white'}`}>
+            <p className="font-medium mb-1 text-sm text-gray-900 dark:text-white">
               {t('dashboard.checklist.no_entries')}
             </p>
-            <p className={`text-xs ${isMinimalDesign ? 'text-gray-500 dark:text-gray-400' : 'text-white/70'}`}>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
               {t('dashboard.checklist.click_to_add')}
             </p>
           </div>
@@ -452,11 +452,7 @@ export function ChecklistWidget() {
         ) : (
           <button
             onClick={() => setIsAdding(true)}
-            className={`w-full flex items-center justify-center space-x-2 py-2 px-3 text-sm rounded-lg transition-all duration-200 ${
-              isMinimalDesign
-                ? 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50'
-                : 'text-white/60 hover:text-white/80 hover:bg-white/5'
-            }`}
+            className="w-full flex items-center justify-center space-x-2 py-2 px-3 text-sm rounded-lg transition-all duration-200 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50"
           >
             <Plus className="w-4 h-4" />
             <span>{t('dashboard.checklist.add_entry')}</span>
