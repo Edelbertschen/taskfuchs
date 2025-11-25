@@ -3815,9 +3815,9 @@ const Settings = React.memo(() => {
                             className="w-full h-16 transition-all duration-200 hover:scale-105"
                             style={{ backgroundColor: colorOption }}
                           />
-                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity flex items-center justify-center">
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-opacity flex items-center justify-center">
                             {customAccentColor === colorOption && (
-                              <div className="bg-white dark:bg-gray-800 bg-opacity-90 px-2 py-1 rounded text-xs font-medium text-gray-900 dark:text-white">
+                              <div className="bg-white/90 dark:bg-gray-800/90 px-2 py-1 rounded text-xs font-medium text-gray-900 dark:text-white">
                                 {settings_appearance.active()}
                               </div>
                             )}
@@ -3999,8 +3999,73 @@ const Settings = React.memo(() => {
                       </button>
                     </div>
                     <div className="grid grid-cols-3 gap-4">
-                      {/* Gallery Images */}
-                      {backgroundImageGallery.map((imageUrl, index) => (
+                      {/* Light/Dark Mode Background Pair - bg12.png & bg13.png */}
+                      {backgroundImageGallery.some(url => url.includes('bg12.png') || url.includes('bg13.png')) && (
+                        <div 
+                          className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all col-span-2 ${
+                            state.preferences.backgroundImage?.includes('bg12.png') || state.preferences.backgroundImage?.includes('bg13.png')
+                              ? 'border-2 ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800'
+                              : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+                          }`}
+                          style={(state.preferences.backgroundImage?.includes('bg12.png') || state.preferences.backgroundImage?.includes('bg13.png')) ? {
+                            borderColor: getAccentColorStyles().border.borderColor,
+                            boxShadow: `0 0 0 2px ${getAccentColorStyles().bg.backgroundColor}20, 0 0 0 4px ${getAccentColorStyles().bg.backgroundColor}`
+                          } : {}}
+                          onClick={() => handleSelectImageFromGallery('/backgrounds/bg12.png')}
+                        >
+                          <div className="flex h-20">
+                            {/* Light Mode Half */}
+                            <div className="relative flex-1 overflow-hidden">
+                              <img 
+                                src="/backgrounds/bg12.png" 
+                                alt="Light Mode Hintergrund"
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute bottom-1 left-1 bg-white/90 dark:bg-white/80 rounded px-1.5 py-0.5 flex items-center gap-1">
+                                <Sun className="w-3 h-3 text-amber-500" />
+                                <span className="text-[10px] font-medium text-gray-700">Light</span>
+                              </div>
+                            </div>
+                            {/* Divider */}
+                            <div className="w-0.5 bg-gradient-to-b from-white/50 via-gray-400 to-white/50 dark:from-gray-600/50 dark:via-gray-500 dark:to-gray-600/50" />
+                            {/* Dark Mode Half */}
+                            <div className="relative flex-1 overflow-hidden">
+                              <img 
+                                src="/backgrounds/bg13.png" 
+                                alt="Dark Mode Hintergrund"
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute bottom-1 right-1 bg-gray-900/90 dark:bg-gray-900/80 rounded px-1.5 py-0.5 flex items-center gap-1">
+                                <Moon className="w-3 h-3 text-blue-400" />
+                                <span className="text-[10px] font-medium text-white">Dark</span>
+                              </div>
+                            </div>
+                          </div>
+                          {/* Pair indicator overlay */}
+                          <div className="absolute top-1 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-sm rounded-full px-2 py-0.5 flex items-center gap-1.5">
+                            <Sun className="w-3 h-3 text-amber-400" />
+                            <span className="text-[10px] font-semibold text-white">/</span>
+                            <Moon className="w-3 h-3 text-blue-400" />
+                          </div>
+                          {/* Hover overlay */}
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-opacity" />
+                          {/* Selected indicator */}
+                          {(state.preferences.backgroundImage?.includes('bg12.png') || state.preferences.backgroundImage?.includes('bg13.png')) && (
+                            <div className="absolute bottom-1 left-1/2 -translate-x-1/2">
+                              <div className="text-white text-xs px-2 py-0.5 rounded text-center font-medium flex items-center gap-1" 
+                                   style={{ backgroundColor: getAccentColorStyles().bg.backgroundColor }}>
+                                <Check className="w-3 h-3" />
+                                {settings_appearance.current()}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      
+                      {/* Regular Gallery Images (excluding bg12 and bg13) */}
+                      {backgroundImageGallery
+                        .filter(url => !url.includes('bg12.png') && !url.includes('bg13.png'))
+                        .map((imageUrl, index) => (
                         <div 
                           key={index}
                           className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
@@ -4027,7 +4092,7 @@ const Settings = React.memo(() => {
                           <div className="hidden w-full h-20 bg-gray-100 dark:bg-gray-700 items-center justify-center">
                             <span className="text-xs text-gray-500">Bild nicht verfügbar</span>
                           </div>
-                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity flex items-center justify-center">
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-opacity flex items-center justify-center">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -4161,9 +4226,9 @@ const Settings = React.memo(() => {
                               className="w-full h-16 transition-all duration-200 hover:scale-105"
                               style={{ backgroundColor: colorOption }}
                             />
-                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity flex items-center justify-center">
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-opacity flex items-center justify-center">
                               {backgroundColorTemp === colorOption && (
-                                <div className="bg-white dark:bg-gray-800 bg-opacity-90 px-2 py-1 rounded text-xs font-medium text-gray-900 dark:text-white">
+                                <div className="bg-white/90 dark:bg-gray-800/90 px-2 py-1 rounded text-xs font-medium text-gray-900 dark:text-white">
                                   {settings_appearance.active()}
                                 </div>
                               )}
@@ -8341,7 +8406,7 @@ const Settings = React.memo(() => {
 
       {/* Image URL Modal */}
       {showImageUrlModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white">{t('settings.addBackgroundImage')}</h3>
@@ -8414,7 +8479,7 @@ const Settings = React.memo(() => {
 
       {/* Color Picker Modal */}
       {showColorPickerModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-sm mx-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white">
