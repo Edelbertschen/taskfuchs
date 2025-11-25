@@ -1,14 +1,22 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 const isElectron = process.env.TF_TARGET === 'electron' || process.env.ELECTRON === 'true';
 
 export default defineConfig({
+  // Exclude superproductivity folder from scanning
+  resolve: {
+    alias: {
+      '@': '/src'
+    }
+  },
   plugins: [
+    tailwindcss(),
     react({
-      // Performance optimizations for React
+      // Performance optimizations for React 19
       jsxRuntime: 'automatic'
     }),
     VitePWA({
@@ -134,23 +142,21 @@ export default defineConfig({
     // Better chunk splitting for faster loading
     rollupOptions: {
       output: {
-                  manualChunks: {
-            // Core React libraries
-            vendor: ['react', 'react-dom'],
-            // UI utilities
-            ui: ['lucide-react'],
-            // Date/time utilities  
-            utils: ['date-fns'],
-            // Internationalization (if used)
-            // i18n: ['react-i18next', 'i18next']
-          },
+        manualChunks: {
+          // Core React libraries
+          vendor: ['react', 'react-dom'],
+          // UI utilities
+          ui: ['lucide-react'],
+          // Date/time utilities  
+          utils: ['date-fns'],
+        },
         // Optimize chunk names
         chunkFileNames: 'js/[name]-[hash].js',
         entryFileNames: 'js/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash].[ext]'
       }
     },
-    // Faster builds
+    // Faster builds with modern target
     target: 'esnext',
     minify: 'esbuild',
     // Reduce bundle size
@@ -170,7 +176,13 @@ export default defineConfig({
     },
     // Better caching
     fs: {
-      strict: false
+      strict: false,
+      // Exclude superproductivity from being served
+      deny: ['**/superproductivity/**']
+    },
+    // Ignore superproductivity in file watcher
+    watch: {
+      ignored: ['**/superproductivity/**', '**/node_modules/**']
     },
     // Proxy for Toggl API to avoid CORS issues
     proxy: {
@@ -198,6 +210,8 @@ export default defineConfig({
       'lucide-react',
       'date-fns'
     ],
+    // Only scan src folder, exclude superproductivity
+    entries: ['src/**/*.{ts,tsx}', 'index.html'],
     // Faster dependency scanning
     force: false
   },

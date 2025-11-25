@@ -19,19 +19,19 @@ export function PageTransition({ currentView, children, className = '' }: PageTr
         clearTimeout(timeoutRef.current);
       }
 
-      // Start transition
+      // Start transition - very quick fade/morph effect
       setIsTransitioning(true);
 
-      // Update display view after exit animation
+      // Update display view almost immediately
       timeoutRef.current = setTimeout(() => {
         setDisplayView(currentView);
+        previousViewRef.current = currentView;
         
-        // End transition after enter animation
+        // End transition after quick fade-in
         setTimeout(() => {
           setIsTransitioning(false);
-          previousViewRef.current = currentView;
-        }, 300); // Match CSS transition duration
-      }, 100); // Small delay for smooth transition
+        }, 80); // Very short fade-in
+      }, 30); // Minimal delay
     }
 
     return () => {
@@ -41,19 +41,12 @@ export function PageTransition({ currentView, children, className = '' }: PageTr
     };
   }, [currentView]);
 
-  const transitionClasses = isTransitioning
-    ? 'page-transition-exit-active'
-    : currentView === displayView
-    ? 'page-transition-enter-active'
-    : '';
-
   return (
     <div 
-      className={`page-transition-wrapper ${transitionClasses} ${className}`}
+      className={`page-transition-wrapper ${className}`}
       style={{
-        opacity: isTransitioning ? 0.8 : 1,
-        transform: isTransitioning ? 'translateX(-10px)' : 'translateX(0)',
-        transition: 'opacity 300ms cubic-bezier(0.16, 1, 0.3, 1), transform 300ms cubic-bezier(0.16, 1, 0.3, 1)'
+        opacity: isTransitioning ? 0.7 : 1,
+        transition: 'opacity 80ms ease-out'
       }}
     >
       {children}

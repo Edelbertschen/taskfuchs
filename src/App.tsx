@@ -11,7 +11,6 @@ import { TaskBoard } from './components/Tasks/TaskBoard';
 import { InboxView } from './components/Inbox/InboxView';
 import { KanbanBoard } from './components/Kanban/KanbanBoard';
 import { PinsView } from './components/Pins/PinsView';
-import { NotesView } from './components/Notes/NotesView';
 
 
 // Lazy-loaded components for better performance
@@ -24,7 +23,6 @@ import {
 } from './components/Lazy/LazyComponents';
 import { SimpleTodayView } from './components/Dashboard/SimpleTodayView';
 import { FocusView } from './components/Focus/FocusView';
-import { ReviewView } from './components/Review/ReviewView';
 import { SmartTaskModal } from './components/Tasks/SmartTaskModal';
 import { TaskModal } from './components/Tasks/TaskModal';
 import { TopTimerBar } from './components/Timer/TopTimerBar';
@@ -89,7 +87,7 @@ const hslToHex = (h: number, s: number, l: number) => {
   return `#${f(0)}${f(8)}${f(4)}`;
 };
 
-type ViewType = 'today' | 'tasks' | 'notes' | 'kanban' | 'focus' | 'pins' | 'archive' | 'inbox' | 'statistics' | 'review' | 'series';
+type ViewType = 'today' | 'tasks' | 'kanban' | 'focus' | 'pins' | 'archive' | 'inbox' | 'statistics' | 'series';
 
 // Column Switcher Component
 interface ColumnSwitcherProps {
@@ -201,7 +199,6 @@ function MainApp() {
   const [currentView, setCurrentView] = React.useState('today');
   const [previousView, setPreviousView] = React.useState<string | null>(null);
   const [isTransitioning, setIsTransitioning] = React.useState(false);
-  const [transitionDirection, setTransitionDirection] = React.useState<'left' | 'right'>('right');
   const [lastViewBeforeFocus, setLastViewBeforeFocus] = React.useState('today');
   const [showSmartTaskModal, setShowSmartTaskModal] = React.useState(false);
   const [showFloatingTimer, setShowFloatingTimer] = React.useState(false);
@@ -226,48 +223,32 @@ function MainApp() {
     }
   }, [state.preferences.language, i18n]);
 
-  // Immediately suggest backup setup if no directory defined yet
-  React.useEffect(() => {
-    try {
-      const handle = (window as any).__taskfuchs_backup_dir__;
-      if (!handle) {
-        setShowBackupSetup(true);
-      }
-    } catch {}
-  }, []);
+  // Backup setup is now triggered via sidebar warning icon instead of auto-popup
+  // The 'open-backup-setup' event handler (below) will open the modal when clicked
 
   // Mobile PWA: Show minimalistic mobile shell
   if (isMobilePWAEnvironment()) {
     return <MobileShell />;
   }
 
-  // View order for navigation direction
-  const viewOrder = ['today', 'inbox', 'tasks', 'kanban', 'notes', 'tags', 'archive', 'statistics', 'settings', 'focus', 'review'];
-
-  // Enhanced navigation with smooth slide transitions
+  // Quick navigation with subtle fade/morph effect
   const handleViewChange = React.useCallback((newView: string) => {
     if (newView === currentView || isTransitioning) return;
     
-    // Determine slide direction
-    const currentIndex = viewOrder.indexOf(currentView);
-    const newIndex = viewOrder.indexOf(newView);
-    const direction = newIndex > currentIndex ? 'right' : 'left';
-    
-    setTransitionDirection(direction);
     setPreviousView(currentView);
     setIsTransitioning(true);
     
-    // After a small delay, update the current view
+    // Almost instant view change with quick fade
     setTimeout(() => {
       setCurrentView(newView);
       
-      // End transition after slide completes
+      // End transition quickly
       setTimeout(() => {
         setIsTransitioning(false);
         setPreviousView(null);
-      }, 300);
-    }, 50);
-  }, [currentView, isTransitioning, viewOrder]);
+      }, 80);
+    }, 30);
+  }, [currentView, isTransitioning]);
 
   // Timer catch-up on visibility change (ensures elapsed time reflects background time)
   React.useEffect(() => {
@@ -656,11 +637,10 @@ function MainApp() {
           '2': 'inbox', 
           '3': 'tasks',
           '4': 'kanban',
-          '5': 'notes',
-          '6': 'tags',
-          '7': 'statistics',
-          '8': 'archive',
-          '9': 'settings'
+          '5': 'tags',
+          '6': 'statistics',
+          '7': 'archive',
+          '8': 'settings'
         };
         if (viewMap[e.key]) {
           handleViewChange(viewMap[e.key]);
@@ -683,12 +663,6 @@ function MainApp() {
           // Enter focus mode
           handleViewChange('focus');
         }
-      }
-
-      // 🚀 New: Review Mode (R)
-      if (e.key === 'r' || e.key === 'R') {
-        e.preventDefault();
-        handleViewChange('review');
       }
 
       // 🚀 New: Timer Controls (Space)
@@ -768,7 +742,7 @@ function MainApp() {
       if (e.shiftKey) {
         const direction = e.deltaY > 0 ? 'next' : 'prev';
         
-        if (currentView === 'tasks' || currentView === 'review') {
+        if (currentView === 'tasks') {
           e.preventDefault();
           dispatch({ type: 'NAVIGATE_DATE', payload: direction });
         } else if (currentView === 'kanban') {
@@ -814,20 +788,8 @@ function MainApp() {
 
   // Dropbox Auto-Sync deaktiviert: kein Intervall mehr
 
-  // Listen for navigation to notes events
+  // Listen for navigation events
   useEffect(() => {
-    const handleNavigateToNotes = (event: CustomEvent) => {
-      handleViewChange('notes');
-      // If noteId is provided, select the note and switch to editor
-      if (event.detail?.noteId) {
-        const note = state.notes.notes.find(n => n.id === event.detail.noteId);
-        if (note) {
-          dispatch({ type: 'SELECT_NOTE', payload: note });
-          dispatch({ type: 'SET_NOTES_VIEW', payload: 'editor' });
-        }
-      }
-    };
-
     const handleNavigateToTasks = (event: CustomEvent) => {
       handleViewChange('tasks');
       // Open task modal if taskId is provided
@@ -842,17 +804,13 @@ function MainApp() {
 
     const handleNavigateToProject = (event: CustomEvent) => {
       handleViewChange('kanban');
-      // If projectId is provided in the event detail, we could potentially set focus on that project
-      // For now, we just navigate to the kanban view
     };
 
-    window.addEventListener('navigate-to-notes', handleNavigateToNotes as EventListener);
     window.addEventListener('navigate-to-tasks', handleNavigateToTasks as EventListener);
     window.addEventListener('navigate-to-settings', handleNavigateToSettings as EventListener);
     window.addEventListener('navigate-to-project', handleNavigateToProject as EventListener);
 
     return () => {
-      window.removeEventListener('navigate-to-notes', handleNavigateToNotes as EventListener);
       window.removeEventListener('navigate-to-tasks', handleNavigateToTasks as EventListener);
       window.removeEventListener('navigate-to-settings', handleNavigateToSettings as EventListener);
       window.removeEventListener('navigate-to-project', handleNavigateToProject as EventListener);
@@ -882,8 +840,6 @@ function MainApp() {
         return <SimpleTodayView />;
       case 'focus':
         return <FocusView onExit={handleExitFocus} />;
-      case 'review':
-        return <ReviewView />;
       case 'inbox':
         return <InboxView />;
       case 'tasks':
@@ -896,8 +852,6 @@ function MainApp() {
             <PinsView />
           </Suspense>
         );
-      case 'notes':
-        return <NotesView />;
       case 'series':
         return (
           <Suspense fallback={<LoadingSpinner message="Lade Serien..." />}>
@@ -938,8 +892,9 @@ function MainApp() {
   // Column options for column controls - Different options for different views
   const columnOptions = [1, 3, 5, 7];
 
-  // Determine if we're in dark mode
-  const isDarkMode = document.documentElement.classList.contains('dark');
+  // Determine if we're in dark mode (reactive based on state, not DOM)
+  const isDarkMode = state.preferences.theme === 'dark' || 
+    (state.preferences.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
   const isMinimalDesign = state.preferences.minimalDesign;
 
   // Check if there are any projects
@@ -1062,23 +1017,18 @@ function MainApp() {
           </div>
         )}
         
-        {/* Content area - different layout for kanban/notes/inbox vs other views */}
+        {/* Content area - different layout for kanban/inbox vs other views */}
         <div className="relative w-full h-full overflow-hidden pb-16 md:pb-0">
-          {/* Current View */}
+          {/* Current View - subtle fade transition */}
           <div 
-            className={`absolute inset-0 transition-transform duration-300 ease-out ${
-              isTransitioning 
-                ? (transitionDirection === 'right' ? '-translate-x-full' : 'translate-x-full')
-                : 'translate-x-0'
-            }`}
+            className="absolute inset-0"
+            style={{
+              opacity: isTransitioning ? 0.85 : 1,
+              transition: 'opacity 80ms ease-out'
+            }}
           >
             {currentView === 'focus' ? (
               // Focus mode - full screen without any chrome
-              <div className="flex-1 allow-scroll-y smooth-scroll h-full">
-                {renderMainContent(currentView)}
-              </div>
-            ) : currentView === 'notes' ? (
-              // Full width content for notes (it has its own sidebar)
               <div className="flex-1 allow-scroll-y smooth-scroll h-full">
                 {renderMainContent(currentView)}
               </div>
@@ -1094,6 +1044,11 @@ function MainApp() {
               </div>
             ) : currentView === 'tasks' ? (
               // Tasks layout - let TaskBoard handle its own layout without header
+              <div className="flex-1 allow-scroll-y smooth-scroll h-full">
+                {renderMainContent(currentView)}
+              </div>
+            ) : currentView === 'pins' ? (
+              // Pins layout - has its own header
               <div className="flex-1 allow-scroll-y smooth-scroll h-full">
                 {renderMainContent(currentView)}
               </div>
@@ -1115,56 +1070,6 @@ function MainApp() {
             )}
           </div>
 
-          {/* Previous View (sliding out) */}
-          {isTransitioning && previousView && (
-            <div 
-              className={`absolute inset-0 transition-transform duration-300 ease-out ${
-                transitionDirection === 'right' ? 'translate-x-full' : '-translate-x-full'
-              }`}
-            >
-              {previousView === 'focus' ? (
-                // Focus mode - full screen without any chrome
-                <div className="flex-1 allow-scroll-y smooth-scroll h-full">
-                  {renderMainContent(previousView)}
-                </div>
-              ) : previousView === 'notes' ? (
-                // Full width content for notes (it has its own sidebar)
-                <div className="flex-1 allow-scroll-y smooth-scroll h-full">
-                  {renderMainContent(previousView)}
-                </div>
-              ) : previousView === 'kanban' ? (
-                // Kanban layout - let ProjectKanbanBoard handle its own layout
-                <div className="flex-1 min-w-0 h-full smooth-scroll">
-                  {renderMainContent(previousView)}
-                </div>
-              ) : previousView === 'inbox' ? (
-                // Inbox layout - let InboxView handle its own layout and header
-                <div className="flex-1 allow-scroll-y smooth-scroll h-full">
-                  {renderMainContent(previousView)}
-                </div>
-              ) : previousView === 'tasks' ? (
-                // Tasks layout - let TaskBoard handle its own layout without header
-                <div className="flex-1 allow-scroll-y smooth-scroll h-full">
-                  {renderMainContent(previousView)}
-                </div>
-              ) : (
-                // Normal layout with header for other views
-                <div className="flex-1 flex flex-col min-w-0 h-full relative">
-                  {/* Only show header if not in today view or fullscreen note editor */}
-                  {previousView !== 'today' && !state.isNoteEditorFullScreen && (
-                    <div className="flex-shrink-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-gray-200/60 dark:border-gray-700/60 shadow-sm transition-all duration-300">
-                      <Header 
-                        currentView={previousView}
-                      />
-                    </div>
-                  )}
-                  <div className="flex-1 allow-scroll-y smooth-scroll">
-                    {renderMainContent(previousView)}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </div>
       
@@ -1282,22 +1187,13 @@ function MainApp() {
               setSelectedTaskForModal(id);
             }
           };
-          const handleOpenNoteModal = (e: any) => {
-            const id = e?.detail?.noteId;
-            if (id) {
-              handleViewChange('notes');
-              window.dispatchEvent(new CustomEvent('open-note-by-id', { detail: { noteId: id } }));
-            }
-          };
           const handleOpenBackupSetup = () => {
             setShowBackupSetup(true);
           };
           window.addEventListener('open-task-modal', handleOpenTaskModal as any);
-          window.addEventListener('open-note-modal', handleOpenNoteModal as any);
           window.addEventListener('open-backup-setup', handleOpenBackupSetup as any);
           return () => {
             window.removeEventListener('open-task-modal', handleOpenTaskModal as any);
-            window.removeEventListener('open-note-modal', handleOpenNoteModal as any);
             window.removeEventListener('open-backup-setup', handleOpenBackupSetup as any);
             try { delete (window as any).__taskfuchs_openTask; } catch {}
           };
@@ -1322,15 +1218,16 @@ function MainApp() {
           archivedTasks: (state as any).archivedTasks || [],
           columns: state.columns,
           tags: state.tags,
-          notes: (state as any).notes?.notes || (state as any).notes || [],
-          noteLinks: (state as any).noteLinks || [],
+          boards: state.boards || [],
           preferences: state.preferences,
           viewState: (state as any).viewState || {},
           projectKanbanColumns: (state as any).viewState?.projectKanban?.columns || [],
           projectKanbanState: (state as any).viewState?.projectKanban || {},
           pinColumns: (state as any).pinColumns || [],
+          events: (state as any).events || [],
+          calendarSources: (state as any).calendarSources || [],
           exportDate: new Date().toISOString(),
-          version: '2.3'
+          version: '3.0'
         };
         const json = exportToJSON(data);
         const filename = `TaskFuchs_${new Date().toISOString().replace(/[:]/g,'-').slice(0,19)}.json`;
@@ -1347,6 +1244,51 @@ function MainApp() {
       backupIntervalIdRef.current = null;
     };
   }, [state.preferences.backup?.enabled, state.preferences.backup?.intervalMinutes, state.tasks, state.columns, state.tags, (state as any).notes, (state as any).viewState]);
+
+  // Dropbox auto-sync scheduler
+  React.useEffect(() => {
+    const dropboxPrefs = state.preferences.dropbox;
+    if (!dropboxPrefs?.enabled || !dropboxPrefs?.autoSync || !dropboxPrefs?.appKey) {
+      return;
+    }
+
+    // Store state reference for auto-sync
+    (window as any).__taskfuchs_state__ = state;
+
+    // Start auto-sync
+    const startAutoSync = async () => {
+      try {
+        const { startAutoSync: start, getDropboxClient } = await import('./utils/dropboxSync');
+        const { getDropboxClient: getClient } = await import('./utils/dropboxClient');
+        
+        // Check if authenticated
+        const client = getClient(dropboxPrefs.appKey);
+        if (!client.isAuthenticated()) {
+          console.log('[Dropbox] Not authenticated, skipping auto-sync');
+          return;
+        }
+        
+        const intervalMinutes = dropboxPrefs.syncInterval || 5;
+        start(state, dispatch, intervalMinutes);
+      } catch (e) {
+        console.error('[Dropbox] Failed to start auto-sync:', e);
+      }
+    };
+
+    startAutoSync();
+
+    return () => {
+      // Stop auto-sync on cleanup
+      import('./utils/dropboxSync').then(({ stopAutoSync }) => {
+        stopAutoSync();
+      });
+    };
+  }, [state.preferences.dropbox?.enabled, state.preferences.dropbox?.autoSync, state.preferences.dropbox?.appKey, state.preferences.dropbox?.syncInterval]);
+
+  // Update state reference for auto-sync
+  React.useEffect(() => {
+    (window as any).__taskfuchs_state__ = state;
+  }, [state]);
 
         return null;
       })()}
@@ -1424,7 +1366,6 @@ function MainApp() {
               { id: 'inbox', label: 'Inbox', icon: Inbox },
               { id: 'tasks', label: 'Planer', icon: CheckSquare },
               { id: 'kanban', label: 'Projekte', icon: Columns },
-              { id: 'notes', label: 'Notizen', icon: FileText },
             ].map(({ id, label, icon: Icon }) => {
               const active = currentView === id;
               return (

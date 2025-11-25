@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useAppTranslation } from '../../utils/i18nHelpers';
@@ -60,6 +61,12 @@ export function InboxView() {
   // Modal navigation state for sequencing inbox tasks
   const [modalTaskIndex, setModalTaskIndex] = useState<number>(-1);
   const [modalNavDirection, setModalNavDirection] = useState<'prev' | 'next' | null>(null);
+  
+  // Track original inbox task IDs when entering the view (tasks stay visible until user leaves)
+  const [initialInboxTaskIds, setInitialInboxTaskIds] = useState<Set<string>>(() => {
+    const ids = new Set(state.tasks.filter(t => t.columnId === 'inbox').map(t => t.id));
+    return ids;
+  });
 
   const openInboxTaskAt = (idx: number) => {
     const flat = inboxTasks; // already sorted newest first
@@ -93,33 +100,38 @@ export function InboxView() {
     }
   };
 
-  // Auto-advance after save
+  // Auto-advance after save - Keep task visible in inbox until user leaves
   const handleTaskSaved = (updated: Task) => {
-    // If task moved out of inbox, recompute current index against updated list
+    // Add the updated task to initialInboxTaskIds so it stays visible
+    setInitialInboxTaskIds(prev => {
+      const newSet = new Set(prev);
+      newSet.add(updated.id);
+      return newSet;
+    });
+    
+    // Recompute current index against list INCLUDING initial inbox tasks
     const flat = state.tasks
-      .filter(t => t.columnId === 'inbox')
+      .filter(t => t.columnId === 'inbox' || initialInboxTaskIds.has(t.id) || t.id === updated.id)
+      .filter(t => !t.completed)
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    
     if (flat.length === 0) {
       setShowTaskModal(false);
       setSelectedTaskForModal(null);
       setModalTaskIndex(-1);
       return;
     }
-    // Determine next index based on current direction or default forward
-    const currentId = updated.id;
-    const currentIdx = flat.findIndex(t => t.id === currentId);
-    const baseNext = currentIdx >= 0 ? currentIdx + 1 : modalTaskIndex + 1;
-    const nextIdx = Math.min(baseNext, flat.length - 1);
-    // Advance if there is another task; else close
-    if (nextIdx > (currentIdx >= 0 ? currentIdx : modalTaskIndex) && nextIdx < flat.length) {
-      setModalNavDirection('next');
-      setSelectedTaskForModal(flat[nextIdx]);
-      setModalTaskIndex(nextIdx);
-      // keep modal open
-    } else {
-      setShowTaskModal(false);
-      setSelectedTaskForModal(null);
-      setModalTaskIndex(-1);
+    
+    // Update the selected task with the new data so changes are visible
+    const updatedTask = flat.find(t => t.id === updated.id);
+    if (updatedTask) {
+      setSelectedTaskForModal(updatedTask);
+    }
+    
+    // Don't auto-advance - let user stay on current task
+    const currentIdx = flat.findIndex(t => t.id === updated.id);
+    if (currentIdx >= 0) {
+      setModalTaskIndex(currentIdx);
     }
   };
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -127,6 +139,9 @@ export function InboxView() {
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [selectedTaskForProject, setSelectedTaskForProject] = useState<Task | null>(null);
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
+  // Pin picker state
+  const [showPinPicker, setShowPinPicker] = useState(false);
+  const [selectedTaskForPin, setSelectedTaskForPin] = useState<Task | null>(null);
   
   // Sidebar state
   const [sidebarVisible, setSidebarVisible] = useState(false);
@@ -236,9 +251,11 @@ export function InboxView() {
     setShowBulkCalendar(false);
   };
 
-  // Get inbox tasks
+  // Get inbox tasks - include tasks that were originally in inbox when user entered the view
+  // Tasks stay visible even after date/project is set, until user leaves the area
   const inboxTasks = state.tasks
-    .filter(task => task.columnId === 'inbox')
+    .filter(task => task.columnId === 'inbox' || initialInboxTaskIds.has(task.id))
+    .filter(task => !task.completed) // Exclude completed tasks
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   // Group tasks by created date
@@ -555,9 +572,26 @@ export function InboxView() {
 
   const handleDateAssign = (columnId: string) => {
     if (selectedTaskForDate) {
+      // Extract date from column ID (format: date-YYYY-MM-DD) or from column's date property
+      let reminderDate = undefined;
+      if (columnId.startsWith('date-')) {
+        reminderDate = columnId.replace('date-', '');
+      } else {
+        // Find the column and get its date
+        const column = state.columns.find(c => c.id === columnId);
+        if (column && column.date) {
+          reminderDate = column.date;
+        }
+      }
+      
       dispatch({
         type: 'UPDATE_TASK',
-        payload: { ...selectedTaskForDate, columnId }
+        payload: { 
+          ...selectedTaskForDate, 
+          reminderDate, // Set the reminder date
+          // Keep task in inbox - don't change columnId
+          updatedAt: new Date().toISOString()
+        }
       });
       setSelectedTaskForDate(null);
     }
@@ -570,24 +604,15 @@ export function InboxView() {
 
   const handleProjectAssign = (projectId: string, columnId?: string) => {
     if (selectedTaskForProject) {
-      let updatePayload = {
-        ...selectedTaskForProject,
-        columnId: undefined,
-        kanbanColumnId: undefined,
-        updatedAt: new Date().toISOString()
-      };
-      
-      if (columnId && columnId !== projectId) {
-        updatePayload.columnId = projectId;
-        updatePayload.kanbanColumnId = columnId;
-      } else {
-        updatePayload.columnId = projectId;
-        updatePayload.kanbanColumnId = undefined;
-      }
-      
       dispatch({
         type: 'UPDATE_TASK',
-        payload: updatePayload
+        payload: {
+          ...selectedTaskForProject,
+          projectId, // Set project ID
+          kanbanColumnId: columnId && columnId !== projectId ? columnId : undefined,
+          // Keep task in inbox - don't change columnId
+          updatedAt: new Date().toISOString()
+        }
       });
       
       setSelectedTaskForProject(null);
@@ -599,8 +624,25 @@ export function InboxView() {
     dispatch({ type: 'ASSIGN_TASK_TO_PIN', payload: { taskId: task.id, pinColumnId } });
   };
 
-  // Get background styles: rely on global App background for custom image to ensure consistency
-  const isDarkMode = document.documentElement.classList.contains('dark');
+  const handlePinSelect = (task: Task) => {
+    setSelectedTaskForPin(task);
+    setShowPinPicker(true);
+  };
+
+  const handlePinAssign = (pinColumnId: string) => {
+    if (selectedTaskForPin) {
+      dispatch({ 
+        type: 'ASSIGN_TASK_TO_PIN', 
+        payload: { taskId: selectedTaskForPin.id, pinColumnId } 
+      });
+      setShowPinPicker(false);
+      setSelectedTaskForPin(null);
+    }
+  };
+
+  // Reactive dark mode check
+  const isDarkMode = state.preferences.theme === 'dark' || 
+    (state.preferences.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
   const useGlobalBackground = !isMinimalDesign && state.preferences.backgroundImage && state.preferences.backgroundType === 'image';
   const backgroundStyles = isMinimalDesign
     ? { backgroundColor: isDarkMode ? '#111827' : '#ffffff' }
@@ -633,17 +675,6 @@ export function InboxView() {
       }`}
       style={backgroundStyles}
     >
-      
-      {/* Background Overlay */}
-      {!isMinimalDesign && state.preferences.backgroundEffects?.overlay !== false && (
-        <div 
-          className="absolute inset-0 z-0"
-          style={{
-            background: `rgba(0, 0, 0, ${state.preferences.backgroundEffects?.overlayOpacity || 0.4})`
-          }}
-        />
-      )}
-      
       {/* Header - positioned to account for sidebar */}
       <div 
         className="absolute top-0 right-0 z-10"
@@ -663,26 +694,20 @@ export function InboxView() {
       
       {/* Sidebar - Full height from top to bottom */}
       <div 
-        className={`absolute top-0 left-0 bottom-0 w-full sm:w-80 flex flex-col overflow-hidden z-20 ${
+        className={`absolute top-0 left-0 bottom-0 w-full sm:w-80 flex flex-col overflow-hidden z-20 border-r ${
           isMinimalDesign
-            ? 'bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700'
-            : `backdrop-blur-xl ${document.documentElement.classList.contains('dark') ? 'bg-black/50' : 'bg-white/30'} border-r ${document.documentElement.classList.contains('dark') ? 'border-white/15' : 'border-gray-200'}`
+            ? 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800'
+            : 'bg-white/30 dark:bg-gray-900/40 backdrop-blur-xl border-white/20 dark:border-gray-700/30'
         }`}
         style={{
-          boxShadow: isMinimalDesign 
-            ? '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-            : '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+          boxShadow: isMinimalDesign ? '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' : '0 8px 32px rgba(0, 0, 0, 0.1)',
           transform: sidebarVisible ? 'translateX(0)' : 'translateX(-100%)',
           transition: 'transform 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
         }}
       >
-        {/* Header */}
+        {/* Header - matching main header style */}
         <div 
-          className={`relative flex items-center px-4 ${
-            isMinimalDesign
-              ? 'border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800'
-              : 'border-b border-white/15 bg-transparent'
-          }`}
+          className="relative flex items-center px-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#111827]"
           style={{ 
             height: '68px',
             minHeight: '68px',
@@ -692,13 +717,13 @@ export function InboxView() {
         >
           {/* Main header content - centered */}
           <div className="flex items-center justify-between w-full">
-            <h1 className={`text-lg font-semibold flex items-center space-x-2 ${isMinimalDesign ? 'text-black dark:text-white' : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`}`}
+            <h1 className="text-lg font-semibold flex items-center space-x-2 text-gray-900 dark:text-white"
                 style={{ textShadow: 'none', lineHeight: '1.5' }}>
               <Inbox className="w-5 h-5" style={{ color: accentColor }} />
               <span>{inboxView.title()}</span>
               {inboxCount > 0 && (
                 <span
-                  className={`${isMinimalDesign ? 'text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600' : (document.documentElement.classList.contains('dark') ? 'text-white/90 bg-white/10 border-white/20' : 'text-white bg-gray-700 border-gray-600')} inline-flex items-center justify-center text-xs px-2 py-0.5 rounded-full border`}
+                  className="text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600 inline-flex items-center justify-center text-xs px-2 py-0.5 rounded-full border"
                   style={{ lineHeight: '1' }}
                 >
                   {inboxCount}
@@ -714,35 +739,35 @@ export function InboxView() {
         </div>
 
         {/* Date Filter List */}
-        <div className="flex-1 overflow-y-auto sidebar-content backdrop-blur-md"
+        <div className="flex-1 overflow-y-auto sidebar-content"
         style={{
           backgroundColor: isMinimalDesign
-            ? (document.documentElement.classList.contains('dark') ? '#111827' : 'rgba(255, 255, 255, 0.5)')
-            : undefined
+            ? (isDarkMode ? '#111827' : 'rgba(255, 255, 255, 0.5)')
+            : 'transparent'
         }}>
           <div className={`border-b ${
             isMinimalDesign
               ? 'border-gray-200 dark:border-gray-800'
-              : 'border-white/15'
+              : 'border-white/10 dark:border-gray-700/30'
           }`}
           style={{
             backgroundColor: isMinimalDesign
-            ? (document.documentElement.classList.contains('dark') ? '#111827' : 'rgba(255, 255, 255, 0.5)')
-            : (document.documentElement.classList.contains('dark') ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.4)')
+            ? (isDarkMode ? '#111827' : 'rgba(255, 255, 255, 0.5)')
+            : 'transparent'
           }}>
             <div className={`px-4 py-3 ${
               isMinimalDesign
                 ? ''
-                : 'bg-white/10'
+                : ''
             }`}
             style={{
               backgroundColor: isMinimalDesign
-            ? (document.documentElement.classList.contains('dark') ? '#111827' : 'rgba(255, 255, 255, 0.5)')
-            : (document.documentElement.classList.contains('dark') ? undefined : 'rgba(255, 255, 255, 0.2)')
+            ? (isDarkMode ? '#111827' : 'rgba(255, 255, 255, 0.5)')
+            : 'transparent'
             }}>
               <div className="flex items-center space-x-2">
                 <Calendar className="w-4 h-4" style={{ color: accentColor }} />
-                <h2 className={`text-sm font-medium flex items-center ${isMinimalDesign ? 'text-gray-800 dark:text-gray-300' : (document.documentElement.classList.contains('dark') ? `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'` : 'text-gray-900')}`}
+                <h2 className={`text-sm font-medium flex items-center ${isMinimalDesign ? 'text-gray-800 dark:text-gray-300' : (isDarkMode ? `isDarkMode ? 'text-white' : 'text-gray-900'` : 'text-gray-900')}`}
                     style={{ textShadow: 'none', lineHeight: '1.5', minHeight: '20px' }}>
                   {inboxView.filterByDate()}
                 </h2>
@@ -767,13 +792,13 @@ export function InboxView() {
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2 flex-1 min-w-0">
-                  <List className={`w-4 h-4 flex-shrink-0 ${isMinimalDesign ? 'text-gray-600 dark:text-gray-400' : `document.documentElement.classList.contains('dark') ? (document.documentElement.classList.contains('dark') ? 'text-white/70' : 'text-gray-70') : 'text-gray-700'`}`} />
-                  <h3 className={`font-medium text-sm flex items-center ${isMinimalDesign ? 'text-gray-800 dark:text-white' : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`}`}
+                  <List className={`w-4 h-4 flex-shrink-0 ${isMinimalDesign ? 'text-gray-600 dark:text-gray-400' : `isDarkMode ? (isDarkMode ? 'text-white/70' : 'text-gray-70') : 'text-gray-700'`}`} />
+                  <h3 className={`font-medium text-sm flex items-center ${isMinimalDesign ? 'text-gray-800 dark:text-white' : `isDarkMode ? 'text-white' : 'text-gray-900'`}`}
                       style={{ textShadow: 'none', lineHeight: '1.5', minHeight: '20px' }}>
                     {inboxView.allTasks()}
                   </h3>
                 </div>
-                <span className={`text-sm ml-2 font-medium ${isMinimalDesign ? 'text-gray-500 dark:text-gray-400' : (document.documentElement.classList.contains('dark') ? (document.documentElement.classList.contains('dark') ? 'text-white/60' : 'text-gray-60') : 'text-gray-600')}`}
+                <span className={`text-sm ml-2 font-medium ${isMinimalDesign ? 'text-gray-500 dark:text-gray-400' : (isDarkMode ? (isDarkMode ? 'text-white/60' : 'text-gray-60') : 'text-gray-600')}`}
                       style={{ textShadow: 'none', lineHeight: '1.5' }}>
                   {inboxTasks.length}
                 </span>
@@ -800,13 +825,13 @@ export function InboxView() {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2 flex-1 min-w-0">
-                    <Calendar className={`w-4 h-4 flex-shrink-0 ${isMinimalDesign ? 'text-gray-600 dark:text-gray-400' : `document.documentElement.classList.contains('dark') ? (document.documentElement.classList.contains('dark') ? 'text-white/70' : 'text-gray-70') : 'text-gray-700'`}`} />
-                                    <h3 className={`font-medium text-sm truncate ${isMinimalDesign ? 'text-gray-800 dark:text-white' : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`}`}
+                    <Calendar className={`w-4 h-4 flex-shrink-0 ${isMinimalDesign ? 'text-gray-600 dark:text-gray-400' : `isDarkMode ? (isDarkMode ? 'text-white/70' : 'text-gray-70') : 'text-gray-700'`}`} />
+                                    <h3 className={`font-medium text-sm truncate ${isMinimalDesign ? 'text-gray-800 dark:text-white' : `isDarkMode ? 'text-white' : 'text-gray-900'`}`}
                     style={{ textShadow: 'none', lineHeight: '1.5' }}>
                       {dateOption.label}
                     </h3>
                   </div>
-                  <span className={`text-sm ml-2 font-medium ${isMinimalDesign ? 'text-gray-500 dark:text-gray-400' : (document.documentElement.classList.contains('dark') ? (document.documentElement.classList.contains('dark') ? 'text-white/60' : 'text-gray-60') : 'text-gray-600')}`}
+                  <span className={`text-sm ml-2 font-medium ${isMinimalDesign ? 'text-gray-500 dark:text-gray-400' : (isDarkMode ? (isDarkMode ? 'text-white/60' : 'text-gray-60') : 'text-gray-600')}`}
                         style={{ textShadow: 'none', lineHeight: '1.5' }}>
                     {dateOption.count}
                   </span>
@@ -861,12 +886,12 @@ export function InboxView() {
       >
         {/* Content Area - main task list */}
         <MobilePullToRefresh onRefresh={async () => dispatch({ type: 'NO_OP' } as any)}>
-        <div className="p-6">
+        <div className="p-6 h-full flex flex-col">
           {/* Top Right Add Button */}
           <div className="mb-6 flex items-center justify-end">
             <button
               onClick={() => setShowSmartTaskModal(true)}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200 hover:shadow-lg active:scale-95 ${isMinimalDesign ? `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'` : 'text-white backdrop-blur-xl border border-white/20'}`}
+              className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200 hover:shadow-lg active:scale-95 ${isMinimalDesign ? `isDarkMode ? 'text-white' : 'text-gray-900'` : 'text-white backdrop-blur-xl border border-white/20'}`}
               style={{ 
                 backgroundColor: `${accentColor}E6`,
                 boxShadow: isMinimalDesign ? 'none' : '0 4px 16px rgba(0, 0, 0, 0.15)',
@@ -885,43 +910,6 @@ export function InboxView() {
             </button>
           </div>
           
-          {/* Actions Bar */}
-          <div className="flex items-center justify-end mb-6 space-x-2">
-            {/* Multi-Select Mode Toggle */}
-            <button
-              onClick={toggleMultiSelectMode}
-              className={`transition-all duration-200 px-3 py-2 rounded-lg text-sm font-medium flex items-center space-x-2 ${
-                multiSelectMode 
-                  ? isMinimalDesign 
-                    ? 'text-white shadow-md' 
-                    : 'text-white backdrop-blur-xl border border-white/20'
-                  : isMinimalDesign 
-                    ? 'text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700' 
-                    : 'text-white/70 hover:text-white hover:bg-white/10 backdrop-blur-xl'
-              }`}
-              style={{ 
-                backgroundColor: multiSelectMode ? `${accentColor}E6` : 'transparent',
-                textShadow: 'none', 
-                lineHeight: '1.5', 
-                minHeight: '32px' 
-              }}
-              title="Mehrfachauswahl (STRG/CMD + Klick)"
-            >
-              <CheckSquare className={`w-4 h-4 ${multiSelectMode ? 'fill-current' : ''}`} />
-              <span>{multiSelectMode ? t('inbox_view.multiSelectMode', { defaultValue: 'Multi-select' }) : t('inbox_view.select', { defaultValue: 'Select' })}</span>
-            </button>
-
-            {/* Select All - only show when multi-select is active */}
-            {multiSelectMode && (
-              <button
-                onClick={handleSelectAll}
-                className={`transition-colors px-3 py-2 rounded-lg text-sm font-medium flex items-center ${isMinimalDesign ? 'text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700' : (document.documentElement.classList.contains('dark') ? 'text-white/70 hover:text-white hover:bg-white/10 backdrop-blur-xl' : 'text-gray-900 bg-gray-100/80 hover:text-white hover:bg-gray-800')}`}
-                style={{ textShadow: 'none', lineHeight: '1.5', minHeight: '32px' }}
-              >
-                {selectedTasks.size === inboxTasks.length ? t('inbox_view.deselect_all') : t('inbox_view.select_all')}
-              </button>
-            )}
-          </div>
 
           {/* Bulk Actions */}
           {showBulkActions && (
@@ -934,7 +922,7 @@ export function InboxView() {
               }}
             >
                               <div className="flex items-center justify-between mb-3">
-                                  <span className={`text-sm font-medium ${isMinimalDesign ? 'text-gray-700 dark:text-gray-200' : (document.documentElement.classList.contains('dark') ? (document.documentElement.classList.contains('dark') ? 'text-white/80' : 'text-gray-80') : 'text-gray-800')}`}
+                                  <span className={`text-sm font-medium ${isMinimalDesign ? 'text-gray-700 dark:text-gray-200' : (isDarkMode ? (isDarkMode ? 'text-white/80' : 'text-gray-80') : 'text-gray-800')}`}
                    style={{ textShadow: 'none', lineHeight: '1.5' }}>
                   {selectedTasks.size} {actions.tasksSelected()}
                 </span>
@@ -1391,21 +1379,13 @@ export function InboxView() {
                     <Archive className={`w-8 h-8 ${
                       isMinimalDesign
                         ? 'text-gray-600 dark:text-gray-300'
-                        : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`
+                        : `isDarkMode ? 'text-white' : 'text-gray-900'`
                     }`} />
                 </div>
-                  <h3 className={`text-lg font-semibold mb-2 relative z-10 ${
-                    isMinimalDesign
-                      ? 'text-gray-900 dark:text-white'
-                      : 'text-white drop-shadow-lg'
-                  }`}>
+                  <h3 className="text-lg font-semibold mb-2 relative z-10 text-gray-900 dark:text-white">
                   {inboxView.emptyState.title()}
                 </h3>
-                  <p className={`mb-6 relative z-10 ${
-                    isMinimalDesign
-                      ? 'text-gray-600 dark:text-gray-300'
-                      : 'text-white/90 drop-shadow-lg'
-                  }`}>
+                  <p className="mb-6 relative z-10 text-gray-800 dark:text-gray-200">
                   {inboxView.emptyState.description()}
                 </p>
                 <button
@@ -1434,7 +1414,7 @@ export function InboxView() {
                   <div key={group.date} className={groupIndex > 0 ? 'mt-8' : ''}>
                     {/* Date Header */}
                     <div className="mb-6">
-                      <h2 className={`text-lg font-semibold mb-3 flex items-center ${isMinimalDesign ? 'text-gray-800 dark:text-white' : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`}`}
+                      <h2 className={`text-lg font-semibold mb-3 flex items-center ${isMinimalDesign ? 'text-gray-800 dark:text-white' : `isDarkMode ? 'text-white' : 'text-gray-900'`}`}
                           style={{ textShadow: 'none', lineHeight: '1.5', minHeight: '28px' }}>
                         {group.displayDate}
                       </h2>
@@ -1460,6 +1440,7 @@ export function InboxView() {
                             onEdit={() => handleEditTask(task)}
                             onDateSelect={() => handleDateSelect(task)}
                             onProjectSelect={() => handleProjectSelect(task)}
+                            onPinSelect={() => handlePinSelect(task)}
                             onAssignToColumn={(columnId) => handleTaskAssign(task, columnId)}
                             onAddTag={(tagName) => handleTaskAddTag(task, tagName)}
                             availableColumns={availableColumns}
@@ -1468,6 +1449,7 @@ export function InboxView() {
                             setEditingTaskId={setEditingTaskId}
                             accentColor={accentColor}
                             isMinimalDesign={isMinimalDesign}
+                            isDarkMode={isDarkMode}
                             multiSelectMode={multiSelectMode}
                             onTaskClick={(event) => handleTaskClick(task, event)}
                           />
@@ -1545,6 +1527,52 @@ export function InboxView() {
         currentColumnId={selectedTaskForProject?.kanbanColumnId}
       />
 
+      {/* Pin Column Picker Modal */}
+      {showPinPicker && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 w-80 max-h-[60vh] overflow-hidden">
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                <PinIcon className="w-5 h-5" style={{ color: accentColor }} />
+                Pin-Spalte wählen
+              </h3>
+            </div>
+            <div className="p-2 max-h-[40vh] overflow-y-auto">
+              {state.pinColumns.map(pinColumn => (
+                <button
+                  key={pinColumn.id}
+                  onClick={() => handlePinAssign(pinColumn.id)}
+                  className={`w-full px-4 py-3 text-left rounded-lg transition-colors flex items-center gap-3 ${
+                    selectedTaskForPin?.pinColumnId === pinColumn.id
+                      ? 'bg-gray-100 dark:bg-gray-700'
+                      : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                  }`}
+                >
+                  <PinIcon 
+                    className="w-4 h-4 flex-shrink-0" 
+                    style={{ color: selectedTaskForPin?.pinColumnId === pinColumn.id ? accentColor : undefined }}
+                  />
+                  <span className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                    {pinColumn.title}
+                  </span>
+                </button>
+              ))}
+            </div>
+            <div className="p-3 border-t border-gray-200 dark:border-gray-700">
+              <button
+                onClick={() => {
+                  setShowPinPicker(false);
+                  setSelectedTaskForPin(null);
+                }}
+                className="w-full px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                Abbrechen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <DeleteConfirmationModal
         isOpen={showBulkDeleteModal}
         onClose={() => setShowBulkDeleteModal(false)}
@@ -1566,6 +1594,7 @@ interface InboxTaskCardProps {
   onEdit: () => void;
   onDateSelect: () => void;
   onProjectSelect: () => void;
+  onPinSelect: () => void;
   onAssignToColumn: (columnId: string) => void;
   onAddTag: (tagName: string) => void;
   availableColumns: Column[];
@@ -1574,6 +1603,7 @@ interface InboxTaskCardProps {
   setEditingTaskId: (id: string | null) => void;
   accentColor: string;
   isMinimalDesign: boolean;
+  isDarkMode: boolean;
   multiSelectMode: boolean;
   onTaskClick: (event: React.MouseEvent) => void;
 }
@@ -1585,6 +1615,7 @@ function InboxTaskCard({
   onEdit,
   onDateSelect,
   onProjectSelect,
+  onPinSelect,
   onAssignToColumn, 
   onAddTag, 
   availableColumns, 
@@ -1593,6 +1624,7 @@ function InboxTaskCard({
   setEditingTaskId,
   accentColor,
   isMinimalDesign,
+  isDarkMode,
   multiSelectMode,
   onTaskClick
 }: InboxTaskCardProps) {
@@ -1600,6 +1632,23 @@ function InboxTaskCard({
   const { actions, inboxView } = useAppTranslation();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
+
+  // Handle context menu (right-click)
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setContextMenu({ x: e.clientX, y: e.clientY });
+  };
+
+  // Close context menu
+  useEffect(() => {
+    const handleClick = () => setContextMenu(null);
+    if (contextMenu) {
+      document.addEventListener('click', handleClick);
+      return () => document.removeEventListener('click', handleClick);
+    }
+  }, [contextMenu]);
 
   const handleComplete = () => {
     // Stop timer if it's running for this task
@@ -1667,23 +1716,25 @@ function InboxTaskCard({
   const [isHovered, setIsHovered] = useState(false);
 
   return (
+    <>
     <div 
       className="group rounded-xl transition-all duration-200 cursor-pointer backdrop-blur-2xl"
       style={{
         // Dark mode: use much darker glass so text is readable over backgrounds
-        background: document.documentElement.classList.contains('dark')
+        background: isDarkMode
             ? 'rgba(17, 24, 39, 0.75)'
             : '#FFFFFF',
         borderWidth: isSelected ? '2px' : '1px',
         borderStyle: 'solid',
         borderColor: isSelected
           ? accentColor
-          : (document.documentElement.classList.contains('dark') ? 'rgba(255, 255, 255, 0.15)' : '#E5E7EB'),
+          : (isDarkMode ? 'rgba(255, 255, 255, 0.15)' : '#E5E7EB'),
         boxShadow: isSelected
-          ? (document.documentElement.classList.contains('dark') ? '0 10px 36px rgba(0, 0, 0, 0.5)' : '0 8px 32px rgba(0, 0, 0, 0.2)')
-          : (document.documentElement.classList.contains('dark') ? '0 6px 20px rgba(0, 0, 0, 0.45)' : '0 2px 8px rgba(0, 0, 0, 0.1)')
+          ? (isDarkMode ? '0 10px 36px rgba(0, 0, 0, 0.5)' : '0 8px 32px rgba(0, 0, 0, 0.2)')
+          : (isDarkMode ? '0 6px 20px rgba(0, 0, 0, 0.45)' : '0 2px 8px rgba(0, 0, 0, 0.1)')
       }}
       onClick={onTaskClick}
+      onContextMenu={handleContextMenu}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -1703,7 +1754,7 @@ function InboxTaskCard({
                 onClick={(e) => e.stopPropagation()}
                 className="w-full px-3 py-2 border border-white/30 rounded-lg text-sm text-white placeholder-white/50 focus:outline-none focus:ring-2 backdrop-blur-xl"
                 style={{
-                  background: document.documentElement.classList.contains('dark') ? 'rgba(17, 24, 39, 0.8)' : 'rgba(255, 255, 255, 0.1)',
+                  background: isDarkMode ? 'rgba(17, 24, 39, 0.8)' : 'rgba(255, 255, 255, 0.1)',
                   textShadow: 'none',
                   '--tw-ring-color': `${accentColor}66`
                 } as React.CSSProperties}
@@ -1714,8 +1765,8 @@ function InboxTaskCard({
                 <span 
                   className={`flex-1 text-sm font-medium ${
                     task.completed 
-                      ? `line-through ${isMinimalDesign ? 'text-gray-400 dark:text-gray-500' : (document.documentElement.classList.contains('dark') ? `document.documentElement.classList.contains('dark') ? (document.documentElement.classList.contains('dark') ? 'text-white/70' : 'text-gray-70') : 'text-gray-700'` : 'text-gray-500')}` 
-                      : isMinimalDesign ? 'text-black dark:text-white' : (document.documentElement.classList.contains('dark') ? `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'` : 'text-gray-900')
+                      ? `line-through ${isMinimalDesign ? 'text-gray-400 dark:text-gray-500' : (isDarkMode ? `isDarkMode ? (isDarkMode ? 'text-white/70' : 'text-gray-70') : 'text-gray-700'` : 'text-gray-500')}` 
+                      : isMinimalDesign ? 'text-black dark:text-white' : (isDarkMode ? `isDarkMode ? 'text-white' : 'text-gray-900'` : 'text-gray-900')
                   }`}
                   style={{ textShadow: 'none' }}
                   
@@ -1753,52 +1804,97 @@ function InboxTaskCard({
               background: task.completed 
                 ? 'rgba(34, 197, 94, 0.8)' 
                 : 'rgba(255, 255, 255, 0.1)',
-              color: task.completed ? 'white' : (document.documentElement.classList.contains('dark') ? 'rgba(255, 255, 255, 0.7)' : 'rgb(17, 24, 39)')
+              color: task.completed ? 'white' : (isDarkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgb(17, 24, 39)')
             }}
             title="Aufgabe abhaken"
           >
             <Check className="w-4 h-4" />
           </button>
 
-          {/* Actions */}
-          <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          {/* Actions - Icons light up permanently when set */}
+          <div className="flex items-center space-x-2">
+            {/* Date button - always visible if date set, otherwise on hover */}
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onDateSelect();
               }}
               onPointerDown={(e) => e.stopPropagation()}
-              className={`p-2 rounded-lg backdrop-blur-xl border border-white/20 transition-all duration-200 hover:scale-110 ${
-                document.documentElement.classList.contains('dark') ? 'text-white/70 hover:text-white' : 'text-gray-900 hover:text-gray-900/80'
+              className={`p-2 rounded-lg backdrop-blur-xl border transition-all duration-200 hover:scale-110 ${
+                task.reminderDate 
+                  ? 'opacity-100' 
+                  : 'opacity-0 group-hover:opacity-100'
               }`}
-              style={{ background: 'rgba(255, 255, 255, 0.1)' }}
+              style={{ 
+                background: task.reminderDate ? `${accentColor}20` : 'rgba(255, 255, 255, 0.1)',
+                borderColor: task.reminderDate ? accentColor : 'rgba(255, 255, 255, 0.2)',
+                color: task.reminderDate ? accentColor : (isDarkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgb(17, 24, 39)')
+              }}
               title="Termin setzen"
             >
               <Calendar className="w-4 h-4" />
             </button>
+            {/* Project button - always visible if project set, otherwise on hover */}
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onProjectSelect();
               }}
               onPointerDown={(e) => e.stopPropagation()}
-              className={`p-2 rounded-lg backdrop-blur-xl border border-white/20 transition-all duration-200 hover:scale-110 ${
-                document.documentElement.classList.contains('dark') ? 'text-white/70 hover:text-white' : 'text-gray-900 hover:text-gray-900/80'
+              className={`p-2 rounded-lg backdrop-blur-xl border transition-all duration-200 hover:scale-110 ${
+                task.projectId 
+                  ? 'opacity-100' 
+                  : 'opacity-0 group-hover:opacity-100'
               }`}
-              style={{ background: 'rgba(255, 255, 255, 0.1)' }}
+              style={{ 
+                background: task.projectId ? `${accentColor}20` : 'rgba(255, 255, 255, 0.1)',
+                borderColor: task.projectId ? accentColor : 'rgba(255, 255, 255, 0.2)',
+                color: task.projectId ? accentColor : (isDarkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgb(17, 24, 39)')
+              }}
               title="Zu Projekt zuweisen"
             >
               <FolderOpen className="w-4 h-4" />
             </button>
+            {/* Pin button - always visible if pinned, otherwise on hover */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (task.pinColumnId) {
+                  // Unpin
+                  dispatch({
+                    type: 'UNPIN_TASK',
+                    payload: task.id
+                  });
+                } else {
+                  // Open pin picker to select column
+                  onPinSelect();
+                }
+              }}
+              onPointerDown={(e) => e.stopPropagation()}
+              className={`p-2 rounded-lg backdrop-blur-xl border transition-all duration-200 hover:scale-110 ${
+                task.pinColumnId 
+                  ? 'opacity-100' 
+                  : 'opacity-0 group-hover:opacity-100'
+              }`}
+              style={{ 
+                background: task.pinColumnId ? `${accentColor}20` : 'rgba(255, 255, 255, 0.1)',
+                borderColor: task.pinColumnId ? accentColor : 'rgba(255, 255, 255, 0.2)',
+                color: task.pinColumnId ? accentColor : (isDarkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgb(17, 24, 39)')
+              }}
+              title={task.pinColumnId ? "Entpinnen" : "Pin-Spalte wählen"}
+            >
+              <PinIcon className="w-4 h-4" />
+            </button>
+            {/* Delete button - only on hover */}
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 handleDelete();
               }}
               onPointerDown={(e) => e.stopPropagation()}
-              className={`p-2 rounded-lg backdrop-blur-xl border border-white/20 transition-all duration-200 hover:scale-110 ${document.documentElement.classList.contains('dark') ? 'text-white/70 hover:text-red-400' : 'text-gray-900 hover:text-red-600'}`}
+              className={`p-2 rounded-lg backdrop-blur-xl border border-white/20 transition-all duration-200 hover:scale-110 opacity-0 group-hover:opacity-100 ${isDarkMode ? 'text-white/70 hover:text-red-400' : 'text-gray-900 hover:text-red-600'}`}
               style={{ background: 'rgba(255, 255, 255, 0.1)' }}
-                              title={actions.delete()}
+              title={actions.delete()}
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -1811,10 +1907,82 @@ function InboxTaskCard({
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleConfirmDelete}
-                    title={inboxView.tooltips.deleteTask()}
+        title={inboxView.tooltips.deleteTask()}
         message={`Möchten Sie die Aufgabe "${task.title}" wirklich löschen?`}
         simple={true}
       />
     </div>
+
+    {/* Context Menu - rendered via Portal to ensure it's on top of everything */}
+    {contextMenu && createPortal(
+      <div 
+        className="fixed z-[99999] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-1 min-w-[180px]"
+        style={{ left: contextMenu.x, top: contextMenu.y }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={() => {
+            handleComplete();
+            setContextMenu(null);
+          }}
+          className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2"
+        >
+          <Check className="w-4 h-4" />
+          <span>{task.completed ? 'Als offen markieren' : 'Aufgabe abhaken'}</span>
+        </button>
+        <button
+          onClick={() => {
+            onDateSelect();
+            setContextMenu(null);
+          }}
+          className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2"
+        >
+          <Calendar className="w-4 h-4" />
+          <span>Termin setzen</span>
+        </button>
+        <button
+          onClick={() => {
+            onProjectSelect();
+            setContextMenu(null);
+          }}
+          className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2"
+        >
+          <FolderOpen className="w-4 h-4" />
+          <span>Zu Projekt zuweisen</span>
+        </button>
+        <button
+          onClick={() => {
+            if (task.pinColumnId) {
+              // Unpin
+              dispatch({
+                type: 'UNPIN_TASK',
+                payload: task.id
+              });
+            } else {
+              // Open pin picker
+              onPinSelect();
+            }
+            setContextMenu(null);
+          }}
+          className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2"
+        >
+          <PinIcon className="w-4 h-4" />
+          <span>{task.pinColumnId ? 'Entpinnen' : 'Pin-Spalte wählen'}</span>
+        </button>
+        <div className="border-t border-gray-200 dark:border-gray-700 my-1" />
+        <button
+          onClick={() => {
+            handleDelete();
+            setContextMenu(null);
+          }}
+          className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center space-x-2"
+        >
+          <Trash2 className="w-4 h-4" />
+          <span>Löschen</span>
+        </button>
+      </div>,
+      document.body
+    )}
+    </>
   );
 } 

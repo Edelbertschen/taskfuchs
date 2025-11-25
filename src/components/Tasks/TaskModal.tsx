@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useAppTranslation } from '../../utils/i18nHelpers';
 import { useTranslation } from 'react-i18next';
 import { 
-  X, Calendar, Clock, Tag, Hash, Plus, Trash2, Save, AlertTriangle, 
+  X, Calendar, Clock, Tag, Hash, Plus, Trash2, AlertTriangle, 
   Eye, Edit, BookOpen, Link, FileText, Play, Pause, Square, Timer,
   CalendarDays, FolderOpen, ChevronDown, Target, Zap, Search, GripHorizontal,
   Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Code, Quote, 
@@ -106,7 +106,6 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
     kanbanColumnId: task?.kanbanColumnId,
   });
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showNotesOverlay, setShowNotesOverlay] = useState(false);
   const [showMarkdownHelp, setShowMarkdownHelp] = useState(false);
   const [notesSearchQuery, setNotesSearchQuery] = useState('');
@@ -354,15 +353,16 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
       }
     } catch {}
     const doClose = () => {
-      if (hasUnsavedChanges) {
-        setShowConfirmDialog(true);
-      } else {
-        onClose();
+      // Autosave is active - always save and close without warning
+      if (hasUnsavedChanges && task) {
+        // Save immediately before closing
+        handleSave();
       }
+      onClose();
     };
     // Allow CSS animation to play briefly
     setTimeout(doClose, 150);
-  }, [hasUnsavedChanges, onClose]);
+  }, [hasUnsavedChanges, onClose, task, handleSave]);
 
   // Handle ESC key and backdrop clicks
   const handleEscape = useCallback((e: KeyboardEvent) => {
@@ -522,10 +522,6 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
     return null;
   };
 
-  const handleConfirmClose = useCallback(() => {
-    setShowConfirmDialog(false);
-    onClose();
-  }, [onClose]);
 
   const handleBackdropClick = useCallback((e: React.MouseEvent) => {
     // Only close if clicking directly on the backdrop (not on modal content)
@@ -736,6 +732,17 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
       onClose();
     }
   }, [task, formData, dispatch, onClose, onSaved, shouldCloseOnSave, recurrenceRule]);
+
+  // Autosave effect - automatically saves changes after a debounce period
+  useEffect(() => {
+    if (!hasUnsavedChanges || !task || !isOpen) return;
+    
+    const autosaveTimeout = setTimeout(() => {
+      handleSave();
+    }, 800); // 800ms debounce for autosave
+    
+    return () => clearTimeout(autosaveTimeout);
+  }, [hasUnsavedChanges, task, isOpen, handleSave]);
 
   // Helper function to determine task visibility from task data
   const getTaskVisibilityFromData = (taskData: Task) => {
@@ -1946,7 +1953,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
         {/* Modal Container */}
         <div 
           ref={modalRef}
-          className="task-modal-root relative rounded-none sm:rounded-2xl shadow-2xl w-screen sm:w-full sm:max-w-6xl h-[100svh] sm:h-[90vh] overflow-hidden flex flex-col modal-content animate-modal-in"
+          className="task-modal-root relative rounded-none sm:rounded-2xl shadow-2xl w-screen sm:w-full sm:max-w-5xl h-[100svh] sm:h-auto sm:max-h-[85vh] overflow-hidden flex flex-col modal-content animate-modal-in"
           onClick={e => e.stopPropagation()}
           onMouseDown={(e) => e.stopPropagation()}
           onMouseMove={(e) => e.stopPropagation()}
@@ -2080,39 +2087,6 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   </div>
                 )}
               </div>
-              
-              {/* Timer Play Button - immer sichtbar */}
-                <button
-                  onClick={() => {
-                    if (task) {
-                      dispatch({
-                        type: 'START_TIMER',
-                        payload: {
-                          taskId: task.id
-                        }
-                      });
-                    }
-                  }}
-                  className={`flex-shrink-0 p-2 transition-all duration-200 rounded-lg hover:scale-105 ${
-                    state.activeTimer?.taskId === task?.id && state.activeTimer?.isActive && !state.activeTimer?.isPaused
-                      ? 'text-white shadow-sm'
-                      : 'hover:bg-gray-100 dark:hover:bg-gray-800'
-                  }`}
-                  style={
-                    state.activeTimer?.taskId === task?.id && state.activeTimer?.isActive && !state.activeTimer?.isPaused
-                      ? getAccentColorStyles().bg
-                      : { color: state.preferences.accentColor }
-                  }
-                  title={
-                    state.activeTimer?.taskId === task?.id && state.activeTimer?.isActive && !state.activeTimer?.isPaused
-                      ? 'Timer läuft'
-                      : 'Timer starten'
-                  }
-                >
-                  <Play className="w-6 h-6" />
-                </button>
-              
-
               
               <input
                 ref={titleInputRef}
@@ -2759,60 +2733,6 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
             {/* Left Content Area */}
                           <div className="flex-1 p-4 overflow-y-auto">
                 <div className="space-y-4">
-                {/* Priority Buttons */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                    {"Priority"}
-                  </label>
-                  <div className="flex gap-1.5 items-center">
-                    {[
-                      { value: 'low', label: "Low", colorBg: 'rgba(34, 197, 94, 0.1)', colorBorder: 'rgb(34, 197, 94)', icon: '!' },
-                      { value: 'medium', label: "Medium", colorBg: 'rgba(234, 179, 8, 0.1)', colorBorder: 'rgb(234, 179, 8)', icon: '!!' },
-                      { value: 'high', label: "High", colorBg: 'rgba(239, 68, 68, 0.1)', colorBorder: 'rgb(239, 68, 68)', icon: '!!!' }
-                    ].map((priority) => (
-                      <button
-                        key={priority.value}
-                        onClick={() => setFormData(prev => ({ ...prev, priority: priority.value as any }))}
-                        className="relative group px-2.5 py-1.5 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer hover:scale-105 border-l-2"
-                        style={{
-                          backgroundColor: formData.priority === priority.value ? priority.colorBg : 'transparent',
-                          borderColor: formData.priority === priority.value ? priority.colorBorder : priority.colorBorder + '30',
-                          opacity: formData.priority === priority.value ? '1' : '0.5',
-                          paddingLeft: formData.priority === priority.value ? '10px' : '12px',
-                          fontFamily: 'monospace',
-                          letterSpacing: '-1px'
-                        }}
-                        onMouseEnter={(e) => {
-                          if (formData.priority !== priority.value) {
-                            e.currentTarget.style.backgroundColor = priority.colorBg;
-                            e.currentTarget.style.opacity = '0.7';
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (formData.priority !== priority.value) {
-                            e.currentTarget.style.backgroundColor = 'transparent';
-                            e.currentTarget.style.opacity = '0.5';
-                          }
-                        }}
-                        title={priority.label}
-                      >
-                        {priority.icon}
-                      </button>
-                    ))}
-                    
-                    {/* Clear priority button */}
-                    {formData.priority && formData.priority !== 'none' && (
-                      <button
-                        onClick={() => setFormData(prev => ({ ...prev, priority: 'none' }))}
-                        className="ml-2 px-2 py-1.5 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer hover:scale-110 border-2 border-gray-300 dark:border-gray-600 hover:border-red-400 dark:hover:border-red-400 text-gray-400 hover:text-red-400 dark:hover:text-red-400"
-                        title="Clear priority"
-                      >
-                        ×
-                      </button>
-                    )}
-                  </div>
-                </div>
-
                 {/* Description */}
                 <div>
                   {/* Header with close button */}
@@ -2839,10 +2759,10 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
 
                   {/* Unified container for preview and edit */}
                   <div 
-                    className={`relative w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 overflow-hidden group resize-y ${
+                    className={`relative w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 overflow-hidden group ${
                       isDescriptionPreviewMode ? 'bg-white/60 dark:bg-gray-800/30 backdrop-blur-sm cursor-text' : 'bg-white dark:bg-gray-800 focus-within:border-accent'
                     } ${
-                      isDescriptionExpanded ? 'h-[calc(100vh-300px)]' : 'h-auto min-h-24 max-h-96'
+                      isDescriptionExpanded ? 'h-[calc(100vh-300px)] resize-y' : 'h-auto min-h-16 max-h-48'
                     }`}
                     onClick={() => isDescriptionPreviewMode && setIsDescriptionPreviewMode(false)}
                     onKeyDown={(e) => {
@@ -2866,7 +2786,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
 
                     {/* Preview content */}
                     {isDescriptionPreviewMode && (
-                      <div className="text-gray-900 dark:text-white text-sm leading-relaxed p-4 wysiwyg-content overflow-y-auto max-h-96">
+                      <div className="text-gray-900 dark:text-white text-sm leading-relaxed p-4 wysiwyg-content overflow-y-auto max-h-44">
                         {!formData.description?.trim() && (
                           <span className="text-gray-400 dark:text-gray-500 text-sm italic opacity-60">
                             {taskModal.descriptionPlaceholder() || 'Click to edit...'}
@@ -2979,6 +2899,60 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
             {/* Right Sidebar - Meta Information */}
             <div className="w-72 bg-gray-100 dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 p-4 overflow-y-auto flex flex-col">
                               <div className="space-y-4">
+                {/* Priority Buttons */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    {"Priority"}
+                  </label>
+                  <div className="flex gap-1.5 items-center">
+                    {[
+                      { value: 'low', label: "Low", colorBg: 'rgba(34, 197, 94, 0.1)', colorBorder: 'rgb(34, 197, 94)', icon: '!' },
+                      { value: 'medium', label: "Medium", colorBg: 'rgba(234, 179, 8, 0.1)', colorBorder: 'rgb(234, 179, 8)', icon: '!!' },
+                      { value: 'high', label: "High", colorBg: 'rgba(239, 68, 68, 0.1)', colorBorder: 'rgb(239, 68, 68)', icon: '!!!' }
+                    ].map((priority) => (
+                      <button
+                        key={priority.value}
+                        onClick={() => setFormData(prev => ({ ...prev, priority: priority.value as any }))}
+                        className="relative group px-2.5 py-1.5 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer hover:scale-105 border-l-2"
+                        style={{
+                          backgroundColor: formData.priority === priority.value ? priority.colorBg : 'transparent',
+                          borderColor: formData.priority === priority.value ? priority.colorBorder : priority.colorBorder + '30',
+                          opacity: formData.priority === priority.value ? '1' : '0.5',
+                          paddingLeft: formData.priority === priority.value ? '10px' : '12px',
+                          fontFamily: 'monospace',
+                          letterSpacing: '-1px'
+                        }}
+                        onMouseEnter={(e) => {
+                          if (formData.priority !== priority.value) {
+                            e.currentTarget.style.backgroundColor = priority.colorBg;
+                            e.currentTarget.style.opacity = '0.7';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (formData.priority !== priority.value) {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                            e.currentTarget.style.opacity = '0.5';
+                          }
+                        }}
+                        title={priority.label}
+                      >
+                        {priority.icon}
+                      </button>
+                    ))}
+                    
+                    {/* Clear priority button */}
+                    {formData.priority && formData.priority !== 'none' && (
+                      <button
+                        onClick={() => setFormData(prev => ({ ...prev, priority: 'none' }))}
+                        className="ml-2 px-2 py-1.5 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer hover:scale-110 border-2 border-gray-300 dark:border-gray-600 hover:border-red-400 dark:hover:border-red-400 text-gray-400 hover:text-red-400 dark:hover:text-red-400"
+                        title="Clear priority"
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
+                </div>
+
                 {/* Task Visibility Status Indicator */}
                 {(() => {
                   const status = getTaskVisibilityStatus();
@@ -3071,269 +3045,6 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                     </div>
                   );
                 })()}
-
-                {/* Review Status */}
-                {(() => {
-                  const isTaskInReview = task?.reminderDate && new Date(task.reminderDate) > new Date();
-                  if (!isTaskInReview) return null;
-                  
-                  const reviewDate = new Date(task.reminderDate);
-                  const accentColor = state.preferences.accentColor;
-                  
-                  const removeReviewStatus = () => {
-                    if (!task) return;
-                    dispatch({
-                      type: 'UPDATE_TASK',
-                      payload: {
-                        ...task,
-                        reminderDate: undefined,
-                        updatedAt: new Date().toISOString()
-                      }
-                    });
-                    setHasUnsavedChanges(true);
-                  };
-                  
-                  return (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {taskModal.reviewStatus()}
-                      </label>
-                      <div 
-                        className="p-3 rounded-lg border transition-all duration-200"
-                        style={{
-                          backgroundColor: `${accentColor}0D`,
-                          borderColor: `${accentColor}25`,
-                        }}
-                      >
-                        <div className="flex items-start space-x-3">
-                          <div className="flex-shrink-0 mt-0.5">
-                            <Clock 
-                              className="w-4 h-4" 
-                              style={{ color: accentColor }}
-                            />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                                  {taskModal.postponed()}
-                                </p>
-                                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
-                                  Review on {format(reviewDate, 'dd.MM.yyyy', { locale: de })}
-                                </p>
-                              </div>
-                              <button
-                                onClick={removeReviewStatus}
-                                className="p-1.5 text-gray-400 hover:text-red-500 dark:hover:text-red-400 rounded transition-colors"
-                                title="Remove review status"
-                              >
-                                <X className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })()}
-                
-                {/* Time Management */}
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Time Management
-                    </label>
-                    {!showTimeManagement && (
-                      <button
-                        onClick={() => {
-                          setShowTimeManagement(true);
-                          setIsEditingEstimatedTime(true);
-                        }}
-                        className="w-5 h-5 flex items-center justify-center text-xs hover:opacity-80 transition-colors rounded"
-                        style={getAccentColorStyles().text}
-                        title="Time Management hinzufügen"
-                      >
-                        +
-                      </button>
-                    )}
-                  </div>
-                  
-                  {showTimeManagement && (
-                    <div className="space-y-3">
-                    {/* Time Display Row */}
-                    <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                      <div className="flex items-center space-x-6">
-                        {/* Tracked Time */}
-                        <div className="text-center">
-                          <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Aufgezeichnet</div>
-                          <button
-                            onClick={startTimeEditing}
-                            className="font-mono text-lg font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
-                            title="Klicken zum Bearbeiten"
-                          >
-                            {formatTime(getCurrentTrackedTime())}
-                          </button>
-                        </div>
-                        
-                        {/* Divider */}
-                        <div className="text-gray-300 dark:text-gray-600">/</div>
-                        
-                        {/* Estimated Time */}
-                        <div className="text-center">
-                          <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Geschätzt</div>
-                          <button
-                            onClick={() => setIsEditingEstimatedTime(!isEditingEstimatedTime)}
-                            className="font-mono text-lg font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
-                            title="Klicken zum Bearbeiten"
-                          >
-                            {formatTime(formData.estimatedTime)}
-                          </button>
-                        </div>
-                      </div>
-                      
-                      {/* Progress and Actions */}
-                      <div className="flex items-center space-x-3">
-                        {formData.estimatedTime > 0 && (
-                          <span className="text-xs px-2 py-1 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
-                            {Math.round(getProgressPercentage())}%
-                          </span>
-                        )}
-                        
-                        {getCurrentTrackedTime() > 0 && (
-                          <button
-                            onClick={resetTrackedTime}
-                            className="p-1.5 text-gray-400 hover:text-red-500 transition-colors"
-                            title="Aufgezeichnete Zeit zurücksetzen"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                    
-                    {/* Edit Tracked Time */}
-                    {isEditingTime && (
-                      <div className="p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
-                        <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Aufgezeichnete Zeit bearbeiten</div>
-                        <div className="flex items-center space-x-2 mb-3">
-                          <input
-                            type="number"
-                            min="0"
-                            max="999"
-                            value={editTimeHours || ''}
-                            onChange={(e) => setEditTimeHours(Math.max(0, parseInt(e.target.value) || 0))}
-                            className="w-16 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-center"
-                            style={{ 
-                              '--tw-ring-color': state.preferences.accentColor + '50'
-                            } as React.CSSProperties}
-                            placeholder="0"
-                            autoFocus
-                          />
-                          <span className="text-sm text-gray-500">h</span>
-                          <input
-                            type="number"
-                            min="0"
-                            max="59"
-                            value={editTimeMinutes || ''}
-                            onChange={(e) => setEditTimeMinutes(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))}
-                            className="w-16 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-center"
-                            style={{ 
-                              '--tw-ring-color': state.preferences.accentColor + '50'
-                            } as React.CSSProperties}
-                            placeholder="0"
-                          />
-                          <span className="text-sm text-gray-500">min</span>
-                        </div>
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={saveEditedTime}
-                            className="flex-1 px-3 py-2 text-sm text-white rounded-lg transition-colors hover:opacity-90"
-                            style={{ backgroundColor: state.preferences.accentColor }}
-                          >
-                            Save
-                          </button>
-                          <button
-                            onClick={cancelTimeEditing}
-                            className="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* Edit Estimated Time */}
-                    {isEditingEstimatedTime && (
-                      <div className="p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
-                        <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Geschätzte Zeit bearbeiten</div>
-                        <div className="flex items-center space-x-2 mb-3">
-                          <input
-                            type="number"
-                            min="0"
-                            max="999"
-                            value={formData.estimatedTime ? Math.floor(formData.estimatedTime / 60) : ''}
-                            onChange={(e) => {
-                              const hours = parseInt(e.target.value) || 0;
-                              const minutes = formData.estimatedTime ? (formData.estimatedTime % 60) : 0;
-                              const totalMinutes = hours * 60 + minutes;
-                              setFormData(prev => ({ 
-                                ...prev, 
-                                estimatedTime: totalMinutes > 0 ? totalMinutes : undefined
-                              }));
-                            }}
-                            className="w-16 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-center"
-                            style={{ 
-                              '--tw-ring-color': state.preferences.accentColor + '50'
-                            } as React.CSSProperties}
-                            placeholder="0"
-                            autoFocus
-                          />
-                          <span className="text-sm text-gray-500">h</span>
-                          <input
-                            type="number"
-                            min="0"
-                            max="59"
-                            value={formData.estimatedTime ? (formData.estimatedTime % 60) : ''}
-                            onChange={(e) => {
-                              const hours = formData.estimatedTime ? Math.floor(formData.estimatedTime / 60) : 0;
-                              const minutes = parseInt(e.target.value) || 0;
-                              const totalMinutes = hours * 60 + minutes;
-                              setFormData(prev => ({ 
-                                ...prev, 
-                                estimatedTime: totalMinutes > 0 ? totalMinutes : undefined
-                              }));
-                            }}
-                            className="w-16 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-center"
-                            style={{ 
-                              '--tw-ring-color': state.preferences.accentColor + '50'
-                            } as React.CSSProperties}
-                            placeholder="0"
-                          />
-                          <span className="text-sm text-gray-500">min</span>
-                        </div>
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => setIsEditingEstimatedTime(false)}
-                            className="flex-1 px-3 py-2 text-sm text-white rounded-lg transition-colors hover:opacity-90"
-                            style={{ backgroundColor: state.preferences.accentColor }}
-                          >
-                            Fertig
-                          </button>
-                          <button
-                            onClick={() => {
-                              setFormData(prev => ({ ...prev, estimatedTime: undefined }));
-                              setIsEditingEstimatedTime(false);
-                            }}
-                            className="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
-                          >
-                            Zurücksetzen
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                    </div>
-                  )}
-                </div>
 
                 {/* Tags */}
                 <div>
@@ -3430,99 +3141,6 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                 </div>
 
 
-
-                {/* Linked Notes - Collapsible */}
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center space-x-2">
-                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Linked Notes
-                      </label>
-                      {formData.linkedNotes.length > 0 && (
-                        <button
-                          onClick={() => setIsNotesExpanded(!isNotesExpanded)}
-                          className="text-left transition-colors hover:opacity-80"
-                        >
-                          <ChevronDown 
-                            className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
-                              isNotesExpanded ? 'rotate-180' : ''
-                            }`} 
-                          />
-                        </button>
-                      )}
-                    </div>
-                    <button
-                      onClick={() => {
-                        setShowNotesOverlay(true);
-                        setIsNotesExpanded(true);
-                      }}
-                      className="w-5 h-5 flex items-center justify-center text-xs hover:opacity-80 transition-colors rounded"
-                      style={getAccentColorStyles().text}
-                      title="Notiz verknüpfen"
-                    >
-                      +
-                    </button>
-                  </div>
-                  
-                  {isNotesExpanded && formData.linkedNotes.length > 0 && (
-                    <div>
-                      {formData.linkedNotes.length > 0 ? (
-                        <div className="space-y-2">
-                          {formData.linkedNotes.map((noteId) => {
-                            const note = (Array.isArray(state.notes?.notes) ? state.notes.notes : []).find(n => n.id === noteId);
-                            return (
-                              <div
-                                key={noteId}
-                                className="group flex items-center justify-between p-2 rounded-lg"
-                                style={{
-                                  backgroundColor: getAccentColorStyles().bg.backgroundColor + '15',
-                                }}
-                              >
-                                <button
-                                  onClick={() => handleNavigateToNote(noteId)}
-                                  className="flex items-center space-x-2 flex-1 min-w-0 text-left rounded transition-colors p-1"
-                                  title={`Zur Notiz: ${note?.title || 'Unbekannte Notiz'}`}
-                                  style={{
-                                    color: getAccentColorStyles().text.color,
-                                  }}
-                                  onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = getAccentColorStyles().bg.backgroundColor + '25';
-                                  }}
-                                  onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'transparent';
-                                  }}
-                                >
-                                  <FileText 
-                                    className="w-4 h-4 flex-shrink-0" 
-                                    style={getAccentColorStyles().text}
-                                  />
-                                  <span className="text-sm truncate" style={getAccentColorStyles().text}>
-                                    {note?.title || 'Unbekannte Notiz'}
-                                  </span>
-                                  <Link 
-                                    className="w-3 h-3" 
-                                    style={getAccentColorStyles().text}
-                                  />
-                                </button>
-                                <button
-                                  onClick={() => unlinkNote(noteId)}
-                                  className="text-red-500 hover:text-red-700 transition-all duration-200 ml-2 opacity-0 group-hover:opacity-100"
-                                  title="Verknüpfung entfernen"
-                                >
-                                  <X className="w-4 h-4" />
-                                </button>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      ) : (
-                        <div className="text-center py-3 text-gray-500 dark:text-gray-400 text-sm">
-                          Keine Notizen verknüpft
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
 
                 {/* Simplified Reminder Section */}
                 <div>
@@ -3841,6 +3459,42 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                 <span>{t('common.delete')}</span>
               </button>
 
+              {/* Timer Button - Center */}
+              <button
+                onClick={() => {
+                  if (task) {
+                    dispatch({
+                      type: 'START_TIMER',
+                      payload: {
+                        taskId: task.id
+                      }
+                    });
+                  }
+                }}
+                className={`flex items-center space-x-2 px-5 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 hover:scale-105 ${
+                  state.activeTimer?.taskId === task?.id && state.activeTimer?.isActive && !state.activeTimer?.isPaused
+                    ? 'text-white shadow-md'
+                    : 'hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600'
+                }`}
+                style={
+                  state.activeTimer?.taskId === task?.id && state.activeTimer?.isActive && !state.activeTimer?.isPaused
+                    ? getAccentColorStyles().bg
+                    : { color: state.preferences.accentColor }
+                }
+                title={
+                  state.activeTimer?.taskId === task?.id && state.activeTimer?.isActive && !state.activeTimer?.isPaused
+                    ? 'Timer läuft'
+                    : 'Timer starten'
+                }
+              >
+                <Play className="w-5 h-5" />
+                <span>
+                  {state.activeTimer?.taskId === task?.id && state.activeTimer?.isActive && !state.activeTimer?.isPaused
+                    ? 'Timer läuft'
+                    : 'Timer starten'}
+                </span>
+              </button>
+
               {/* Action Buttons - Right Side */}
               <div className="flex items-center space-x-2 sm:space-x-3">
                 <button
@@ -3859,16 +3513,6 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                 >
                   <CheckSquare className="w-4 h-4" />
                   <span>{task?.completed ? t('tasks.mark_incomplete') : t('tasks.mark_complete')}</span>
-                </button>
-                
-                <button
-                  onClick={handleSave}
-                  disabled={!hasUnsavedChanges}
-                  className="flex items-center space-x-2 px-4 py-2 disabled:bg-gray-400 text-white text-sm rounded-lg transition-colors disabled:cursor-not-allowed hover:opacity-90"
-                  style={hasUnsavedChanges ? getAccentColorStyles().bg : {}}
-                >
-                  <Save className="w-4 h-4" />
-                  <span>{t('common.save')}</span>
                 </button>
               </div>
             </div>
@@ -3911,233 +3555,9 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
         )}
       </div>
 
-      {/* Confirmation Dialog */}
-      {showConfirmDialog && (
-                    <div 
-                      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[999999999]"
-                      style={{ pointerEvents: 'auto' }}
-                      onMouseDown={(e) => e.stopPropagation()}
-                      onMouseMove={(e) => e.stopPropagation()}
-                      onMouseUp={(e) => e.stopPropagation()}
-                      onDragStart={(e) => e.preventDefault()}
-                      onDrag={(e) => e.preventDefault()}
-                      onDragEnd={(e) => e.preventDefault()}
-                      onDragOver={(e) => e.preventDefault()}
-                      onDrop={(e) => e.preventDefault()}
-                    >
-          <div 
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md p-6"
-            onClick={(e) => e.stopPropagation()}
-            style={{ pointerEvents: 'auto' }}
-          >
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center">
-                <AlertTriangle className="w-5 h-5 text-orange-600 dark:text-orange-400" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Änderungen verwerfen
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Möchten Sie das Modal ohne Save schließen?
-                </p>
-              </div>
-            </div>
-            
-            <div className="flex justify-between space-x-3">
-              <button
-                onClick={handleConfirmClose}
-                className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-              >
-                Schließen
-              </button>
-              <div className="flex space-x-3">
-                <button
-                  onClick={() => setShowConfirmDialog(false)}
-                  className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    setShowConfirmDialog(false);
-                    handleSave();
-                  }}
-                  className="px-4 py-2 text-white rounded-lg transition-colors hover:opacity-90"
-                  style={getAccentColorStyles().bg}
-                >
-                  Save
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Confirmation Dialog removed - autosave is always active */}
 
 
-
-      {/* Notes Linking Overlay */}
-      {showNotesOverlay && (
-        <div 
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[999999999]"
-          style={{ pointerEvents: 'auto' }}
-          onMouseDown={(e) => e.stopPropagation()}
-          onMouseMove={(e) => e.stopPropagation()}
-          onMouseUp={(e) => e.stopPropagation()}
-          onDragStart={(e) => e.preventDefault()}
-          onDrag={(e) => e.preventDefault()}
-          onDragEnd={(e) => e.preventDefault()}
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={(e) => e.preventDefault()}
-        >
-          <div 
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[70vh] overflow-hidden flex flex-col"
-            onClick={(e) => e.stopPropagation()}
-            style={{ pointerEvents: 'auto' }}
-          >
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Notizen verknüpfen
-              </h3>
-              <button
-                onClick={() => {
-                  setShowNotesOverlay(false);
-                  setNotesSearchQuery('');
-                }}
-                className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            
-            {/* Search Input */}
-            <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="text"
-                  value={notesSearchQuery}
-                  onChange={(e) => setNotesSearchQuery(e.target.value)}
-                  placeholder="Notizen durchsuchen..."
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-accent focus:border-transparent"
-                />
-              </div>
-            </div>
-            
-            <div className="p-4 overflow-y-auto flex-1">
-              <div className="space-y-2">
-                {getFilteredNotes().map((note) => (
-                  <div 
-                    key={note.id} 
-                    className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                      formData.linkedNotes.includes(note.id)
-                        ? 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600'
-                        : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'
-                    }`}
-                    style={formData.linkedNotes.includes(note.id) ? {
-                      backgroundColor: state.preferences.accentColor + '15',
-                      borderColor: state.preferences.accentColor + '50'
-                    } : {}}
-                    onClick={() => {
-                      if (formData.linkedNotes.includes(note.id)) {
-                        unlinkNote(note.id);
-                      } else {
-                        setFormData(prev => ({
-                          ...prev,
-                          linkedNotes: [...prev.linkedNotes, note.id]
-                        }));
-                        
-                        // Dispatch bidirectional link
-                        if (task) {
-                          dispatch({
-                            type: 'LINK_TASK_TO_NOTE',
-                            payload: { taskId: task.id, noteId: note.id }
-                          });
-                        }
-                      }
-                    }}
-                  >
-                    <div className="flex items-start space-x-3">
-                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                        formData.linkedNotes.includes(note.id)
-                          ? 'border-gray-300 dark:border-gray-500'
-                          : 'border-gray-300 dark:border-gray-500'
-                      }`}
-                      style={formData.linkedNotes.includes(note.id) ? {
-                        backgroundColor: state.preferences.accentColor,
-                        borderColor: state.preferences.accentColor
-                      } : {}}>
-                        {formData.linkedNotes.includes(note.id) && (
-                          <div className="w-2 h-2 bg-white rounded-full" />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                          {note.title}
-                        </h4>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
-                          {note.content ? note.content.substring(0, 100) + (note.content.length > 100 ? '...' : '') : 'Keine Inhalte'}
-                        </p>
-                        {note.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-2">
-                            {note.tags.slice(0, 3).map(tag => (
-                              <span
-                                key={tag}
-                                className="inline-block px-2 py-0.5 text-xs bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded"
-                              >
-                                #{tag}
-                              </span>
-                            ))}
-                            {note.tags.length > 3 && (
-                              <span className="text-xs text-gray-500 dark:text-gray-400">
-                                +{note.tags.length - 3} weitere
-                              </span>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              
-              {getFilteredNotes().length === 0 && notesSearchQuery.trim() && (
-                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                  <Search className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm">Keine Notizen gefunden</p>
-                  <p className="text-xs mt-1">Versuchen Sie einen anderen Suchbegriff</p>
-                </div>
-              )}
-              
-              {getFilteredNotes().length === 0 && !notesSearchQuery.trim() && (
-                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                  <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm">Keine Notizen verfügbar</p>
-                  <p className="text-xs mt-1">Erstellen Sie zuerst eine Notiz, um sie zu verknüpfen</p>
-                </div>
-              )}
-            </div>
-            
-            <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-750">
-              <div className="flex justify-between items-center">
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  {formData.linkedNotes.length} Notizen ausgewählt
-                </div>
-                <button
-                  onClick={() => {
-                    setShowNotesOverlay(false);
-                    setNotesSearchQuery('');
-                  }}
-                  className="px-4 py-2 text-white rounded-lg transition-colors hover:opacity-90"
-                  style={getAccentColorStyles().bg}
-                >
-                  Fertig
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Markdown Help Modal */}
       {showMarkdownHelp && (

@@ -1,4 +1,4 @@
-import type { Task, Tag, KanbanBoard, UserPreferences, Note, NoteLink, PinColumn } from '../types';
+import type { Task, Tag, KanbanBoard, UserPreferences, PinColumn } from '../types';
 import { format } from 'date-fns';
 import { parseTaskInput } from './taskParser';
 
@@ -10,8 +10,9 @@ export interface ExportData {
   tasks: Task[];
   tags: Tag[];
   boards: KanbanBoard[];
-  notes?: Note[];
-  noteLinks?: NoteLink[];
+  // DEPRECATED: Notes were removed in v3.0 - kept for backward compatibility with old backups
+  notes?: any[];
+  noteLinks?: any[];
   preferences?: UserPreferences;
   // Additional data fields for complete export
   viewState?: any; // Current view mode and settings
@@ -29,7 +30,6 @@ export interface ExportData {
   // Vollständige App-Daten (Version 2.0+)
   archivedTasks?: Task[];
   kanbanBoards?: KanbanBoard[];
-  notesState?: any; // Notes view state
   imageStorage?: any; // Image storage state
   searchQuery?: string;
   activeTagFilters?: string[];
@@ -47,27 +47,10 @@ export interface ExportData {
   // Timer und Statusdaten
   activeTimer?: any; // Active timer context
   currentDate?: string; // Current date as ISO string
-  isNoteEditorFullScreen?: boolean; // Note editor fullscreen state
   recurrence?: any; // Recurrence rules state
   
-  // 🎯 NEUE FEATURES (Version 2.2+)
-  pinColumns?: PinColumn[]; // Pin-Spalten System
-  emailMode?: boolean; // E-Mail-Modus in Notes
-  notesViewState?: {
-    selectedNote?: string | null;
-    isEditing?: boolean;
-    searchQuery?: string;
-    selectedTags?: string[];
-    view?: 'grid' | 'list';
-    sortBy?: string;
-    sortOrder?: 'asc' | 'desc';
-    showArchived?: boolean;
-    showLinkPreviews?: boolean;
-    editorMode?: 'markdown' | 'wysiwyg' | 'split';
-    dailyNotesMode?: boolean;
-    emailMode?: boolean;
-    selectedDailyNoteDate?: string | null;
-  };
+  // 🎯 Pin-Spalten System (Version 2.2+)
+  pinColumns?: PinColumn[];
   
   // 🔗 INTEGRATION SETTINGS - Explizite Integration-Konfigurationen
   integrations?: {
@@ -140,31 +123,38 @@ export interface ExportData {
   
   metadata?: {
     totalTasks: number;
-    totalNotes: number;
     totalTags: number;
     totalBoards: number;
     dataSize: number;
     exportTime: number;
     // Zusätzliche Metadaten für vollständigen Export
     totalArchivedTasks?: number;
-    totalDailyNotes?: number;
     totalColumns?: number;
-    totalNoteLinks?: number;
     totalImages?: number;
     totalNotifications?: number;
     totalEvents?: number;
     totalCalendarSources?: number;
+    totalPinColumns?: number;
+    // DEPRECATED - kept for backward compatibility
+    totalNotes?: number;
+    totalDailyNotes?: number;
+    totalNoteLinks?: number;
   };
   
-  // 🕒 ZEITBUDGET FEATURES (Version 2.3+)
-  personalCapacity?: any; // Persönliche Kapazitätsplanung und Zeitbudgets
-  projectTimebudgets?: any; // Projekt-Zeitbudgets (falls separate gespeichert)
+  // DEPRECATED - kept for backward compatibility with old backups
+  notesState?: any;
+  notesViewState?: any;
+  emailMode?: boolean;
+  isNoteEditorFullScreen?: boolean;
+  personalCapacity?: any;
+  projectTimebudgets?: any;
   
   exportDate: string;
   version: string;
 }
 
 // Funktion zur Überprüfung der Vollständigkeit von importierten Daten
+// Supports importing old backups with notes (they will be ignored)
 export function validateImportData(data: ExportData): {
   isComplete: boolean;
   version: string;
@@ -172,16 +162,17 @@ export function validateImportData(data: ExportData): {
   summary: {
     tasks: number;
     archivedTasks: number;
-    notes: number;
-    dailyNotes: number;
     tags: number;
     boards: number;
     columns: number;
-    noteLinks: number;
+    pinColumns: number;
     images: number;
     notifications: number;
     events: number;
     calendarSources: number;
+    // Legacy fields (for info only)
+    legacyNotes?: number;
+    legacyNoteLinks?: number;
   };
 } {
   const warnings: string[] = [];
@@ -190,26 +181,6 @@ export function validateImportData(data: ExportData): {
   // Basis-Validierung
   if (!data.tasks || !Array.isArray(data.tasks)) {
     warnings.push('Keine gültigen Aufgaben gefunden');
-  }
-  
-  // Daily Notes überprüfen - Unterstütze verschiedene Datenstrukturen
-  let notesArray: any[] = [];
-  
-  // Bestimme das notes Array basierend auf der Datenstruktur
-  if (Array.isArray(data.notes)) {
-    // Neues Format: notes ist bereits ein Array
-    notesArray = data.notes;
-  } else if (data.notes && typeof data.notes === 'object' && Array.isArray((data.notes as any).notes)) {
-    // Altes/komplexes Format: notes ist ein Objekt mit notes-Property
-    notesArray = (data.notes as any).notes;
-  } else {
-    // Fallback - leeres Array wenn notes nicht verfügbar
-    notesArray = [];
-  }
-  
-  // Validierung der notes-Struktur
-  if (notesArray.length === 0) {
-    warnings.push('Keine Notizen gefunden');
   }
   
   if (!data.preferences) {
@@ -221,36 +192,39 @@ export function validateImportData(data: ExportData): {
     warnings.push('Ältere Export-Version - möglicherweise unvollständige Daten');
   }
   
-  if (!data.archivedTasks) {
-    warnings.push('Keine archivierten Aufgaben gefunden');
+  // Check for legacy notes data (informational only, not a warning)
+  let legacyNotesCount = 0;
+  let legacyNoteLinksCount = 0;
+  if (data.notes) {
+    if (Array.isArray(data.notes)) {
+      legacyNotesCount = data.notes.length;
+    } else if (typeof data.notes === 'object' && Array.isArray((data.notes as any).notes)) {
+      legacyNotesCount = (data.notes as any).notes.length;
+    }
+  }
+  if (data.noteLinks && Array.isArray(data.noteLinks)) {
+    legacyNoteLinksCount = data.noteLinks.length;
   }
   
-  if (!data.imageStorage) {
-    warnings.push('Kein Bildspeicher gefunden');
-  }
-  
-  if (!data.noteLinks) {
-    warnings.push('Keine Notiz-Verknüpfungen gefunden');
-  }
-  
-  const dailyNotes = notesArray.filter(note => note && note.dailyNote) || [];
-  if (dailyNotes.length === 0) {
-    warnings.push('Keine Daily Notes gefunden');
+  // Info about legacy data
+  if (legacyNotesCount > 0 || legacyNoteLinksCount > 0) {
+    console.info(`Import enthält Legacy-Daten: ${legacyNotesCount} Notizen, ${legacyNoteLinksCount} Notiz-Links (werden ignoriert)`);
   }
   
   const summary = {
     tasks: data.tasks?.length || 0,
     archivedTasks: data.archivedTasks?.length || 0,
-    notes: notesArray.length,
-    dailyNotes: dailyNotes.length,
     tags: data.tags?.length || 0,
     boards: data.boards?.length || data.kanbanBoards?.length || 0,
     columns: data.columns?.length || 0,
-    noteLinks: data.noteLinks?.length || 0,
+    pinColumns: data.pinColumns?.length || 0,
     images: data.imageStorage?.images?.length || 0,
     notifications: data.notifications?.length || 0,
     events: data.events?.length || 0,
     calendarSources: data.calendarSources?.length || 0,
+    // Legacy info
+    legacyNotes: legacyNotesCount,
+    legacyNoteLinks: legacyNoteLinksCount,
   };
   
   const isComplete = warnings.length === 0;
@@ -363,6 +337,7 @@ function extractIntegrationSettings(preferences: any): ExportData['integrations'
 }
 
 // JSON Export (vollständig) - Enhanced for complete export with all new features
+// Version 3.0: Notes and Personal Capacity removed
 export function exportToJSON(data: ExportData, encrypted = false): string {
   // Extrahiere Integration-Einstellungen
   const integrations = extractIntegrationSettings(data.preferences);
@@ -370,40 +345,50 @@ export function exportToJSON(data: ExportData, encrypted = false): string {
   // Calculate metadata
   const metadata = {
     totalTasks: data.tasks?.length || 0,
-    totalNotes: data.notes?.length || 0,
+    totalArchivedTasks: data.archivedTasks?.length || 0,
     totalTags: data.tags?.length || 0,
     totalBoards: data.boards?.length || 0,
+    totalColumns: data.columns?.length || 0,
+    totalPinColumns: data.pinColumns?.length || 0,
     totalEvents: data.events?.length || 0,
     totalCalendarSources: data.calendarSources?.length || 0,
-    totalPinColumns: data.pinColumns?.length || 0, // ✨ Neue Metadaten
-    totalNoteLinks: data.noteLinks?.length || 0,
-    totalIntegrations: Object.keys(integrations).filter(key => integrations[key as keyof typeof integrations]?.enabled).length,
-    // 🕒 Zeitbudget-Metadaten
-    hasPersonalCapacity: !!data.personalCapacity,
-    projectsWithTimebudgets: data.columns?.filter(col => col.type === 'project' && col.timebudget)?.length || 0,
+    totalIntegrations: Object.keys(integrations || {}).filter(key => integrations?.[key as keyof typeof integrations]?.enabled).length,
+    projectsWithTimebudgets: data.columns?.filter((col: any) => col.type === 'project' && col.timebudget)?.length || 0,
     dataSize: 0, // Wird später berechnet
     exportTime: Date.now()
   };
 
+  // Clean export data - remove deprecated fields
   const exportData = {
-    ...data,
-    integrations, // ✅ Integration-Einstellungen explizit hinzufügen
-    metadata,
-    version: '2.3', // ✨ Version für Zeitbudget-Features
-    exportDate: new Date().toISOString(),
-    // Ensure all optional fields are included even if empty
-    notes: data.notes || [],
-    noteLinks: data.noteLinks || [],
+    // Core data
+    tasks: data.tasks || [],
+    archivedTasks: data.archivedTasks || [],
+    columns: data.columns || [],
+    tags: data.tags || [],
+    boards: data.boards || [],
+    pinColumns: data.pinColumns || [],
     preferences: data.preferences || {},
+    
+    // View state
+    viewState: data.viewState || {},
+    projectKanbanColumns: data.projectKanbanColumns || [],
+    projectKanbanState: data.projectKanbanState || {},
+    
+    // Calendar/Events
     events: data.events || [],
     calendarSources: data.calendarSources || [],
-    // ✨ Neue Features explizit sicherstellen
-    pinColumns: data.pinColumns || [],
-    notesViewState: data.notesViewState || {},
-    emailMode: data.emailMode || false,
-    // 🕒 Zeitbudget-Features sicherstellen
-    personalCapacity: data.personalCapacity || null,
-    projectTimebudgets: data.projectTimebudgets || null,
+    
+    // Timer state
+    timerState: data.timerState || null,
+    activeTimer: data.activeTimer || null,
+    
+    // Integrations
+    integrations,
+    
+    // Metadata
+    metadata,
+    version: '3.0', // Version 3.0: Notes and Capacity removed
+    exportDate: new Date().toISOString(),
   };
 
   // Berechne finale Datengröße
@@ -434,11 +419,10 @@ export function exportToCSV(tasks: Task[]): string {
     'Subtasks',
     'Spalte',
     'Fälligkeitsdatum',
-    'Deadline',
-    'Wiederholung',
+    'Projekt',
+    'Pin-Spalte',
     'Timer Status',
     'Attachments',
-    'Verknüpfte Notizen',
     'Position',
     'Erstellt am',
     'Aktualisiert am'
@@ -449,7 +433,7 @@ export function exportToCSV(tasks: Task[]): string {
     `"${task.title.replace(/"/g, '""')}"`,
     `"${(task.description || '').replace(/"/g, '""')}"`,
     task.completed ? 'Ja' : 'Nein',
-    task.priority === 'high' ? 'Hoch' : task.priority === 'medium' ? 'Mittel' : 'Niedrig',
+    task.priority === 'high' ? 'Hoch' : task.priority === 'medium' ? 'Mittel' : task.priority === 'low' ? 'Niedrig' : 'Keine',
     task.estimatedTime || '',
     task.trackedTime || '',
     task.actualTime || '',
@@ -457,11 +441,10 @@ export function exportToCSV(tasks: Task[]): string {
     `"${task.subtasks.length > 0 ? task.subtasks.map(st => `${st.title}${st.completed ? '✓' : ''}`).join('; ') : ''}"`,
     task.columnId,
     task.reminderDate || '',
-    '', // removed deadline field
-          '',
+    task.projectId || '',
+    task.pinColumnId || '',
     task.timerState ? `"${task.timerState.isActive ? 'Aktiv' : 'Inaktiv'} (${task.timerState.mode})"` : '',
     task.attachments ? `"${task.attachments.map(att => att.filename).join('; ')}"` : '',
-    task.linkedNotes ? `"${task.linkedNotes.join(', ')}"` : '',
     task.position,
     task.createdAt,
     task.updatedAt
@@ -470,51 +453,15 @@ export function exportToCSV(tasks: Task[]): string {
   return [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
 }
 
-// CSV Export for Notes - New function
-export function exportNotesToCSV(notes: Note[]): string {
-  const headers = [
-    'ID',
-    'Titel',
-    'Inhalt (Vorschau)',
-    'Tags',
-    'Verknüpfte Aufgaben',
-    'Verknüpfte Notizen',
-    'Angeheftet',
-    'Archiviert',
-    'Wortanzahl',
-    'Lesezeit (Min)',
-    'Erstellt am',
-    'Aktualisiert am'
-  ];
+// DEPRECATED: exportNotesToCSV removed in v3.0 - Notes feature was removed
 
-  const rows = notes.map(note => [
-    note.id,
-    `"${note.title.replace(/"/g, '""')}"`,
-    `"${(note.content.substring(0, 100) + (note.content.length > 100 ? '...' : '')).replace(/"/g, '""')}"`,
-    `"${note.tags.join(', ')}"`,
-    `"${note.linkedTasks.join(', ')}"`,
-    `"${note.linkedNotes.join(', ')}"`,
-    note.pinned ? 'Ja' : 'Nein',
-    note.archived ? 'Ja' : 'Nein',
-    note.metadata?.wordCount || 0,
-    note.metadata?.readingTime || 0,
-    note.createdAt,
-    note.updatedAt
-  ]);
-
-  return [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
-}
-
-// Combined CSV Export - Tasks and Notes in separate sheets (or sections)
-export function exportAllToCSV(tasks: Task[], notes: Note[]): string {
-  const tasksCsv = exportToCSV(tasks);
-  const notesCsv = exportNotesToCSV(notes);
-  
-  return `AUFGABEN\n${tasksCsv}\n\n\nNOTIZEN\n${notesCsv}`;
+// Export all tasks to CSV
+export function exportAllToCSV(tasks: Task[]): string {
+  return exportToCSV(tasks);
 }
 
 // PDF Export (simplified - in production use proper PDF library)
-export function exportToPDF(tasks: Task[], notes?: Note[]): string {
+export function exportToPDF(tasks: Task[]): string {
   // This is a simplified version - in production, use libraries like jsPDF or PDFKit
   const content = `
 TaskFuchs Export
@@ -527,18 +474,9 @@ ${tasks.map(task => `
   ${task.tags.length > 0 ? `  Tags: ${task.tags.join(', ')}` : ''}
   ${task.reminderDate ? `  Erinnerung: ${format(new Date(task.reminderDate), 'dd.MM.yyyy')}` : ''}
   ${task.estimatedTime ? `  Geschätzte Zeit: ${task.estimatedTime} Min` : ''}
+  ${task.projectId ? `  Projekt: ${task.projectId}` : ''}
+  ${task.pinColumnId ? `  Pin-Spalte: ${task.pinColumnId}` : ''}
 `).join('')}
-
-${notes && notes.length > 0 ? `
-Notizen (${notes.length}):
-${notes.map(note => `
-- ${note.title} ${note.pinned ? '📌' : ''}${note.archived ? ' [Archiviert]' : ''}
-  ${note.tags.length > 0 ? `  Tags: ${note.tags.join(', ')}` : ''}
-  ${note.linkedTasks.length > 0 ? `  Verknüpfte Aufgaben: ${note.linkedTasks.length}` : ''}
-  Erstellt: ${format(new Date(note.createdAt), 'dd.MM.yyyy')}
-  ${note.content ? `\n  Inhalt:\n  ${note.content.split('\n').map(line => `  ${line}`).join('\n')}` : ''}
-`).join('')}
-` : ''}
   `;
   
   return content;

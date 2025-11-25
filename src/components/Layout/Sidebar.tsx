@@ -15,20 +15,20 @@ import {
   CheckSquare,
   Trophy,
   Target,
-  ClipboardList,
   RefreshCw,
-  StickyNote,
   Pin,
   Upload,
   Download,
   User,
   MoreHorizontal,
-  HardDrive
+  HardDrive,
+  AlertTriangle,
+  Cloud,
+  CloudOff,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { EndOfDayModal } from '../Common/EndOfDayModal';
 import { getAssetVersion } from '../../utils/imageUtils';
-import { PersonalCapacityModal } from '../Common/PersonalCapacityModal';
 import { PlannerAssignmentModal } from '../Common/PlannerAssignmentModal';
 import { Task } from '../../types';
 
@@ -47,7 +47,6 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [assignedTask, setAssignedTask] = useState<Task | null>(null);
   const [showPlannerUserMenu, setShowPlannerUserMenu] = useState(false);
-  const [showPersonalCapacity, setShowPersonalCapacity] = useState(false);
   const userButtonRef = useRef<HTMLButtonElement | null>(null);
   const [userMenuPos, setUserMenuPos] = useState<{ left: number; top: number }>({ left: 0, top: 0 });
   const [showMoreMenu, setShowMoreMenu] = useState(false);
@@ -55,6 +54,10 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
   const [moreMenuPos, setMoreMenuPos] = useState<{ left: number; top: number }>({ left: 0, top: 0 });
   const [backupButtonPressed, setBackupButtonPressed] = useState(false);
   const [showBackupSuccess, setShowBackupSuccess] = useState(false);
+  
+  // Reactive dark mode check based on theme preference
+  const isDarkMode = state.preferences.theme === 'dark' || 
+    (state.preferences.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
   
   // Detect if running in Electron
   const isElectron = !!(window as any).require;
@@ -69,41 +72,80 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
     dispatch({ type: 'NAVIGATE_DATE', payload: 'today' });
   }, [onViewChange, dispatch]);
 
-  // Dropbox quick actions (sidebar): separate Upload/Download with LED indicators
-  const canDropbox = false; // Dropbox sync removed
+  // Dropbox sync status
+  const dropboxEnabled = !!state.preferences.dropbox?.enabled && !!state.preferences.dropbox?.appKey;
   const canLocalBackup = !!state.preferences.backup?.enabled && !!(window as any).__taskfuchs_backup_dir__;
-  const [uploadLed, setUploadLed] = useState<'idle'|'syncing'|'success'|'error'>('idle');
-  const [downloadLed, setDownloadLed] = useState<'idle'|'syncing'|'success'|'error'>('idle');
+  const [dropboxSyncStatus, setDropboxSyncStatus] = useState<'idle'|'syncing'|'success'|'error'>('idle');
+  const [dropboxSyncMessage, setDropboxSyncMessage] = useState('');
 
-  const handleUpload = useCallback(async () => {
-    if (!canDropbox) return;
-    if (!confirm('Sicherung zu Dropbox hochladen?')) return;
-    setUploadLed('syncing');
+  // Handle Dropbox sync
+  const handleDropboxSync = useCallback(async () => {
+    if (!dropboxEnabled) return;
+    
+    setDropboxSyncStatus('syncing');
+    setDropboxSyncMessage('Synchronisiere...');
+    
     try {
-      const { dropboxUpload } = await import('../../utils/dropboxSync');
-      await dropboxUpload(state as any, dispatch as any);
-      setUploadLed('success');
-      setTimeout(() => setUploadLed('idle'), 1500);
-    } catch (e) {
-      console.error('Sidebar upload failed', e);
-      setUploadLed('error');
+      const { dropboxSync, getDropboxClient } = await import('../../utils/dropboxSync');
+      const { getDropboxClient: getClient } = await import('../../utils/dropboxClient');
+      
+      const prefs = state.preferences.dropbox;
+      if (!prefs?.appKey) throw new Error('Dropbox nicht konfiguriert');
+      
+      // Initialize client
+      const client = getClient(prefs.appKey);
+      if (!client.isAuthenticated()) {
+        throw new Error('Nicht mit Dropbox verbunden');
+      }
+      
+      const passphrase = prefs.rememberPassphrase ? localStorage.getItem('taskfuchs_dropbox_passphrase') || '' : '';
+      
+      const result = await dropboxSync(state, dispatch, {
+        folderPathOverride: prefs.folderPath,
+        passphraseOverride: passphrase,
+      });
+      
+      if (result.status === 'error' || result.status === 'conflict') {
+        setDropboxSyncStatus('error');
+        setDropboxSyncMessage(result.message);
+        setTimeout(() => setDropboxSyncStatus('idle'), 3000);
+      } else {
+        setDropboxSyncStatus('success');
+        setDropboxSyncMessage(result.message);
+        setTimeout(() => setDropboxSyncStatus('idle'), 2000);
+      }
+      
+      // Update preferences
+      dispatch({ type: 'UPDATE_PREFERENCES', payload: { dropbox: {
+        ...prefs,
+        lastSync: new Date().toISOString(),
+        lastSyncStatus: result.status === 'error' ? 'error' : 'success',
+        lastSyncError: result.status === 'error' ? result.message : undefined,
+      } } });
+      
+    } catch (e: any) {
+      console.error('Dropbox sync failed', e);
+      setDropboxSyncStatus('error');
+      setDropboxSyncMessage(e?.message || 'Sync fehlgeschlagen');
+      setTimeout(() => setDropboxSyncStatus('idle'), 3000);
     }
-  }, [canDropbox, state, dispatch]);
+  }, [dropboxEnabled, state, dispatch]);
 
-  const handleDownload = useCallback(async () => {
-    if (!canDropbox) return;
-    if (!confirm('Sicherung von Dropbox herunterladen und laden?')) return;
-    setDownloadLed('syncing');
-    try {
-      const { dropboxDownload } = await import('../../utils/dropboxSync');
-      await dropboxDownload(state as any, dispatch as any, 'remote');
-      setDownloadLed('success');
-      setTimeout(() => setDownloadLed('idle'), 1500);
-    } catch (e) {
-      console.error('Sidebar download failed', e);
-      setDownloadLed('error');
-    }
-  }, [canDropbox, state, dispatch]);
+  // Listen for sync complete events from auto-sync
+  useEffect(() => {
+    const handleSyncComplete = (e: CustomEvent) => {
+      const result = e.detail;
+      if (result.status === 'error' || result.status === 'conflict') {
+        setDropboxSyncStatus('error');
+      } else if (result.status === 'pushed' || result.status === 'pulled') {
+        setDropboxSyncStatus('success');
+        setTimeout(() => setDropboxSyncStatus('idle'), 2000);
+      }
+    };
+    
+    window.addEventListener('dropbox-sync-complete', handleSyncComplete as any);
+    return () => window.removeEventListener('dropbox-sync-complete', handleSyncComplete as any);
+  }, []);
 
   const handleManualBackup = useCallback(async () => {
     // Visual feedback: button press
@@ -120,17 +162,19 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
       const { exportToJSON, writeBackupToDirectory } = await import('../../utils/importExport');
       const data: any = {
         tasks: state.tasks,
-        archivedTasks: state.archivedTasks,
+        archivedTasks: state.archivedTasks || [],
         columns: state.columns,
         tags: state.tags,
-        notes: state.notes?.notes || state.notes || [],
-        noteLinks: state.noteLinks || [],
+        boards: state.boards || [],
         preferences: state.preferences,
         viewState: state.viewState || {},
         projectKanbanColumns: state.viewState?.projectKanban?.columns || [],
         projectKanbanState: state.viewState?.projectKanban || {},
+        pinColumns: state.pinColumns || [],
+        events: state.events || [],
+        calendarSources: state.calendarSources || [],
         exportDate: new Date().toISOString(),
-        version: '2.3'
+        version: '3.0'
       };
       const json = exportToJSON(data);
       const filename = `TaskFuchs_${new Date().toISOString().replace(/[:]/g,'-').slice(0,19)}.json`;
@@ -348,14 +392,6 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
       active: activeView === 'today',
       onClick: () => onViewChange('today')
     },
-    // Focus entry removed from sidebar
-    {
-      id: 'review',
-      label: t('navigation.review'),
-      icon: ClipboardList,
-      active: activeView === 'review',
-      onClick: () => onViewChange('review')
-    },
     {
       id: 'inbox',
       label: t('navigation.inbox'),
@@ -386,13 +422,6 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
       icon: Pin,
       active: activeView === 'pins',
       onClick: () => onViewChange('pins')
-    },
-    {
-      id: 'notes',
-      label: t('navigation.notes'),
-      icon: StickyNote,
-      active: activeView === 'notes',
-      onClick: () => onViewChange('notes')
     },
     {
       id: 'series',
@@ -444,7 +473,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
   })();
 
   // Define overflow into "Mehr" menu from preferences (fallback to defaults)
-  const preferredMoreIds = state.preferences.sidebar?.moreItems || ['series', 'review', 'archive', 'tags', 'statistics'];
+  const preferredMoreIds = state.preferences.sidebar?.moreItems || ['series', 'archive', 'tags', 'statistics'];
   const overflowNavItems = navigationItems.filter(item => preferredMoreIds.includes(item.id));
   const baseNavItems = navigationItems.filter(item => !preferredMoreIds.includes(item.id));
 
@@ -457,10 +486,10 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
     : "border-r border-gray-200 dark:border-gray-800";
   
   const sidebarStyle = isMinimalDesign
-    ? document.documentElement.classList.contains('dark')
+    ? isDarkMode
       ? { backgroundColor: '#111827' }
       : { backgroundColor: '#FFFFFF' }
-    : document.documentElement.classList.contains('dark')
+    : isDarkMode
       ? { backgroundColor: '#111827' }
       : { backgroundColor: '#FFFFFF' };
 
@@ -496,8 +525,8 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
             boxSizing: 'border-box',
             borderBottomColor: `${
               isMinimalDesign 
-                ? (document.documentElement.classList.contains('dark') ? '#4b5563' : '#6b7280')
-                : (document.documentElement.classList.contains('dark') ? 'rgba(255, 255, 255, 0.2)' : '#d1d5db')
+                ? (isDarkMode ? '#4b5563' : '#6b7280')
+                : (isDarkMode ? 'rgba(255, 255, 255, 0.2)' : '#d1d5db')
             }`
           }}
         >
@@ -526,15 +555,6 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
               onMouseDown={(e) => e.stopPropagation()}
             >
               <div className="py-2">
-                <button
-                  onClick={() => {
-                    setShowPersonalCapacity(true);
-                    setShowPlannerUserMenu(false);
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                >
-                  {t('capacity.personal_capacity')}
-                </button>
                 <button
                   onClick={() => {
                     try { onViewChange('settings'); } catch {}
@@ -587,7 +607,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                       isActive
                         ? 'bg-[var(--accent-color)] text-white active'
                         : isMinimalDesign
-                          ? (document.documentElement.classList.contains('dark')
+                          ? (isDarkMode
                               ? 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-white'
                               : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800')
                           : (glassEffectEnabled 
@@ -609,7 +629,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                     style={{
                       color: isActive 
                         ? 'white'
-                        : (document.documentElement.classList.contains('dark') ? '#9ca3af' : '#111827')
+                        : (isDarkMode ? '#9ca3af' : '#111827')
                     }} />
                     <span className={`text-xs leading-none text-center whitespace-nowrap ${isActive ? "text-white" : "text-gray-900 dark:text-gray-300"}`}>
                       {item.label}
@@ -621,6 +641,19 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                         <span className="absolute top-[2px] right-[2px] text-[11px] min-w-[20px] h-[20px] px-1.5 rounded-full flex items-center justify-center text-white shadow font-semibold dark:text-white"
                           style={{ backgroundColor: state.preferences.accentColor }}>
                           {inboxCount}
+                        </span>
+                      ) : null;
+                    })()}
+
+                    {/* Today view count badge */}
+                    {item.id === 'today' && (() => {
+                      const today = new Date().toISOString().split('T')[0];
+                      const todayColumnId = `date-${today}`;
+                      const todayCount = (state.tasks || []).filter(t => t.columnId === todayColumnId && !t.completed).length;
+                      return todayCount > 0 ? (
+                        <span className="absolute top-[2px] right-[2px] text-[11px] min-w-[20px] h-[20px] px-1.5 rounded-full flex items-center justify-center text-white shadow font-semibold dark:text-white"
+                          style={{ backgroundColor: state.preferences.accentColor }}>
+                          {todayCount}
                         </span>
                       ) : null;
                     })()}
@@ -679,7 +712,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                   }}
                   className={`w-full flex flex-col items-center justify-center rounded-lg text-xs font-medium sidebar-item py-3 px-1 gap-1 btn-hover smooth-transform transition-all duration-200 min-h-[60px] ${
                     isMinimalDesign
-                      ? (document.documentElement.classList.contains('dark')
+                      ? (isDarkMode
                           ? 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-white'
                           : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800')
                       : (glassEffectEnabled 
@@ -708,18 +741,48 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
           </div>
         </nav>
 
-        {/* Bottom section (Dropbox quick actions only) */}
+        {/* Bottom section (Backup & Dropbox sync) */}
         <div className="sidebar-content px-2 pb-4">
-          {/* Dropbox Upload/Download with LEDs */}
-          {canDropbox && (
-            <div className="mb-2 flex items-center justify-center px-1 space-x-2">
-              <button onClick={handleUpload} className="relative w-10 h-10 rounded-full flex items-center justify-center hover:opacity-90 focus:outline-none" title="Hochladen" aria-label="Jetzt hochladen">
-                <Upload className="w-5 h-5 text-white" />
-                <span className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full pointer-events-none ${uploadLed==='success'?'bg-green-500':uploadLed==='error'?'bg-red-500':uploadLed==='syncing'?'bg-amber-400':'bg-gray-500'}`} />
-              </button>
-              <button onClick={handleDownload} className="relative w-10 h-10 rounded-full flex items-center justify-center hover:opacity-90 focus:outline-none" title="Herunterladen" aria-label="Jetzt herunterladen">
-                <Download className="w-5 h-5 text-white" />
-                <span className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full pointer-events-none ${downloadLed==='success'?'bg-green-500':downloadLed==='error'?'bg-red-500':downloadLed==='syncing'?'bg-amber-400':'bg-gray-500'}`} />
+          {/* Dropbox Sync Button */}
+          {dropboxEnabled && (
+            <div className="mt-2 flex items-center justify-center px-1">
+              <button 
+                onClick={handleDropboxSync}
+                disabled={dropboxSyncStatus === 'syncing'}
+                className={`
+                  relative w-10 h-10 rounded-full flex items-center justify-center 
+                  transition-all duration-200
+                  ${dropboxSyncStatus === 'syncing' ? 'animate-pulse' : ''}
+                  ${state.preferences.design?.mode === 'minimal'
+                    ? dropboxSyncStatus === 'error' 
+                      ? 'bg-red-500 hover:bg-red-600 text-white'
+                      : dropboxSyncStatus === 'success'
+                        ? 'bg-green-500 hover:bg-green-600 text-white'
+                        : 'bg-blue-500 hover:bg-blue-600 text-white'
+                    : isDarkMode
+                      ? dropboxSyncStatus === 'error'
+                        ? 'bg-red-500/20 hover:bg-red-500/30 text-red-400'
+                        : dropboxSyncStatus === 'success'
+                          ? 'bg-green-500/20 hover:bg-green-500/30 text-green-400'
+                          : 'bg-blue-500/20 hover:bg-blue-500/30 text-blue-400'
+                      : dropboxSyncStatus === 'error'
+                        ? 'bg-red-500/10 hover:bg-red-500/20 text-red-600'
+                        : dropboxSyncStatus === 'success'
+                          ? 'bg-green-500/10 hover:bg-green-500/20 text-green-600'
+                          : 'bg-blue-500/10 hover:bg-blue-500/20 text-blue-600'
+                  }
+                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                  dark:focus:ring-offset-gray-900
+                  disabled:opacity-50
+                `}
+                title={dropboxSyncStatus === 'syncing' ? 'Synchronisiere...' : dropboxSyncMessage || 'Mit Dropbox synchronisieren'} 
+                aria-label="Dropbox Sync"
+              >
+                {dropboxSyncStatus === 'error' ? (
+                  <CloudOff className="w-5 h-5" />
+                ) : (
+                  <Cloud className={`w-5 h-5 ${dropboxSyncStatus === 'syncing' ? 'animate-bounce' : ''}`} />
+                )}
               </button>
             </div>
           )}
@@ -733,7 +796,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                   ${backupButtonPressed ? 'scale-90' : 'scale-100'}
                   ${state.preferences.design?.mode === 'minimal'
                     ? 'bg-orange-500 hover:bg-orange-600 text-white'
-                    : document.documentElement.classList.contains('dark')
+                    : isDarkMode
                       ? 'bg-orange-500/20 hover:bg-orange-500/30 text-orange-400'
                       : 'bg-orange-500/10 hover:bg-orange-500/20 text-orange-600'
                   }
@@ -744,6 +807,31 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                 aria-label={t('backup.manual_backup') || 'Backup jetzt sichern'}
               >
                 <HardDrive className="w-5 h-5" />
+              </button>
+            </div>
+          )}
+          {/* Backup Warning Icon - show when backup is not configured */}
+          {!canLocalBackup && (
+            <div className="mt-2 flex items-center justify-center px-1">
+              <button 
+                onClick={() => window.dispatchEvent(new CustomEvent('open-backup-setup'))}
+                className={`
+                  relative w-10 h-10 rounded-full flex items-center justify-center 
+                  transition-all duration-200 hover:scale-105
+                  ${state.preferences.design?.mode === 'minimal'
+                    ? 'bg-amber-500 hover:bg-amber-600 text-white'
+                    : isDarkMode
+                      ? 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-400'
+                      : 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-600'
+                  }
+                  focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2
+                  dark:focus:ring-offset-gray-900
+                  animate-pulse
+                `}
+                title={t('backup.setup_backup') || 'Backup einrichten'} 
+                aria-label={t('backup.setup_backup') || 'Backup einrichten'}
+              >
+                <AlertTriangle className="w-5 h-5" />
               </button>
             </div>
           )}
@@ -758,12 +846,6 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
       <EndOfDayModal 
         isOpen={showEndOfDayModal}
         onClose={() => setShowEndOfDayModal(false)}
-      />
-
-      {/* Personal Capacity Modal */}
-      <PersonalCapacityModal
-        isOpen={showPersonalCapacity}
-        onClose={() => setShowPersonalCapacity(false)}
       />
 
       {/* Planner Assignment Modal */}

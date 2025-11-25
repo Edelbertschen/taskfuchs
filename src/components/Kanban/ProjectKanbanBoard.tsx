@@ -99,9 +99,9 @@ export function ProjectKanbanBoard() {
   const [draggedTaskForProjectAssignment, setDraggedTaskForProjectAssignment] = useState<Task | null>(null);
   const [targetProjectId, setTargetProjectId] = useState<string | null>(null);
 
-  const [isDarkMode, setIsDarkMode] = useState(
-    document.documentElement.classList.contains('dark')
-  );
+  // Reactive dark mode - derived from state, not DOM
+  const isDarkMode = state.preferences.theme === 'dark' || 
+    (state.preferences.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
   const [editingColumnId, setEditingColumnId] = useState<string | null>(null);
   const [editingColumnTitle, setEditingColumnTitle] = useState('');
   // Removed local columnOffset - now using state.projectColumnOffset from global state
@@ -579,7 +579,7 @@ export function ProjectKanbanBoard() {
 
     return (
               <div className="fixed inset-0 flex items-center justify-center">
-        <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onClick={onClose} />
+        <div className="fixed inset-0 bg-black/50 transition-opacity" onClick={onClose} />
         <div className={`relative rounded-lg shadow-xl p-6 max-w-md w-full mx-4 ${
           isMinimalDesign
             ? 'bg-white dark:bg-gray-800'
@@ -765,8 +765,8 @@ export function ProjectKanbanBoard() {
                       ? 'text-gray-900 dark:text-white' 
                       : 'text-gray-700 dark:text-gray-300')
                   : (isSelected 
-                      ? `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'` 
-                      : `document.documentElement.classList.contains('dark') ? 'text-gray-200' : 'text-gray-900'`)
+                      ? (isDarkMode ? 'text-white' : 'text-gray-900')
+                      : (isDarkMode ? 'text-gray-200' : 'text-gray-900'))
               }`}>
                 {project.title}
               </h3>
@@ -786,20 +786,14 @@ export function ProjectKanbanBoard() {
               }}
             />
             
-            {/* Task count indicator in circle */}
-            <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
-              isMinimalDesign
-                ? 'bg-gray-300 border border-gray-400'
-                : 'bg-gray-600'
+            {/* Task count indicator - plain text like Inbox */}
+            <span className={`text-sm font-medium ${
+              isMinimalDesign 
+                ? 'text-gray-500 dark:text-gray-400' 
+                : (isDarkMode ? 'text-white/60' : 'text-gray-600')
             }`}>
-              <span className={`text-xs font-medium ${
-                isMinimalDesign
-                  ? 'text-gray-700'
-                  : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`
-              }`}>
-                {projectTaskCount}
-              </span>
-            </div>
+              {projectTaskCount}
+            </span>
 
             {/* Three-dots menu */}
             <div className="relative">
@@ -1575,23 +1569,23 @@ export function ProjectKanbanBoard() {
             }}
               className={`w-full flex flex-col items-center justify-center min-h-[120px] rounded-lg transition-all duration-200 group ${
               isMinimalDesign
-                ? 'border-2 border-dashed border-gray-300 hover:border-gray-400'
-                : 'bg-gray-100 bg-opacity-20 hover:bg-opacity-35 dark:bg-gray-700 dark:bg-opacity-20 dark:hover:bg-opacity-35 border border-dashed border-gray-300 border-opacity-40 dark:border-gray-600 dark:border-opacity-40'
+                ? 'border-2 border-dashed border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500'
+                : 'backdrop-blur-xl bg-white/30 dark:bg-gray-900/40 border-2 border-dashed border-white/40 dark:border-gray-600/50 hover:bg-white/40 dark:hover:bg-gray-900/50 hover:border-white/60 dark:hover:border-gray-500/60'
             }`}
             style={isMinimalDesign ? {
-              backgroundColor: document.documentElement.classList.contains('dark') ? '#111827' : '#FFFFFF'
+              backgroundColor: isDarkMode ? '#111827' : '#FFFFFF'
             } : undefined}
             title={actions.add_column()}
           >
             <Plus className={`w-6 h-6 mb-1 transition-colors ${
               isMinimalDesign
-                ? 'text-gray-600 group-hover:text-gray-800'
-                : 'text-white group-hover:text-white'
+                ? 'text-gray-600 group-hover:text-gray-800 dark:text-gray-400 dark:group-hover:text-gray-200'
+                : 'text-gray-700 dark:text-white group-hover:text-gray-900 dark:group-hover:text-white'
             }`} />
             <span className={`text-xs font-medium transition-colors ${
               isMinimalDesign
-                ? 'text-gray-600 group-hover:text-gray-800'
-                : 'text-white group-hover:text-white'
+                ? 'text-gray-600 group-hover:text-gray-800 dark:text-gray-400 dark:group-hover:text-gray-200'
+                : 'text-gray-700 dark:text-white group-hover:text-gray-900 dark:group-hover:text-white'
             }`}>
               {actions.add_column()}
             </span>
@@ -1783,57 +1777,33 @@ export function ProjectKanbanBoard() {
         isMinimalDesign ? 'bg-white dark:bg-[#111827]' : ''
       }`}>
         {/* Projects Sidebar - Now using flexbox instead of absolute positioning */}
-        <div className={`flex-shrink-0 flex flex-col overflow-hidden transition-all duration-300 ${
-          isMinimalDesign
-            ? 'border-r border-gray-200 dark:border-gray-800'
-            : `backdrop-blur-xl ${document.documentElement.classList.contains('dark') ? 'bg-black/50' : 'bg-white/30'} border-r ${document.documentElement.classList.contains('dark') ? 'border-white/15' : 'border-gray-200'}`
-        }`}
-        style={{ 
-              ...(isMinimalDesign 
-                  ? { 
-                      backgroundColor: document.documentElement.classList.contains('dark')
-                        ? '#111827'  // Elegant dark blue-gray for dark mode
-                        : '#FFFFFF'
-                    }
-                  : {}),
-              boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-            // Flexbox sizing
+        <div 
+          className={`flex-shrink-0 flex flex-col overflow-hidden transition-all duration-300 border-r ${
+            isMinimalDesign
+              ? 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800'
+              : 'bg-white/30 dark:bg-gray-900/40 backdrop-blur-xl border-white/20 dark:border-gray-700/30'
+          }`}
+          style={{ 
+            boxShadow: isMinimalDesign ? '0 1px 3px 0 rgba(0, 0, 0, 0.1)' : '0 8px 32px rgba(0, 0, 0, 0.1)',
             width: sidebarMinimized ? '0px' : '320px',
             marginLeft: sidebarMinimized ? '-320px' : '0px',
+          }}
+        >
+          {/* Header */}
+          <div 
+            className="relative flex items-center px-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#111827]"
+            style={{ 
+              height: '68px',
+              minHeight: '68px',
+              maxHeight: '68px',
+              boxSizing: 'border-box'
             }}
           >
-                {/* Header */}
-                <div 
-                  className={`relative flex items-center px-4 ${
-                    isMinimalDesign
-                      ? 'border-b border-gray-200 dark:border-gray-800'
-                      : 'border-b border-white/15 bg-transparent'
-                  }`}
-                  style={{ 
-                    ...(isMinimalDesign 
-                        ? { 
-                            backgroundColor: document.documentElement.classList.contains('dark')
-                              ? '#111827'
-                              : '#FFFFFF'
-                          }
-                        : {}),
-                    height: '68px',
-                    minHeight: '68px',
-                    maxHeight: '68px',
-                    boxSizing: 'border-box'
-                  }}
-                >
-                  {/* Main header content - centered */}
-                  <div className="flex items-center justify-between w-full">
-                    {projects.length > 0 ? (
-                      <>
-                        <h1 className={`text-lg font-semibold flex items-center space-x-2 ${
-                          isMinimalDesign 
-                            ? (document.documentElement.classList.contains('dark')
-                                ? `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`
-                                : 'text-black')
-                            : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`
-                        }`}>
+            {/* Main header content - centered */}
+            <div className="flex items-center justify-between w-full">
+              {projects.length > 0 ? (
+                <>
+                  <h1 className="text-lg font-semibold flex items-center space-x-2 text-gray-900 dark:text-white">
                           <Columns className="w-5 h-5" style={getAccentColorStyles().text} />
                           <span>{t('projects.title')}</span>
                         </h1>
@@ -1842,7 +1812,7 @@ export function ProjectKanbanBoard() {
                           onClick={handleOpenNewProjectModal}
                           className={`p-2 rounded-md transition-colors duration-200 ${
                             isMinimalDesign 
-                              ? (document.documentElement.classList.contains('dark')
+                              ? (isDarkMode
                                   ? 'text-white bg-gray-800 hover:bg-gray-700'
                                   : 'text-black bg-gray-100 hover:bg-gray-200')
                               : 'text-white shadow-sm'
@@ -1865,7 +1835,7 @@ export function ProjectKanbanBoard() {
                       </>
                     ) : (
                       <h1 className={`text-lg font-semibold flex items-center space-x-2 ${
-                        isMinimalDesign ? 'text-black' : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`
+                        isMinimalDesign ? 'text-black dark:text-white' : (isDarkMode ? 'text-white' : 'text-gray-900')
                       }`}>
                         <Columns className="w-5 h-5" style={getAccentColorStyles().text} />
                         <span>{t('projects.title')}</span>
@@ -1880,25 +1850,25 @@ export function ProjectKanbanBoard() {
                   isMinimalDesign
                     ? 'border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900'
                     : state.preferences.glassEffects?.enabled && state.preferences.glassEffects?.secondarySidebar
-                      ? (document.documentElement.classList.contains('dark') ? 'border-white/15 bg-transparent' : 'border-gray-300/50 bg-white/30')
-                      : (document.documentElement.classList.contains('dark') ? 'border-gray-800 bg-[#1a1d21]' : 'border-gray-300 bg-gray-100')
+                      ? (isDarkMode ? 'border-white/15 bg-transparent' : 'border-gray-300/50 bg-white/30')
+                      : (isDarkMode ? 'border-gray-800 bg-[#1a1d21]' : 'border-gray-300 bg-gray-100')
                 }`}>
                   <div className="flex items-center justify-between">
                     <span className={`text-sm font-medium ${
                       isMinimalDesign 
-                        ? (document.documentElement.classList.contains('dark')
+                        ? (isDarkMode
                             ? 'text-gray-300'
                             : 'text-gray-700')
-                        : (document.documentElement.classList.contains('dark') ? 'text-gray-300' : 'text-gray-900')
+                        : (isDarkMode ? 'text-gray-300' : 'text-gray-900')
                     }`}>
                       {selectedProject ? (t('tasks.title') + `: ${filteredTasks.length}`) : (t('projects.no_project_selected'))}
                     </span>
                     <span className={`text-sm font-medium ${
                       isMinimalDesign 
-                        ? (document.documentElement.classList.contains('dark')
+                        ? (isDarkMode
                             ? 'text-gray-300'
                             : 'text-gray-700')
-                        : (document.documentElement.classList.contains('dark') ? 'text-gray-300' : 'text-gray-900')
+                        : (isDarkMode ? 'text-gray-300' : 'text-gray-900')
                     }`}>
                       {t('projects.title') + `: ${projects.length}`}
                     </span>
@@ -1922,25 +1892,25 @@ export function ProjectKanbanBoard() {
                       <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 ${
                         isMinimalDesign 
                           ? 'bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600' 
-                          : (document.documentElement.classList.contains('dark') ? 'bg-gray-700 dark:bg-gray-700' : 'bg-gray-200')
+                          : (isDarkMode ? 'bg-gray-700 dark:bg-gray-700' : 'bg-gray-200')
                       }`}>
                         <Columns className={`w-6 h-6 ${
                           isMinimalDesign 
                             ? 'text-gray-500 dark:text-gray-400' 
-                            : (document.documentElement.classList.contains('dark') ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600')
+                            : (isDarkMode ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600')
                         }`} />
                       </div>
                       <h3 className={`text-base font-medium mb-2 ${
                         isMinimalDesign 
                           ? 'text-gray-900 dark:text-white' 
-                          : (document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900')
+                          : (isDarkMode ? 'text-white' : 'text-gray-900')
                       }`}>
                         {t('projects.no_projects_title')}
                       </h3>
                       <p className={`text-sm mb-6 max-w-md ${
                         isMinimalDesign 
                           ? 'text-gray-600 dark:text-gray-300' 
-                          : (document.documentElement.classList.contains('dark') ? 'text-gray-400' : 'text-gray-700')
+                          : (isDarkMode ? 'text-gray-400' : 'text-gray-700')
                       }`}>
                         {t('projects.no_projects_description')}
                       </p>
@@ -2165,7 +2135,7 @@ export function ProjectKanbanBoard() {
                                   className={`px-3 py-1.5 text-sm rounded-full transition-all duration-200 ${
                                     isActive
                                       ? 'text-white shadow-sm'
-                                      : (isMinimalDesign ? 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700' : (document.documentElement.classList.contains('dark') ? 'bg-gray-700/40 text-gray-300 hover:bg-gray-600/40' : 'bg-white/40 text-gray-900 hover:bg-white/50'))
+                                      : (isMinimalDesign ? 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700' : (isDarkMode ? 'bg-gray-700/40 text-gray-300 hover:bg-gray-600/40' : 'bg-white/40 text-gray-900 hover:bg-white/50'))
                                   }`}
                                   style={isActive ? { backgroundColor: state.preferences.accentColor } : {}}
                                 >
@@ -2232,12 +2202,12 @@ export function ProjectKanbanBoard() {
 
                   {/* Kanban Board - Using TaskColumn like TaskBoard */}
                   <div className="flex-1 overflow-hidden">
-                    <div className="h-full flex flex-col relative px-4 pb-4">
+                    <div className="h-full flex flex-col relative px-4 pb-4" style={{ paddingTop: '35px' }}>
                     <div style={{ 
                       display: 'flex', 
                       flexDirection: 'column', 
-                        height: '100%', 
-                        gap: '17px',
+                        height: 'auto', 
+                        gap: '12px',
                         padding: '0',
                         alignItems: 'stretch',
                         width: '100%'
@@ -2250,8 +2220,8 @@ export function ProjectKanbanBoard() {
                             style={{ 
                               flex: 1,
                               width: '100%',
-                              height: '100%',
-                              marginTop: '10px',
+                              height: 'auto',
+                              marginTop: '0',
                               overflowX: 'auto',
                               overflowY: 'hidden', // Container scrolls horizontal, columns scroll vertical
                               scrollbarWidth: 'thin',
@@ -2270,8 +2240,7 @@ export function ProjectKanbanBoard() {
                               <div style={{ 
                                 display: 'flex', 
                                 gap: isMinimalDesign ? '5px' : '9px',
-                                alignItems: 'stretch',
-                                height: '100%',
+                                alignItems: 'flex-start',
                                 minWidth: 'fit-content' // Ensure container is wide enough for all content
                               }}>
                                 {renderColumns(displayColumns)}
@@ -2289,32 +2258,32 @@ export function ProjectKanbanBoard() {
               <div className={`flex flex-col items-center justify-center text-center p-8 rounded-3xl shadow-2xl max-w-md mx-4 backdrop-blur-3xl ${
                 isMinimalDesign
                   ? 'bg-white/5 dark:bg-gray-900/5 border border-white/10 dark:border-gray-700/10 shadow-[0_16px_40px_rgba(0,0,0,0.12)]'
-                  : (document.documentElement.classList.contains('dark')
+                  : (isDarkMode
                       ? 'bg-white/5 border border-white/10 shadow-[0_16px_40px_rgba(31,38,135,0.2)]'
                       : 'bg-white/40 border border-white/30 shadow-[0_16px_40px_rgba(31,38,135,0.1)]')
               } before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none relative overflow-hidden`}>
                 <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 backdrop-blur-xl ${
                   isMinimalDesign
                     ? 'bg-white/15 dark:bg-gray-700/15 border border-white/25 dark:border-gray-600/25 shadow-lg'
-                    : (document.documentElement.classList.contains('dark') ? 'bg-white/15 border border-white/25 shadow-lg' : 'bg-gray-200/60 border border-gray-300/40 shadow-lg')
+                    : (isDarkMode ? 'bg-white/15 border border-white/25 shadow-lg' : 'bg-gray-200/60 border border-gray-300/40 shadow-lg')
                 } relative z-10`}>
                   <Columns className={`w-8 h-8 ${
                     isMinimalDesign
                       ? 'text-white dark:text-white'
-                      : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`
+                      : (isDarkMode ? 'text-white' : 'text-gray-900')
                   }`} />
                 </div>
                 <h3 className={`text-lg font-semibold mb-2 relative z-10 ${
                   isMinimalDesign
                     ? 'text-white dark:text-white'
-                    : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`
+                    : (isDarkMode ? 'text-white' : 'text-gray-900')
                 } drop-shadow-lg`}>
                   {t('projects.no_project_selected')}
                 </h3>
                 <p className={`mb-6 relative z-10 ${
                   isMinimalDesign
                     ? 'text-white/90 dark:text-white/90'
-                    : (document.documentElement.classList.contains('dark') ? 'text-white/90' : 'text-gray-700')
+                    : (isDarkMode ? 'text-white/90' : 'text-gray-700')
                 } drop-shadow-lg`}>
                   {t('projects.select_project_sidebar')}
                 </p>

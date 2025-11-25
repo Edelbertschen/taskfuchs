@@ -1450,6 +1450,7 @@ export function ListView({ onTaskEdit, onTaskView, onTaskPlay }: ListViewProps) 
   }, [activeTask]);
 
   return (
+    <>
     <DndContext
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
@@ -1460,23 +1461,21 @@ export function ListView({ onTaskEdit, onTaskView, onTaskPlay }: ListViewProps) 
     <div className="h-full w-full relative overflow-hidden flex">
       {/* Project Tasks Sidebar - Now with position relative, not absolute */}
       <div 
-        className="flex-shrink-0 w-80 z-20 flex flex-col overflow-hidden transition-all duration-300"
+        className="flex-shrink-0 w-80 z-20 flex flex-col overflow-hidden transition-all duration-300 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800"
         style={{
-          backgroundColor: '#23262A',
-          borderRight: '1px solid #1f2937',
           boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
           width: sidebarVisible ? '320px' : '0px',
           marginLeft: sidebarVisible ? '0px' : '-320px',
         }}
       >
-        {/* Sidebar Header */}
-        <div className="p-4 border-b border-gray-800" style={{ backgroundColor: '#23262A' }}>
-          <h1 className="text-lg font-semibold text-white flex items-center space-x-2">
+        {/* Sidebar Header - matching main header style */}
+        <div className="p-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#111827]">
+          <h1 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center space-x-2">
             <Folder className="w-5 h-5" style={{ color: state.preferences.accentColor }} />
             <span>{t('planner.projects')}</span>
           </h1>
           <div className="flex items-center justify-end mt-2">
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-gray-500 dark:text-gray-400">
               {(() => {
                 const count = getProjectTasks.reduce((total, group) => total + group.tasks.length, 0);
                 return t(count === 1 ? 'planner.planner_task_count' : 'planner.planner_task_count_plural', { count });
@@ -1731,13 +1730,13 @@ export function ListView({ onTaskEdit, onTaskView, onTaskPlay }: ListViewProps) 
     {/* Project Timebudget Modal */}
     {showProjectTimebudgetModal && (
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                 <ProjectTimebudgetDetailModal 
-           project={showProjectTimebudgetModal}
-           isOpen={true}
-           onClose={() => setShowProjectTimebudgetModal(null)}
-         />
-      </div>
-    )}
-    
+                <ProjectTimebudgetDetailModal 
+          project={showProjectTimebudgetModal}
+          isOpen={true}
+          onClose={() => setShowProjectTimebudgetModal(null)}
+        />
+     </div>
+   )}
+    </>
   );
-} 
+}

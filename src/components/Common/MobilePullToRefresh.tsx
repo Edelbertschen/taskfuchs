@@ -57,11 +57,11 @@ export function MobilePullToRefresh({ onRefresh, children }: MobilePullToRefresh
   }, [onRefresh, refreshing, pullDistance]);
 
   return (
-    <div ref={containerRef} className="overflow-y-auto overscroll-y-contain touch-pan-y">
+    <div ref={containerRef} className="h-full flex-1 overflow-y-auto overscroll-y-contain touch-pan-y">
       <div className="sticky top-0 z-10 flex items-center justify-center text-xs text-gray-500 dark:text-gray-400 h-[40px]" style={{ transform: `translateY(${pullDistance}px)` }}>
         {refreshing ? 'Aktualisiere…' : pullDistance > 0 ? 'Zum Aktualisieren loslassen' : ''}
       </div>
-      <div style={{ transform: `translateY(${pullDistance}px)` }}>
+      <div className="h-full" style={{ transform: `translateY(${pullDistance}px)` }}>
         {children}
       </div>
     </div>

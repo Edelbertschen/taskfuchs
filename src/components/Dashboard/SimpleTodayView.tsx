@@ -18,11 +18,17 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  closestCenter,
 } from '@dnd-kit/core';
 import {
   useDraggable,
   useDroppable,
 } from '@dnd-kit/core';
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+} from '@dnd-kit/sortable';
 
 import { 
   Star, AlertCircle, CheckCircle2, Circle, Plus, Check, X, ArrowRight,
@@ -32,17 +38,16 @@ import {
 } from 'lucide-react';
 import { TaskModal } from '../Tasks/TaskModal';
 import { SmartTaskModal } from '../Tasks/SmartTaskModal';
+import { TaskCard } from '../Tasks/TaskCard';
 import { EndOfDayModal } from '../Common/EndOfDayModal';
 import type { Task } from '../../types';
 import { notificationService } from '../../utils/notificationService';
 import { ChecklistReminderModal } from '../Common/ChecklistReminderModal';
 import { PinnedTasksWidget } from './PinnedTasksWidget';
 import { SyncStatusWidget } from './SyncStatusWidget';
-import { DeadlineWidget } from './DeadlineWidget';
 import { MobilePullToRefresh } from '../Common/MobilePullToRefresh';
 import { SwipeableTaskCard } from '../Inbox/SwipeableTaskCard';
 import { MobileSnackbar } from '../Common/MobileSnackbar';
-import { ChecklistWidget } from './ChecklistWidget';
 
 interface TodayViewProps {
   onNavigate?: (view: string) => void;
@@ -151,18 +156,21 @@ const StandardWidget = ({
       : 'glass-effect'
   }`}>
     <div className={WIDGET_STYLES.header}>
-      <div className={`${WIDGET_STYLES.iconContainer} ${
-        isMinimalDesign
-          ? 'bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600'
-          : 'bg-gradient-to-br from-white/20 to-white/10 backdrop-blur-md border border-white/20'
-      }`}>
+      <div 
+        className={`${WIDGET_STYLES.iconContainer} ${
+          isMinimalDesign
+            ? 'bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600'
+            : ''
+        }`}
+        style={!isMinimalDesign ? {
+          background: `${accentColor}20`,
+          border: `1px solid ${accentColor}30`
+        } : undefined}
+      >
         <MaterialIcon name={icon} size={32} style={{ color: accentColor }} />
       </div>
       <h3 className={`${WIDGET_STYLES.title} text-gray-900 dark:text-white`} 
-          style={{ 
-            fontFamily: "'Roboto', sans-serif", 
-            textShadow: isMinimalDesign ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.3)' 
-          }}>
+          style={{ fontFamily: "'Roboto', sans-serif" }}>
         {title}
       </h3>
     </div>
@@ -185,14 +193,12 @@ const EmptyState = ({
   <div className="flex flex-col items-center justify-center h-full text-center">
     <p className={`${WIDGET_STYLES.emptyTitle} text-gray-900 dark:text-white`} 
        style={{ 
-         textShadow: isMinimalDesign ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.3)',
          fontFamily: "'Roboto', sans-serif"
        }}>
       {title}
     </p>
-    <p className={`${WIDGET_STYLES.emptySubtext} text-gray-600 dark:text-gray-300`} 
+    <p className={`${WIDGET_STYLES.emptySubtext} text-gray-600 dark:text-gray-400`} 
        style={{ 
-         textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.3)',
          fontFamily: "'Roboto', sans-serif"
        }}>
       {subtitle}
@@ -234,10 +240,7 @@ const TaskItem = ({
       )}
       <div className="flex-1 min-w-0">
         <span className={`block ${WIDGET_STYLES.itemTitle} truncate text-gray-900 dark:text-white`}
-              style={{ 
-                textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.3)',
-                fontFamily: "'Roboto', sans-serif"
-              }}>
+              style={{ fontFamily: "'Roboto', sans-serif" }}>
           {task.title}
         </span>
         {showDeadline && task.dueDate && (
@@ -1441,6 +1444,35 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
       return;
     }
 
+    // Handle reordering within today tasks (drag between tasks)
+    if (activeId !== overId && activeTask.columnId === todayColumnId) {
+      const currentTodayTasks = state.tasks
+        .filter(task => task.columnId === todayColumnId && !task.completed)
+        .sort((a, b) => a.position - b.position);
+      
+      const oldIndex = currentTodayTasks.findIndex(t => t.id === activeId);
+      const newIndex = currentTodayTasks.findIndex(t => t.id === overId);
+      
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const reorderedTasks = arrayMove(currentTodayTasks, oldIndex, newIndex);
+        
+        // Update positions for all reordered tasks
+        reorderedTasks.forEach((task, index) => {
+          if (task.position !== index) {
+            dispatch({
+              type: 'UPDATE_TASK',
+              payload: {
+                ...task,
+                position: index,
+                updatedAt: new Date().toISOString()
+              }
+            });
+          }
+        });
+        return;
+      }
+    }
+
     // Check if we're dropping on the today tasks drop zone
     if (overId === 'today-tasks-drop-zone') {
       // Move task to today's column
@@ -1468,8 +1500,8 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
         type: 'ADD_NOTIFICATION',
         payload: {
           id: `moved-task-${Date.now()}`,
-                  title: simpleTodayView.taskMoved(),
-        message: simpleTodayView.taskMovedMessage(activeTask.title),
+          title: simpleTodayView.taskMoved(),
+          message: simpleTodayView.taskMovedMessage(activeTask.title),
           timestamp: new Date().toISOString(),
           type: 'success' as const,
           read: false
@@ -1682,8 +1714,8 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
 
         {/* Pull to refresh for mobile */}
         <MobilePullToRefresh onRefresh={async () => dispatch({ type: 'NO_OP' } as any)}>
-        {/* Simple Widgets Grid - Heutige Aufgaben, Deadlines und Meine Checkliste */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto items-stretch">
+        {/* Today Tasks - Single Column Layout */}
+        <div className="max-w-2xl mx-auto">
 
           {/* Today Tasks Widget */}
           <StandardWidget
@@ -1717,62 +1749,33 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
                   )}
                 </div>
 
-                <div className={WIDGET_STYLES.spacing.itemsCompact}>
-                {todayTasks.slice(0, 6).map(task => (
-                  <SwipeableTaskCard
-                    key={task.id}
-                    onSwipeLeft={() => {
-                      setLastArchivedTaskId(task.id);
-                      dispatch({ type: 'UPDATE_TASK', payload: { ...task, columnId: 'archive' } });
-                      setSnackbarOpen(true);
-                    }}
-                    onSwipeRight={() => handleTaskClick(task.id)}
-                  >
-                    <TaskItem
-                      task={task}
-                      onComplete={handleCompleteTask}
-                      onClick={handleTaskClick}
-                      isMinimalDesign={isMinimalDesign}
-                      showDeadline={task.deadline ? true : false}
-                      showCheckmark={false}
-                    />
-                  </SwipeableTaskCard>
-                ))}
-                {todayTasks.length > 6 && (
-                  <div className={`text-center pt-2 ${isMinimalDesign ? 'text-gray-500 dark:text-gray-400' : 'text-white/70'}`}>
-                    <span className="text-xs" style={{ fontFamily: "'Roboto', sans-serif" }}>
-                        +{todayTasks.length - 6} {i18n.language === 'en' ? 'more tasks' : 'weitere Aufgaben'}
-                    </span>
+                <SortableContext
+                  items={todayTasks.map(t => t.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="space-y-1">
+                    {todayTasks.map((task, index) => (
+                      <SwipeableTaskCard
+                        key={task.id}
+                        onSwipeLeft={() => {
+                          setLastArchivedTaskId(task.id);
+                          dispatch({ type: 'UPDATE_TASK', payload: { ...task, columnId: 'archive' } });
+                          setSnackbarOpen(true);
+                        }}
+                        onSwipeRight={() => handleTaskClick(task.id)}
+                      >
+                        <TaskCard
+                          task={task}
+                          isFirst={index === 0}
+                          isLast={index === todayTasks.length - 1}
+                        />
+                      </SwipeableTaskCard>
+                    ))}
                   </div>
-                )}
-              </div>
+                </SortableContext>
               </>
               )}
           </StandardWidget>
-
-
-
-          {/* Deadlines Widget with Live Countdown */}
-                     <StandardWidget
-             icon="schedule"
-             title={simpleTodayView.deadlines()}
-             accentColor={state.preferences.accentColor}
-             isMinimalDesign={isMinimalDesign}
-           >
-            <DeadlineWidget onTaskClick={handleTaskClick} />
-           </StandardWidget>
-
-          {/* Checklist Widget */}
-          <StandardWidget
-            icon="checklist"
-            title={t('dashboard.my_checklist')}
-            accentColor={state.preferences.accentColor}
-            isMinimalDesign={isMinimalDesign}
-          >
-            <ChecklistWidget />
-          </StandardWidget>
-
-
 
         </div>
         </MobilePullToRefresh>

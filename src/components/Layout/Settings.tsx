@@ -429,31 +429,38 @@ const Settings = React.memo(() => {
   // Dropbox OAuth handler
   const handleConnectDropbox = useCb(async () => {
     try {
+      if (!dropboxAppKey) {
+        setDropboxStatus('error');
+        setDropboxMessage('Bitte zuerst einen App-Key eingeben.');
+        return;
+      }
+      
       setDropboxStatus('connecting');
       setDropboxMessage('Dropbox-Verbindung wird aufgebaut...');
-      const redirectUri = `${window.location.origin}/auth/dropbox.html`;
+      
       const { DropboxClient } = await import('../../utils/dropboxClient');
+      const redirectUri = `${window.location.origin}/auth/dropbox.html`;
       const client = new DropboxClient(dropboxAppKey, redirectUri);
-      const token = await client.authorizeWithPopup();
+      
+      // Start OAuth flow with popup
+      const token = await client.connect();
+      
+      // Get user profile
       let profile: any = undefined;
       try {
-        profile = await client.getCurrentAccount(token.access_token);
+        profile = await client.getProfile();
       } catch (e) {
-        console.warn('get_current_account failed', e);
+        console.warn('getProfile failed', e);
       }
-      const expiresAt = token.expires_in ? Date.now() + token.expires_in * 1000 : undefined;
 
       dispatch({ type: 'UPDATE_PREFERENCES', payload: { dropbox: {
         enabled: true,
         appKey: dropboxAppKey,
-        accessToken: token.access_token,
-        refreshToken: token.refresh_token,
-        expiresAt,
-        accountEmail: profile?.email || state.preferences.dropbox?.accountEmail || '',
-        accountName: profile?.name?.display_name || state.preferences.dropbox?.accountName || '',
         folderPath: dropboxFolder,
         autoSync: dropboxAutoSync,
         syncInterval: dropboxSyncInterval,
+        accountEmail: profile?.email || state.preferences.dropbox?.accountEmail || '',
+        accountName: profile?.name?.display_name || state.preferences.dropbox?.accountName || '',
         lastSyncStatus: 'success',
         lastSync: state.preferences.dropbox?.lastSync,
         lastSyncError: state.preferences.dropbox?.lastSyncError,
@@ -478,101 +485,59 @@ const Settings = React.memo(() => {
     try {
       setDropboxStatus('syncing');
       setDropboxMessage('Synchronisiere mit Dropbox...');
-      const { encryptJson } = await import('../../utils/e2ee');
-      const { DropboxClient } = await import('../../utils/dropboxClient');
-
+      
+      const { dropboxSync } = await import('../../utils/dropboxSync');
+      const { getDropboxClient } = await import('../../utils/dropboxClient');
+      
       const prefs = state.preferences.dropbox || {} as any;
-      const token = prefs.accessToken as string | undefined;
-      const refreshToken = prefs.refreshToken as string | undefined;
-      const appKey = prefs.appKey as string;
-      if (!token && !refreshToken) throw new Error('Nicht verbunden');
-      if (!dropboxPassphrase && !prefs.rememberPassphrase) throw new Error('Passphrase erforderlich');
-
-      const redirectUri = `${window.location.origin}/auth/dropbox.html`;
-      const client = new DropboxClient(appKey, redirectUri);
-      let accessToken = token as string;
-      if (!accessToken && refreshToken) {
-        const refreshed = await client.refreshToken(refreshToken);
-        accessToken = refreshed.access_token;
-        const expiresAt = refreshed.expires_in ? Date.now() + refreshed.expires_in * 1000 : undefined;
-        dispatch({ type: 'UPDATE_PREFERENCES', payload: { dropbox: {
-          enabled: prefs.enabled ?? true,
-          appKey: prefs.appKey || '',
-          accessToken,
-          refreshToken: prefs.refreshToken,
-          expiresAt,
-          accountEmail: prefs.accountEmail,
-          accountName: prefs.accountName,
-          folderPath: prefs.folderPath || '/Apps/TaskFuchs',
-          autoSync: prefs.autoSync ?? true,
-          syncInterval: prefs.syncInterval ?? 30,
-          lastSync: prefs.lastSync,
-          lastSyncStatus: prefs.lastSyncStatus,
-          lastSyncError: prefs.lastSyncError,
-          conflictResolution: prefs.conflictResolution || 'manual',
-          rememberPassphrase: prefs.rememberPassphrase ?? false,
-          passphraseHint: prefs.passphraseHint
-        } } });
+      if (!prefs.appKey) throw new Error('App-Key nicht konfiguriert');
+      
+      // Initialize client
+      const client = getDropboxClient(prefs.appKey);
+      if (!client.isAuthenticated()) {
+        throw new Error('Nicht mit Dropbox verbunden. Bitte zuerst verbinden.');
       }
-
-      const appState = state; // Full state snapshot
-      const encrypted = await encryptJson(appState, dropboxPassphrase || (prefs.rememberPassphrase ? localStorage.getItem('taskfuchs_dropbox_passphrase') || '' : ''));
-      const filePath = `${prefs.folderPath || '/Apps/TaskFuchs'}/state.enc`;
-
-      // Try to fetch rev for optimistic locking
-      let rev: string | undefined = undefined;
-      try {
-        const existing = await client.downloadEncrypted(accessToken, filePath);
-        if (existing) rev = existing.rev;
-      } catch {}
-
-      await client.uploadEncrypted(accessToken, filePath, encrypted.data, rev);
-
+      
+      // Run sync with current passphrase
+      const passphrase = dropboxPassphrase || (prefs.rememberPassphrase ? localStorage.getItem('taskfuchs_dropbox_passphrase') || '' : '');
+      
+      const result = await dropboxSync(state, dispatch, {
+        folderPathOverride: dropboxFolder,
+        passphraseOverride: passphrase,
+      });
+      
+      // Update preferences with sync result
       dispatch({ type: 'UPDATE_PREFERENCES', payload: { dropbox: {
-        enabled: prefs.enabled ?? true,
-        appKey: prefs.appKey || '',
-        accessToken: prefs.accessToken,
-        refreshToken: prefs.refreshToken,
-        expiresAt: prefs.expiresAt,
-        accountEmail: prefs.accountEmail,
-        accountName: prefs.accountName,
-        folderPath: prefs.folderPath || '/Apps/TaskFuchs',
-        autoSync: prefs.autoSync ?? true,
-        syncInterval: prefs.syncInterval ?? 30,
+        ...prefs,
         lastSync: new Date().toISOString(),
-        lastSyncStatus: 'success',
-        lastSyncError: undefined,
-        conflictResolution: prefs.conflictResolution || 'manual',
-        rememberPassphrase: prefs.rememberPassphrase ?? false,
-        passphraseHint: prefs.passphraseHint
+        lastSyncStatus: result.status === 'error' ? 'error' : 'success',
+        lastSyncError: result.status === 'error' ? result.message : undefined,
       } } });
-      setDropboxStatus('connected');
-      setDropboxMessage('Synchronisierung abgeschlossen.');
+      
+      if (result.status === 'error') {
+        setDropboxStatus('error');
+        setDropboxMessage(result.message);
+      } else if (result.status === 'conflict') {
+        setDropboxStatus('error');
+        setDropboxMessage(result.message);
+      } else {
+        setDropboxStatus('connected');
+        setDropboxMessage(result.message);
+      }
     } catch (e: any) {
       console.error('Dropbox sync error:', e);
       setDropboxStatus('error');
       setDropboxMessage(e?.message || 'Synchronisierung fehlgeschlagen');
+      
       const prefs = state.preferences.dropbox || {} as any;
       dispatch({ type: 'UPDATE_PREFERENCES', payload: { dropbox: {
-        enabled: prefs.enabled ?? false,
-        appKey: prefs.appKey || '',
-        accessToken: prefs.accessToken,
-        refreshToken: prefs.refreshToken,
-        expiresAt: prefs.expiresAt,
-        accountEmail: prefs.accountEmail,
-        accountName: prefs.accountName,
-        folderPath: prefs.folderPath || '/Apps/TaskFuchs',
-        autoSync: prefs.autoSync ?? true,
-        syncInterval: prefs.syncInterval ?? 30,
+        ...prefs,
         lastSync: new Date().toISOString(),
         lastSyncStatus: 'error',
         lastSyncError: e?.message || String(e),
-        conflictResolution: prefs.conflictResolution || 'manual',
-        rememberPassphrase: prefs.rememberPassphrase ?? false,
-        passphraseHint: prefs.passphraseHint
       } } });
     }
-  }, [dispatch, state, dropboxPassphrase]);
+  }, [dispatch, state, dropboxPassphrase, dropboxFolder]);
 
   useEffect(() => {
     // Persist passphrase if requested
@@ -627,13 +592,68 @@ const Settings = React.memo(() => {
         <button onClick={handleConnectDropbox} className="px-4 py-2 rounded-md text-white" style={{ backgroundColor: state.preferences.accentColor }}>
           {dropboxEnabled ? 'Neu verbinden' : 'Mit Dropbox verbinden'}
         </button>
-        <button onClick={async () => { const { dropboxUpload } = await import('../../utils/dropboxSync'); try { setDropboxStatus('syncing'); await dropboxUpload(state as any, dispatch as any, { folderPathOverride: dropboxFolder, passphraseOverride: dropboxPassphrase }); setDropboxStatus('connected'); setDropboxMessage('Upload erfolgreich.'); } catch (e: any) { setDropboxStatus('error'); setDropboxMessage(e?.message || 'Upload fehlgeschlagen'); } }} className="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-200">Jetzt hochladen</button>
-        <button onClick={async () => { const { dropboxDownload } = await import('../../utils/dropboxSync'); try { setDropboxStatus('syncing'); setDropboxMessage('Lade Daten von Dropbox...'); const ok = await dropboxDownload(state as any, dispatch as any, 'remote', { folderPathOverride: dropboxFolder, passphraseOverride: dropboxPassphrase }); if (ok) { setDropboxStatus('connected'); setDropboxMessage('Download abgeschlossen. Hinweis: Änderungen sind nach einem Neuladen sichtbar.'); } } catch (e: any) { setDropboxStatus('error'); setDropboxMessage(e?.message || 'Download fehlgeschlagen'); } }} className="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-200">Jetzt herunterladen</button>
-        <button onClick={async () => { const ok = confirm('Nur lokale Dropbox-Einstellungen zurücksetzen? Dateien in Dropbox bleiben erhalten.'); if (!ok) return; const { dropboxResetLocal } = await import('../../utils/dropboxSync'); try { dropboxResetLocal(dispatch as any); setDropboxEnabled(false); setDropboxAppKey(''); setDropboxFolder(''); setDropboxStatus('idle'); setDropboxMessage('Lokale Dropbox-Einstellungen gelöscht.'); } catch (e: any) { setDropboxStatus('error'); setDropboxMessage(e?.message || 'Zurücksetzen fehlgeschlagen'); } }} className="px-4 py-2 rounded-md border border-red-300 text-red-700 dark:border-red-700 dark:text-red-300">Dropbox‑Einstellungen zurücksetzen (nur lokal)</button>
-        {dropboxAccountEmail && (
-          <span className="text-sm text-gray-600 dark:text-gray-400">Angemeldet als {dropboxAccountName || 'Nutzer'} ({dropboxAccountEmail})</span>
+        {dropboxEnabled && (
+          <>
+            <button 
+              onClick={handleDropboxSyncNow} 
+              disabled={dropboxStatus === 'syncing'}
+              className="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-200 disabled:opacity-50"
+            >
+              {dropboxStatus === 'syncing' ? 'Synchronisiere...' : 'Jetzt synchronisieren'}
+            </button>
+            <button 
+              onClick={async () => { 
+                const { dropboxSync } = await import('../../utils/dropboxSync'); 
+                try { 
+                  setDropboxStatus('syncing');
+                  setDropboxMessage('Force Push...');
+                  const result = await dropboxSync(state as any, dispatch as any, { folderPathOverride: dropboxFolder, passphraseOverride: dropboxPassphrase, forcePush: true }); 
+                  setDropboxStatus(result.status === 'error' ? 'error' : 'connected'); 
+                  setDropboxMessage(result.message); 
+                } catch (e: any) { 
+                  setDropboxStatus('error'); 
+                  setDropboxMessage(e?.message || 'Force Push fehlgeschlagen'); 
+                } 
+              }} 
+              className="px-3 py-2 rounded-md border border-orange-300 text-orange-700 dark:border-orange-700 dark:text-orange-300 text-sm"
+            >
+              Force Push ↑
+            </button>
+            <button 
+              onClick={async () => { 
+                const { dropboxSync } = await import('../../utils/dropboxSync'); 
+                try { 
+                  setDropboxStatus('syncing');
+                  setDropboxMessage('Force Pull...');
+                  const result = await dropboxSync(state as any, dispatch as any, { folderPathOverride: dropboxFolder, passphraseOverride: dropboxPassphrase, forcePull: true }); 
+                  setDropboxStatus(result.status === 'error' ? 'error' : 'connected'); 
+                  setDropboxMessage(result.message); 
+                } catch (e: any) { 
+                  setDropboxStatus('error'); 
+                  setDropboxMessage(e?.message || 'Force Pull fehlgeschlagen'); 
+                } 
+              }} 
+              className="px-3 py-2 rounded-md border border-blue-300 text-blue-700 dark:border-blue-700 dark:text-blue-300 text-sm"
+            >
+              Force Pull ↓
+            </button>
+          </>
         )}
+        <button onClick={async () => { const ok = confirm('Nur lokale Dropbox-Einstellungen zurücksetzen? Dateien in Dropbox bleiben erhalten.'); if (!ok) return; const { dropboxResetLocal } = await import('../../utils/dropboxSync'); try { dropboxResetLocal(dispatch as any); setDropboxEnabled(false); setDropboxAppKey(''); setDropboxFolder('/Apps/TaskFuchs'); setDropboxAccountEmail(''); setDropboxAccountName(''); setDropboxStatus('idle'); setDropboxMessage('Lokale Dropbox-Einstellungen gelöscht.'); } catch (e: any) { setDropboxStatus('error'); setDropboxMessage(e?.message || 'Zurücksetzen fehlgeschlagen'); } }} className="px-3 py-2 rounded-md border border-red-300 text-red-700 dark:border-red-700 dark:text-red-300 text-sm">Zurücksetzen</button>
       </div>
+      {dropboxAccountEmail && (
+        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+          ✓ Angemeldet als {dropboxAccountName || 'Nutzer'} ({dropboxAccountEmail})
+        </p>
+      )}
+      {state.preferences.dropbox?.lastSync && (
+        <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
+          Letzte Synchronisation: {new Date(state.preferences.dropbox.lastSync).toLocaleString()}
+          {state.preferences.dropbox.lastSyncStatus === 'error' && state.preferences.dropbox.lastSyncError && (
+            <span className="text-red-500"> — Fehler: {state.preferences.dropbox.lastSyncError}</span>
+          )}
+        </p>
+      )}
       {dropboxMessage && (
         <p className={`mt-2 text-sm ${dropboxStatus === 'error' ? 'text-red-500' : 'text-gray-600 dark:text-gray-400'}`}>{dropboxMessage}</p>
       )}
@@ -7178,6 +7198,7 @@ const Settings = React.memo(() => {
             <div className="border-b border-gray-200 dark:border-gray-700">
               <nav className="-mb-px flex space-x-8" aria-label="Tabs">
                 {[
+                  { id: 'sync-dropbox', title: 'Dropbox' },
                   { id: 'sync-nextcloud', title: t('settings_sync.nextcloud') },
                   { id: 'sync-caldav', title: t('settings_sync.caldav') },
                   { id: 'sync-ical', title: t('settings_sync.icalImport') }
@@ -7200,7 +7221,10 @@ const Settings = React.memo(() => {
 
             {/* Sync Tab Content */}
             <div className="mt-6 space-y-6">
-              {(activeIntegrationTab === 'sync-nextcloud' || !['sync-caldav','sync-ical'].includes(String(activeIntegrationTab))) && (
+              {activeIntegrationTab === 'sync-dropbox' && (
+                renderDropboxSection()
+              )}
+              {activeIntegrationTab === 'sync-nextcloud' && (
                 <NextcloudSection />
               )}
               {activeIntegrationTab === 'sync-caldav' && (
@@ -7308,18 +7332,19 @@ const Settings = React.memo(() => {
                       const { exportToJSON, writeBackupToDirectory } = await import('../../utils/importExport');
                       const data: any = {
                         tasks: state.tasks,
-                        archivedTasks: state.archivedTasks,
+                        archivedTasks: state.archivedTasks || [],
                         columns: state.columns,
                         tags: state.tags,
-                        // Notes structure can vary; guard via optional chaining
-                        notes: state.notes?.notes || state.notes || [],
-                        noteLinks: state.noteLinks || [],
+                        boards: state.boards || [],
                         preferences: state.preferences,
                         viewState: state.viewState || {},
                         projectKanbanColumns: state.viewState?.projectKanban?.columns || [],
                         projectKanbanState: state.viewState?.projectKanban || {},
+                        pinColumns: state.pinColumns || [],
+                        events: state.events || [],
+                        calendarSources: state.calendarSources || [],
                         exportDate: new Date().toISOString(),
-                        version: '2.3'
+                        version: '3.0'
                       };
                       const json = exportToJSON(data);
                       const filename = `TaskFuchs_${new Date().toISOString().replace(/[:]/g,'-').slice(0,19)}.json`;

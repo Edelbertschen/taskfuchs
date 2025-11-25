@@ -48,7 +48,6 @@ import { DatePickerSlider } from '../Common/DatePickerSlider';
 import { UserGuide } from '../Common/UserGuide';
 import { OnboardingTour } from '../Common/OnboardingTour';
 import { ProjectTimebudgetHeader } from '../Projects/ProjectTimebudgetHeader';
-import { PersonalCapacityModal } from '../Common/PersonalCapacityModal';
 import { ProjectTimebudgetDetailModal } from '../Projects/ProjectTimebudgetDetailModal';
 import { ColumnManager } from '../Projects/ColumnManager';
 import { exportPlannerToPrint } from '../../utils/plannerExport';
@@ -1854,11 +1853,6 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
         ) : null;
       })()}
 
-      {/* Personal Capacity Modal */}
-      <PersonalCapacityModal 
-        isOpen={showPersonalCapacity} 
-        onClose={() => setShowPersonalCapacity(false)} 
-      />
     </>
   );
 }); 

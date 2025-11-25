@@ -156,10 +156,13 @@ export interface NextcloudVersion {
   size: number;
   metadata: {
     totalTasks: number;
-    totalNotes: number;
     totalTags: number;
+    totalColumns?: number;
+    totalPinColumns?: number;
     appVersion: string;
     deviceName: string;
+    // DEPRECATED - kept for backward compatibility
+    totalNotes?: number;
   };
   isAutomatic: boolean; // Automatisch vs. manuell erstellt
 }
@@ -348,25 +351,25 @@ export class NextcloudSyncService {
       
       // Zusätzliche Daten
       archivedTasks: appData.archivedTasks || [],
-      noteLinks: appData.noteLinks || [],
       viewState: appData.viewState || {},
       projectKanbanColumns: appData.projectKanbanColumns || [],
       projectKanbanState: appData.projectKanbanState || {},
       pinColumns: appData.pinColumns || [],
+      events: appData.events || [],
+      calendarSources: appData.calendarSources || [],
       
       // Metadaten
       exportDate: new Date().toISOString(),
-      version: '2.0',
+      version: '3.0',
       metadata: {
         totalTasks: (appData.tasks || []).length,
-        totalNotes: (appData.notes || []).length,
         totalTags: (appData.tags || []).length,
         totalBoards: (appData.boards || []).length,
+        totalColumns: (appData.columns || []).length,
+        totalPinColumns: (appData.pinColumns || []).length,
+        totalArchivedTasks: (appData.archivedTasks || []).length,
         dataSize: 0, // Wird später berechnet
         exportTime: Date.now(),
-        totalArchivedTasks: (appData.archivedTasks || []).length,
-        totalColumns: (appData.columns || []).length,
-        totalNoteLinks: (appData.noteLinks || []).length,
       }
     };
   }
@@ -406,15 +409,14 @@ export class NextcloudSyncService {
   private async hasSignificantChanges(version: NextcloudVersion, newData: ExportData): Promise<boolean> {
     // Vergleiche Metadaten für schnelle Überprüfung
     const newTaskCount = (newData.tasks || []).length;
-    const newNoteCount = (newData.notes || []).length;
+    const newColumnCount = (newData.columns || []).length;
     
     const taskDiff = Math.abs(newTaskCount - version.metadata.totalTasks);
-    const noteDiff = Math.abs(newNoteCount - version.metadata.totalNotes);
+    const columnDiff = Math.abs(newColumnCount - (version.metadata.totalColumns || 0));
     
-    // Signifikante Änderung: >5% Änderung oder >10 neue Items
-    const significantChange = taskDiff > 10 || noteDiff > 5 || 
-                             taskDiff > version.metadata.totalTasks * 0.05 ||
-                             noteDiff > version.metadata.totalNotes * 0.05;
+    // Signifikante Änderung: >5% Änderung oder >10 neue Tasks/Columns
+    const significantChange = taskDiff > 10 || columnDiff > 2 || 
+                             taskDiff > version.metadata.totalTasks * 0.05;
     
     return significantChange;
   }
@@ -443,8 +445,9 @@ export class NextcloudSyncService {
       size: jsonContent.length,
       metadata: {
         totalTasks: data.metadata!.totalTasks,
-        totalNotes: data.metadata!.totalNotes,
         totalTags: data.metadata!.totalTags,
+        totalColumns: data.metadata!.totalColumns || 0,
+        totalPinColumns: data.metadata!.totalPinColumns || 0,
         appVersion: data.version,
         deviceName: deviceName
       },
@@ -641,9 +644,10 @@ export class NextcloudSyncService {
           size: file.size,
           metadata: {
             totalTasks: 0, // Wird bei Bedarf geladen
-            totalNotes: 0,
             totalTags: 0,
-            appVersion: '2.0',
+            totalColumns: 0,
+            totalPinColumns: 0,
+            appVersion: '3.0',
             deviceName: 'unknown'
           },
           isAutomatic: versionInfo.isAutomatic
@@ -752,8 +756,9 @@ export class NextcloudSyncService {
       size: jsonContent.length,
       metadata: {
         totalTasks: exportData.metadata!.totalTasks,
-        totalNotes: exportData.metadata!.totalNotes,
         totalTags: exportData.metadata!.totalTags,
+        totalColumns: exportData.metadata!.totalColumns || 0,
+        totalPinColumns: exportData.metadata!.totalPinColumns || 0,
         appVersion: exportData.version,
         deviceName: this.getDeviceName()
       },

@@ -42,8 +42,6 @@ import {
 import { format, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subDays, subWeeks, subMonths, isToday, isThisWeek, isThisMonth, differenceInMinutes, parseISO, isValid, startOfYear, endOfYear } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { TimebudgetReports } from './TimebudgetReports';
-import { CapacityReports } from './CapacityReports';
-import { PersonalCapacityModal } from '../Common/PersonalCapacityModal';
 
 type TimeRange = 'today' | 'week' | 'month' | 'year';
 
@@ -84,7 +82,6 @@ export function StatisticsView() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [activeInsight, setActiveInsight] = useState(0);
   const [showExportModal, setShowExportModal] = useState(false);
-  const [showPersonalCapacity, setShowPersonalCapacity] = useState(false);
 
   // Robuste Zeitberechnung mit Fallback-Werten
   const formatTime = useCallback((minutes: number) => {
@@ -1877,12 +1874,9 @@ export function StatisticsView() {
       {/* Time Budget Reports */}
       <TimebudgetReports className="mt-8" />
 
-      {/* Capacity Reports */}
-      <CapacityReports className="mt-8" />
-
       {/* Export Modal */}
       {showExportModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white">Zeiterfassung exportieren</h3>
@@ -1942,12 +1936,6 @@ export function StatisticsView() {
           </div>
         </div>
       )}
-
-      {/* Personal Capacity Modal */}
-      <PersonalCapacityModal 
-        isOpen={showPersonalCapacity} 
-        onClose={() => setShowPersonalCapacity(false)} 
-      />
     </div>
   );
 }

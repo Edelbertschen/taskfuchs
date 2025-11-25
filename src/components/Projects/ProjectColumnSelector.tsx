@@ -96,7 +96,7 @@ export function ProjectColumnSelector({
 
   return (
     <div 
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[10000000]"
+              className="fixed inset-0 sm:left-80 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[10000000]"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           onClose();

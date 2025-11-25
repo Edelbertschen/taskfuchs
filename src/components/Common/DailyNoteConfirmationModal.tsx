@@ -34,7 +34,7 @@ export function DailyNoteConfirmationModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
               <div className={`rounded-lg shadow-lg max-w-md w-full ${
                 isMinimalDesign
                   ? 'bg-white dark:bg-gray-800'

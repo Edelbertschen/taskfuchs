@@ -112,7 +112,7 @@ export function ImageStorageManager({ isOpen, onClose }: ImageStorageManagerProp
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-6xl h-[90vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
@@ -235,7 +235,7 @@ export function ImageStorageManager({ isOpen, onClose }: ImageStorageManagerProp
                       />
                       
                       {/* Overlay with actions */}
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
                         <div className="flex space-x-2">
                           <button
                             onClick={() => setShowImageModal(image)}
@@ -313,7 +313,7 @@ export function ImageStorageManager({ isOpen, onClose }: ImageStorageManagerProp
           <div className="relative max-w-4xl max-h-full">
             <button
               onClick={() => setShowImageModal(null)}
-              className="absolute top-4 right-4 p-2 bg-black bg-opacity-50 hover:bg-opacity-75 text-white rounded-lg transition-all z-10"
+              className="absolute top-4 right-4 p-2 bg-black/50 hover:bg-opacity-75 text-white rounded-lg transition-all z-10"
             >
               <X className="w-5 h-5" />
             </button>
@@ -336,7 +336,7 @@ export function ImageStorageManager({ isOpen, onClose }: ImageStorageManagerProp
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-60">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-60">
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4">
             <div className="flex items-center space-x-3 mb-4">
               <div className="w-10 h-10 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center">

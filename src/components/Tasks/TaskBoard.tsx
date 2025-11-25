@@ -248,7 +248,7 @@ function DroppableProjectHeader({ project, tasks, isExpanded, onToggle, accentCo
             }`
       }`}
       style={isMinimalDesign && isExpanded 
-        ? { borderLeftColor: document.documentElement.classList.contains('dark') ? '#6b7280' : '#374151' } 
+        ? { borderLeftColor: isDarkMode ? '#6b7280' : '#374151' } 
         : {}}
     >
       <div className="flex items-center space-x-2 flex-1 min-w-0">
@@ -268,7 +268,7 @@ function DroppableProjectHeader({ project, tasks, isExpanded, onToggle, accentCo
           <div className={`font-medium text-sm truncate text-left ${
             isMinimalDesign
               ? (isExpanded ? 'text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-300')
-              : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`
+              : `isDarkMode ? 'text-white' : 'text-gray-900'`
           }`}>
             {project.title}
           </div>
@@ -1322,31 +1322,39 @@ export function TaskBoard() {
 
   
   const filteredTasks = state.tasks.filter(task => {
-    // NEW FLEXIBLE LOGIC: Show tasks in TaskBoard based on multiple conditions
+    // First, check if task should be visible in TaskBoard at all
+    let shouldShowInTaskBoard = false;
     
-    // 1. Always show tasks that are directly assigned to date columns (primary assignment)
+    // 1. Tasks directly assigned to date columns (primary assignment)
     if (task.columnId && task.columnId.startsWith('date-')) {
-      return true;
+      shouldShowInTaskBoard = true;
     }
-    
-    // 2. Always show tasks in inbox
-    if (task.columnId === 'inbox') {
-      return true;
+    // 2. Tasks in inbox
+    else if (task.columnId === 'inbox') {
+      shouldShowInTaskBoard = true;
     }
-    
-    // 3. Show tasks with deadlines (they appear in date columns as deadline reminders)
-    if (task.deadline) {
-      return true;
+    // 3. Tasks with deadlines (they appear in date columns as deadline reminders)
+    else if (task.deadline) {
+      shouldShowInTaskBoard = true;
     }
-    
     // 4. Tasks with projectId but no reminderDate stay in project view only (unless they have deadline)
-    if (task.projectId && !task.reminderDate && !task.deadline) {
+    else if (task.projectId && !task.reminderDate && !task.deadline) {
+      shouldShowInTaskBoard = false;
+    }
+    // 5. Tasks with projectId AND reminderDate are visible in both project and date planner
+    // 6. Tasks without projectId but with valid columnId are shown normally
+    else {
+      shouldShowInTaskBoard = true;
+    }
+    
+    // If task shouldn't be in TaskBoard, filter it out immediately
+    if (!shouldShowInTaskBoard) {
       return false;
     }
     
-    // 5. Tasks with projectId AND reminderDate are visible in both project and date planner
-    // 6. Tasks without projectId but with valid columnId are shown normally
+    // Now apply filters to all tasks that should be visible
     
+    // Search filter
     if (state.searchQuery) {
       const query = state.searchQuery.toLowerCase();
       const matchesTitle = task.title.toLowerCase().includes(query);
@@ -1372,12 +1380,19 @@ export function TaskBoard() {
       }
     }
 
-    // Priority-Filter: ODER-Verknüpfung (eine der gewählten Prioritäten muss zutreffen)
-    if (state.activePriorityFilters.length > 0) {
+    // Priority-Filter: Lokaler Filter aus Sidebar (einzelne Auswahl)
+    if (priorityFilter !== 'all') {
       const taskPriority = task.priority || 'none';
-      const hasActivePriority = state.activePriorityFilters.includes(taskPriority);
-      if (!hasActivePriority) {
-        return false;
+      if (priorityFilter === 'none') {
+        // Filter for tasks without priority
+        if (taskPriority !== 'none' && task.priority) {
+          return false;
+        }
+      } else {
+        // Filter for specific priority
+        if (taskPriority !== priorityFilter) {
+          return false;
+        }
       }
     }
 
@@ -1541,8 +1556,9 @@ export function TaskBoard() {
 
 
 
-  // Get background styles for focus mode
-  const isDarkMode = document.documentElement.classList.contains('dark');
+  // Reactive dark mode check
+  const isDarkMode = state.preferences.theme === 'dark' || 
+    (state.preferences.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
   const focusBackgroundStyles = isDarkMode 
     ? getDarkModeBackgroundStyles(state.preferences)
     : getBackgroundStyles(state.preferences);
@@ -1742,20 +1758,13 @@ export function TaskBoard() {
           {/* Project Tasks Sidebar */}
           {sidebarVisible && (
           <div 
-            className={`absolute top-0 left-0 bottom-0 w-full sm:w-80 z-20 flex flex-col overflow-hidden min-w-0 ${
+            className={`absolute top-0 left-0 bottom-0 w-full sm:w-80 z-20 flex flex-col overflow-hidden min-w-0 border-r ${
               isMinimalDesign
-                ? 'border-r border-gray-200 dark:border-gray-800'
-                : `backdrop-blur-xl ${document.documentElement.classList.contains('dark') ? 'bg-black/50' : 'bg-white/30'} border-r ${document.documentElement.classList.contains('dark') ? 'border-white/15' : 'border-gray-200'}`
+                ? 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800'
+                : 'bg-white/30 dark:bg-gray-900/40 backdrop-blur-xl border-white/20 dark:border-gray-700/30'
             }`}
             style={{
-              ...(isMinimalDesign 
-                  ? { 
-                      backgroundColor: document.documentElement.classList.contains('dark')
-                        ? '#111827'
-                        : '#FFFFFF'
-                    }
-                  : {}),
-              boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+              boxShadow: isMinimalDesign ? '0 1px 3px 0 rgba(0, 0, 0, 0.1)' : '0 8px 32px rgba(0, 0, 0, 0.1)',
               transform: sidebarVisible ? 'translateX(0)' : 'translateX(-100%)',
               transition: mounted ? 'transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none',
               visibility: !mounted && !sidebarVisible ? 'hidden' : 'visible',
@@ -1766,28 +1775,15 @@ export function TaskBoard() {
           >
             {/* Sidebar Header */}
             <div 
-              className={`flex flex-col justify-center px-4 min-w-0 ${
-                isMinimalDesign
-                  ? 'border-b border-gray-200 dark:border-gray-800'
-                  : 'border-b border-white/15 bg-transparent'
-              }`}
+              className="flex flex-col justify-center px-4 min-w-0 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#111827]"
               style={{ 
-                ...(isMinimalDesign 
-                    ? { 
-                        backgroundColor: document.documentElement.classList.contains('dark')
-                          ? '#111827'
-                          : '#FFFFFF'
-                      }
-                    : {}),
                 height: '68px',
                 minHeight: '68px',
                 maxHeight: '68px',
                 boxSizing: 'border-box'
               }}
             >
-              <h1 className={`text-lg font-semibold flex items-center space-x-2 min-w-0 ${
-                isMinimalDesign ? 'text-black' : `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'`
-              }`}>
+              <h1 className="text-lg font-semibold flex items-center space-x-2 min-w-0 text-gray-900 dark:text-white">
                 <Folder className="w-5 h-5 flex-shrink-0" style={{ color: state.preferences.accentColor }} />
                 <span className="truncate">{t('navigation.planner')}</span>
               </h1>
@@ -1803,7 +1799,7 @@ export function TaskBoard() {
                       ? (showFilters || priorityFilter !== 'all' || state.activeTagFilters.length > 0
                           ? 'bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600'
                           : 'bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700')
-                      : (document.documentElement.classList.contains('dark') 
+                      : (isDarkMode 
                           ? (showFilters || priorityFilter !== 'all' || state.activeTagFilters.length > 0
                               ? 'bg-gray-600/40 border border-gray-500/50'
                               : 'bg-gray-700/40 hover:bg-gray-600/40 border border-gray-600/40')
@@ -1817,8 +1813,8 @@ export function TaskBoard() {
                   }}
                 >
                   <div className="flex items-center space-x-2">
-                    <Filter className={`w-4 h-4 ${isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (document.documentElement.classList.contains('dark') ? `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'` : 'text-gray-900')}`} />
-                    <span className={`text-sm font-medium ${isMinimalDesign ? 'text-gray-900 dark:text-white' : (document.documentElement.classList.contains('dark') ? `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'` : 'text-gray-900')}`}>Filter</span>
+                    <Filter className={`w-4 h-4 ${isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? `isDarkMode ? 'text-white' : 'text-gray-900'` : 'text-gray-900')}`} />
+                    <span className={`text-sm font-medium ${isMinimalDesign ? 'text-gray-900 dark:text-white' : (isDarkMode ? `isDarkMode ? 'text-white' : 'text-gray-900'` : 'text-gray-900')}`}>Filter</span>
                     {(priorityFilter !== 'all' || state.activeTagFilters.length > 0) && (
                       <div 
                         className="w-2 h-2 rounded-full animate-pulse"
@@ -1838,7 +1834,7 @@ export function TaskBoard() {
                     <ChevronDown 
                       className={`w-4 h-4 transition-transform duration-300 ${
                         showFilters ? 'rotate-180' : ''
-                      } ${isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (document.documentElement.classList.contains('dark') ? `document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'` : 'text-gray-900')}`} 
+                      } ${isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? `isDarkMode ? 'text-white' : 'text-gray-900'` : 'text-gray-900')}`} 
                     />
                   </div>
                 </button>
@@ -1850,13 +1846,13 @@ export function TaskBoard() {
                   <div className={`p-4 rounded-lg backdrop-blur-sm border space-y-4 ${
                     isMinimalDesign
                       ? 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
-                      : (document.documentElement.classList.contains('dark') ? 'bg-black/20 border-gray-600/30' : 'bg-white/30 border-gray-300/30')
+                      : (isDarkMode ? 'bg-black/20 border-gray-600/30' : 'bg-white/30 border-gray-300/30')
                   }`}>
                     
                     {/* Priority Filters */}
                     <div>
                       <label className={`block text-xs font-medium mb-2 flex items-center space-x-2 ${
-                        isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (document.documentElement.classList.contains('dark') ? 'text-gray-300' : 'text-gray-900')
+                        isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? 'text-gray-300' : 'text-gray-900')
                       }`}>
                         <AlertCircle className="w-3 h-3" />
                         <span>Prioritäten</span>
@@ -1907,7 +1903,7 @@ export function TaskBoard() {
                     {/* Tag Filters */}
                     <div>
                       <label className={`block text-xs font-medium mb-2 flex items-center space-x-2 ${
-                        isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (document.documentElement.classList.contains('dark') ? 'text-gray-300' : 'text-gray-900')
+                        isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? 'text-gray-300' : 'text-gray-900')
                       }`}>
                         <Tag className="w-3 h-3" />
                         <span>Tags</span>
@@ -2007,7 +2003,7 @@ export function TaskBoard() {
               {/* Stats */}
               <div className="flex items-center justify-end mt-4">
                 <span className={`text-xs ${
-                  isMinimalDesign ? 'text-gray-600 dark:text-gray-300' : (document.documentElement.classList.contains('dark') ? 'text-gray-400' : 'text-gray-900')
+                  isMinimalDesign ? 'text-gray-600 dark:text-gray-300' : (isDarkMode ? 'text-gray-400' : 'text-gray-900')
                 }`}>
                   {(() => {
                     const totalTasks = getProjectTasks.reduce((total, group) => total + group.tasks.length, 0);
@@ -2024,18 +2020,18 @@ export function TaskBoard() {
               {/* Projektaufgaben Überschrift */}
               <div className="px-4 pt-2 pb-3 border-b border-gray-600/20">
                 <h2 className={`text-sm font-medium flex items-center space-x-2 ${
-                  isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (document.documentElement.classList.contains('dark') ? 'text-gray-300' : 'text-gray-900')
+                  isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? 'text-gray-300' : 'text-gray-900')
                 }`}>
                   <span>{t('planner.project_tasks')}</span>
                 </h2>
               </div>
               {getProjectTasks.length === 0 ? (
                 <div className={`p-4 mt-4 text-center ${
-                  isMinimalDesign ? 'text-gray-600 dark:text-gray-300' : (document.documentElement.classList.contains('dark') ? 'text-gray-400' : 'text-gray-900')
+                  isMinimalDesign ? 'text-gray-600 dark:text-gray-300' : (isDarkMode ? 'text-gray-400' : 'text-gray-900')
                 }`}>
                   <Folder className={`w-8 h-8 mx-auto mb-2 ${
-                    isMinimalDesign ? 'opacity-60' : (document.documentElement.classList.contains('dark') ? 'opacity-50' : 'opacity-70')
-                  }`} style={{ color: isMinimalDesign ? undefined : (document.documentElement.classList.contains('dark') ? undefined : '#111827') }} />
+                    isMinimalDesign ? 'opacity-60' : (isDarkMode ? 'opacity-50' : 'opacity-70')
+                  }`} style={{ color: isMinimalDesign ? undefined : (isDarkMode ? undefined : '#111827') }} />
                   <p className="text-sm">{t('planner.no_project_tasks')}</p>
                 </div>
               ) : (
@@ -2098,7 +2094,7 @@ export function TaskBoard() {
               }}
             >
               <MobilePullToRefresh onRefresh={async () => dispatch({ type: 'NO_OP' } as any)}>
-              <div className="h-full flex flex-col relative z-10 px-4 pb-4">
+              <div className="h-full flex flex-col relative z-10 px-4 pb-4" style={{ paddingTop: '0px', marginTop: '-5px' }}>
 
             {/* Board Content */}
             <div style={{ 
@@ -2118,7 +2114,7 @@ export function TaskBoard() {
                       gap: isMinimalDesign ? '5px' : '9px',
                       alignItems: 'stretch',
                       width: '100%',
-                      marginTop: '10px',
+                      marginTop: '0',
                       overflowX: 'auto',
                       overflowY: 'hidden',
                       scrollbarWidth: 'thin',

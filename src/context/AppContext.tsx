@@ -495,7 +495,7 @@ const initialState: AppState = {
   pinColumns: [
     {
       id: 'default-pin',
-      title: 'Pin',
+      title: 'Fokus',
       color: '#64748b',
       order: 0,
       createdAt: new Date().toISOString(),

@@ -1,9 +1,0 @@
-@import '../../../../common';
-
-:host {
-  form {
-    @include mq(xs) {
-      width: 500px;
-    }
-  }
-}

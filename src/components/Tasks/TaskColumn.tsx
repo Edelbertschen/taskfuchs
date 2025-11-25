@@ -97,6 +97,11 @@ const TaskColumn = React.memo(({
   const taskColumnAny = taskColumn as any;
   const { i18n, t } = useTranslation();
   const isMinimalDesign = state.preferences.minimalDesign;
+  
+  // Reactive dark mode check
+  const isDarkMode = state.preferences.theme === 'dark' || 
+    (state.preferences.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(column.title);
   const [showSmartTaskModal, setShowSmartTaskModal] = useState(false);
@@ -621,9 +626,7 @@ const TaskColumn = React.memo(({
         onContextMenu={handleContextMenu}
         className={`group flex-1 min-w-0 h-auto flex flex-col relative ${
           isMinimalDesign
-            ? (document.documentElement.classList.contains('dark')
-                ? 'px-4'
-                : 'px-4')
+            ? 'px-4'
             : 'glass-effect rounded-lg'
         } overflow-hidden ${
           isFocusMode
@@ -635,7 +638,7 @@ const TaskColumn = React.memo(({
                   style={{
             // ✨ Column background - use style instead of className for guaranteed color
             backgroundColor: isMinimalDesign
-              ? (document.documentElement.classList.contains('dark') ? '#111827' : '#FFFFFF')
+              ? (isDarkMode ? '#111827' : '#FFFFFF')
               : undefined,
             // ✨ ULTRA-STABLE: No transitions during any drag for projects
             transition: (activeTask && isProjectColumn) ? 'none' : activeTask ? 'none' : 'border-color 200ms cubic-bezier(0.16, 1, 0.3, 1)',
@@ -680,7 +683,7 @@ const TaskColumn = React.memo(({
         {/* Column Header */}
         <div className={`flex-shrink-0 relative no-text-select ${
         isMinimalDesign 
-          ? (document.documentElement.classList.contains('dark')
+          ? (isDarkMode
               ? 'bg-[#111827] py-3 border-b border-gray-800'
               : 'bg-white py-3 border-b border-gray-200')
           : 'bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border-b border-gray-200/20 dark:border-gray-200/20 p-3'
@@ -700,7 +703,7 @@ const TaskColumn = React.memo(({
                 <span className={`text-xs font-medium ${isProjectColumn ? '' : 'transition-all duration-300'} ${
                   isValidDropTarget 
                     ? `text-accent/80 ${isProjectColumn ? '' : 'animate-pulse'}` 
-                      : (document.documentElement.classList.contains('dark')
+                      : (isDarkMode
                           ? 'text-white/80'
                           : 'text-gray-600')
                 }`}>
@@ -708,8 +711,8 @@ const TaskColumn = React.memo(({
                 </span>
                 <h3 className={`font-bold text-base ${isProjectColumn ? '' : 'transition-all duration-300'} ${
                   titleInfo.isCurrentDay || isFocusMode || isValidDropTarget
-                    ? 'scale-105'
-                      : (document.documentElement.classList.contains('dark')
+                    ? ''
+                      : (isDarkMode
                           ? 'text-white/95 drop-shadow-md'
                           : 'text-gray-900')
                 }`}

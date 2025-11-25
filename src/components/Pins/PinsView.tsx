@@ -46,6 +46,10 @@ export function PinsView() {
   const { actions, forms, titles, messages, pins } = useAppTranslation();
   const isMinimalDesign = state.preferences.minimalDesign;
   
+  // Reactive dark mode check
+  const isDarkMode = state.preferences.theme === 'dark' || 
+    (state.preferences.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  
   // States
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [activeColumn, setActiveColumn] = useState<PinColumnType | null>(null);
@@ -467,20 +471,23 @@ export function PinsView() {
             onClick={() => handleAddColumn()}
             className={`flex flex-col items-center justify-center min-h-[120px] flex-1 min-w-0 rounded-lg transition-all duration-200 group ${
               isMinimalDesign
-                ? 'bg-gray-50 hover:bg-gray-100 border-2 border-dashed border-gray-300 hover:border-gray-400'
-                : 'bg-gray-100 bg-opacity-20 hover:bg-opacity-35 dark:bg-gray-700 dark:bg-opacity-20 dark:hover:bg-opacity-35 border border-dashed border-gray-300 border-opacity-40 dark:border-gray-600 dark:border-opacity-40'
+                ? 'border-2 border-dashed border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500'
+                : 'backdrop-blur-xl bg-white/30 dark:bg-gray-900/40 border-2 border-dashed border-white/40 dark:border-gray-600/50 hover:bg-white/40 dark:hover:bg-gray-900/50 hover:border-white/60 dark:hover:border-gray-500/60'
             }`}
+            style={isMinimalDesign ? {
+              backgroundColor: isDarkMode ? '#111827' : '#FFFFFF'
+            } : undefined}
             title={pins.addNewColumn()}
           >
             <Plus className={`w-6 h-6 mb-1 transition-colors ${
               isMinimalDesign
-                ? 'text-gray-600 group-hover:text-gray-800'
-                : 'text-white group-hover:text-white'
+                ? 'text-gray-600 group-hover:text-gray-800 dark:text-gray-400 dark:group-hover:text-gray-200'
+                : 'text-gray-700 dark:text-white group-hover:text-gray-900 dark:group-hover:text-white'
             }`} />
             <span className={`text-xs font-medium transition-colors ${
               isMinimalDesign
-                ? 'text-gray-600 group-hover:text-gray-800'
-                : 'text-white group-hover:text-white'
+                ? 'text-gray-600 group-hover:text-gray-800 dark:text-gray-400 dark:group-hover:text-gray-200'
+                : 'text-gray-700 dark:text-white group-hover:text-gray-900 dark:group-hover:text-white'
             }`}>
               {pins.addColumn()}
             </span>
@@ -533,12 +540,20 @@ export function PinsView() {
         <div className="h-full flex flex-col overflow-hidden">
           
           {/* Header */}
-          <div className={`flex-shrink-0 px-4 py-3 ${
-            isMinimalDesign
-              ? 'bg-white dark:bg-[#111827] border-b border-gray-200 dark:border-gray-800'
-              : 'bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700'
-          }`}>
-            <div className="flex items-center justify-between">
+          <div 
+            className={`flex-shrink-0 px-4 flex items-center ${
+              isMinimalDesign
+                ? 'bg-white dark:bg-[#111827] border-b border-gray-200 dark:border-gray-800'
+                : 'bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700'
+            }`}
+            style={{
+              height: '68px',
+              minHeight: '68px',
+              maxHeight: '68px',
+              boxSizing: 'border-box'
+            }}
+          >
+            <div className="flex items-center justify-between w-full">
               <div className="flex items-center space-x-3">
                 <div className="p-2 rounded-lg" style={{ backgroundColor: state.preferences.accentColor + '1A' }}>
                   <Pin className="w-5 h-5" style={{ color: state.preferences.accentColor }} />
@@ -559,7 +574,7 @@ export function PinsView() {
 
           {/* Board Content */}
           <div className="flex-1 overflow-hidden">
-            <div className="h-full flex flex-col relative px-4 pb-4">
+            <div className="h-full flex flex-col relative px-4 pb-4" style={{ paddingTop: '35px' }}>
               <div style={{ 
                 display: 'flex', 
                 flexDirection: 'column', 
@@ -578,7 +593,7 @@ export function PinsView() {
                       flex: 1,
                       alignItems: 'flex-start',
                       width: '100%',
-                      marginTop: '10px',
+                      marginTop: '0',
                       overflowX: 'auto',
                       overflowY: 'hidden',
                       scrollbarWidth: 'thin',
