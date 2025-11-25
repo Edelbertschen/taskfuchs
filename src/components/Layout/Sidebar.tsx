@@ -53,6 +53,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
   const moreButtonRef = useRef<HTMLButtonElement | null>(null);
   const [moreMenuPos, setMoreMenuPos] = useState<{ left: number; top: number }>({ left: 0, top: 0 });
   const [backupButtonPressed, setBackupButtonPressed] = useState(false);
+  const [backupRunning, setBackupRunning] = useState(false);
   const [showBackupSuccess, setShowBackupSuccess] = useState(false);
   
   // Reactive dark mode check based on theme preference
@@ -152,10 +153,14 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
     setBackupButtonPressed(true);
     setTimeout(() => setBackupButtonPressed(false), 200);
     
+    // Start backup - show pulsing
+    setBackupRunning(true);
+    
     try {
       const dir: any = (window as any).__taskfuchs_backup_dir__;
       if (!dir) { 
         alert(t('backup.no_folder_selected') || 'Kein Backup-Ordner gewählt.'); 
+        setBackupRunning(false);
         return; 
       }
       
@@ -180,11 +185,15 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
       const filename = `TaskFuchs_${new Date().toISOString().replace(/[:]/g,'-').slice(0,19)}.json`;
       await writeBackupToDirectory(dir, filename, json);
       
-      // Show success notification
+      // Backup complete
+      setBackupRunning(false);
+      
+      // Show success (green) for 10 seconds
       setShowBackupSuccess(true);
-      setTimeout(() => setShowBackupSuccess(false), 3000);
+      setTimeout(() => setShowBackupSuccess(false), 10000);
     } catch (e) {
       console.error('Manual backup failed', e);
+      setBackupRunning(false);
       alert(t('backup.failed') || 'Backup fehlgeschlagen.');
     }
   }, [state, t]);
@@ -790,17 +799,19 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
             <div className="mt-2 flex items-center justify-center px-1">
               <button 
                 onClick={handleManualBackup}
+                disabled={backupRunning}
                 className={`
                   relative w-10 h-10 rounded-full flex items-center justify-center 
                   transition-all duration-200
                   ${backupButtonPressed ? 'scale-90' : 'scale-100'}
-                  ${state.preferences.design?.mode === 'minimal'
-                    ? 'bg-orange-500 hover:bg-orange-600 text-white'
+                  ${backupRunning ? 'animate-pulse' : ''}
+                  ${showBackupSuccess
+                    ? 'bg-green-500 text-white'
                     : isDarkMode
-                      ? 'bg-orange-500/20 hover:bg-orange-500/30 text-orange-400'
-                      : 'bg-orange-500/10 hover:bg-orange-500/20 text-orange-600'
+                      ? 'bg-gray-700/50 hover:bg-gray-600/60 text-gray-400 hover:text-gray-300'
+                      : 'bg-gray-200/60 hover:bg-gray-300/70 text-gray-500 hover:text-gray-600'
                   }
-                  focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2
+                  focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2
                   dark:focus:ring-offset-gray-900
                 `}
                 title={t('backup.manual_backup') || 'Backup jetzt sichern'} 

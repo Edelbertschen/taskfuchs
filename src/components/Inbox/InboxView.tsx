@@ -62,11 +62,9 @@ export function InboxView() {
   const [modalTaskIndex, setModalTaskIndex] = useState<number>(-1);
   const [modalNavDirection, setModalNavDirection] = useState<'prev' | 'next' | null>(null);
   
-  // Track original inbox task IDs when entering the view (tasks stay visible until user leaves)
-  const [initialInboxTaskIds, setInitialInboxTaskIds] = useState<Set<string>>(() => {
-    const ids = new Set(state.tasks.filter(t => t.columnId === 'inbox').map(t => t.id));
-    return ids;
-  });
+  // Track task IDs that were edited during this session (tasks stay visible until user leaves)
+  // Only tasks WITHOUT a date AND WITHOUT a project are considered "true" inbox tasks
+  const [sessionEditedTaskIds, setSessionEditedTaskIds] = useState<Set<string>>(new Set());
 
   const openInboxTaskAt = (idx: number) => {
     const flat = inboxTasks; // already sorted newest first
@@ -102,16 +100,22 @@ export function InboxView() {
 
   // Auto-advance after save - Keep task visible in inbox until user leaves
   const handleTaskSaved = (updated: Task) => {
-    // Add the updated task to initialInboxTaskIds so it stays visible
-    setInitialInboxTaskIds(prev => {
+    // Add the updated task to sessionEditedTaskIds so it stays visible during this session
+    setSessionEditedTaskIds(prev => {
       const newSet = new Set(prev);
       newSet.add(updated.id);
       return newSet;
     });
     
-    // Recompute current index against list INCLUDING initial inbox tasks
+    // Recompute current index against list INCLUDING session-edited tasks
     const flat = state.tasks
-      .filter(t => t.columnId === 'inbox' || initialInboxTaskIds.has(t.id) || t.id === updated.id)
+      .filter(t => {
+        // True inbox task: columnId is inbox AND no date AND no project
+        const isTrueInbox = t.columnId === 'inbox' && !t.reminderDate && !t.projectId;
+        // Or it was edited this session
+        const isSessionEdited = sessionEditedTaskIds.has(t.id) || t.id === updated.id;
+        return isTrueInbox || isSessionEdited;
+      })
       .filter(t => !t.completed)
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     
@@ -252,9 +256,16 @@ export function InboxView() {
   };
 
   // Get inbox tasks - include tasks that were originally in inbox when user entered the view
-  // Tasks stay visible even after date/project is set, until user leaves the area
+  // Tasks in inbox: columnId='inbox' AND no date AND no project
+  // OR tasks edited during this session (stay visible until leaving the area)
   const inboxTasks = state.tasks
-    .filter(task => task.columnId === 'inbox' || initialInboxTaskIds.has(task.id))
+    .filter(task => {
+      // True inbox task: columnId is inbox AND no date AND no project assigned
+      const isTrueInbox = task.columnId === 'inbox' && !task.reminderDate && !task.projectId;
+      // Or it was edited this session (stays visible until user leaves)
+      const isSessionEdited = sessionEditedTaskIds.has(task.id);
+      return isTrueInbox || isSessionEdited;
+    })
     .filter(task => !task.completed) // Exclude completed tasks
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 

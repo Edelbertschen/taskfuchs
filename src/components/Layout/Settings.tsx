@@ -7845,12 +7845,9 @@ const Settings = React.memo(() => {
                                 warningMessage += `📊 Importierte Daten (Version ${validation.version}):\n`;
                                 warningMessage += `• Aufgaben: ${validation.summary.tasks}\n`;
                                 warningMessage += `• Archivierte Aufgaben: ${validation.summary.archivedTasks}\n`;
-                                warningMessage += `• Notizen: ${validation.summary.notes}\n`;
-                                warningMessage += `• Daily Notes: ${validation.summary.dailyNotes}\n`;
                                 warningMessage += `• Tags: ${validation.summary.tags}\n`;
-                                warningMessage += `• Boards: ${validation.summary.boards}\n`;
+                                warningMessage += `• Boards/Projekte: ${validation.summary.boards}\n`;
                                 warningMessage += `• Spalten: ${validation.summary.columns}\n`;
-                                warningMessage += `• Notiz-Verknüpfungen: ${validation.summary.noteLinks}\n`;
                                 warningMessage += `• Bilder: ${validation.summary.images}\n`;
                                 warningMessage += `• Benachrichtigungen: ${validation.summary.notifications}\n`;
                                 
@@ -7934,11 +7931,9 @@ const Settings = React.memo(() => {
                                     successMessage += `📊 Importierte Daten:\n`;
                                     successMessage += `• ${validation.summary.tasks} Aufgaben\n`;
                                     successMessage += `• ${validation.summary.archivedTasks} archivierte Aufgaben\n`;
-                                    successMessage += `• ${validation.summary.notes} Notizen (davon ${validation.summary.dailyNotes} Daily Notes)\n`;
                                     successMessage += `• ${validation.summary.tags} Tags\n`;
-                                    successMessage += `• ${validation.summary.boards} Boards\n`;
+                                    successMessage += `• ${validation.summary.boards} Boards/Projekte\n`;
                                     successMessage += `• ${validation.summary.columns} Spalten\n`;
-                                    successMessage += `• ${validation.summary.noteLinks} Notiz-Verknüpfungen\n`;
                                     successMessage += `• ${validation.summary.images} Bilder\n`;
                                     successMessage += `• ${validation.summary.notifications} Benachrichtigungen`;
                                     
