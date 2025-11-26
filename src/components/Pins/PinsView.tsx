@@ -1073,16 +1073,18 @@ export function PinsView() {
           );
         })()}
 
-        {/* Drag Overlay */}
-        <DragOverlay>
+        {/* Drag Overlay - Minimalist style like Planer */}
+        <DragOverlay
+          dropAnimation={null}
+          style={{
+            zIndex: 9999,
+            pointerEvents: 'none',
+          }}
+        >
           {activeTask && (
-            <div 
-              className="rotate-3 opacity-95"
-              style={{ 
-                transform: 'translateX(-76px)',
-                pointerEvents: 'none'
-              }}
-            >
+            <div style={{
+              filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',
+            }}>
               <TaskCard
                 task={activeTask}
                 isInDragOverlay={true}
