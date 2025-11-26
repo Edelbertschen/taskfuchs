@@ -25,6 +25,7 @@ import {
   AlertTriangle,
   Cloud,
   CloudOff,
+  ChevronDown,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { EndOfDayModal } from '../Common/EndOfDayModal';
@@ -73,15 +74,17 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
     dispatch({ type: 'NAVIGATE_DATE', payload: 'today' });
   }, [onViewChange, dispatch]);
 
-  // Dropbox sync status
-  const dropboxEnabled = !!state.preferences.dropbox?.enabled && !!state.preferences.dropbox?.appKey;
+  // Dropbox sync status - only show when actually connected (has access token)
+  const dropboxConnected = !!state.preferences.dropbox?.enabled && 
+    !!state.preferences.dropbox?.appKey && 
+    !!(state.preferences.dropbox?.accessToken || state.preferences.dropbox?.refreshToken);
   const canLocalBackup = !!state.preferences.backup?.enabled && !!(window as any).__taskfuchs_backup_dir__;
   const [dropboxSyncStatus, setDropboxSyncStatus] = useState<'idle'|'syncing'|'success'|'error'>('idle');
   const [dropboxSyncMessage, setDropboxSyncMessage] = useState('');
 
   // Handle Dropbox sync
   const handleDropboxSync = useCallback(async () => {
-    if (!dropboxEnabled) return;
+    if (!dropboxConnected) return;
     
     setDropboxSyncStatus('syncing');
     setDropboxSyncMessage('Synchronisiere...');
@@ -130,7 +133,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
       setDropboxSyncMessage(e?.message || 'Sync fehlgeschlagen');
       setTimeout(() => setDropboxSyncStatus('idle'), 3000);
     }
-  }, [dropboxEnabled, state, dispatch]);
+  }, [dropboxConnected, state, dispatch]);
 
   // Listen for sync complete events from auto-sync
   useEffect(() => {
@@ -551,10 +554,20 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                 return willOpen;
               });
             }}
-            className="w-14 h-14 rounded-lg flex items-center justify-center hover:scale-105 transition-transform"
+            className="w-14 h-14 rounded-lg flex items-center justify-center hover:scale-105 transition-transform group relative"
             title={t('header.settings')}
           >
-            <User className="w-6 h-6 text-gray-700 dark:text-white" />
+            <div className="flex flex-col items-center gap-0.5">
+              <User className="w-6 h-6 text-gray-700 dark:text-white" />
+              {/* Elegant dropdown indicator */}
+              <ChevronDown 
+                className={`w-3.5 h-3.5 transition-all duration-200 ${
+                  showPlannerUserMenu 
+                    ? 'text-gray-700 dark:text-white rotate-180' 
+                    : 'text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300'
+                }`} 
+              />
+            </div>
           </button>
 
           {showPlannerUserMenu && createPortal(
@@ -753,7 +766,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
         {/* Bottom section (Backup & Dropbox sync) */}
         <div className="sidebar-content px-2 pb-4">
           {/* Dropbox Sync Button */}
-          {dropboxEnabled && (
+          {dropboxConnected && (
             <div className="mt-2 flex items-center justify-center px-1">
               <button 
                 onClick={handleDropboxSync}

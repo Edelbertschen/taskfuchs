@@ -275,7 +275,7 @@ const initialState: AppState = {
   },
   activeTimer: null,
   preferences: {
-    theme: 'system',
+    theme: 'light',
     language: 'de',
     accentColor: '#f97316',
     backgroundImage: '/backgrounds/bg12.png',
@@ -3930,11 +3930,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   }, [state.tasks]);
 
-  // Apply theme and accent color immediately on mount
+  // Apply theme and accent color immediately on mount - BEFORE preferences are loaded
   useLayoutEffect(() => {
     const root = document.documentElement;
     // Set accent color immediately
     root.style.setProperty('--accent-color', state.preferences.accentColor);
+    
+    // Apply light mode immediately on first mount to prevent dark mode flash
+    // The actual theme will be applied later when preferences are loaded
+    root.classList.remove('dark');
   }, []);
 
   // Heartbeat: ensure UI updates even if browser throttles intervals or loses focus
@@ -4000,8 +4004,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
   }, [dispatch]);
 
-  // Apply theme
-  useEffect(() => {
+  // Apply theme - use useLayoutEffect for instant updates without flicker
+  useLayoutEffect(() => {
     const root = document.documentElement;
     if (state.preferences.theme === 'dark') {
       root.classList.add('dark');

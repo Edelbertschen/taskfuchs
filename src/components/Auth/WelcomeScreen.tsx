@@ -1,90 +1,35 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  CheckSquare, Clock, Tags, Calendar, Timer, ArrowRight, 
-  Play, Pause, Square, BarChart3
-} from 'lucide-react';
-import { LoginForm } from './LoginForm';
-import { RegisterForm } from './RegisterForm';
-import { LandingPage } from './LandingPage';
-
-type AuthMode = 'welcome' | 'login' | 'register';
+import React, { useEffect } from 'react';
 
 interface WelcomeScreenProps {
   onGuestMode: () => void;
 }
 
 export function WelcomeScreen({ onGuestMode }: WelcomeScreenProps) {
-  const [authMode, setAuthMode] = useState<AuthMode>('welcome');
-  const [isAnimating, setIsAnimating] = useState(false);
-
-  // Check if we're in a desktop app (Electron) - multiple detection methods
-  const isDesktopApp = typeof window !== 'undefined' && (
-    ('electron' in window) || 
-    ('require' in window) || 
-    (!!(window as any).process?.type) ||
-    (!!(window as any).process?.versions?.electron) ||
-    (navigator.userAgent.includes('Electron')) ||
-    (typeof navigator !== 'undefined' && navigator.userAgent.includes('TaskFuchs'))
-  );
-
-  // If we're in a desktop app, skip everything and go directly to guest mode
+  // For all users (web and desktop), skip the old landing page and go directly to guest mode
+  // The new SplashModal and OnboardingTour in MainApp will handle the welcome experience
   useEffect(() => {
-    if (isDesktopApp) {
-      // Desktop-App: Direkt in Guest-Mode ohne Landing Page
+    // Small delay for smooth transition
+    const timer = setTimeout(() => {
       onGuestMode();
-    }
-  }, [isDesktopApp, onGuestMode]);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [onGuestMode]);
 
-  const handleModeChange = (mode: AuthMode) => {
-    setIsAnimating(true);
-    setTimeout(() => {
-      setAuthMode(mode);
-      setIsAnimating(false);
-    }, 200);
-  };
-
-  const handleGuestMode = () => {
-    setIsAnimating(true);
-    setTimeout(() => {
-      onGuestMode();
-    }, 200);
-  };
-
-  if (authMode === 'login') {
-    return (
-      <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4 transition-opacity duration-200 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}>
-        <LoginForm
-          onSwitchToRegister={() => handleModeChange('register')}
-          onGuestMode={handleGuestMode}
-        />
-      </div>
-    );
-  }
-
-  if (authMode === 'register') {
-    return (
-      <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4 transition-opacity duration-200 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}>
-        <RegisterForm
-          onSwitchToLogin={() => handleModeChange('login')}
-          onGuestMode={handleGuestMode}
-        />
-      </div>
-    );
-  }
-
-  // Only show landing page for web apps, not desktop apps
-  if (!isDesktopApp) {
-    return <LandingPage onGuestLogin={handleGuestMode} />;
-  }
-
-  // This should not happen in desktop apps due to the useEffect above,
-  // but return login form as fallback
+  // Show a brief loading state while transitioning
   return (
-    <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4 transition-opacity duration-200 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}>
-      <LoginForm
-        onSwitchToRegister={() => handleModeChange('register')}
-        onGuestMode={handleGuestMode}
-      />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+      <div className="text-center">
+        <img 
+          src="/3d_fox.png" 
+          alt="TaskFuchs" 
+          className="w-20 h-20 mx-auto mb-4 animate-bounce"
+          onError={(e) => {
+            const img = e.target as HTMLImageElement;
+            if (img.src.includes('/3d_fox.png')) img.src = './3d_fox.png';
+          }}
+        />
+        <div className="text-xl font-bold text-gray-900 dark:text-white">TaskFuchs</div>
+      </div>
     </div>
   );
 } 

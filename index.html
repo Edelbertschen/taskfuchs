@@ -23,6 +23,26 @@
     <title>TaskFuchs - Smarte Aufgabenverwaltung</title>
   </head>
   <body data-has-js="false" style="visibility:hidden">
+    <script>
+      // Prevent dark mode flash - apply saved theme or default to light BEFORE React loads
+      (function() {
+        try {
+          var prefs = localStorage.getItem('taskfuchs-preferences');
+          if (prefs) {
+            var p = JSON.parse(prefs);
+            if (p.theme === 'dark') {
+              document.documentElement.classList.add('dark');
+            } else if (p.theme === 'system') {
+              if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.classList.add('dark');
+              }
+            }
+            // Light mode is default - no class needed
+          }
+          // If no preferences, default is light mode (no dark class)
+        } catch(e) {}
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx?t=20251021120100"></script>
   </body>

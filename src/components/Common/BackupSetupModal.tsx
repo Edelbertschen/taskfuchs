@@ -1,8 +1,10 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
-import { X } from 'lucide-react';
+import { X, CheckCircle, AlertCircle, Clock, HardDrive, FolderOpen } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
+import { de, enUS } from 'date-fns/locale';
 
 interface BackupSetupModalProps {
   isOpen: boolean;
@@ -14,6 +16,12 @@ export function BackupSetupModal({ isOpen, onClose, onChooseDirectory }: BackupS
   const { state, dispatch } = useApp();
   const { i18n, t } = useTranslation();
   const [dirName, setDirName] = React.useState<string | null>(null);
+  const [isCreatingBackup, setIsCreatingBackup] = React.useState(false);
+  const [backupMessage, setBackupMessage] = React.useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  
+  const lastBackup = state.preferences.backup?.lastSuccess;
+  const dateLocale = i18n.language === 'de' ? de : enUS;
+  
   if (!isOpen) return null;
 
   React.useEffect(() => {
@@ -28,6 +36,42 @@ export function BackupSetupModal({ isOpen, onClose, onChooseDirectory }: BackupS
     window.addEventListener('backup-dir-selected', handler as any);
     return () => window.removeEventListener('backup-dir-selected', handler as any);
   }, []);
+  
+  // Create backup now function
+  const handleCreateBackupNow = async () => {
+    setIsCreatingBackup(true);
+    setBackupMessage(null);
+    try {
+      // Trigger the backup event
+      window.dispatchEvent(new CustomEvent('create-backup-now'));
+      // Wait a bit for the backup to complete
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setBackupMessage({ type: 'success', text: i18n.language === 'de' ? 'Backup erfolgreich erstellt!' : 'Backup created successfully!' });
+      // Update last backup time
+      dispatch({ 
+        type: 'UPDATE_PREFERENCES', 
+        payload: { 
+          backup: { 
+            ...state.preferences.backup, 
+            lastSuccess: new Date().toISOString() 
+          } 
+        } 
+      });
+    } catch (e: any) {
+      setBackupMessage({ type: 'error', text: (i18n.language === 'de' ? 'Backup fehlgeschlagen: ' : 'Backup failed: ') + (e?.message || 'Unknown error') });
+    } finally {
+      setIsCreatingBackup(false);
+    }
+  };
+  
+  // Handle directory selection and create initial backup
+  const handleChooseDirectoryAndBackup = async () => {
+    await onChooseDirectory();
+    // After directory is selected, create initial backup
+    setTimeout(() => {
+      handleCreateBackupNow();
+    }, 500);
+  };
 
   return createPortal(
     <div className="fixed inset-0 z-[100000] flex items-center justify-center" onClick={onClose}>
@@ -63,71 +107,113 @@ export function BackupSetupModal({ isOpen, onClose, onChooseDirectory }: BackupS
         {/* Body */}
         <div className="p-6">
           <p className="text-[15px] leading-relaxed text-gray-800 dark:text-gray-100 mb-5">
-            {t('backup_modal.description', 'Um Datenverlust zu vermeiden, speichert TaskFuchs regelmäßig automatische Backups als JSON. Bitte wähle ein Verzeichnis für die Sicherungen aus.')}
+            {t('backup_modal.description', 'Um Datenverlust zu vermeiden, solltest du regelmäßig Backups als JSON-Datei erstellen. Klicke am Ende des Arbeitstages einfach auf den Backup-Button in der Sidebar.')}
           </p>
-          {/* Enable + Interval */}
-          <div className="flex items-center gap-3 mb-4">
-            <label className="inline-flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={!!state.preferences.backup?.enabled}
-                onChange={(e) => dispatch({ type: 'UPDATE_PREFERENCES', payload: { backup: { ...(state.preferences.backup||{ intervalMinutes: 60, notify: true }), enabled: e.target.checked } } })}
-              />
-              <span className="text-sm text-gray-800 dark:text-gray-200">{t('backup_modal.enable', 'Automatische Backups aktivieren')}</span>
-            </label>
+          
+          {/* Last Backup Status */}
+          <div className="mb-5 p-4 rounded-xl border" style={{ 
+            backgroundColor: lastBackup ? `${state.preferences.accentColor}10` : 'rgb(254, 243, 199)',
+            borderColor: lastBackup ? `${state.preferences.accentColor}30` : 'rgb(252, 211, 77)'
+          }}>
+            <div className="flex items-center gap-3">
+              {lastBackup ? (
+                <CheckCircle className="w-5 h-5 flex-shrink-0" style={{ color: state.preferences.accentColor }} />
+              ) : (
+                <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0" />
+              )}
+              <div className="flex-1">
+                <div className="text-sm font-medium text-gray-900 dark:text-white">
+                  {lastBackup 
+                    ? (i18n.language === 'de' ? 'Letztes Backup' : 'Last Backup')
+                    : (i18n.language === 'de' ? 'Noch kein Backup erstellt' : 'No backup created yet')
+                  }
+                </div>
+                {lastBackup && (
+                  <div className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
+                    {format(new Date(lastBackup), i18n.language === 'de' ? "dd. MMMM yyyy 'um' HH:mm 'Uhr'" : "MMMM dd, yyyy 'at' h:mm a", { locale: dateLocale })}
+                  </div>
+                )}
+              </div>
+              {dirName && (
+                <button
+                  onClick={handleCreateBackupNow}
+                  disabled={isCreatingBackup}
+                  className="px-3 py-1.5 text-sm font-medium text-white rounded-lg transition-all hover:opacity-90 disabled:opacity-60"
+                  style={{ backgroundColor: state.preferences.accentColor }}
+                >
+                  {isCreatingBackup 
+                    ? (i18n.language === 'de' ? 'Speichern...' : 'Saving...') 
+                    : (i18n.language === 'de' ? 'Jetzt sichern' : 'Backup now')
+                  }
+                </button>
+              )}
+            </div>
+            {backupMessage && (
+              <div className={`mt-2 text-sm flex items-center gap-2 ${backupMessage.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+                {backupMessage.type === 'success' ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+                {backupMessage.text}
+              </div>
+            )}
           </div>
+          
+          {/* Selected Directory */}
           {dirName && (
-            <div className="mb-4 flex items-center gap-2 text-sm">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-gray-600 dark:text-gray-300"><path d="M2 6a2 2 0 0 1 2-2h4.5a2 2 0 0 1 1.6.8l.9 1.2H20a2 2 0 0 1 2 2v8.5A2.5 2.5 0 0 1 19.5 19h-15A2.5 2.5 0 0 1 2 16.5V6z"/></svg>
-              <span className="text-gray-700 dark:text-gray-200">{t('backup_modal.selected_dir', 'Ausgewählter Ordner')}:</span>
-              <span className="px-2 py-0.5 rounded-md bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 max-w-[60%] truncate" title={dirName}>{dirName}</span>
+            <div className="mb-4 flex items-center gap-2 text-sm p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+              <FolderOpen className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+              <span className="text-gray-600 dark:text-gray-300">{t('backup_modal.selected_dir', 'Ordner')}:</span>
+              <span className="font-medium text-gray-900 dark:text-gray-100 truncate flex-1" title={dirName}>{dirName}</span>
             </div>
           )}
-          {/* Interval input */}
-          <div className="flex items-center gap-3 mb-4">
-            <label className="text-sm font-medium text-gray-800 dark:text-gray-200 w-44">
-              {t('backup_modal.interval', 'Intervall (Minuten)')}
-            </label>
-            <input
-              type="number"
-              min={1}
-              className="w-28 h-10 px-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2"
-              style={{ boxShadow: `0 0 0 1px rgba(0,0,0,0.02)`, WebkitTapHighlightColor: 'transparent' }}
-              value={state.preferences.backup?.intervalMinutes ?? 60}
-              onChange={(e) => {
-                const val = Math.max(1, parseInt(e.target.value || '60'));
-                dispatch({ type: 'UPDATE_PREFERENCES', payload: { backup: { enabled: state.preferences.backup?.enabled ?? false, intervalMinutes: val, notify: state.preferences.backup?.notify ?? true, lastSuccess: state.preferences.backup?.lastSuccess } } });
+          
+          {!dirName && (
+            <div className="mb-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-sm text-amber-800 dark:text-amber-200">
+              {i18n.language === 'de' 
+                ? 'Bitte wähle zuerst einen Speicherort für deine Backups.'
+                : 'Please choose a save location for your backups first.'
+              }
+            </div>
+          )}
+          
+          <div className="text-xs text-gray-600 dark:text-gray-300 mb-5">
+            {t('backup_modal.hint', 'Du kannst Backups jederzeit über Einstellungen → Daten wiederherstellen.')}
+          </div>
+          
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+            <img 
+              src="/3d_fox.png" 
+              alt="Fuchs" 
+              className="w-12 h-12 object-contain flex-shrink-0"
+              onError={(e) => {
+                const img = e.target as HTMLImageElement;
+                if (img.src.includes('/3d_fox.png')) img.src = './3d_fox.png';
               }}
             />
-          </div>
-          <div className="text-xs text-gray-600 dark:text-gray-300 mb-5">
-            {t('backup_modal.hint', 'Du kannst Intervall und Ziel jederzeit unter Einstellungen → Daten → Backup ändern.')}
-          </div>
-          <div className="flex items-center gap-3">
-            <img src="/3d_fox.png" alt="Fuchs" width={64} height={64} className="rounded-full" style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.25))' }} />
             <div className="text-sm text-gray-700 dark:text-gray-300">
-              <div className="font-medium text-gray-900 dark:text-white">{t('backup_modal.tip_title', 'Tipp des Fuchses')}</div>
-              {t('backup_modal.tip_text', 'Lege das Verzeichnis z. B. in deiner Cloud (Nextcloud/Dropbox/OneDrive) an, um zusätzliche Sicherheit zu haben.')}
+              <div className="font-medium text-gray-900 dark:text-white mb-0.5">{t('backup_modal.tip_title', 'Tipp des Fuchses')}</div>
+              {i18n.language === 'de' 
+                ? 'Klicke am Ende jedes Arbeitstages auf den Backup-Button – so bist du immer auf der sicheren Seite!'
+                : 'Click the backup button at the end of each work day – that way you\'re always safe!'
+              }
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-end gap-2 bg-white dark:bg-gray-900">
-          <button onClick={onClose} className="px-3.5 h-10 rounded-lg text-gray-800 dark:text-gray-100 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600 shadow-sm">
-            {t('backup_modal.cancel', 'Später')}
+        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between bg-white dark:bg-gray-900">
+          <button onClick={onClose} className="px-4 h-10 rounded-lg text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors">
+            {i18n.language === 'de' ? 'Schließen' : 'Close'}
           </button>
           <button
-            onClick={async () => { await onChooseDirectory(); /* keep modal open for explicit confirmation */ }}
-            className="px-3.5 h-10 rounded-lg text-white shadow-sm hover:opacity-95"
+            onClick={handleChooseDirectoryAndBackup}
+            className="px-4 h-10 rounded-lg text-white shadow-sm hover:opacity-95 flex items-center gap-2"
             style={{ backgroundColor: state.preferences.accentColor, boxShadow: `${state.preferences.accentColor}33 0 4px 16px` }}
           >
-            {t('backup_modal.choose', 'Verzeichnis wählen')}
+            <FolderOpen className="w-4 h-4" />
+            {dirName 
+              ? (i18n.language === 'de' ? 'Ordner ändern' : 'Change folder')
+              : (i18n.language === 'de' ? 'Ordner wählen' : 'Choose folder')
+            }
           </button>
-          <button
-            onClick={() => onClose()}
-            className="ml-2 px-3.5 h-10 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"
-          >OK</button>
         </div>
       </div>
     </div>,

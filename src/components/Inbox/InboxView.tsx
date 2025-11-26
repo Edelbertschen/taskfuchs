@@ -314,10 +314,20 @@ export function InboxView() {
   const dateColumns = availableColumns.filter(col => col.type === 'date');
   const projectColumns = availableColumns.filter(col => col.type === 'project');
   const availableTags = state.tags;
-  // Count for header badge
+  
+  // Count for header badge - only count TRUE inbox tasks (not session-edited ones with dates/projects)
+  const trueInboxCount = useMemo(() => 
+    state.tasks.filter(task => 
+      task.columnId === 'inbox' && 
+      !task.reminderDate && 
+      !task.projectId && 
+      !task.completed
+    ).length,
+  [state.tasks]);
+  
   const inboxCount = selectedDateFilter
     ? filteredGroups.reduce((acc, group) => acc + group.tasks.length, 0)
-    : inboxTasks.length;
+    : trueInboxCount;
 
   const handleTaskSelect = (taskId: string, selected: boolean) => {
     const newSelected = new Set(selectedTasks);
@@ -596,6 +606,13 @@ export function InboxView() {
         }
       }
       
+      // Add to sessionEditedTaskIds so task stays visible until user leaves inbox
+      setSessionEditedTaskIds(prev => {
+        const newSet = new Set(prev);
+        newSet.add(selectedTaskForDate.id);
+        return newSet;
+      });
+      
       dispatch({
         type: 'UPDATE_TASK',
         payload: { 
@@ -616,6 +633,13 @@ export function InboxView() {
 
   const handleProjectAssign = (projectId: string, columnId?: string) => {
     if (selectedTaskForProject) {
+      // Add to sessionEditedTaskIds so task stays visible until user leaves inbox
+      setSessionEditedTaskIds(prev => {
+        const newSet = new Set(prev);
+        newSet.add(selectedTaskForProject.id);
+        return newSet;
+      });
+      
       dispatch({
         type: 'UPDATE_TASK',
         payload: {
@@ -633,6 +657,14 @@ export function InboxView() {
 
   const handleAssignTaskToPin = (task: Task, pinColumnId: string) => {
     if (!pinColumnId) return;
+    
+    // Add to sessionEditedTaskIds so task stays visible until user leaves inbox
+    setSessionEditedTaskIds(prev => {
+      const newSet = new Set(prev);
+      newSet.add(task.id);
+      return newSet;
+    });
+    
     dispatch({ type: 'ASSIGN_TASK_TO_PIN', payload: { taskId: task.id, pinColumnId } });
   };
 
@@ -643,6 +675,13 @@ export function InboxView() {
 
   const handlePinAssign = (pinColumnId: string) => {
     if (selectedTaskForPin) {
+      // Add to sessionEditedTaskIds so task stays visible until user leaves inbox
+      setSessionEditedTaskIds(prev => {
+        const newSet = new Set(prev);
+        newSet.add(selectedTaskForPin.id);
+        return newSet;
+      });
+      
       dispatch({ 
         type: 'ASSIGN_TASK_TO_PIN', 
         payload: { taskId: selectedTaskForPin.id, pinColumnId } 
@@ -709,7 +748,7 @@ export function InboxView() {
         className={`absolute top-0 left-0 bottom-0 w-full sm:w-80 flex flex-col overflow-hidden z-20 border-r ${
           isMinimalDesign
             ? 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800'
-            : 'bg-white/30 dark:bg-gray-900/40 backdrop-blur-xl border-white/20 dark:border-gray-700/30'
+            : 'bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border-white/20 dark:border-gray-700/30'
         }`}
         style={{
           boxShadow: isMinimalDesign ? '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' : '0 8px 32px rgba(0, 0, 0, 0.1)',
@@ -1381,17 +1420,17 @@ export function InboxView() {
                 <div className={`flex flex-col items-center justify-center text-center p-8 rounded-3xl max-w-md mx-4 ${
                   isMinimalDesign
                     ? 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700'
-                    : 'bg-white/5 border border-white/10 shadow-[0_16px_40px_rgba(31,38,135,0.2)] backdrop-blur-3xl before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none relative overflow-hidden'
+                    : 'bg-white/80 dark:bg-gray-900/60 border border-gray-200/50 dark:border-white/10 shadow-[0_16px_40px_rgba(31,38,135,0.15)] backdrop-blur-xl relative overflow-hidden'
                 }`}>
                   <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${
                     isMinimalDesign
                       ? 'bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600'
-                      : 'bg-white/15 border border-white/25 backdrop-blur-xl shadow-lg'
+                      : 'bg-gray-100 dark:bg-white/15 border border-gray-200 dark:border-white/25 shadow-lg'
                   } relative z-10`}>
                     <Archive className={`w-8 h-8 ${
                       isMinimalDesign
                         ? 'text-gray-600 dark:text-gray-300'
-                        : `isDarkMode ? 'text-white' : 'text-gray-900'`
+                        : 'text-gray-700 dark:text-white'
                     }`} />
                 </div>
                   <h3 className="text-lg font-semibold mb-2 relative z-10 text-gray-900 dark:text-white">
@@ -1944,13 +1983,27 @@ function InboxTaskCard({
         </button>
         <button
           onClick={() => {
-            onDateSelect();
+            if (task.reminderDate) {
+              // Remove date
+              dispatch({
+                type: 'UPDATE_TASK',
+                payload: {
+                  ...task,
+                  reminderDate: undefined,
+                  columnId: 'inbox', // Move back to inbox when date is removed
+                  updatedAt: new Date().toISOString()
+                }
+              });
+            } else {
+              // Set date
+              onDateSelect();
+            }
             setContextMenu(null);
           }}
           className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2"
         >
           <Calendar className="w-4 h-4" />
-          <span>Termin setzen</span>
+          <span>{task.reminderDate ? 'Datum entfernen' : 'Termin setzen'}</span>
         </button>
         <button
           onClick={() => {

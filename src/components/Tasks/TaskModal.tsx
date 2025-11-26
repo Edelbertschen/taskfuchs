@@ -8,7 +8,7 @@ import {
   CalendarDays, FolderOpen, ChevronDown, Target, Zap, Search, GripHorizontal,
   Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Code, Quote, 
   Minus, CheckSquare, HelpCircle, EyeOff, Pin, Edit2, ChevronLeft, ChevronRight,
-  ArrowLeftRight, Inbox, Bell, Maximize, Minimize, ChevronUp, GripVertical
+  ArrowLeftRight, Inbox, Bell, Maximize, Minimize, ChevronUp, GripVertical, Pencil, Expand
 } from 'lucide-react';
 import { MarkdownRenderer } from '../Common/MarkdownRenderer';
 import type { Task, Subtask, Column, RecurrenceRule, TaskReminder } from '../../types';
@@ -229,6 +229,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
   const [newColumnTitle, setNewColumnTitle] = useState('');
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [isDescriptionPreviewMode, setIsDescriptionPreviewMode] = useState(true);
+  const [showDescriptionFullscreen, setShowDescriptionFullscreen] = useState(false);
   
   // Multi-line subtask creation
   const [showMultiLineModal, setShowMultiLineModal] = useState(false);
@@ -339,7 +340,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
     setHasUnsavedChanges(hasChanges);
   }, [formData, task]);
 
-  // Handle modal close
+  // Handle modal close - Autosave is active, so changes are already saved automatically
   const handleClose = useCallback(() => {
     // Trigger graceful close animation before unmounting
     try {
@@ -352,17 +353,10 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
         backdropEl.classList.add('animate-backdrop-out');
       }
     } catch {}
-    const doClose = () => {
-      // Autosave is active - always save and close without warning
-      if (hasUnsavedChanges && task) {
-        // Save immediately before closing
-        handleSave();
-      }
-      onClose();
-    };
-    // Allow CSS animation to play briefly
-    setTimeout(doClose, 150);
-  }, [hasUnsavedChanges, onClose, task, handleSave]);
+    // Allow CSS animation to play briefly, then close
+    // Autosave already handles saving changes, no need to save again here
+    setTimeout(() => onClose(), 150);
+  }, [onClose]);
 
   // Handle ESC key and backdrop clicks
   const handleEscape = useCallback((e: KeyboardEvent) => {
@@ -554,7 +548,9 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
     );
   };
 
-  const handleSave = useCallback(() => {
+  // closeAfterSave: true = close modal after save (default for manual save)
+  //                 false = don't close (used by autosave)
+  const handleSave = useCallback((closeAfterSave: boolean = true) => {
     if (!task) return;
     
     const taskData: Task = {
@@ -724,21 +720,23 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
     });
 
     setHasUnsavedChanges(false);
-    // Notify parent before closing to allow navigation/auto-advance flows
+    // Notify parent to allow navigation/auto-advance flows
     try {
       onSaved && onSaved(taskData);
     } catch {}
-    if (shouldCloseOnSave) {
+    // Only close if explicitly requested AND shouldCloseOnSave is true
+    if (closeAfterSave && shouldCloseOnSave) {
       onClose();
     }
   }, [task, formData, dispatch, onClose, onSaved, shouldCloseOnSave, recurrenceRule]);
 
   // Autosave effect - automatically saves changes after a debounce period
+  // Important: pass false to handleSave to prevent closing the modal
   useEffect(() => {
     if (!hasUnsavedChanges || !task || !isOpen) return;
     
     const autosaveTimeout = setTimeout(() => {
-      handleSave();
+      handleSave(false); // Don't close after autosave
     }, 800); // 800ms debounce for autosave
     
     return () => clearTimeout(autosaveTimeout);
@@ -1950,10 +1948,10 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
           backdropMouseDownRef.current = false;
         }}
       >
-        {/* Modal Container */}
+        {/* Modal Container - Premium Frosted Glass Design */}
         <div 
           ref={modalRef}
-          className="task-modal-root relative rounded-none sm:rounded-2xl shadow-2xl w-screen sm:w-full sm:max-w-5xl h-[100svh] sm:h-auto sm:max-h-[85vh] overflow-hidden flex flex-col modal-content animate-modal-in"
+          className="task-modal-root relative rounded-none sm:rounded-3xl w-screen sm:w-full sm:max-w-4xl h-[100svh] sm:h-auto sm:max-h-[80vh] overflow-hidden flex flex-col modal-content animate-modal-in"
           onClick={e => e.stopPropagation()}
           onMouseDown={(e) => e.stopPropagation()}
           onMouseMove={(e) => e.stopPropagation()}
@@ -1966,21 +1964,32 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
           style={{ 
             pointerEvents: 'auto',
             transform: navDirection === 'next' ? 'translateX(8px)' : navDirection === 'prev' ? 'translateX(-8px)' : 'translateX(0)',
-            transition: 'transform 200ms ease',
-            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 251, 0.92) 100%)',
-            backdropFilter: 'blur(30px)',
-            WebkitBackdropFilter: 'blur(30px)',
-            border: '1.5px solid rgba(255, 255, 255, 0.4)',
-            boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.25), inset 0 0 32px rgba(255, 255, 255, 0.3)',
+            transition: 'transform 200ms cubic-bezier(0.4, 0, 0.2, 1)',
+            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(250, 250, 252, 0.92) 50%, rgba(255, 255, 255, 0.88) 100%)',
+            backdropFilter: 'blur(60px) saturate(200%) contrast(1.05)',
+            WebkitBackdropFilter: 'blur(60px) saturate(200%) contrast(1.05)',
+            border: '1.5px solid rgba(255, 255, 255, 0.7)',
+            boxShadow: `
+              0 32px 64px -16px rgba(0, 0, 0, 0.2),
+              0 16px 32px -8px rgba(0, 0, 0, 0.1),
+              0 0 0 1px rgba(255, 255, 255, 0.4),
+              inset 0 1px 0 rgba(255, 255, 255, 0.8),
+              inset 0 -1px 0 rgba(255, 255, 255, 0.3)
+            `,
           }}
         >
           <style>{`
             .dark .task-modal-root {
-              background: linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(31, 41, 55, 0.90) 100%) !important;
-              border: 1.5px solid rgba(255, 255, 255, 0.15) !important;
-              box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4), inset 0 0 32px rgba(255, 255, 255, 0.05) !important;
-              backdrop-filter: blur(30px) !important;
-              -webkit-backdrop-filter: blur(30px) !important;
+              background: linear-gradient(135deg, rgba(30, 41, 59, 0.97) 0%, rgba(15, 23, 42, 0.95) 50%, rgba(30, 41, 59, 0.92) 100%) !important;
+              border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
+              box-shadow: 
+                0 32px 64px -16px rgba(0, 0, 0, 0.5),
+                0 16px 32px -8px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.03) !important;
+              backdrop-filter: blur(60px) saturate(200%) contrast(1.05) !important;
+              -webkit-backdrop-filter: blur(60px) saturate(200%) contrast(1.05) !important;
             }
           `}</style>
           {/* Progress Line at Top */}
@@ -2001,34 +2010,43 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
             </div>
           )}
 
-          {/* Header with editable title, date, and project */}
-          <div className="relative p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-            {/* Close button - Large, prominent */}
+          {/* Header with editable title, date, and project - Frosted Glass */}
+          <div className="task-modal-header relative p-4 sm:p-5 border-b border-white/40 dark:border-white/10"
+            style={{
+              background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(250, 251, 252, 0.3) 100%)',
+            }}
+          >
+            <style>{`
+              .dark .task-modal-header {
+                background: linear-gradient(180deg, rgba(51, 65, 85, 0.4) 0%, rgba(30, 41, 59, 0.2) 100%) !important;
+              }
+            `}</style>
+            {/* Close button - Subtle, elegant */}
             <div className="absolute top-4 right-4 z-10">
               <button
                 onClick={handleClose}
-                className="p-2.5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-all hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg hover:scale-110 shadow-sm hover:shadow-md"
+                className="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-all duration-200 hover:bg-gray-100/80 dark:hover:bg-gray-800/80 rounded-full hover:scale-105"
                 title="Close modal"
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Title with Date and Project */}
             <div className="pr-12 flex items-center space-x-4">
-              {/* Pin Dropdown vor dem Titel */}
+              {/* Pin Dropdown vor dem Titel - Elegant */}
               <div className="relative flex-shrink-0">
                 <button
                   onClick={() => setShowPinDropdown(!showPinDropdown)}
-                  className={`p-2 transition-all duration-200 rounded-lg ${
+                  className={`p-2.5 transition-all duration-200 rounded-xl ${
                     task?.pinColumnId
-                      ? 'text-white shadow-sm'
-                      : 'text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+                      ? 'text-white shadow-md'
+                      : 'text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100/80 dark:hover:bg-gray-800/80'
                   }`}
-                  style={task?.pinColumnId ? getAccentColorStyles().bg : {}}
+                  style={task?.pinColumnId ? { ...getAccentColorStyles().bg, boxShadow: `0 4px 12px -2px ${state.preferences.accentColor}40` } : {}}
                   title={task?.pinColumnId ? `Gepinnt in ${state.pinColumns.find(col => col.id === task.pinColumnId)?.title || 'Unbekannt'}` : 'An Pins anheften'}
                 >
-                  <Pin className="w-6 h-6" />
+                  <Pin className="w-5 h-5" />
                 </button>
 
                 {/* Pin Dropdown */}
@@ -2096,35 +2114,35 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                 onBlur={handleTitleBlur}
                 onKeyDown={handleTitleKeyDown}
                 placeholder="Aufgabentitel eingeben..."
-                className={`text-xl sm:text-2xl font-bold bg-transparent border-none p-0 flex-1 min-w-0 focus:outline-none focus:ring-0 placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200 ${
+                className={`text-lg sm:text-xl font-semibold bg-transparent border-none p-0 flex-1 min-w-0 focus:outline-none focus:ring-0 placeholder-gray-300 dark:placeholder-gray-600 transition-all duration-200 tracking-tight ${
                   task?.completed
                     ? 'text-gray-400 dark:text-gray-500 line-through'
-                    : 'text-gray-900 dark:text-white'
+                    : 'text-gray-800 dark:text-white'
                 }`}
                 autoFocus={false}
               />
               
-              {/* Date & Project in Header */}
-              <div className="flex items-center space-x-3 flex-shrink-0">
-                {/* Date */}
-                <div className="relative dropdown-container">
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => {
-                        setShowInlineCalendar(!showInlineCalendar);
-                        setShowInlineProjectSelector(false);
-                        setExpandedProject(null);
-                      }}
-                      className="flex items-center space-x-2 px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors bg-white dark:bg-gray-700 font-medium"
-                    >
-                      <CalendarDays className="w-4 h-4 text-gray-500" />
-                      <span className="text-gray-900 dark:text-white">
-                        {formData.reminderDate 
-                          ? format(new Date(formData.reminderDate), 'dd.MM.yyyy', { locale: de })
-                          : taskModal.dateSelect()
-                        }
-                      </span>
-                    </button>
+                {/* Date & Project in Header - Elegant Pills */}
+                <div className="flex items-center space-x-2 flex-shrink-0">
+                  {/* Date */}
+                  <div className="relative dropdown-container">
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => {
+                          setShowInlineCalendar(!showInlineCalendar);
+                          setShowInlineProjectSelector(false);
+                          setExpandedProject(null);
+                        }}
+                        className="flex items-center space-x-2 px-3.5 py-2 text-sm rounded-xl transition-all duration-200 bg-white/60 dark:bg-gray-800/60 hover:bg-white dark:hover:bg-gray-800 border border-gray-200/50 dark:border-gray-700/50 hover:shadow-sm font-medium backdrop-blur-sm"
+                      >
+                        <CalendarDays className="w-4 h-4 text-gray-400" />
+                        <span className="text-gray-700 dark:text-gray-200">
+                          {formData.reminderDate 
+                            ? format(new Date(formData.reminderDate), 'dd.MM.yyyy', { locale: de })
+                            : taskModal.dateSelect()
+                          }
+                        </span>
+                      </button>
                     
                     {/* Remove Date Button */}
                     {formData.reminderDate && (
@@ -2730,41 +2748,61 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
 
           {/* Main Content */}
           <div className="flex flex-1 min-h-0">
-            {/* Left Content Area */}
-                          <div className="flex-1 p-4 overflow-y-auto">
-                <div className="space-y-4">
+            {/* Left Content Area - Elegant */}
+                          <div className="flex-1 p-5 overflow-y-auto">
+                <div className="space-y-5">
                 {/* Description */}
                 <div>
-                  {/* Header with close button */}
-                  <div className="flex items-center justify-between mb-2">
+                  {/* Header with edit/fullscreen icons */}
+                  <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-2">
-                      <BookOpen className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <BookOpen className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                      <label className="text-sm font-medium text-gray-600 dark:text-gray-400">
                         Description
                       </label>
                     </div>
-                    {!isDescriptionPreviewMode && (
+                    <div className="flex items-center space-x-1">
+                      {/* Fullscreen button */}
                       <button
-                        onClick={() => {
-                          setIsDescriptionPreviewMode(true);
-                          setIsDescriptionExpanded(false);
-                        }}
-                        className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
-                        title={taskModal.closeDescription()}
+                        onClick={() => setShowDescriptionFullscreen(true)}
+                        className="p-1.5 hover:bg-gray-100/80 dark:hover:bg-gray-800/80 rounded-lg transition-all duration-200"
+                        title="Vollbildansicht"
                       >
-                        <X className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                        <Expand className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                       </button>
-                    )}
+                      {/* Edit toggle button */}
+                      {isDescriptionPreviewMode ? (
+                        <button
+                          onClick={() => setIsDescriptionPreviewMode(false)}
+                          className="p-1.5 hover:bg-gray-100/80 dark:hover:bg-gray-800/80 rounded-lg transition-all duration-200"
+                          title="Bearbeiten"
+                        >
+                          <Pencil className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            setIsDescriptionPreviewMode(true);
+                            setIsDescriptionExpanded(false);
+                          }}
+                          className="p-1.5 hover:bg-gray-100/80 dark:hover:bg-gray-800/80 rounded-lg transition-all duration-200"
+                          title="Bearbeitung beenden"
+                        >
+                          <Eye className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                        </button>
+                      )}
+                    </div>
                   </div>
 
-                  {/* Unified container for preview and edit */}
+                  {/* Unified container for preview and edit - Glass Style */}
                   <div 
-                    className={`relative w-full rounded-lg border-2 border-gray-300 dark:border-gray-600 overflow-hidden group ${
-                      isDescriptionPreviewMode ? 'bg-white/60 dark:bg-gray-800/30 backdrop-blur-sm cursor-text' : 'bg-white dark:bg-gray-800 focus-within:border-accent'
+                    className={`relative w-full rounded-2xl overflow-hidden group transition-all duration-300 ${
+                      isDescriptionPreviewMode 
+                        ? 'bg-gray-50/50 dark:bg-gray-800/30 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/30' 
+                        : 'bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 focus-within:border-accent shadow-sm'
                     } ${
-                      isDescriptionExpanded ? 'h-[calc(100vh-300px)] resize-y' : 'h-auto min-h-16 max-h-48'
+                      isDescriptionExpanded ? 'h-[calc(100vh-300px)] resize-y' : 'h-auto min-h-20 max-h-48'
                     }`}
-                    onClick={() => isDescriptionPreviewMode && setIsDescriptionPreviewMode(false)}
                     onKeyDown={(e) => {
                       if (e.key === 'Escape' && !isDescriptionPreviewMode) {
                         e.preventDefault();
@@ -2789,7 +2827,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                       <div className="text-gray-900 dark:text-white text-sm leading-relaxed p-4 wysiwyg-content overflow-y-auto max-h-44">
                         {!formData.description?.trim() && (
                           <span className="text-gray-400 dark:text-gray-500 text-sm italic opacity-60">
-                            {taskModal.descriptionPlaceholder() || 'Click to edit...'}
+                            Keine Beschreibung
                           </span>
                         )}
                         {formData.description?.trim() && (
@@ -2825,20 +2863,20 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   </div>
                 </div>
 
-                {/* Subtasks - Collapsible */}
+                {/* Subtasks - Collapsible - Elegant */}
                 <div>
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-2">
-                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <label className="text-sm font-medium text-gray-600 dark:text-gray-400">
                         Subtasks ({formData.subtasks.length})
                       </label>
                       {formData.subtasks.length > 0 && (
                         <button
                           onClick={() => setIsSubtasksExpanded(!isSubtasksExpanded)}
-                          className="p-1 hover:bg-gray-50 dark:hover:bg-gray-800 rounded transition-colors"
+                          className="p-1 hover:bg-gray-100/80 dark:hover:bg-gray-800/80 rounded-lg transition-all duration-200"
                         >
                           <ChevronDown 
-                            className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
+                            className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
                               isSubtasksExpanded ? 'rotate-180' : ''
                             }`} 
                           />
@@ -2850,7 +2888,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                         addSubtask();
                         setIsSubtasksExpanded(true);
                       }}
-                      className="flex items-center space-x-1 px-2 py-1 text-xs rounded-md transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
+                      className="flex items-center space-x-1 px-2.5 py-1.5 text-xs rounded-lg transition-all duration-200 hover:bg-gray-100/80 dark:hover:bg-gray-800/80 font-medium"
                       style={getAccentColorStyles().text}
                     >
                       <Plus className="w-3 h-3" />
@@ -2859,14 +2897,14 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   </div>
 
                   {isSubtasksExpanded && formData.subtasks.length > 0 && (
-                    <div className="space-y-0 ml-6">
+                    <div className="space-y-1 ml-4">
                       {formData.subtasks.map((subtask, index) => (
-                        <div key={subtask.id} className="flex items-center space-x-3 py-1 px-2 bg-gray-50 dark:bg-gray-800 rounded-lg group">
+                        <div key={subtask.id} className="flex items-center space-x-3 py-2 px-3 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl group transition-all duration-200 hover:bg-gray-100/50 dark:hover:bg-gray-800/50">
                           <input
                             type="checkbox"
                             checked={subtask.completed}
                             onChange={(e) => updateSubtask(subtask.id, { completed: e.target.checked })}
-                            className="w-4 h-4 border-gray-300 rounded"
+                            className="w-4 h-4 border-gray-300 rounded-md"
                             style={{ 
                               accentColor: state.preferences.accentColor,
                               ...getAccentColorStyles().text 
@@ -2878,15 +2916,15 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                             onChange={(e) => updateSubtask(subtask.id, { title: e.target.value })}
                             onKeyPress={(e) => handleSubtaskKeyPress(e, subtask.id)}
                             onPaste={(e) => handleSubtaskPaste(e, subtask.id)}
-                            placeholder={`$Subtasks ${index + 1}`}
-                            className="flex-1 px-2 py-1 text-sm border border-transparent focus:border-gray-300 dark:focus:border-gray-600 rounded focus:outline-none bg-transparent text-gray-900 dark:text-white"
+                            placeholder={`Subtask ${index + 1}`}
+                            className="flex-1 px-2 py-1 text-sm border border-transparent focus:border-gray-200 dark:focus:border-gray-700 rounded-lg focus:outline-none bg-transparent text-gray-700 dark:text-gray-200"
                             data-subtask-input
                           />
                           <button
                             onClick={() => deleteSubtask(subtask.id)}
-                            className="p-1 text-red-500 hover:text-red-700 transition-colors opacity-0 group-hover:opacity-100"
+                            className="p-1.5 text-gray-400 hover:text-red-500 transition-all duration-200 opacity-0 group-hover:opacity-100 rounded-lg hover:bg-red-50/50 dark:hover:bg-red-900/20"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
                       ))}
@@ -2896,43 +2934,41 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
               </div>
             </div>
 
-            {/* Right Sidebar - Meta Information */}
-            <div className="w-72 bg-gray-100 dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 p-4 overflow-y-auto flex flex-col">
-                              <div className="space-y-4">
-                {/* Priority Buttons */}
+            {/* Right Sidebar - Meta Information - Frosted Glass */}
+            <div className="task-modal-sidebar w-64 p-4 overflow-y-auto flex flex-col border-l border-white/40 dark:border-white/10"
+              style={{
+                background: 'linear-gradient(180deg, rgba(248, 250, 252, 0.7) 0%, rgba(241, 245, 249, 0.6) 100%)',
+                backdropFilter: 'blur(20px)',
+              }}
+            >
+              <style>{`
+                .dark .task-modal-sidebar {
+                  background: linear-gradient(180deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.5) 100%) !important;
+                }
+              `}</style>
+                              <div className="space-y-5">
+                {/* Priority Buttons - Elegant Pills */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                    {"Priority"}
+                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">
+                    Priority
                   </label>
-                  <div className="flex gap-1.5 items-center">
+                  <div className="flex gap-2 items-center">
                     {[
-                      { value: 'low', label: "Low", colorBg: 'rgba(34, 197, 94, 0.1)', colorBorder: 'rgb(34, 197, 94)', icon: '!' },
-                      { value: 'medium', label: "Medium", colorBg: 'rgba(234, 179, 8, 0.1)', colorBorder: 'rgb(234, 179, 8)', icon: '!!' },
-                      { value: 'high', label: "High", colorBg: 'rgba(239, 68, 68, 0.1)', colorBorder: 'rgb(239, 68, 68)', icon: '!!!' }
+                      { value: 'low', label: "Low", colorBg: 'rgba(34, 197, 94, 0.12)', colorBorder: 'rgb(34, 197, 94)', icon: '!' },
+                      { value: 'medium', label: "Medium", colorBg: 'rgba(234, 179, 8, 0.12)', colorBorder: 'rgb(234, 179, 8)', icon: '!!' },
+                      { value: 'high', label: "High", colorBg: 'rgba(239, 68, 68, 0.12)', colorBorder: 'rgb(239, 68, 68)', icon: '!!!' }
                     ].map((priority) => (
                       <button
                         key={priority.value}
                         onClick={() => setFormData(prev => ({ ...prev, priority: priority.value as any }))}
-                        className="relative group px-2.5 py-1.5 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer hover:scale-105 border-l-2"
+                        className={`relative px-3 py-2 rounded-xl text-xs font-bold transition-all duration-300 cursor-pointer ${
+                          formData.priority === priority.value ? 'scale-105 shadow-sm' : 'opacity-50 hover:opacity-80'
+                        }`}
                         style={{
                           backgroundColor: formData.priority === priority.value ? priority.colorBg : 'transparent',
-                          borderColor: formData.priority === priority.value ? priority.colorBorder : priority.colorBorder + '30',
-                          opacity: formData.priority === priority.value ? '1' : '0.5',
-                          paddingLeft: formData.priority === priority.value ? '10px' : '12px',
-                          fontFamily: 'monospace',
-                          letterSpacing: '-1px'
-                        }}
-                        onMouseEnter={(e) => {
-                          if (formData.priority !== priority.value) {
-                            e.currentTarget.style.backgroundColor = priority.colorBg;
-                            e.currentTarget.style.opacity = '0.7';
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (formData.priority !== priority.value) {
-                            e.currentTarget.style.backgroundColor = 'transparent';
-                            e.currentTarget.style.opacity = '0.5';
-                          }
+                          border: `1.5px solid ${formData.priority === priority.value ? priority.colorBorder : priority.colorBorder + '30'}`,
+                          color: priority.colorBorder,
+                          fontFamily: 'system-ui',
                         }}
                         title={priority.label}
                       >
@@ -2944,11 +2980,82 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                     {formData.priority && formData.priority !== 'none' && (
                       <button
                         onClick={() => setFormData(prev => ({ ...prev, priority: 'none' }))}
-                        className="ml-2 px-2 py-1.5 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer hover:scale-110 border-2 border-gray-300 dark:border-gray-600 hover:border-red-400 dark:hover:border-red-400 text-gray-400 hover:text-red-400 dark:hover:text-red-400"
+                        className="p-2 rounded-xl text-xs transition-all duration-200 cursor-pointer hover:scale-105 text-gray-400 hover:text-red-400 hover:bg-red-50/50 dark:hover:bg-red-900/20"
                         title="Clear priority"
                       >
-                        ×
+                        <X className="w-3.5 h-3.5" />
                       </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Time Management - Estimated & Tracked Time */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">
+                    Zeit
+                  </label>
+                  <div className="space-y-3">
+                    {/* Estimated Time */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Clock className="w-4 h-4 text-gray-400" />
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Geschätzt</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <input
+                          type="number"
+                          min="0"
+                          value={formData.estimatedTime || ''}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value) || 0;
+                            setFormData(prev => ({ ...prev, estimatedTime: value > 0 ? value : undefined }));
+                            setHasUnsavedChanges(true);
+                          }}
+                          className="w-16 text-right px-2 py-1 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1"
+                          style={{ '--tw-ring-color': state.preferences.accentColor } as React.CSSProperties}
+                          placeholder="0"
+                        />
+                        <span className="text-xs text-gray-400">min</span>
+                      </div>
+                    </div>
+                    
+                    {/* Tracked Time */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Timer className="w-4 h-4 text-gray-400" />
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Verbraucht</span>
+                      </div>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        {(() => {
+                          const trackedTime = getCurrentTrackedTime();
+                          if (trackedTime === 0) return '0 min';
+                          const hours = Math.floor(trackedTime / 60);
+                          const mins = trackedTime % 60;
+                          if (hours > 0) return `${hours}h ${mins}min`;
+                          return `${mins} min`;
+                        })()}
+                      </span>
+                    </div>
+                    
+                    {/* Progress Bar (if estimated time is set) */}
+                    {formData.estimatedTime && formData.estimatedTime > 0 && (
+                      <div className="mt-2">
+                        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
+                          <span>Fortschritt</span>
+                          <span>{Math.round(getProgressPercentage())}%</span>
+                        </div>
+                        <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full rounded-full transition-all duration-300"
+                            style={{ 
+                              width: `${Math.min(getProgressPercentage(), 100)}%`,
+                              backgroundColor: getProgressPercentage() > 100 
+                                ? '#ef4444' 
+                                : state.preferences.accentColor
+                            }}
+                          />
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -3432,11 +3539,21 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
             </div>
           </div>
 
-          {/* Footer */}
-          <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 sticky bottom-0">
+          {/* Footer - Frosted Glass */}
+          <div className="task-modal-footer border-t border-white/50 dark:border-white/10 sticky bottom-0"
+            style={{
+              background: 'linear-gradient(180deg, rgba(250, 251, 252, 0.85) 0%, rgba(248, 250, 252, 0.9) 100%)',
+              backdropFilter: 'blur(20px)',
+            }}
+          >
+            <style>{`
+              .dark .task-modal-footer {
+                background: linear-gradient(180deg, rgba(30, 41, 59, 0.85) 0%, rgba(15, 23, 42, 0.9) 100%) !important;
+              }
+            `}</style>
             {/* Action Buttons */}
-            <div className="flex items-center justify-between p-3 sm:p-6">
-              {/* Delete Button - Left Side */}
+            <div className="flex items-center justify-between p-4">
+              {/* Delete Button - Left Side - Subtle */}
               <button
                 onClick={() => {
                   if (!task) return;
@@ -3453,13 +3570,13 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                     }
                   }
                 }}
-                className="flex items-center space-x-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50/50 dark:hover:bg-red-900/10 rounded-xl transition-all duration-200"
               >
                 <Trash2 className="w-4 h-4" />
-                <span>{t('common.delete')}</span>
+                <span className="hidden sm:inline">{t('common.delete')}</span>
               </button>
 
-              {/* Timer Button - Center */}
+              {/* Timer Button - Center - Premium */}
               <button
                 onClick={() => {
                   if (task) {
@@ -3471,14 +3588,14 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                     });
                   }
                 }}
-                className={`flex items-center space-x-2 px-5 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 hover:scale-105 ${
+                className={`flex items-center space-x-2 px-5 py-2.5 text-sm font-medium rounded-xl transition-all duration-300 ${
                   state.activeTimer?.taskId === task?.id && state.activeTimer?.isActive && !state.activeTimer?.isPaused
-                    ? 'text-white shadow-md'
-                    : 'hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600'
+                    ? 'text-white shadow-lg shadow-accent/30'
+                    : 'bg-white/60 dark:bg-gray-800/60 hover:bg-white dark:hover:bg-gray-800 border border-gray-200/50 dark:border-gray-700/50 hover:shadow-md'
                 }`}
                 style={
                   state.activeTimer?.taskId === task?.id && state.activeTimer?.isActive && !state.activeTimer?.isPaused
-                    ? getAccentColorStyles().bg
+                    ? { ...getAccentColorStyles().bg, boxShadow: `0 10px 25px -5px ${state.preferences.accentColor}40` }
                     : { color: state.preferences.accentColor }
                 }
                 title={
@@ -3487,7 +3604,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                     : 'Timer starten'
                 }
               >
-                <Play className="w-5 h-5" />
+                <Play className="w-4 h-4" />
                 <span>
                   {state.activeTimer?.taskId === task?.id && state.activeTimer?.isActive && !state.activeTimer?.isPaused
                     ? 'Timer läuft'
@@ -3496,19 +3613,22 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
               </button>
 
               {/* Action Buttons - Right Side */}
-              <div className="flex items-center space-x-2 sm:space-x-3">
+              <div className="flex items-center space-x-2">
                 <button
                   onClick={handleClose}
-                  className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100/50 dark:hover:bg-gray-800/50 rounded-xl transition-all duration-200"
                 >
                   {t('common.cancel')}
                 </button>
                 
-                {/* Task Completed Button */}
+                {/* Task Completed Button - Premium */}
                 <button
                   onClick={task?.completed ? handleToggleComplete : handleCompleteAndClose}
-                  className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white rounded-lg transition-all duration-200 hover:opacity-90"
-                  style={{ backgroundColor: state.preferences.accentColor }}
+                  className="flex items-center space-x-2 px-5 py-2.5 text-sm font-medium text-white rounded-xl transition-all duration-300 hover:shadow-lg"
+                  style={{ 
+                    backgroundColor: state.preferences.accentColor,
+                    boxShadow: `0 4px 14px -3px ${state.preferences.accentColor}50`
+                  }}
                   title={task?.completed ? t('tasks.mark_incomplete') : t('tasks.mark_complete')}
                 >
                   <CheckSquare className="w-4 h-4" />
@@ -3879,6 +3999,114 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
         </div>
       )}
 
+      {/* Fullscreen Description Modal */}
+      {showDescriptionFullscreen && createPortal(
+        <div 
+          className="fixed inset-0 z-[99999999] flex items-center justify-center"
+          onClick={() => setShowDescriptionFullscreen(false)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              setShowDescriptionFullscreen(false);
+            }
+          }}
+        >
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          
+          {/* Modal */}
+          <div 
+            className="relative w-[95vw] h-[90vh] max-w-7xl rounded-2xl overflow-hidden shadow-2xl flex flex-col"
+            style={{
+              background: document.documentElement.classList.contains('dark') 
+                ? 'linear-gradient(135deg, rgba(17, 24, 39, 0.98) 0%, rgba(31, 41, 55, 0.98) 100%)'
+                : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 251, 0.98) 100%)',
+              border: document.documentElement.classList.contains('dark') 
+                ? '1px solid rgba(255, 255, 255, 0.1)'
+                : '1px solid rgba(200, 200, 200, 0.3)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center space-x-3">
+                <BookOpen className="w-5 h-5" style={{ color: state.preferences.accentColor }} />
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Beschreibung bearbeiten
+                </h2>
+              </div>
+              <button
+                onClick={() => setShowDescriptionFullscreen(false)}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+              </button>
+            </div>
+            
+            {/* Two-Column Layout */}
+            <div className="flex-1 flex overflow-hidden">
+              {/* Left Column - Markdown Editor */}
+              <div className="w-1/2 flex flex-col border-r border-gray-200 dark:border-gray-700">
+                <div className="px-4 py-2 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center space-x-2">
+                    <Pencil className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Markdown</span>
+                  </div>
+                </div>
+                <div className="flex-1 p-4 overflow-hidden">
+                  <textarea
+                    value={formData.description}
+                    onChange={(e) => {
+                      setFormData(prev => ({ ...prev, description: e.target.value }));
+                      setHasUnsavedChanges(true);
+                    }}
+                    className="w-full h-full resize-none bg-transparent text-gray-900 dark:text-white font-mono text-sm leading-relaxed focus:outline-none"
+                    placeholder="Beschreibung in Markdown eingeben..."
+                    style={{ fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace' }}
+                  />
+                </div>
+              </div>
+              
+              {/* Right Column - Preview */}
+              <div className="w-1/2 flex flex-col">
+                <div className="px-4 py-2 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center space-x-2">
+                    <Eye className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Vorschau</span>
+                  </div>
+                </div>
+                <div className="flex-1 p-6 overflow-y-auto wysiwyg-content">
+                  {formData.description?.trim() ? (
+                    <MarkdownRenderer 
+                      content={formData.description}
+                      onCheckboxChange={(newDescription) => {
+                        setFormData(prev => ({ ...prev, description: newDescription }));
+                        setHasUnsavedChanges(true);
+                      }}
+                    />
+                  ) : (
+                    <p className="text-gray-400 dark:text-gray-500 italic">
+                      Keine Beschreibung vorhanden
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            {/* Footer */}
+            <div className="flex items-center justify-end px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30">
+              <button
+                onClick={() => setShowDescriptionFullscreen(false)}
+                className="px-5 py-2 rounded-xl font-medium text-white transition-all hover:scale-[1.02]"
+                style={{ backgroundColor: state.preferences.accentColor }}
+              >
+                Fertig
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
     </>
   );
 
@@ -3930,7 +4158,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
       }
     `;
     document.head.appendChild(style);
-    return () => document.head.removeChild(style);
+    return () => { document.head.removeChild(style); };
   }, []);
 
   return (

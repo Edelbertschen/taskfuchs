@@ -107,7 +107,7 @@ function DropZone({ id, className, children }: { id: string; className?: string;
 // Standardized Widget Styles - für absolute Konsistenz
 const WIDGET_STYLES = {
   // Container Styles
-  container: "p-6 rounded-2xl transition-all duration-300 hover:scale-105 cursor-pointer h-[450px] flex flex-col",
+  container: "p-6 rounded-2xl transition-all duration-300 h-[450px] flex flex-col",
   
   // Header Styles  
   header: "flex items-center space-x-3 mb-4",
@@ -504,6 +504,16 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
       return () => document.removeEventListener('click', handleClickOutside);
     }
   }, [contextMenu]);
+
+  // Listen for 'open-end-of-day-modal' event (from onboarding)
+  useEffect(() => {
+    const handleOpenEndOfDayModal = () => {
+      setShowEndOfDayModal(true);
+    };
+    
+    window.addEventListener('open-end-of-day-modal', handleOpenEndOfDayModal);
+    return () => window.removeEventListener('open-end-of-day-modal', handleOpenEndOfDayModal);
+  }, []);
 
   // Overlay styles removed - no background overlays in today view
 

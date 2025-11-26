@@ -41,7 +41,8 @@ import {
   Info,
   Printer,
   Edit3,
-  Trash2
+  Trash2,
+  Pin
 } from 'lucide-react';
 import { ProfileModal } from '../Common/ProfileModal';
 import { DatePickerSlider } from '../Common/DatePickerSlider';
@@ -76,6 +77,7 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
   const [showPersonalCapacity, setShowPersonalCapacity] = useState(false);
   const [projectSidebarMinimized, setProjectSidebarMinimized] = useState(false);
   const [taskSidebarMinimized, setTaskSidebarMinimized] = useState(false);
+  const [pinsSidebarMinimized, setPinsSidebarMinimized] = useState(true);
   const [notesSliderOpen, setNotesSliderOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -131,6 +133,10 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
       setTaskSidebarMinimized(event.detail.minimized);
     };
 
+    const handlePinsSidebarStateChange = (event: CustomEvent) => {
+      setPinsSidebarMinimized(event.detail.minimized);
+    };
+
     const handleNotesSliderStateChange = (event: CustomEvent) => {
       setNotesSliderOpen(event.detail.isOpen);
     };
@@ -146,6 +152,7 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
     document.addEventListener('keydown', handleKeyDown);
     window.addEventListener('project-sidebar-state-changed', handleSidebarStateChange);
     window.addEventListener('task-sidebar-state-changed', handleTaskSidebarStateChange);
+    window.addEventListener('pins-sidebar-state-changed', handlePinsSidebarStateChange);
     window.addEventListener('notes-slider-state-changed', handleNotesSliderStateChange);
     window.addEventListener('open-user-guide', handleOpenUserGuide);
     window.addEventListener('start-onboarding', handleStartOnboarding);
@@ -154,6 +161,7 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
       document.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('project-sidebar-state-changed', handleSidebarStateChange);
       window.removeEventListener('task-sidebar-state-changed', handleTaskSidebarStateChange);
+      window.removeEventListener('pins-sidebar-state-changed', handlePinsSidebarStateChange);
       window.removeEventListener('notes-slider-state-changed', handleNotesSliderStateChange);
       window.removeEventListener('open-user-guide', handleOpenUserGuide);
       window.removeEventListener('start-onboarding', handleStartOnboarding);
@@ -798,6 +806,35 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
               </>
             )}
             
+            {/* Pins Controls */}
+            {currentView === 'pins' && (
+              <>
+                {/* Sidebar Toggle Button */}
+                <button
+                  onClick={() => {
+                    window.dispatchEvent(new CustomEvent('toggle-pins-sidebar'));
+                  }}
+                  className="flex items-center justify-center w-[44px] h-[44px] text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all duration-200"
+                  title={pinsSidebarMinimized ? (t('pins.show_sidebar') || 'Aufgaben anzeigen') : (t('pins.hide_sidebar') || 'Aufgaben ausblenden')}
+                >
+                  {pinsSidebarMinimized ? (
+                    <PanelLeftOpen className="w-5 h-5" />
+                  ) : (
+                    <PanelLeftClose className="w-5 h-5" />
+                  )}
+                </button>
+
+                {/* Title when sidebar is minimized */}
+                {pinsSidebarMinimized && (
+                  <div className="flex items-center h-[44px] space-x-2">
+                    <Pin className="w-5 h-5" style={{ color: state.preferences.accentColor }} />
+                    <span className="text-gray-900 dark:text-white font-semibold text-lg">
+                      {t('pins.title') || 'Pins'}
+                    </span>
+                  </div>
+                )}
+              </>
+            )}
 
           </div>
 

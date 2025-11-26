@@ -2,6 +2,8 @@ import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useApp } from '../../context/AppContext';
 import { createPortal } from 'react-dom';
 import { useAppTranslation } from '../../utils/i18nHelpers';
+import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
 import { 
   DndContext, 
   DragOverlay, 
@@ -12,7 +14,8 @@ import {
   useSensors,
   PointerSensor,
   TouchSensor,
-  MouseSensor
+  MouseSensor,
+  useDraggable
 } from '@dnd-kit/core';
 import { 
   SortableContext, 
@@ -33,17 +36,90 @@ import {
   FolderOpen,
   Sparkles,
   Columns,
-  Focus
+  Focus,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Calendar,
+  Folder
 } from 'lucide-react';
 import { TaskCard } from '../Tasks/TaskCard';
 import { TaskColumn } from '../Tasks/TaskColumn';
 import { TaskModal } from '../Tasks/TaskModal';
 import { PinColumnManager } from './PinColumnManager';
-import type { Task, PinColumn as PinColumnType } from '../../types';
+import { Header } from '../Layout/Header';
+import type { Task, PinColumn as PinColumnType, Column } from '../../types';
+
+// Draggable Sidebar Task Component for Pins
+function PinsSidebarTaskItem({ task, formatEstimatedTime }: { task: Task, formatEstimatedTime: (minutes: number) => string | null }) {
+  const { t } = useTranslation();
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    isDragging,
+  } = useDraggable({
+    id: task.id,
+    data: {
+      type: 'sidebar-task',
+      task: task,
+    },
+  });
+
+  // Constrain transform to not allow leftward movement out of sidebar
+  const constrainedTransform = transform ? {
+    x: Math.max(0, transform.x),
+    y: transform.y
+  } : null;
+
+  const style = {
+    transform: constrainedTransform ? `translate3d(${constrainedTransform.x}px, ${constrainedTransform.y}px, 0)` : undefined,
+    opacity: isDragging ? 0.8 : 1,
+    zIndex: isDragging ? 9998 : 1,
+    scale: isDragging ? 1.02 : 1,
+    transition: isDragging ? 'none' : 'all 0.2s ease',
+  };
+
+  const getPriorityBorderClass = (priority?: string) => {
+    switch (priority) {
+      case 'high': return 'border-l-red-500';
+      case 'medium': return 'border-l-yellow-500';
+      case 'low': return 'border-l-green-500';
+      default: return '';
+    }
+  };
+
+  const hasPriority = task.priority && task.priority !== 'none';
+  const priorityBorderClass = getPriorityBorderClass(task.priority);
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...listeners}
+      {...attributes}
+      className={`px-3 py-2 mx-2 mb-1 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow text-sm truncate ${
+        hasPriority ? `border-l-2 ${priorityBorderClass}` : ''
+      }`}
+      title={task.title}
+    >
+      <div className="flex items-center gap-2 min-w-0">
+        <span className="truncate flex-1 text-gray-800 dark:text-gray-200">{task.title}</span>
+        {task.estimatedTime && task.estimatedTime > 0 && (
+          <span className="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0">
+            {formatEstimatedTime(task.estimatedTime)}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export function PinsView() {
   const { state, dispatch } = useApp();
   const { actions, forms, titles, messages, pins } = useAppTranslation();
+  const { t, i18n } = useTranslation();
   const isMinimalDesign = state.preferences.minimalDesign;
   
   // Reactive dark mode check
@@ -59,6 +135,109 @@ export function PinsView() {
   const [editingColumnId, setEditingColumnId] = useState<string | null>(null);
   const [editingColumnTitle, setEditingColumnTitle] = useState('');
   const [showColumnManager, setShowColumnManager] = useState(false);
+  
+  // Sidebar state - like ProjectKanbanBoard uses sidebarMinimized
+  const [sidebarMinimized, setSidebarMinimized] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('taskfuchs-pins-sidebar-minimized');
+      return saved === 'true';
+    } catch {
+      return true; // Start minimized
+    }
+  });
+  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
+  const [showTodayTasks, setShowTodayTasks] = useState(true);
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  
+  // Dispatch sidebar state to header
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('pins-sidebar-state-changed', {
+      detail: { minimized: sidebarMinimized }
+    }));
+  }, [sidebarMinimized]);
+  
+  // Toggle sidebar - like Projects
+  const toggleSidebar = useCallback(() => {
+    setSidebarMinimized(prev => {
+      const newState = !prev;
+      try { localStorage.setItem('taskfuchs-pins-sidebar-minimized', String(newState)); } catch {}
+      window.dispatchEvent(new CustomEvent('pins-sidebar-state-changed', {
+        detail: { minimized: newState }
+      }));
+      return newState;
+    });
+  }, []);
+  
+  // Listen for toggle events from header
+  useEffect(() => {
+    const handleToggleSidebar = () => {
+      toggleSidebar();
+    };
+    
+    window.addEventListener('toggle-pins-sidebar', handleToggleSidebar);
+    return () => window.removeEventListener('toggle-pins-sidebar', handleToggleSidebar);
+  }, [toggleSidebar]);
+  
+  // Toggle project expansion
+  const toggleProject = useCallback((projectId: string) => {
+    setExpandedProjects(prev => {
+      const next = new Set(prev);
+      if (next.has(projectId)) {
+        next.delete(projectId);
+      } else {
+        next.add(projectId);
+      }
+      return next;
+    });
+  }, []);
+  
+  // Format estimated time helper
+  const formatEstimatedTime = useCallback((minutes: number) => {
+    if (!minutes || minutes <= 0) return null;
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    if (hours > 0 && mins > 0) return `${hours}h ${mins}m`;
+    if (hours > 0) return `${hours}h`;
+    return `${mins}m`;
+  }, []);
+  
+  // Get today's date column ID
+  const todayColumnId = useMemo(() => {
+    const today = format(new Date(), 'yyyy-MM-dd');
+    return `date-${today}`;
+  }, []);
+  
+  // Get tasks from today's date column (not already pinned)
+  const todayTasks = useMemo(() => {
+    return state.tasks
+      .filter(task => 
+        task.columnId === todayColumnId && 
+        !task.completed && 
+        !task.archived &&
+        !task.pinColumnId // Not already pinned
+      )
+      .sort((a, b) => (a.position || 0) - (b.position || 0));
+  }, [state.tasks, todayColumnId]);
+  
+  // Get project tasks (not already pinned)
+  const projectTasks = useMemo(() => {
+    const projects = state.columns.filter(col => col.type === 'project');
+    return projects
+      .map(project => ({
+        project,
+        tasks: state.tasks.filter(task => 
+          task.projectId === project.id && 
+          !task.completed && 
+          !task.archived &&
+          !task.pinColumnId // Not already pinned
+        ).sort((a, b) => (a.position || 0) - (b.position || 0))
+      }))
+      .filter(group => group.tasks.length > 0);
+  }, [state.tasks, state.columns]);
 
   const sensors = useSensors(
     useSensor(MouseSensor, {
@@ -171,6 +350,10 @@ export function PinsView() {
     if (activeData?.type === 'pin-column') {
       const column = state.pinColumns.find(c => c.id === active.id);
       setActiveColumn(column || null);
+    } else if (activeData?.type === 'sidebar-task') {
+      // Sidebar task being dragged
+      const task = activeData.task as Task;
+      setActiveTask(task || null);
     } else {
       const task = state.tasks.find(t => t.id === active.id);
       setActiveTask(task || null);
@@ -180,6 +363,31 @@ export function PinsView() {
   const handleDragOver = (event: DragOverEvent) => {
     const { active, over } = event;
     setOverId(over ? over.id as string : null);
+  };
+
+  // Helper function to normalize task positions in pin columns
+  const normalizeTaskPositions = (tasks: Task[], pinColumnIds: string[]) => {
+    const normalizedTasks = [...tasks];
+    
+    pinColumnIds.forEach(pinColumnId => {
+      const columnTasks = normalizedTasks
+        .filter(task => task.pinColumnId === pinColumnId)
+        .sort((a, b) => (a.position || 0) - (b.position || 0));
+      
+      // Reassign positions starting from 0 with no gaps
+      columnTasks.forEach((task, index) => {
+        const taskIndex = normalizedTasks.findIndex(t => t.id === task.id);
+        if (taskIndex !== -1) {
+          normalizedTasks[taskIndex] = {
+            ...normalizedTasks[taskIndex],
+            position: index,
+            updatedAt: new Date().toISOString()
+          };
+        }
+      });
+    });
+    
+    return normalizedTasks;
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -193,6 +401,7 @@ export function PinsView() {
 
     const activeData = active.data.current;
     const overData = over.data.current;
+    const isSidebarTask = activeData?.type === 'sidebar-task';
 
     // Pin column reordering
     if (activeData?.type === 'pin-column' && overData?.type === 'pin-column') {
@@ -215,65 +424,141 @@ export function PinsView() {
       return;
     }
 
-    // Task drag & drop
-    if (!activeTask || activeData?.type !== 'task') return;
+    // Get the active task (either from sidebar or regular drag)
+    const draggedTask = isSidebarTask ? (activeData?.task as Task) : activeTask;
+    if (!draggedTask) return;
 
     const activeId = active.id as string;
     const overId = over.id as string;
-    
-    // Dropping on pin column
-    const targetPinColumn = state.pinColumns.find(col => col.id === overId);
-    if (targetPinColumn) {
-      const columnTasks = state.tasks
-        .filter(task => task.pinColumnId === targetPinColumn.id && task.id !== activeId)
-        .sort((a, b) => (a.position || 0) - (b.position || 0));
-      
-      const newPosition = columnTasks.length > 0 ? Math.max(...columnTasks.map(t => t.position || 0)) + 1 : 0;
-      
-      dispatch({
-        type: 'UPDATE_TASK',
-        payload: {
-          ...activeTask,
-          pinColumnId: targetPinColumn.id,
-          pinned: true,
-          position: newPosition,
-          updatedAt: new Date().toISOString()
-        }
-      });
-      return;
-    }
 
-    // Dropping on another task
-    const overTask = state.tasks.find(t => t.id === overId);
-    if (overTask && overTask.pinColumnId) {
-      const targetColumnId = overTask.pinColumnId;
-      const targetPosition = overTask.position || 0;
+    // Task drag & drop (both sidebar and regular tasks)
+    if (isSidebarTask || activeData?.type === 'task') {
       
-      const updatedTasks = state.tasks.map(task => {
-        if (task.id === activeId) {
-          return {
-            ...task,
-            pinColumnId: targetColumnId,
+      // Dropping on pin column (empty area or column itself)
+      const targetPinColumn = state.pinColumns.find(col => col.id === overId);
+      if (targetPinColumn) {
+        const columnTasks = state.tasks
+          .filter(task => task.pinColumnId === targetPinColumn.id && task.id !== activeId)
+          .sort((a, b) => (a.position || 0) - (b.position || 0));
+        
+        const newPosition = columnTasks.length > 0 ? Math.max(...columnTasks.map(t => t.position || 0)) + 1 : 0;
+        
+        dispatch({
+          type: 'UPDATE_TASK',
+          payload: {
+            ...draggedTask,
+            pinColumnId: targetPinColumn.id,
             pinned: true,
-            position: targetPosition,
+            position: newPosition,
             updatedAt: new Date().toISOString()
-          };
-        } else if (task.pinColumnId === targetColumnId && task.id !== activeId) {
-          if ((task.position || 0) >= targetPosition) {
-            return {
-              ...task,
-              position: (task.position || 0) + 1,
-              updatedAt: new Date().toISOString()
-            };
+          }
+        });
+        
+        console.log('📌 Task pinned to column:', {
+          taskId: draggedTask.id,
+          taskTitle: draggedTask.title,
+          pinColumn: targetPinColumn.title
+        });
+        return;
+      }
+
+      // Dropping on another task in a pin column
+      const overTask = state.tasks.find(t => t.id === overId);
+      if (overTask && overTask.pinColumnId) {
+        const targetColumnId = overTask.pinColumnId;
+        const isSameColumn = draggedTask.pinColumnId === targetColumnId;
+        const activeTaskPosition = draggedTask.position || 0;
+        const targetPosition = overTask.position || 0;
+        
+        // Calculate new position
+        let newPosition = targetPosition;
+        
+        if (isSameColumn) {
+          // Within same column: determine if we're moving up or down
+          if (activeTaskPosition < targetPosition) {
+            // Moving down
+            newPosition = targetPosition;
+          } else {
+            // Moving up
+            newPosition = targetPosition;
           }
         }
-        return task;
-      });
 
-      dispatch({
-        type: 'SET_TASKS',
-        payload: updatedTasks
-      });
+        // Update all tasks with proper position management
+        const updatedTasks = state.tasks.map(task => {
+          if (task.id === activeId) {
+            // Update the active task
+            return {
+              ...task,
+              pinColumnId: targetColumnId,
+              pinned: true,
+              position: newPosition,
+              updatedAt: new Date().toISOString()
+            };
+          } else if (task.pinColumnId === targetColumnId && task.id !== activeId) {
+            // Handle position shifts in target column
+            if (isSameColumn) {
+              // Same column movement
+              if (activeTaskPosition < targetPosition && (task.position || 0) > activeTaskPosition && (task.position || 0) <= targetPosition) {
+                // Moving down: shift tasks between old and new position up
+                return {
+                  ...task,
+                  position: (task.position || 0) - 1,
+                  updatedAt: new Date().toISOString()
+                };
+              } else if (activeTaskPosition > targetPosition && (task.position || 0) >= targetPosition && (task.position || 0) < activeTaskPosition) {
+                // Moving up: shift tasks between new and old position down
+                return {
+                  ...task,
+                  position: (task.position || 0) + 1,
+                  updatedAt: new Date().toISOString()
+                };
+              }
+            } else {
+              // Different column: shift tasks at or after target position down
+              if ((task.position || 0) >= newPosition) {
+                return {
+                  ...task,
+                  position: (task.position || 0) + 1,
+                  updatedAt: new Date().toISOString()
+                };
+              }
+            }
+          } else if (!isSameColumn && task.pinColumnId === draggedTask.pinColumnId && task.id !== activeId) {
+            // Handle position shifts in source column (only for cross-column moves)
+            if ((task.position || 0) > activeTaskPosition) {
+              return {
+                ...task,
+                position: (task.position || 0) - 1,
+                updatedAt: new Date().toISOString()
+              };
+            }
+          }
+          return task;
+        });
+
+        // Normalize positions to ensure no gaps
+        const columnsToNormalize = isSameColumn 
+          ? [targetColumnId] 
+          : [targetColumnId, draggedTask.pinColumnId].filter(Boolean) as string[];
+        const normalizedTasks = normalizeTaskPositions(updatedTasks, columnsToNormalize);
+
+        dispatch({
+          type: 'SET_TASKS',
+          payload: normalizedTasks
+        });
+        
+        console.log('📌 Task repositioned in pin column:', {
+          taskId: draggedTask.id,
+          taskTitle: draggedTask.title,
+          fromColumn: draggedTask.pinColumnId,
+          toColumn: targetColumnId,
+          fromPosition: activeTaskPosition,
+          toPosition: newPosition,
+          isSameColumn
+        });
+        return;
+      }
     }
   };
 
@@ -472,7 +757,7 @@ export function PinsView() {
             className={`flex flex-col items-center justify-center min-h-[120px] flex-1 min-w-0 rounded-lg transition-all duration-200 group ${
               isMinimalDesign
                 ? 'border-2 border-dashed border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500'
-                : 'backdrop-blur-xl bg-white/30 dark:bg-gray-900/40 border-2 border-dashed border-white/40 dark:border-gray-600/50 hover:bg-white/40 dark:hover:bg-gray-900/50 hover:border-white/60 dark:hover:border-gray-500/60'
+                : 'backdrop-blur-xl bg-white/70 dark:bg-gray-900/70 border-2 border-dashed border-white/40 dark:border-gray-600/50 hover:bg-white/40 dark:hover:bg-gray-900/50 hover:border-white/60 dark:hover:border-gray-500/60'
             }`}
             style={isMinimalDesign ? {
               backgroundColor: isDarkMode ? '#111827' : '#FFFFFF'
@@ -532,21 +817,27 @@ export function PinsView() {
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
-      <div className={`h-full w-full relative overflow-hidden ${
+      <div className={`h-full w-full flex overflow-hidden ${
         isMinimalDesign ? 'bg-white dark:bg-[#111827]' : ''
       }`}>
         
-        {/* Main Content Area */}
-        <div className="h-full flex flex-col overflow-hidden">
-          
-          {/* Header */}
+        {/* Sidebar - styled like ProjectKanbanBoard */}
+        <div 
+          className={`flex-shrink-0 h-full flex flex-col overflow-hidden transition-all duration-300 border-r ${
+            isMinimalDesign
+              ? 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800'
+              : 'bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border-white/20 dark:border-gray-700/30'
+          }`}
+          style={{ 
+            boxShadow: isMinimalDesign ? '0 1px 3px 0 rgba(0, 0, 0, 0.1)' : '0 8px 32px rgba(0, 0, 0, 0.1)',
+            width: sidebarMinimized ? '0px' : '320px',
+            marginLeft: sidebarMinimized ? '-320px' : '0px',
+          }}
+        >
+          {/* Sidebar Header - solid, not glass */}
           <div 
-            className={`flex-shrink-0 px-4 flex items-center ${
-              isMinimalDesign
-                ? 'bg-white dark:bg-[#111827] border-b border-gray-200 dark:border-gray-800'
-                : 'bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700'
-            }`}
-            style={{
+            className="relative flex items-center px-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#111827]"
+            style={{ 
               height: '68px',
               minHeight: '68px',
               maxHeight: '68px',
@@ -554,22 +845,154 @@ export function PinsView() {
             }}
           >
             <div className="flex items-center justify-between w-full">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 rounded-lg" style={{ backgroundColor: state.preferences.accentColor + '1A' }}>
-                  <Pin className="w-5 h-5" style={{ color: state.preferences.accentColor }} />
-                </div>
-                <div>
-                  <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    {pins.title()}
-                  </h1>
-                  <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
-                    <span>{pins.tasksCount(Object.values(tasksByPinColumn).flat().length)}</span>
-                    <span>•</span>
-                    <span>{pins.columnsCount(state.pinColumns.length)}</span>
-                  </div>
-                </div>
-              </div>
+              <h1 className="text-lg font-semibold flex items-center space-x-2 text-gray-900 dark:text-white">
+                <Pin className="w-5 h-5" style={{ color: state.preferences.accentColor }} />
+                <span>{t('pins.title') || 'Pins'}</span>
+              </h1>
             </div>
+          </div>
+          
+          {/* Hint Section */}
+          <div className={`px-4 py-3 border-b ${
+            isMinimalDesign
+              ? 'border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900'
+              : (isDarkMode ? 'border-white/15 bg-transparent' : 'border-gray-300/50 bg-white/30')
+          }`}>
+            <p className={`text-xs ${
+              isMinimalDesign ? 'text-gray-500 dark:text-gray-400' : (isDarkMode ? 'text-gray-400' : 'text-gray-600')
+            }`}>
+              Ziehe Aufgaben in die Pin-Spalten
+            </p>
+          </div>
+          
+          {/* Sidebar Content */}
+          <div className="flex-1 overflow-y-auto overflow-x-hidden py-2">
+            {/* Today's Tasks Section */}
+            <div className="mb-4">
+              <button
+                onClick={() => setShowTodayTasks(!showTodayTasks)}
+                className={`w-full px-4 py-2 flex items-center justify-between text-left hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors`}
+              >
+                <div className="flex items-center space-x-2">
+                  <Calendar className="w-4 h-4" style={{ color: state.preferences.accentColor }} />
+                  <span className={`text-sm font-medium ${
+                    isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? 'text-gray-300' : 'text-gray-700')
+                  }`}>
+                    Heute
+                  </span>
+                  <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+                    isMinimalDesign 
+                      ? 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                      : 'bg-gray-200/50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400'
+                  }`}>
+                    {todayTasks.length}
+                  </span>
+                </div>
+                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${
+                  showTodayTasks ? 'rotate-180' : ''
+                } ${isMinimalDesign ? 'text-gray-500' : (isDarkMode ? 'text-gray-400' : 'text-gray-500')}`} />
+              </button>
+              
+              {showTodayTasks && (
+                <div className="mt-1">
+                  {todayTasks.length === 0 ? (
+                    <p className={`px-4 py-2 text-xs italic ${
+                      isMinimalDesign ? 'text-gray-500 dark:text-gray-400' : (isDarkMode ? 'text-gray-500' : 'text-gray-500')
+                    }`}>
+                      Keine Aufgaben für heute
+                    </p>
+                  ) : (
+                    todayTasks.map(task => (
+                      <PinsSidebarTaskItem
+                        key={task.id}
+                        task={task}
+                        formatEstimatedTime={formatEstimatedTime}
+                      />
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+            
+            {/* Divider */}
+            <div className={`mx-4 border-t ${
+              isMinimalDesign ? 'border-gray-200 dark:border-gray-700' : 'border-gray-200/50 dark:border-gray-700/50'
+            }`} />
+            
+            {/* Project Tasks Section */}
+            <div className="mt-4">
+              <div className={`px-4 pb-2 text-xs font-medium uppercase tracking-wider ${
+                isMinimalDesign ? 'text-gray-500 dark:text-gray-400' : (isDarkMode ? 'text-gray-400' : 'text-gray-500')
+              }`}>
+                Projektaufgaben
+              </div>
+              
+              {projectTasks.length === 0 ? (
+                <div className={`px-4 py-4 text-center ${
+                  isMinimalDesign ? 'text-gray-500 dark:text-gray-400' : (isDarkMode ? 'text-gray-400' : 'text-gray-500')
+                }`}>
+                  <Folder className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                  <p className="text-xs">Keine Projektaufgaben</p>
+                </div>
+              ) : (
+                projectTasks.map(({ project, tasks: projTasks }) => (
+                  <div key={project.id} className="mb-2">
+                    <button
+                      onClick={() => toggleProject(project.id)}
+                      className={`w-full px-4 py-2 flex items-center justify-between text-left hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors`}
+                    >
+                      <div className="flex items-center space-x-2 min-w-0">
+                        <div 
+                          className="w-3 h-3 rounded-full flex-shrink-0"
+                          style={{ backgroundColor: project.color || state.preferences.accentColor }}
+                        />
+                        <span className={`text-sm font-medium truncate ${
+                          isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? 'text-gray-300' : 'text-gray-700')
+                        }`}>
+                          {project.title}
+                        </span>
+                        <span className={`text-xs px-1.5 py-0.5 rounded-full flex-shrink-0 ${
+                          isMinimalDesign 
+                            ? 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                            : 'bg-gray-200/50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400'
+                        }`}>
+                          {projTasks.length}
+                        </span>
+                      </div>
+                      <ChevronDown className={`w-4 h-4 transition-transform duration-200 flex-shrink-0 ${
+                        expandedProjects.has(project.id) ? 'rotate-180' : ''
+                      } ${isMinimalDesign ? 'text-gray-500' : (isDarkMode ? 'text-gray-400' : 'text-gray-500')}`} />
+                    </button>
+                    
+                    {expandedProjects.has(project.id) && (
+                      <div className="mt-1">
+                        {projTasks.map(task => (
+                          <PinsSidebarTaskItem
+                            key={task.id}
+                            task={task}
+                            formatEstimatedTime={formatEstimatedTime}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+        
+        {/* Main Content Area */}
+        <div 
+          className="flex-1 h-full flex flex-col overflow-hidden"
+        >
+          {/* Header */}
+          <div className={`flex-shrink-0 border-b shadow-sm ${
+            isMinimalDesign
+              ? 'bg-white dark:bg-[#111827] border-gray-200 dark:border-gray-800'
+              : 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-gray-200/60 dark:border-gray-700/60'
+          }`}>
+            <Header currentView="pins" />
           </div>
 
           {/* Board Content */}

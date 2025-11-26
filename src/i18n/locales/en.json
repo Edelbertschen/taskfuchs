@@ -1711,5 +1711,10 @@
     "failed": "Backup failed",
     "success_title": "Backup successful",
     "success_message": "Your data has been saved securely"
+  },
+  "pwa": {
+    "update_available": "New version available",
+    "update_now": "Update now",
+    "update_later": "Later"
   }
 } 

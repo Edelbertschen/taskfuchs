@@ -282,17 +282,30 @@ const Settings = React.memo(() => {
   const [customDangerColor, setCustomDangerColor] = useState('#ef4444');
   const [hexInput, setHexInput] = useState('#e06610');
 
-  // Available accent colors
-  const accentColors = [
-    '#e06610',
-    '#9a244f',
-    '#7b2ff2',
-    '#006d8f',
-    '#00a78e',
-    '#00b92a',
-    '#2f4f4f',
-    '#7c2a00',
-    '#c600ff'
+  // Available accent colors for Light Mode (darker, richer tones)
+  const accentColorsLight = [
+    '#e06610', // Warm Orange
+    '#9a244f', // Deep Magenta
+    '#7b2ff2', // Rich Purple
+    '#006d8f', // Deep Teal
+    '#00a78e', // Forest Green
+    '#00b92a', // Vibrant Green
+    '#2f4f4f', // Dark Slate
+    '#7c2a00', // Deep Brown
+    '#c600ff'  // Electric Purple
+  ];
+
+  // Available accent colors for Dark Mode (brighter, more vibrant)
+  const accentColorsDark = [
+    '#ff8a3d', // Bright Orange
+    '#ff6b9d', // Bright Pink
+    '#a78bfa', // Soft Violet
+    '#22d3ee', // Bright Cyan
+    '#34d399', // Bright Emerald
+    '#4ade80', // Lime Green
+    '#60a5fa', // Sky Blue
+    '#fbbf24', // Golden Yellow
+    '#f472b6'  // Rose Pink
   ];
 
   // Available background colors (same as accent colors)
@@ -3780,6 +3793,149 @@ const Settings = React.memo(() => {
               </div>
             </div>
 
+            {/* Theme Presets Section */}
+            <div className="settings-card p-6 border">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                  {state.preferences.language === 'de' ? 'Theme Presets' : 'Theme Presets'}
+                </h3>
+              </div>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                {state.preferences.language === 'de' 
+                  ? 'Wähle ein vordefiniertes Theme oder erstelle dein eigenes mit den Einstellungen unten.'
+                  : 'Choose a predefined theme or create your own with the settings below.'}
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {/* Default Theme */}
+                <button
+                  onClick={() => {
+                    dispatch({
+                      type: 'UPDATE_PREFERENCES',
+                      payload: {
+                        theme: 'light',
+                        accentColor: '#f97316',
+                        backgroundImage: '/backgrounds/bg12.png',
+                        backgroundType: 'image'
+                      }
+                    });
+                    document.documentElement.classList.remove('dark');
+                  }}
+                  className="group relative p-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-orange-400 dark:hover:border-orange-400 transition-all duration-200 bg-white dark:bg-gray-800"
+                >
+                  <div className="aspect-[4/3] rounded-lg overflow-hidden mb-2 relative">
+                    <img 
+                      src="/backgrounds/bg12.png" 
+                      alt="Default Theme"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute top-1 right-1 w-4 h-4 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: '#f97316' }} />
+                    <div className="absolute bottom-1 left-1 bg-white/90 rounded px-1.5 py-0.5 flex items-center gap-1">
+                      <Sun className="w-3 h-3 text-amber-500" />
+                    </div>
+                  </div>
+                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                    {state.preferences.language === 'de' ? 'Standard' : 'Default'}
+                  </span>
+                </button>
+
+                {/* Cyan & Dark Theme */}
+                <button
+                  onClick={() => {
+                    dispatch({
+                      type: 'UPDATE_PREFERENCES',
+                      payload: {
+                        theme: 'dark',
+                        accentColor: '#22d3ee',
+                        backgroundImage: '/backgrounds/bg2.jpg',
+                        backgroundType: 'image'
+                      }
+                    });
+                    document.documentElement.classList.add('dark');
+                  }}
+                  className="group relative p-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-cyan-400 dark:hover:border-cyan-400 transition-all duration-200 bg-white dark:bg-gray-800"
+                >
+                  <div className="aspect-[4/3] rounded-lg overflow-hidden mb-2 relative">
+                    <img 
+                      src="/backgrounds/bg2.jpg" 
+                      alt="Cyan & Dark Theme"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute top-1 right-1 w-4 h-4 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: '#22d3ee' }} />
+                    <div className="absolute bottom-1 left-1 bg-gray-900/90 rounded px-1.5 py-0.5 flex items-center gap-1">
+                      <Moon className="w-3 h-3 text-blue-400" />
+                    </div>
+                  </div>
+                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                    {state.preferences.language === 'de' ? 'Cyan & Dunkel' : 'Cyan & Dark'}
+                  </span>
+                </button>
+
+                {/* Purple & Dark Theme */}
+                <button
+                  onClick={() => {
+                    dispatch({
+                      type: 'UPDATE_PREFERENCES',
+                      payload: {
+                        theme: 'dark',
+                        accentColor: '#7b2ff2',
+                        backgroundImage: '/backgrounds/bg8.jpg',
+                        backgroundType: 'image'
+                      }
+                    });
+                    document.documentElement.classList.add('dark');
+                  }}
+                  className="group relative p-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-purple-500 dark:hover:border-purple-400 transition-all duration-200 bg-white dark:bg-gray-800"
+                >
+                  <div className="aspect-[4/3] rounded-lg overflow-hidden mb-2 relative">
+                    <img 
+                      src="/backgrounds/bg8.jpg" 
+                      alt="Purple & Dark Theme"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute top-1 right-1 w-4 h-4 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: '#7b2ff2' }} />
+                    <div className="absolute bottom-1 left-1 bg-gray-900/90 rounded px-1.5 py-0.5 flex items-center gap-1">
+                      <Moon className="w-3 h-3 text-blue-400" />
+                    </div>
+                  </div>
+                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                    {state.preferences.language === 'de' ? 'Lila & Dunkel' : 'Purple & Dark'}
+                  </span>
+                </button>
+
+                {/* Teal & Light Theme */}
+                <button
+                  onClick={() => {
+                    dispatch({
+                      type: 'UPDATE_PREFERENCES',
+                      payload: {
+                        theme: 'light',
+                        accentColor: '#006d8f',
+                        backgroundImage: '/backgrounds/bg11.jpg',
+                        backgroundType: 'image'
+                      }
+                    });
+                    document.documentElement.classList.remove('dark');
+                  }}
+                  className="group relative p-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-teal-500 dark:hover:border-teal-400 transition-all duration-200 bg-white dark:bg-gray-800"
+                >
+                  <div className="aspect-[4/3] rounded-lg overflow-hidden mb-2 relative">
+                    <img 
+                      src="/backgrounds/bg11.jpg" 
+                      alt="Teal & Light Theme"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute top-1 right-1 w-4 h-4 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: '#006d8f' }} />
+                    <div className="absolute bottom-1 left-1 bg-white/90 rounded px-1.5 py-0.5 flex items-center gap-1">
+                      <Sun className="w-3 h-3 text-amber-500" />
+                    </div>
+                  </div>
+                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                    {state.preferences.language === 'de' ? 'Petrol & Hell' : 'Teal & Light'}
+                  </span>
+                </button>
+              </div>
+            </div>
+
             <div className="settings-card p-6 border">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">{settings_appearance.colors()}</h3>
@@ -3813,36 +3969,66 @@ const Settings = React.memo(() => {
                     </div>
                   </div>
                   
-                  {/* Color Palette Grid */}
+                  {/* Color Palette Grid - Light Mode */}
                   <div className="mb-4">
-                    <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{settings_appearance.colorPalette()}</div>
-                    <div className="grid grid-cols-3 gap-3">
-                      {accentColors.map((colorOption, index) => (
-                        <div 
-                          key={index}
-                          className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
+                    <div className="flex items-center gap-2 mb-2">
+                      <Sun className="w-4 h-4 text-amber-500" />
+                      <span className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">Light Mode</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {accentColorsLight.map((colorOption, index) => (
+                        <button 
+                          key={`light-${index}`}
+                          className={`relative w-8 h-8 rounded-lg transition-all duration-200 hover:scale-110 ${
                             customAccentColor === colorOption
-                              ? 'border-2 ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800'
-                              : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+                              ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800'
+                              : 'hover:ring-1 hover:ring-gray-300'
                           }`}
-                          style={customAccentColor === colorOption ? {
-                            borderColor: colorOption,
-                            boxShadow: `0 0 0 2px ${colorOption}20, 0 0 0 4px ${colorOption}`
-                          } : {}}
+                          style={{
+                            backgroundColor: colorOption,
+                            boxShadow: customAccentColor === colorOption 
+                              ? `0 0 0 2px ${colorOption}` 
+                              : '0 1px 3px rgba(0,0,0,0.1)'
+                          }}
                           onClick={() => handleColorChange('accent', colorOption)}
+                          title={colorOption}
                         >
-                          <div 
-                            className="w-full h-16 transition-all duration-200 hover:scale-105"
-                            style={{ backgroundColor: colorOption }}
-                          />
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-opacity flex items-center justify-center">
-                            {customAccentColor === colorOption && (
-                              <div className="bg-white/90 dark:bg-gray-800/90 px-2 py-1 rounded text-xs font-medium text-gray-900 dark:text-white">
-                                {settings_appearance.active()}
-                              </div>
-                            )}
-                          </div>
-                        </div>
+                          {customAccentColor === colorOption && (
+                            <Check className="w-4 h-4 text-white absolute inset-0 m-auto drop-shadow-md" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Color Palette Grid - Dark Mode */}
+                  <div className="mb-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Moon className="w-4 h-4 text-indigo-400" />
+                      <span className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">Dark Mode</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {accentColorsDark.map((colorOption, index) => (
+                        <button 
+                          key={`dark-${index}`}
+                          className={`relative w-8 h-8 rounded-lg transition-all duration-200 hover:scale-110 ${
+                            customAccentColor === colorOption
+                              ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800'
+                              : 'hover:ring-1 hover:ring-gray-300'
+                          }`}
+                          style={{
+                            backgroundColor: colorOption,
+                            boxShadow: customAccentColor === colorOption 
+                              ? `0 0 0 2px ${colorOption}` 
+                              : '0 1px 3px rgba(0,0,0,0.1)'
+                          }}
+                          onClick={() => handleColorChange('accent', colorOption)}
+                          title={colorOption}
+                        >
+                          {customAccentColor === colorOption && (
+                            <Check className="w-4 h-4 text-white absolute inset-0 m-auto drop-shadow-md" />
+                          )}
+                        </button>
                       ))}
                     </div>
                   </div>

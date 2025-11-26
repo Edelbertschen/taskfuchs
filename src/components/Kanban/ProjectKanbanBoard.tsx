@@ -1570,7 +1570,7 @@ export function ProjectKanbanBoard() {
               className={`w-full flex flex-col items-center justify-center min-h-[120px] rounded-lg transition-all duration-200 group ${
               isMinimalDesign
                 ? 'border-2 border-dashed border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500'
-                : 'backdrop-blur-xl bg-white/30 dark:bg-gray-900/40 border-2 border-dashed border-white/40 dark:border-gray-600/50 hover:bg-white/40 dark:hover:bg-gray-900/50 hover:border-white/60 dark:hover:border-gray-500/60'
+                : 'backdrop-blur-xl bg-white/70 dark:bg-gray-900/70 border-2 border-dashed border-white/40 dark:border-gray-600/50 hover:bg-white/40 dark:hover:bg-gray-900/50 hover:border-white/60 dark:hover:border-gray-500/60'
             }`}
             style={isMinimalDesign ? {
               backgroundColor: isDarkMode ? '#111827' : '#FFFFFF'
@@ -1781,7 +1781,7 @@ export function ProjectKanbanBoard() {
           className={`flex-shrink-0 flex flex-col overflow-hidden transition-all duration-300 border-r ${
             isMinimalDesign
               ? 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800'
-              : 'bg-white/30 dark:bg-gray-900/40 backdrop-blur-xl border-white/20 dark:border-gray-700/30'
+              : 'bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border-white/20 dark:border-gray-700/30'
           }`}
           style={{ 
             boxShadow: isMinimalDesign ? '0 1px 3px 0 rgba(0, 0, 0, 0.1)' : '0 8px 32px rgba(0, 0, 0, 0.1)',

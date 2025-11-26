@@ -1761,7 +1761,7 @@ export function TaskBoard() {
             className={`absolute top-0 left-0 bottom-0 w-full sm:w-80 z-20 flex flex-col overflow-hidden min-w-0 border-r ${
               isMinimalDesign
                 ? 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800'
-                : 'bg-white/30 dark:bg-gray-900/40 backdrop-blur-xl border-white/20 dark:border-gray-700/30'
+                : 'bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border-white/20 dark:border-gray-700/30'
             }`}
             style={{
               boxShadow: isMinimalDesign ? '0 1px 3px 0 rgba(0, 0, 0, 0.1)' : '0 8px 32px rgba(0, 0, 0, 0.1)',
@@ -1787,6 +1787,19 @@ export function TaskBoard() {
                 <Folder className="w-5 h-5 flex-shrink-0" style={{ color: state.preferences.accentColor }} />
                 <span className="truncate">{t('navigation.planner')}</span>
               </h1>
+            </div>
+            
+            {/* Hint Section */}
+            <div className={`px-4 py-3 border-b ${
+              isMinimalDesign
+                ? 'border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900'
+                : (isDarkMode ? 'border-white/15 bg-transparent' : 'border-gray-300/50 bg-white/30')
+            }`}>
+              <p className={`text-xs ${
+                isMinimalDesign ? 'text-gray-500 dark:text-gray-400' : (isDarkMode ? 'text-gray-400' : 'text-gray-600')
+              }`}>
+                {t('planner.drag_hint') || 'Ziehe Aufgaben in die Tagesspalten'}
+              </p>
             </div>
               
             {/* Filter Toggle Button - Below the line */}

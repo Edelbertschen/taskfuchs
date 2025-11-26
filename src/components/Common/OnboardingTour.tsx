@@ -1,537 +1,1455 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { X, ArrowRight, ArrowLeft, Check, Star } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+import { ChevronRight, ChevronLeft, X, Inbox, CalendarDays, LayoutGrid, FolderKanban, Pin, Check, Sparkles, PanelLeftOpen, FileText, ListChecks, Flag, Smartphone, HardDrive, Clock, Timer, Moon, Palette, Sun } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { getOnboardingImagePath } from '../../utils/imageUtils';
+import { format } from 'date-fns';
+import type { Task } from '../../types';
 
-interface OnboardingStep {
-  id: string;
-  title: string;
-  subtitle: string;
-  description: string;
-  foxMessage: string;
-  foxImageIndex: number;
-  features?: string[];
-  demoAction?: () => void;
-  skipable?: boolean;
-}
+// Preload images for smooth transitions
+const preloadImages = (urls: string[]) => {
+  urls.forEach(url => {
+    const img = new Image();
+    img.src = url;
+  });
+};
+
+// Demo background images to preload (note: most are jpg, bg12/bg13 are png)
+const DEMO_BACKGROUND_IMAGES = [
+  '/backgrounds/bg2.jpg',
+  '/backgrounds/bg8.jpg',
+  '/backgrounds/bg11.jpg',
+  '/backgrounds/bg12.png',
+  '/backgrounds/bg13.png'
+];
+
+// Check if we're in a PWA/Web context (not Electron)
+const isPWA = () => {
+  if (typeof window === 'undefined') return false;
+  const isElectron = ('electron' in window) || 
+    ('require' in window) || 
+    (!!(window as any).process?.type) ||
+    (!!(window as any).process?.versions?.electron) ||
+    (navigator.userAgent.includes('Electron'));
+  return !isElectron;
+};
 
 interface OnboardingTourProps {
   isOpen: boolean;
   onClose: () => void;
+  onNavigate?: (view: string) => void;
 }
 
-export function OnboardingTour({ isOpen, onClose }: OnboardingTourProps) {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [isCompleted, setIsCompleted] = useState(false);
-  const [foxAnimating, setFoxAnimating] = useState(false);
-  const [countdown, setCountdown] = useState(8);
-  const [isSliding, setIsSliding] = useState(false);
-  const { dispatch, state } = useApp();
-  const { t } = useTranslation();
+type Language = 'de' | 'en';
 
-  // Helper function to get the correct path for both web and Electron
-  const getBackgroundImagePath = () => {
-    // Use bg12.png as background
-    return '/backgrounds/bg12.png';
-  };
+interface StylingConfig {
+  theme: 'light' | 'dark' | 'system';
+  accentColor: string;
+  backgroundImage: string;
+  label: { de: string; en: string };
+}
 
-  const steps: OnboardingStep[] = [
-    {
-      id: 'welcome',
-      title: t('onboarding.welcome.title'),
-      subtitle: t('onboarding.welcome.subtitle'),
-      description: t('onboarding.welcome.description'),
-      foxMessage: t('onboarding.welcome.fox_message'),
-      foxImageIndex: 1,
-      features: t('onboarding.welcome.features', { returnObjects: true }) as string[]
-    },
-    {
-      id: 'today-dashboard',
-      title: t('onboarding.today_dashboard.title'),
-      subtitle: t('onboarding.today_dashboard.subtitle'),
-      description: t('onboarding.today_dashboard.description'),
-      foxMessage: t('onboarding.today_dashboard.fox_message'),
-      foxImageIndex: 2,
-      features: t('onboarding.today_dashboard.features', { returnObjects: true }) as string[]
-    },
-    {
-      id: 'inbox',
-      title: t('onboarding.inbox.title'),
-      subtitle: t('onboarding.inbox.subtitle'),
-      description: t('onboarding.inbox.description'),
-      foxMessage: t('onboarding.inbox.fox_message'),
-      foxImageIndex: 3,
-      features: t('onboarding.inbox.features', { returnObjects: true }) as string[]
-    },
-    {
-      id: 'tasks',
-      title: t('onboarding.tasks.title'),
-      subtitle: t('onboarding.tasks.subtitle'),
-      description: t('onboarding.tasks.description'),
-      foxMessage: t('onboarding.tasks.fox_message'),
-      foxImageIndex: 4,
-      features: t('onboarding.tasks.features', { returnObjects: true }) as string[]
-    },
-    {
-      id: 'kanban',
-      title: t('onboarding.kanban.title'),
-      subtitle: t('onboarding.kanban.subtitle'),
-      description: t('onboarding.kanban.description'),
-      foxMessage: t('onboarding.kanban.fox_message'),
-      foxImageIndex: 1,
-      features: t('onboarding.kanban.features', { returnObjects: true }) as string[]
-    },
-    {
-      id: 'notes',
-      title: t('onboarding.notes.title'),
-      subtitle: t('onboarding.notes.subtitle'),
-      description: t('onboarding.notes.description'),
-      foxMessage: t('onboarding.notes.fox_message'),
-      foxImageIndex: 2,
-      features: t('onboarding.notes.features', { returnObjects: true }) as string[]
-    },
-    {
-      id: 'focus',
-      title: t('onboarding.focus.title'),
-      subtitle: t('onboarding.focus.subtitle'),
-      description: t('onboarding.focus.description'),
-      foxMessage: t('onboarding.focus.fox_message'),
-      foxImageIndex: 3,
-      features: t('onboarding.focus.features', { returnObjects: true }) as string[]
-    },
-    {
-      id: 'series',
-      title: t('onboarding.series.title'),
-      subtitle: t('onboarding.series.subtitle'),
-      description: t('onboarding.series.description'),
-      foxMessage: t('onboarding.series.fox_message'),
-      foxImageIndex: 4,
-      features: t('onboarding.series.features', { returnObjects: true }) as string[]
-    },
-    {
-      id: 'review',
-      title: t('onboarding.review.title'),
-      subtitle: t('onboarding.review.subtitle'),
-      description: t('onboarding.review.description'),
-      foxMessage: t('onboarding.review.fox_message'),
-      foxImageIndex: 1,
-      features: t('onboarding.review.features', { returnObjects: true }) as string[]
-    },
-    {
-      id: 'timer',
-      title: t('onboarding.timer.title'),
-      subtitle: t('onboarding.timer.subtitle'),
-      description: t('onboarding.timer.description'),
-      foxMessage: t('onboarding.timer.fox_message'),
-      foxImageIndex: 2,
-      features: t('onboarding.timer.features', { returnObjects: true }) as string[]
-    },
-    {
-      id: 'statistics',
-      title: t('onboarding.statistics.title'),
-      subtitle: t('onboarding.statistics.subtitle'),
-      description: t('onboarding.statistics.description'),
-      foxMessage: t('onboarding.statistics.fox_message'),
-      foxImageIndex: 3,
-      features: t('onboarding.statistics.features', { returnObjects: true }) as string[]
-    },
-    {
-      id: 'smart-features',
-      title: t('onboarding.smart_features.title'),
-      subtitle: t('onboarding.smart_features.subtitle'),
-      description: t('onboarding.smart_features.description'),
-      foxMessage: t('onboarding.smart_features.fox_message'),
-      foxImageIndex: 4,
-      features: t('onboarding.smart_features.features', { returnObjects: true }) as string[]
-    },
-    {
-      id: 'customization',
-      title: t('onboarding.customization.title'),
-      subtitle: t('onboarding.customization.subtitle'),
-      description: t('onboarding.customization.description'),
-      foxMessage: t('onboarding.customization.fox_message'),
-      foxImageIndex: 1,
-      features: t('onboarding.customization.features', { returnObjects: true }) as string[]
-    },
-    {
-      id: 'ready',
-      title: t('onboarding.ready.title'),
-      subtitle: t('onboarding.ready.subtitle'),
-      description: t('onboarding.ready.description'),
-      foxMessage: t('onboarding.ready.fox_message'),
-      foxImageIndex: 2,
-      features: t('onboarding.ready.features', { returnObjects: true }) as string[]
-    }
-  ];
+interface TourSubStep {
+  title: { de: string; en: string };
+  text: { de: string; en: string };
+  foxMessage?: { de: string; en: string };
+  position: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left' | 'center-right' | 'center-left' | 'center';
+  openTaskModal?: boolean;
+  openEndOfDayModal?: boolean;
+  stylingDemo?: boolean; // For the styling demo step
+  applyStyling?: StylingConfig; // Styling to apply when entering this step
+  restoreOriginalStyling?: boolean; // Restore original styling when entering this step
+}
 
-  const nextStep = () => {
-    if (isSliding) return;
-    
-    setFoxAnimating(true);
-    setIsSliding(true);
-    
-    setTimeout(() => {
-      if (currentStep < steps.length - 1) {
-        setCurrentStep(currentStep + 1);
-      } else {
-        completeOnboarding();
-      }
-      setIsSliding(false);
-      setFoxAnimating(false);
-    }, 400);
-  };
+interface TourSection {
+  id: string;
+  view: string;
+  icon: React.ReactNode;
+  steps: TourSubStep[];
+}
 
-  const prevStep = () => {
-    if (isSliding) return;
-    
-    setFoxAnimating(true);
-    setIsSliding(true);
-    
-    setTimeout(() => {
-      if (currentStep > 0) {
-        setCurrentStep(currentStep - 1);
-      }
-      setIsSliding(false);
-      setFoxAnimating(false);
-    }, 400);
-  };
+const SAMPLE_TASK_ID = 'onboarding-sample-task';
 
-  const completeOnboarding = () => {
-    setIsCompleted(true);
-    dispatch({ 
-      type: 'UPDATE_PREFERENCES', 
-      payload: { hasCompletedOnboarding: true } 
-    });
-    try { localStorage.setItem('taskfuchs-onboarding-complete', 'true'); } catch {}
-    // Start 8-second countdown
-    setCountdown(8);
-    const countdownInterval = setInterval(() => {
-      setCountdown(prev => {
-        if (prev <= 1) {
-          clearInterval(countdownInterval);
-          onClose();
-          return 0;
+// Build tour sections dynamically based on platform
+const buildTourSections = (): TourSection[] => {
+  const sections: TourSection[] = [];
+  
+  // PWA section - only for web apps
+  if (isPWA()) {
+    sections.push({
+      id: 'pwa',
+      view: 'today',
+      icon: <Smartphone className="w-5 h-5" />,
+      steps: [
+        {
+          title: { de: 'TaskFuchs als Web-App', en: 'TaskFuchs as Web App' },
+          text: { de: 'TaskFuchs ist eine Progressive Web App (PWA). Das bedeutet, sie läuft direkt in deinem Browser – ohne Installation. Deine Daten werden lokal auf deinem Gerät gespeichert.', en: 'TaskFuchs is a Progressive Web App (PWA). It runs directly in your browser – no installation needed. Your data is stored locally on your device.' },
+          foxMessage: { de: 'Schnell, sicher und überall verfügbar!', en: 'Fast, secure, and available everywhere!' },
+          position: 'center'
+        },
+        {
+          title: { de: 'Backups sind wichtig!', en: 'Backups are important!' },
+          text: { de: 'Da deine Daten nur lokal gespeichert werden, solltest du regelmäßig Backups erstellen. Klicke am Ende jedes Arbeitstages auf den Backup-Button unten in der Sidebar.', en: 'Since your data is stored locally only, you should create regular backups. Click the backup button at the bottom of the sidebar at the end of each work day.' },
+          foxMessage: { de: 'Lieber einmal zu oft sichern!', en: 'Better safe than sorry!' },
+          position: 'bottom-left'
+        },
+        {
+          title: { de: 'Backup einrichten', en: 'Setup Backup' },
+          text: { de: 'Beim ersten Klick auf den Backup-Button wählst du einen Speicherort. Danach reicht ein Klick, um ein Backup zu erstellen. Wiederherstellung erfolgt über Einstellungen → Daten.', en: 'On first click, you choose a save location. After that, one click creates a backup. Restore via Settings → Data.' },
+          position: 'bottom-left'
         }
-        return prev - 1;
-      });
-    }, 1000);
-  };
-
-  const skipTour = () => {
-    dispatch({ 
-      type: 'UPDATE_PREFERENCES', 
-      payload: { hasCompletedOnboarding: true } 
+      ]
     });
-    try { localStorage.setItem('taskfuchs-onboarding-complete', 'true'); } catch {}
-    onClose();
-  };
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        skipTour();
-      } else if (e.key === 'ArrowRight' || e.key === 'Enter') {
-        nextStep();
-      } else if (e.key === 'ArrowLeft') {
-        prevStep();
+  }
+  
+  // Inbox section
+  sections.push({
+      id: 'inbox',
+    view: 'inbox',
+    icon: <Inbox className="w-5 h-5" />,
+    steps: [
+      {
+        title: { de: 'Willkommen in der Inbox!', en: 'Welcome to the Inbox!' },
+        text: { de: 'Hier landen alle neuen Aufgaben. Sammle hier alles, was dir einfällt.', en: 'All new tasks land here. Collect everything that comes to mind.' },
+        foxMessage: { de: 'Wirf alles rein – ich helfe beim Sortieren!', en: 'Throw everything in – I\'ll help sort!' },
+        position: 'bottom-right'
+      },
+      {
+        title: { de: 'Schnelle Eingabe', en: 'Quick Input' },
+        text: { de: 'Nutze das Eingabefeld oben für eine blitzschnelle Aufgabenerfassung.', en: 'Use the input field at the top for lightning-fast task entry.' },
+        position: 'top-right'
+      },
+      {
+        title: { de: 'Aufgaben organisieren', en: 'Organize Tasks' },
+        text: { de: 'Weise Datum, Projekt oder Pin zu – per Icon auf der Karte.', en: 'Assign date, project, or pin – via icons on the card.' },
+        position: 'center-right'
       }
-    };
+    ]
+  });
+  
+  return sections;
+};
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, currentStep]);
+const tourSections: TourSection[] = [
+  {
+    id: 'inbox',
+    view: 'inbox',
+    icon: <Inbox className="w-5 h-5" />,
+    steps: [
+      {
+        title: { de: 'Willkommen in der Inbox!', en: 'Welcome to the Inbox!' },
+        text: { de: 'Hier landen alle neuen Aufgaben. Sammle hier alles, was dir einfällt.', en: 'All new tasks land here. Collect everything that comes to mind.' },
+        foxMessage: { de: 'Wirf alles rein – ich helfe beim Sortieren!', en: 'Throw everything in – I\'ll help sort!' },
+        position: 'bottom-right'
+      },
+      {
+        title: { de: 'Schnelle Eingabe', en: 'Quick Input' },
+        text: { de: 'Nutze das Eingabefeld oben für eine blitzschnelle Aufgabenerfassung.', en: 'Use the input field at the top for lightning-fast task entry.' },
+        position: 'top-right'
+      },
+      {
+        title: { de: 'Aufgaben organisieren', en: 'Organize Tasks' },
+        text: { de: 'Weise Datum, Projekt oder Pin zu – per Icon auf der Karte.', en: 'Assign date, project, or pin – via icons on the card.' },
+        position: 'center-right'
+      }
+    ]
+  },
+  {
+    id: 'taskmodal',
+    view: 'inbox',
+    icon: <FileText className="w-5 h-5" />,
+    steps: [
+      {
+        title: { de: 'Die Aufgabenansicht', en: 'The Task View' },
+        text: { de: 'Klicke auf eine Aufgabe, um sie im Detail zu bearbeiten. Hier siehst du alle Optionen auf einen Blick.', en: 'Click on a task to edit it in detail. Here you can see all options at a glance.' },
+        foxMessage: { de: 'Diese Beispielaufgabe zeigt dir alles!', en: 'This sample task shows you everything!' },
+        position: 'center',
+        openTaskModal: true
+      },
+      {
+        title: { de: 'Prioritäten & Beschreibung', en: 'Priorities & Description' },
+        text: { de: 'Setze Prioritäten (niedrig, mittel, hoch) und nutze die Beschreibung für Details. Markdown wird unterstützt!', en: 'Set priorities (low, medium, high) and use the description for details. Markdown is supported!' },
+        position: 'center',
+        openTaskModal: true
+      },
+      {
+        title: { de: 'Unteraufgaben', en: 'Subtasks' },
+        text: { de: 'Teile große Aufgaben in kleine Schritte auf. Unteraufgaben können einzeln abgehakt werden.', en: 'Break big tasks into small steps. Subtasks can be checked off individually.' },
+        position: 'center',
+        openTaskModal: true
+      }
+    ]
+  },
+  {
+    id: 'today',
+    view: 'today',
+    icon: <CalendarDays className="w-5 h-5" />,
+    steps: [
+      {
+        title: { de: 'Dein Tagesüberblick', en: 'Your Daily Overview' },
+        text: { de: 'Hier siehst du alle Aufgaben für heute auf einen Blick.', en: 'See all tasks for today at a glance.' },
+        foxMessage: { de: 'Ein Schritt nach dem anderen!', en: 'One step at a time!' },
+        position: 'bottom-right'
+      },
+      {
+        title: { de: 'Tag beenden', en: 'End Day' },
+        text: { de: 'Am Ende des Tages kannst du über "Tag beenden" erledigte Aufgaben archivieren und offene verschieben. Perfekt auch für dein tägliches Backup!', en: 'At the end of the day, you can archive completed tasks and move open ones via "End Day". Perfect for your daily backup too!' },
+        foxMessage: { de: 'Vergiss nicht, ein Backup zu machen!', en: 'Don\'t forget to backup!' },
+        position: 'center-right',
+        openEndOfDayModal: true
+      }
+    ]
+  },
+  {
+    id: 'styling',
+    view: 'tasks',
+    icon: <Palette className="w-5 h-5" />,
+    steps: [
+      {
+        title: { de: 'Dein persönlicher Look', en: 'Your Personal Look' },
+        text: { de: 'TaskFuchs passt sich deinem Geschmack an! Wähle zwischen Light- und Darkmode, verschiedenen Akzentfarben und Hintergrundbildern.', en: 'TaskFuchs adapts to your taste! Choose between light and dark mode, different accent colors, and backgrounds.' },
+        foxMessage: { de: 'Klicke auf Weiter und sieh, wie sich alles verändert!', en: 'Click Next and see how everything changes!' },
+        position: 'center',
+        stylingDemo: true
+      },
+      {
+        title: { de: 'Style: Cyan & Dunkel', en: 'Style: Cyan & Dark' },
+        text: { de: 'Darkmode mit coolem Cyan-Akzent und atmosphärischem Hintergrund.', en: 'Dark mode with cool cyan accent and atmospheric background.' },
+        position: 'center',
+        stylingDemo: true,
+        applyStyling: {
+          theme: 'dark',
+          accentColor: '#22d3ee',
+          backgroundImage: '/backgrounds/bg2.jpg',
+          label: { de: 'Cyan & Dunkel', en: 'Cyan & Dark' }
+        }
+      },
+      {
+        title: { de: 'Style: Lila & Dunkel', en: 'Style: Purple & Dark' },
+        text: { de: 'Darkmode mit elegantem Lila-Akzent und stimmungsvollem Hintergrund.', en: 'Dark mode with elegant purple accent and moody background.' },
+        position: 'center',
+        stylingDemo: true,
+        applyStyling: {
+          theme: 'dark',
+          accentColor: '#7b2ff2',
+          backgroundImage: '/backgrounds/bg8.jpg',
+          label: { de: 'Lila & Dunkel', en: 'Purple & Dark' }
+        }
+      },
+      {
+        title: { de: 'Style: Petrol & Hell', en: 'Style: Teal & Light' },
+        text: { de: 'Lightmode mit edlem Petrol-Akzent und hellem, freundlichem Hintergrund.', en: 'Light mode with elegant teal accent and bright, friendly background.' },
+        position: 'center',
+        stylingDemo: true,
+        applyStyling: {
+          theme: 'light',
+          accentColor: '#006d8f',
+          backgroundImage: '/backgrounds/bg11.jpg',
+          label: { de: 'Petrol & Hell', en: 'Teal & Light' }
+        }
+      },
+      {
+        title: { de: 'Deine Einstellungen', en: 'Your Settings' },
+        text: { de: 'Wir stellen deine ursprünglichen Einstellungen wieder her. Diese Themes findest du als Presets in den Einstellungen – oder stelle dir dein eigenes zusammen!', en: 'We\'re restoring your original settings. Find these themes as presets in Settings – or create your own combination!' },
+        foxMessage: { de: 'In den Einstellungen warten noch mehr Optionen!', en: 'Even more options await in Settings!' },
+        position: 'center',
+        stylingDemo: true,
+        restoreOriginalStyling: true
+      }
+    ]
+  },
+  {
+    id: 'tasks',
+    view: 'tasks',
+    icon: <LayoutGrid className="w-5 h-5" />,
+    steps: [
+      {
+        title: { de: 'Der Wochenplaner', en: 'The Weekly Planner' },
+        text: { de: 'Deine Aufgaben in Spalten nach Datum – für die perfekte Übersicht.', en: 'Your tasks in columns by date – for the perfect overview.' },
+        foxMessage: { de: 'Gute Planung = weniger Stress!', en: 'Good planning = less stress!' },
+        position: 'bottom-left'
+      },
+      {
+        title: { de: 'Zeitplanung', en: 'Time Planning' },
+        text: { de: 'Gib bei Aufgaben eine geschätzte Zeit an. Die Gesamtzeit wird oben in jeder Spalte angezeigt – so siehst du sofort, ob dein Tag realistisch geplant ist.', en: 'Add estimated time to tasks. Total time is shown at the top of each column – so you can see if your day is realistically planned.' },
+        foxMessage: { de: 'Plane realistisch, schaffe mehr!', en: 'Plan realistically, achieve more!' },
+        position: 'top-right'
+      },
+      {
+        title: { de: 'Der Timer', en: 'The Timer' },
+        text: { de: 'Starte den Timer bei einer Aufgabe, um fokussiert zu arbeiten. Die Zeit wird getrackt und am Ende des Tages ausgewertet.', en: 'Start the timer on a task to work focused. Time is tracked and evaluated at the end of the day.' },
+        position: 'center-right'
+      },
+      {
+        title: { de: 'Die Sidebar', en: 'The Sidebar' },
+        text: { de: 'Links findest du unverplante Projekt-Aufgaben. Die Sidebar ist auf- und zuklappbar.', en: 'On the left you\'ll find unscheduled project tasks. The sidebar can be expanded and collapsed.' },
+        position: 'top-left'
+      },
+      {
+        title: { de: 'Drag & Drop', en: 'Drag & Drop' },
+        text: { de: 'Ziehe Aufgaben zwischen Tagen hin und her, um umzuplanen.', en: 'Drag tasks between days to reschedule.' },
+        position: 'center-left'
+      }
+    ]
+  },
+  {
+    id: 'projects',
+    view: 'kanban',
+    icon: <FolderKanban className="w-5 h-5" />,
+    steps: [
+      {
+        title: { de: 'Projekte organisieren', en: 'Organize Projects' },
+        text: { de: 'Gruppiere zusammengehörige Aufgaben in Projekten.', en: 'Group related tasks in projects.' },
+        foxMessage: { de: 'Große Ziele, kleine Schritte!', en: 'Big goals, small steps!' },
+        position: 'bottom-right'
+      },
+      {
+        title: { de: 'Kanban-Workflow', en: 'Kanban Workflow' },
+        text: { de: 'Erstelle eigene Spalten wie "To Do", "In Arbeit", "Fertig". Die Projekt-Sidebar ist auf- und zuklappbar.', en: 'Create columns like "To Do", "In Progress", "Done". The project sidebar can be expanded and collapsed.' },
+        position: 'center-right'
+      }
+    ]
+  },
+  {
+    id: 'pins',
+    view: 'pins',
+    icon: <Pin className="w-5 h-5" />,
+    steps: [
+      {
+        title: { de: 'Dein Fokus-Board', en: 'Your Focus Board' },
+        text: { de: 'Hefte wichtige Aufgaben hier an – unabhängig von Projekt oder Datum.', en: 'Pin important tasks here – regardless of project or date.' },
+        foxMessage: { de: 'Was wichtig ist, verdient Aufmerksamkeit!', en: 'What\'s important deserves attention!' },
+        position: 'bottom-right'
+      },
+      {
+        title: { de: 'Eigene Pin-Spalten', en: 'Custom Pin Columns' },
+        text: { de: 'Erstelle Spalten wie "Diese Woche" oder "Dringend". Die Aufgaben-Sidebar ist auf- und zuklappbar.', en: 'Create columns like "This Week" or "Urgent". The task sidebar can be expanded and collapsed.' },
+        position: 'center-right'
+      }
+    ]
+  },
+  {
+    id: 'complete',
+    view: 'today',
+    icon: <Sparkles className="w-5 h-5" />,
+    steps: [
+      {
+        title: { de: 'Geschafft!', en: 'All Done!' },
+        text: { de: 'Du kennst jetzt alle wichtigen Bereiche von TaskFuchs. Leg los und plane smart!', en: 'You now know all the important areas of TaskFuchs. Get started and plan smart!' },
+        foxMessage: { de: 'Sei schlau wie ein Fuchs – plane smart! 🦊', en: 'Be clever like a fox – plan smart! 🦊' },
+        position: 'center'
+      }
+    ]
+  }
+];
 
-  const getFoxImage = (imageIndex: number) => {
-    return getOnboardingImagePath(imageIndex);
+// Get fox image path that works in both web and Electron
+const getFoxImagePath = () => {
+  const basePath = (window as any).__ELECTRON__ ? '.' : '';
+  return `${basePath}/3d_fox.png`;
+};
+
+// Create a sample task for the onboarding
+const createSampleTask = (pinColumnId?: string): Task => {
+  const today = format(new Date(), 'yyyy-MM-dd');
+  const now = new Date().toISOString();
+  
+  return {
+    id: SAMPLE_TASK_ID,
+    title: 'Welcome to TaskFuchs!',
+    description: `## Your First Task 🦊
+
+This is a **sample task** to show you how TaskFuchs works.
+
+### Features you can use:
+- **Markdown formatting** in descriptions
+- *Italic*, **bold**, and \`code\` text
+- Lists and checklists
+- Links and more!
+
+> Pro tip: Use the timer to track your time on tasks.`,
+    completed: false,
+    priority: 'high',
+    estimatedTime: 30,
+    tags: ['onboarding', 'demo'],
+    subtasks: [
+      {
+        id: 'subtask-1',
+        title: 'Explore the Inbox',
+        completed: false,
+        tags: [],
+        createdAt: now,
+        updatedAt: now
+      },
+      {
+        id: 'subtask-2', 
+        title: 'Check out the Planner',
+        completed: false,
+        tags: [],
+        createdAt: now,
+        updatedAt: now
+      },
+      {
+        id: 'subtask-3',
+        title: 'Create your first project',
+        completed: false,
+        tags: [],
+        createdAt: now,
+        updatedAt: now
+      }
+    ],
+    columnId: `date-${today}`,
+    reminderDate: today,
+    pinColumnId: pinColumnId,
+    pinned: !!pinColumnId,
+    createdAt: now,
+    updatedAt: now,
+    position: 0
   };
+};
 
-  if (!isOpen) return null;
+// PWA-specific section (only shown for web apps)
+const pwaSections: TourSection[] = isPWA() ? [
+  {
+    id: 'pwa',
+    view: 'today',
+    icon: <Smartphone className="w-5 h-5" />,
+    steps: [
+      {
+        title: { de: 'TaskFuchs als Web-App', en: 'TaskFuchs as Web App' },
+        text: { de: 'TaskFuchs ist eine Progressive Web App (PWA). Sie läuft im Browser ohne Installation. Deine Daten werden lokal auf deinem Gerät gespeichert.', en: 'TaskFuchs is a Progressive Web App (PWA). It runs in your browser without installation. Your data is stored locally on your device.' },
+        foxMessage: { de: 'Schnell, sicher und überall verfügbar!', en: 'Fast, secure, and available everywhere!' },
+        position: 'center'
+      },
+      {
+        title: { de: 'App installieren', en: 'Install the App' },
+        text: { de: 'Du kannst TaskFuchs wie eine echte App installieren:\n\n• Chrome/Edge: Klicke auf das Installieren-Symbol in der Adressleiste (⊕) oder Menü → „App installieren"\n• Safari (iOS): Teilen-Button → „Zum Home-Bildschirm"\n• Firefox: Menü → „Seite zum Startbildschirm hinzufügen"', en: 'You can install TaskFuchs like a real app:\n\n• Chrome/Edge: Click the install icon in the address bar (⊕) or Menu → "Install app"\n• Safari (iOS): Share button → "Add to Home Screen"\n• Firefox: Menu → "Add page to Home Screen"' },
+        foxMessage: { de: 'So hast du mich immer griffbereit!', en: 'This way you always have me at hand!' },
+        position: 'center'
+      },
+      {
+        title: { de: 'Backups sind wichtig!', en: 'Backups are important!' },
+        text: { de: 'Da deine Daten lokal gespeichert werden, solltest du regelmäßig Backups erstellen. Am Ende jedes Arbeitstages ein Klick auf den Backup-Button in der Sidebar reicht!', en: 'Since your data is stored locally, you should create regular backups. At the end of each work day, just click the backup button in the sidebar!' },
+        foxMessage: { de: 'Lieber einmal zu oft sichern!', en: 'Better safe than sorry!' },
+        position: 'bottom-left'
+      },
+      {
+        title: { de: 'Backup einrichten', en: 'Setup Backup' },
+        text: { de: 'Beim ersten Klick auf den Backup-Button wählst du einen Speicherort. Danach reicht ein Klick für ein Backup. Wiederherstellung über Einstellungen → Daten.', en: 'On first click, you choose a save location. After that, one click creates a backup. Restore via Settings → Data.' },
+        position: 'bottom-left'
+      }
+    ]
+  }
+] : [];
 
-  const currentStepData = steps[currentStep];
+// Combine PWA sections with regular sections
+const getAllTourSections = () => [...pwaSections, ...tourSections];
 
-  if (isCompleted) {
-    return createPortal(
-      <div className="fixed inset-0 flex items-center justify-center z-[99998]" 
-           style={{ 
-             isolation: 'isolate',
-             backgroundImage: `url(${getBackgroundImagePath()})`,
-             backgroundSize: 'cover',
-             backgroundPosition: 'center',
-             backgroundRepeat: 'no-repeat',
-             backgroundAttachment: 'fixed'
-           }}>
-        {/* Background Overlay */}
-        <div className="absolute inset-0 bg-black/25 backdrop-blur-sm" style={{ zIndex: -1 }} />
+// Language Selection Modal with Toggle Switch
+interface LanguageSelectionModalProps {
+  isDark: boolean;
+  accentColor: string;
+  onSelect: (lang: Language) => void;
+  onSkip: () => void;
+}
+
+function LanguageSelectionModal({ isDark, accentColor, onSelect, onSkip }: LanguageSelectionModalProps) {
+  const [selectedLang, setSelectedLang] = useState<Language>('de');
+  
+  return (
+    <div className="absolute inset-0 flex items-center justify-center pointer-events-auto">
+      <div 
+        className="absolute inset-0 bg-black/20"
+        onClick={onSkip}
+      />
+      <div 
+        className="relative w-full max-w-sm mx-4 rounded-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 fade-in duration-300"
+        style={{
+          background: isDark 
+            ? 'linear-gradient(135deg, rgba(30,41,59,0.98) 0%, rgba(15,23,42,0.98) 100%)'
+            : 'linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(250,250,252,0.98) 100%)',
+          border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.8)',
+        }}
+      >
+        {/* Fox */}
+        <div className="flex justify-center pt-6 pb-3">
+          <img 
+            src={getFoxImagePath()}
+            alt="TaskFuchs" 
+            className="w-20 h-20 object-contain"
+            onError={(e) => {
+              const img = e.target as HTMLImageElement;
+              if (img.src.includes('/3d_fox.png')) img.src = './3d_fox.png';
+            }}
+            style={{ animation: 'bounce-gentle 2s ease-in-out infinite' }}
+          />
+        </div>
         
-        <div className="backdrop-blur-3xl rounded-3xl p-8 max-w-md mx-4 text-center shadow-2xl border border-white/25 dark:border-gray-700/20 transform"
-             style={{
-               background: 'linear-gradient(145deg, rgba(255,255,255,0.15), rgba(255,255,255,0.08))',
-               boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
-             }}>
-          <div className="relative mb-6">
-            <div className="flex justify-center mb-4 transform animate-pulse">
-              <img 
-                src="/3d_fox.png" 
-                alt="TaskFuchs" 
-                className="w-32 h-32 object-contain drop-shadow-lg"
-              />
-            </div>
-            <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center animate-ping">
-              <Check className="w-5 h-5 text-white" />
-            </div>
-          </div>
+        {/* Title & Language Toggle */}
+        <div className="text-center px-6 pb-4">
+          <h1 className={`text-xl font-bold mb-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+            {selectedLang === 'de' ? 'Bereit für die Einführung?' : 'Ready for the introduction?'}
+          </h1>
           
-          <h3 className="text-3xl font-bold text-white mb-3" style={{ textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)' }}>
-            Fantastisch!
-          </h3>
-          
-          <p className="text-lg text-white mb-4" style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)' }}>
-            Du bist jetzt bereit für eine produktive Reise mit TaskFuchs!
-          </p>
-          
-          <div className="backdrop-blur-xl border border-orange-200/25 dark:border-orange-700/20 p-4 rounded-xl mb-6"
-               style={{
-                 background: 'linear-gradient(135deg, rgba(251, 146, 60, 0.1), rgba(251, 191, 36, 0.08))',
-                 boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.15)'
-               }}>
-            <p className="text-sm text-white italic" style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)' }}>
-              Denk daran: Nutze natürliche Sprache für Aufgaben und entdecke alle Funktionen!
-            </p>
-          </div>
-          
-          <div className="flex justify-center space-x-1 mb-4">
-            {[...Array(5)].map((_, i) => (
-              <Star 
-                key={i} 
-                className="w-6 h-6 text-yellow-400 fill-current animate-pulse" 
-                style={{ animationDelay: `${i * 0.1}s` }}
-              />
-            ))}
-          </div>
-
-          {/* Countdown Display */}
-          <div className="text-center">
-            <p className="text-sm text-white/80" style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)' }}>
-              {t('onboarding.completion.close_automatically')} {countdown} {t('onboarding.navigation.seconds')}...
-            </p>
+          {/* Language Toggle Switch */}
+          <div 
+            className="inline-flex items-center rounded-full p-1 gap-1"
+            style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }}
+          >
             <button
-              onClick={onClose}
-              className="mt-2 px-3 py-1 text-sm text-white hover:text-white backdrop-blur-xl rounded-lg border border-orange-200/25 transition-all duration-300 cursor-pointer"
-              style={{
-                background: 'linear-gradient(145deg, rgba(251, 146, 60, 0.1), rgba(251, 146, 60, 0.05))',
-                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-                textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'linear-gradient(145deg, rgba(251, 146, 60, 0.15), rgba(251, 146, 60, 0.08))';
-                e.currentTarget.style.textShadow = '0 1px 2px rgba(0, 0, 0, 0.5)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'linear-gradient(145deg, rgba(251, 146, 60, 0.1), rgba(251, 146, 60, 0.05))';
-                e.currentTarget.style.textShadow = '0 1px 2px rgba(0, 0, 0, 0.5)';
-              }}
+              onClick={() => setSelectedLang('de')}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                selectedLang === 'de' 
+                  ? 'text-white shadow-sm' 
+                  : isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'
+              }`}
+              style={{ backgroundColor: selectedLang === 'de' ? accentColor : 'transparent' }}
             >
-              {t('common.close')}
+              Deutsch
+            </button>
+            <button
+              onClick={() => setSelectedLang('en')}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                selectedLang === 'en' 
+                  ? 'text-white shadow-sm' 
+                  : isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'
+              }`}
+              style={{ backgroundColor: selectedLang === 'en' ? accentColor : 'transparent' }}
+            >
+              English
             </button>
           </div>
         </div>
-      </div>,
-      document.body
-    );
+        
+        {/* Start Button */}
+        <div className="px-6 pb-6">
+          <button
+            onClick={() => onSelect(selectedLang)}
+            className="w-full py-3 px-4 rounded-xl font-semibold text-white text-base transition-all duration-200 hover:scale-[1.01] active:scale-[0.99]"
+            style={{ backgroundColor: accentColor }}
+          >
+            {selectedLang === 'de' ? 'Einführung starten' : 'Start Introduction'}
+          </button>
+          <button
+            onClick={onSkip}
+            className={`w-full mt-2 py-2 text-sm transition-colors ${
+              isDark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'
+            }`}
+          >
+            {selectedLang === 'de' ? 'Überspringen' : 'Skip'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourProps) {
+  const { state, dispatch } = useApp();
+  
+  // Restore state from sessionStorage if available (survives re-renders and StrictMode)
+  const getStoredState = useCallback(() => {
+    try {
+      const stored = sessionStorage.getItem('taskfuchs-onboarding-state');
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch {
+      // Ignore parsing errors
+    }
+    return null;
+  }, []);
+  
+  const storedState = getStoredState();
+  
+  const [language, setLanguage] = useState<Language | null>(storedState?.language || null);
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(storedState?.sectionIndex || 0);
+  const [currentStepIndex, setCurrentStepIndex] = useState(storedState?.stepIndex || 0);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [dontShowAgain, setDontShowAgain] = useState(false);
+  const [sampleTaskCreated, setSampleTaskCreated] = useState(storedState?.sampleTaskCreated || false);
+  const [showTaskModal, setShowTaskModal] = useState(false);
+  
+  // Styling demo state - save original settings when entering styling section
+  const originalSettingsRef = useRef<{
+    theme: 'light' | 'dark' | 'system';
+    accentColor: string;
+    backgroundImage: string;
+  } | null>(null);
+  
+  const accentColor = state.preferences.accentColor;
+  
+  // Get the complete tour sections (including PWA if applicable)
+  const allTourSections = React.useMemo(() => getAllTourSections(), []);
+  
+  // Persist current state to sessionStorage whenever it changes
+  useEffect(() => {
+    if (isOpen && language) {
+      sessionStorage.setItem('taskfuchs-onboarding-state', JSON.stringify({
+        language,
+        sectionIndex: currentSectionIndex,
+        stepIndex: currentStepIndex,
+        sampleTaskCreated
+      }));
+    }
+  }, [isOpen, language, currentSectionIndex, currentStepIndex, sampleTaskCreated]);
+  
+  // Track previous open state to detect fresh opens
+  const prevIsOpenRef = useRef(false);
+  
+  // Initialize/reset state when opening fresh (no stored state)
+  useEffect(() => {
+    const wasOpen = prevIsOpenRef.current;
+    prevIsOpenRef.current = isOpen;
+    
+    if (!isOpen) {
+      // When closing, we don't clear state here (it's cleared when starting fresh from menu)
+      return;
+    }
+    
+    // Opening - check if we should reset to initial state
+    if (isOpen && !wasOpen) {
+      // Check for stored state NOW (not from initial render)
+      const currentStoredState = sessionStorage.getItem('taskfuchs-onboarding-state');
+      
+      if (!currentStoredState) {
+        // No stored state - this is a fresh start, reset everything
+        setLanguage(null);
+        setCurrentSectionIndex(0);
+        setCurrentStepIndex(0);
+        setDontShowAgain(false);
+        setSampleTaskCreated(false);
+        setShowTaskModal(false);
+        originalSettingsRef.current = null;
+      }
+      
+      // Preload demo background images for smooth transitions
+      preloadImages(DEMO_BACKGROUND_IMAGES);
+    }
+  }, [isOpen]);
+  
+  // Track previous section to detect entering/leaving styling section
+  const prevSectionIdRef = useRef<string | null>(null);
+  const stylingSectionEntered = useRef(false);
+  
+  // Handle styling demo - save original settings and apply styling per step
+  useEffect(() => {
+    const currentSection = allTourSections[currentSectionIndex];
+    const currentStep = currentSection?.steps[currentStepIndex];
+    const prevSectionId = prevSectionIdRef.current;
+    const isEnteringStyling = currentSection?.id === 'styling' && prevSectionId !== 'styling';
+    const isLeavingStyling = prevSectionId === 'styling' && currentSection?.id !== 'styling';
+    
+    // Update prev section id for next render
+    prevSectionIdRef.current = currentSection?.id || null;
+    
+    // Entering styling section - save original settings (using ref to capture current values)
+    if (isEnteringStyling && !stylingSectionEntered.current) {
+      stylingSectionEntered.current = true;
+      // Read current state values directly
+      const prefs = state.preferences;
+      originalSettingsRef.current = {
+        theme: prefs.theme as 'light' | 'dark' | 'system',
+        accentColor: prefs.accentColor,
+        backgroundImage: prefs.backgroundImage || ''
+      };
+    }
+    
+    // Helper to apply dark mode class immediately
+    const applyDarkModeClass = (theme: 'light' | 'dark' | 'system') => {
+      const root = document.documentElement;
+      if (theme === 'dark') {
+        root.classList.add('dark');
+      } else if (theme === 'light') {
+        root.classList.remove('dark');
+      } else {
+        // System theme
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (prefersDark) {
+          root.classList.add('dark');
+        } else {
+          root.classList.remove('dark');
+        }
+      }
+    };
+    
+    // Apply styling when in styling section
+    if (currentSection?.id === 'styling') {
+      if (currentStep?.applyStyling) {
+        // Apply dark mode class immediately for instant visual feedback
+        applyDarkModeClass(currentStep.applyStyling.theme);
+        
+    dispatch({ 
+      type: 'UPDATE_PREFERENCES', 
+          payload: {
+            theme: currentStep.applyStyling.theme,
+            accentColor: currentStep.applyStyling.accentColor,
+            backgroundImage: currentStep.applyStyling.backgroundImage
+          }
+        });
+      } else if (currentStep?.restoreOriginalStyling && originalSettingsRef.current) {
+        // Apply dark mode class immediately for instant visual feedback
+        applyDarkModeClass(originalSettingsRef.current.theme);
+        
+        // Restore original settings
+        dispatch({
+          type: 'UPDATE_PREFERENCES',
+          payload: {
+            theme: originalSettingsRef.current.theme,
+            accentColor: originalSettingsRef.current.accentColor,
+            backgroundImage: originalSettingsRef.current.backgroundImage
+          }
+        });
+      }
+    }
+    
+    // Leaving styling section - restore original settings
+    if (isLeavingStyling && originalSettingsRef.current) {
+      // Apply dark mode class immediately for instant visual feedback
+      applyDarkModeClass(originalSettingsRef.current.theme);
+      
+      dispatch({
+        type: 'UPDATE_PREFERENCES',
+        payload: {
+          theme: originalSettingsRef.current.theme,
+          accentColor: originalSettingsRef.current.accentColor,
+          backgroundImage: originalSettingsRef.current.backgroundImage
+        }
+      });
+      originalSettingsRef.current = null;
+      stylingSectionEntered.current = false;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSectionIndex, currentStepIndex]);
+  
+  // Create sample task when language is selected
+  useEffect(() => {
+    if (isOpen && language && !sampleTaskCreated) {
+      // Find an existing pin column or use the first one
+      const pinColumn = state.pinColumns?.[0];
+      const sampleTask = createSampleTask(pinColumn?.id);
+      
+      // Check if sample task already exists
+      const existingTask = state.tasks.find(t => t.id === SAMPLE_TASK_ID);
+      if (!existingTask) {
+        dispatch({ type: 'ADD_TASK', payload: sampleTask });
+      } else {
+        // Update it to have today's date
+        dispatch({ type: 'UPDATE_TASK', payload: sampleTask });
+      }
+      setSampleTaskCreated(true);
+    }
+  }, [isOpen, language, sampleTaskCreated, state.pinColumns, state.tasks, dispatch]);
+  
+  // Expand all sidebars when tour starts
+  useEffect(() => {
+    if (isOpen && language) {
+      window.dispatchEvent(new CustomEvent('task-sidebar-state-changed', { detail: { minimized: false } }));
+      window.dispatchEvent(new CustomEvent('project-sidebar-state-changed', { detail: { minimized: false } }));
+      window.dispatchEvent(new CustomEvent('pins-sidebar-state-changed', { detail: { minimized: false } }));
+    }
+  }, [isOpen, language]);
+  
+  // Handle task modal visibility based on current step
+  useEffect(() => {
+    const currentSection = allTourSections[currentSectionIndex];
+    const currentStep = currentSection?.steps[currentStepIndex];
+    
+    if (currentStep?.openTaskModal && sampleTaskCreated) {
+      // Add class to body for TaskModal positioning during onboarding
+      document.body.classList.add('onboarding-taskmodal-active');
+      // Open the sample task modal
+      window.dispatchEvent(new CustomEvent('open-task-modal', { 
+        detail: { taskId: SAMPLE_TASK_ID } 
+      }));
+      setShowTaskModal(true);
+    } else if (showTaskModal) {
+      // Remove class and close the task modal when leaving the taskmodal section
+      document.body.classList.remove('onboarding-taskmodal-active');
+      window.dispatchEvent(new CustomEvent('close-task-modal'));
+      setShowTaskModal(false);
+    }
+    
+    return () => {
+      document.body.classList.remove('onboarding-taskmodal-active');
+    };
+  }, [currentSectionIndex, currentStepIndex, sampleTaskCreated, showTaskModal]);
+  
+  // Handle End of Day modal visibility based on current step
+  useEffect(() => {
+    const currentSection = allTourSections[currentSectionIndex];
+    const currentStep = currentSection?.steps[currentStepIndex];
+    
+    if (currentStep?.openEndOfDayModal) {
+      // Open the End of Day modal
+      window.dispatchEvent(new CustomEvent('open-end-of-day-modal'));
+    }
+  }, [currentSectionIndex, currentStepIndex]);
+  
+  // Calculate total progress
+  const totalSteps = allTourSections.reduce((acc, section) => acc + section.steps.length, 0);
+  const currentTotalStep = allTourSections.slice(0, currentSectionIndex).reduce((acc, section) => acc + section.steps.length, 0) + currentStepIndex + 1;
+  
+  const currentSection = allTourSections[currentSectionIndex];
+  const currentStep = currentSection?.steps[currentStepIndex];
+  
+  // Navigate to the current section's view
+  const navigateToView = useCallback((view: string) => {
+    if (onNavigate) {
+      onNavigate(view);
+    }
+  }, [onNavigate]);
+  
+  // Go to next step or section - stable version without stale closures
+  const handleNext = useCallback(() => {
+    if (isAnimating) return; // Prevent double-clicks
+    
+    const section = allTourSections[currentSectionIndex];
+    if (!section) return;
+    
+    const stepsCount = section.steps.length;
+    
+    setIsAnimating(true);
+    
+    if (currentStepIndex < stepsCount - 1) {
+      // More steps in current section
+      setCurrentStepIndex(currentStepIndex + 1);
+    } else if (currentSectionIndex < allTourSections.length - 1) {
+      // Move to next section
+      const nextSection = allTourSections[currentSectionIndex + 1];
+      setCurrentSectionIndex(currentSectionIndex + 1);
+      setCurrentStepIndex(0);
+      if (nextSection) {
+        navigateToView(nextSection.view);
+      }
+    }
+    
+    // Reset animation state after a short delay
+    setTimeout(() => setIsAnimating(false), 200);
+  }, [currentStepIndex, currentSectionIndex, allTourSections, navigateToView, isAnimating]);
+  
+  // Go to previous step or section - stable version without stale closures
+  const handlePrev = useCallback(() => {
+    if (isAnimating) return; // Prevent double-clicks
+    
+    setIsAnimating(true);
+    
+    if (currentStepIndex > 0) {
+      // Previous step in current section
+      setCurrentStepIndex(currentStepIndex - 1);
+    } else if (currentSectionIndex > 0) {
+      // Move to previous section, last step
+      const prevSection = allTourSections[currentSectionIndex - 1];
+      if (prevSection) {
+        setCurrentSectionIndex(currentSectionIndex - 1);
+        setCurrentStepIndex(prevSection.steps.length - 1);
+        navigateToView(prevSection.view);
+      }
+    }
+    
+    // Reset animation state after a short delay
+    setTimeout(() => setIsAnimating(false), 200);
+  }, [currentStepIndex, currentSectionIndex, allTourSections, navigateToView, isAnimating]);
+  
+  const handleComplete = useCallback(() => {
+    // Close task modal if open
+    if (showTaskModal) {
+      window.dispatchEvent(new CustomEvent('close-task-modal'));
+    }
+    
+    if (dontShowAgain) {
+    dispatch({ 
+      type: 'UPDATE_PREFERENCES', 
+      payload: { hasCompletedOnboarding: true } 
+    });
+    }
+    onClose();
+  }, [dispatch, onClose, dontShowAgain, showTaskModal]);
+  
+  const handleSkip = useCallback(() => {
+    // Close task modal if open
+    if (showTaskModal) {
+      window.dispatchEvent(new CustomEvent('close-task-modal'));
+    }
+    onClose();
+  }, [onClose, showTaskModal]);
+  
+  const handleLanguageSelect = useCallback((lang: Language) => {
+    setLanguage(lang);
+    // Reset indices to ensure we start from the beginning
+    setCurrentSectionIndex(0);
+    setCurrentStepIndex(0);
+    // Navigate to first section's view
+    const firstSection = allTourSections[0];
+    if (firstSection) {
+      navigateToView(firstSection.view);
+    }
+  }, [navigateToView, allTourSections]);
+  
+  // Keyboard navigation
+  useEffect(() => {
+    if (!isOpen || !language) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Get current section safely
+      const section = allTourSections[currentSectionIndex];
+      if (!section) return;
+      
+      const isLastSection = currentSectionIndex === allTourSections.length - 1;
+      const isLastStepInSection = currentStepIndex === section.steps.length - 1;
+      
+      if (e.key === 'ArrowRight' || e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        if (isLastSection && isLastStepInSection) {
+          handleComplete();
+        } else {
+          handleNext();
+        }
+      } else if (e.key === 'ArrowLeft') {
+        handlePrev();
+      } else if (e.key === 'Escape') {
+        handleSkip();
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, language, currentSectionIndex, currentStepIndex, allTourSections, handleNext, handlePrev, handleComplete, handleSkip]);
+
+  if (!isOpen) return null;
+  
+  // Safety check - ensure we have valid section and step
+  if (!currentSection || !currentStep) {
+    // Reset to beginning if something went wrong
+    if (currentSectionIndex !== 0 || currentStepIndex !== 0) {
+      setCurrentSectionIndex(0);
+      setCurrentStepIndex(0);
+    }
+    return null;
   }
 
-  return createPortal(
-    <div 
-      className="fixed inset-0 flex items-center justify-center z-[99998] p-4"
-      style={{ 
-        isolation: 'isolate',
-        backgroundImage: `url(${getBackgroundImagePath()})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed'
-      }}
-      onClick={onClose}
-    >
-      {/* Background Overlay */}
-      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" style={{ zIndex: -1 }} />
-      
+  const t = (obj: { de: string; en: string } | undefined) => obj ? (language ? obj[language] : obj.de) : '';
+  
+  // Position classes for the modal
+  const getPositionClasses = (position: string, isTaskModalOpen: boolean) => {
+    // When TaskModal is open during onboarding, position explanation on left
+    if (isTaskModalOpen) {
+      return 'top-1/2 -translate-y-1/2 left-6 sm:left-24';
+    }
+    
+    switch (position) {
+      case 'bottom-right': return 'bottom-6 right-6';
+      case 'bottom-left': return 'bottom-6 left-6 sm:left-24';
+      case 'top-right': return 'top-24 right-6';
+      case 'top-left': return 'top-24 left-6 sm:left-24';
+      case 'center-right': return 'top-1/2 -translate-y-1/2 right-6';
+      case 'center-left': return 'top-1/2 -translate-y-1/2 left-6 sm:left-24';
+      case 'center': return 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2';
+      default: return 'bottom-6 right-6';
+    }
+  };
+  
+  // Get icon for current step (special icons for taskmodal section)
+  const getStepIcon = () => {
+    if (currentSection.id === 'taskmodal') {
+      if (currentStepIndex === 0) return <FileText className="w-5 h-5" />;
+      if (currentStepIndex === 1) return <Flag className="w-5 h-5" />;
+      if (currentStepIndex === 2) return <ListChecks className="w-5 h-5" />;
+    }
+    return currentSection.icon;
+  };
+  
+  const isLastStep = currentSectionIndex === allTourSections.length - 1 && currentStepIndex === currentSection.steps.length - 1;
+  const isFirstStep = currentSectionIndex === 0 && currentStepIndex === 0;
+  
+  // Reactive dark mode detection - updates instantly when theme changes
+  const isDark = state.preferences.theme === 'dark' || 
+    (state.preferences.theme === 'system' && typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  
+  const content = (
+    <div className="fixed inset-0 z-[999999999] pointer-events-none">
+      {/* Subtle vignette overlay */}
       <div 
-        className="bg-white/20 dark:bg-gray-800/25 backdrop-blur-3xl rounded-3xl shadow-2xl border border-white/30 dark:border-gray-600/25 max-w-4xl w-full overflow-hidden relative my-auto"
-        style={{
-          background: 'linear-gradient(145deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.2))',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
-          height: '420px',
-          minHeight: '420px',
-          maxHeight: '420px'
+        className="absolute inset-0 pointer-events-none"
+           style={{ 
+          background: 'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.15) 100%)'
         }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Close Button - positioned absolutely in top right corner */}
-        <div className="absolute top-3 right-3 z-10">
-          <button
-            onClick={skipTour}
-            className="p-1.5 text-white hover:text-white transition-all duration-300 hover:bg-white/20 backdrop-blur-xl rounded-lg border border-white/25 hover:border-white/40"
-            style={{
-              background: 'linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))',
-              textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
+      />
+      
+      {/* Language Selection Modal */}
+      {!language && (
+        <LanguageSelectionModal
+          isDark={isDark}
+          accentColor={accentColor}
+          onSelect={handleLanguageSelect}
+          onSkip={handleSkip}
+        />
+      )}
+
+      {/* Final Congratulations Modal */}
+      {language && currentSection?.id === 'complete' && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-auto">
+          <div 
+            className="absolute inset-0 bg-black/20"
+            onClick={handleComplete}
+          />
+          <div 
+            className={`relative w-full max-w-sm mx-4 rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 ${
+              isAnimating ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
+            }`}
+             style={{
+              background: isDark 
+                ? 'linear-gradient(135deg, rgba(30,41,59,0.98) 0%, rgba(15,23,42,0.98) 100%)'
+                : 'linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(250,250,252,0.98) 100%)',
+              border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.8)',
+              animation: !isAnimating ? 'float-in 0.5s ease-out' : undefined
             }}
           >
-            <X className="w-4 h-4" />
+            {/* Fox with celebration animation */}
+            <div className="flex justify-center pt-8 pb-4">
+              <div className="relative">
+                <img 
+                  src={getFoxImagePath()}
+                alt="TaskFuchs" 
+                  className="w-24 h-24 object-contain"
+                  onError={(e) => {
+                    const img = e.target as HTMLImageElement;
+                    if (img.src.includes('/3d_fox.png')) img.src = './3d_fox.png';
+                  }}
+                  style={{ animation: 'bounce-gentle 1.5s ease-in-out infinite' }}
+                />
+                <Sparkles 
+                  className="absolute -top-2 -right-2 w-6 h-6 text-yellow-400"
+                  style={{ animation: 'pulse 1s ease-in-out infinite' }}
+                />
+                <Sparkles 
+                  className="absolute -bottom-1 -left-3 w-5 h-5 text-yellow-500"
+                  style={{ animation: 'pulse 1.2s ease-in-out infinite 0.3s' }}
+              />
+            </div>
+          </div>
+          
+            {/* Content */}
+            <div className="text-center px-6 pb-4">
+              <h1 className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                {t(currentStep?.title)}
+              </h1>
+              <p className={`text-base mb-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                {t(currentStep?.text)}
+              </p>
+              
+              {/* Fox Slogan */}
+              <div 
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-4"
+                style={{ backgroundColor: `${accentColor}20` }}
+              >
+                <span className="text-lg" style={{ color: accentColor }}>
+                  {t(currentStep?.foxMessage)}
+                </span>
+              </div>
+          </div>
+          
+            {/* Checkbox */}
+            <div className="px-6 pb-4">
+              <label className={`flex items-center justify-center gap-2 cursor-pointer ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                <input
+                  type="checkbox"
+                  checked={dontShowAgain}
+                  onChange={(e) => setDontShowAgain(e.target.checked)}
+                  className="w-4 h-4 rounded border-gray-300"
+                  style={{ accentColor }}
+                />
+                <span className="text-sm">
+                  {language === 'de' ? 'Onboarding nicht mehr anzeigen' : 'Don\'t show onboarding again'}
+                </span>
+              </label>
+          </div>
+
+            {/* Button */}
+            <div className="px-6 pb-6">
+            <button
+                onClick={handleComplete}
+                className="w-full py-3 px-4 rounded-xl font-bold text-white text-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+                style={{ backgroundColor: accentColor }}
+              >
+                <Check className="w-5 h-5" />
+                <span>{language === 'de' ? 'Los geht\'s!' : 'Let\'s go!'}</span>
+            </button>
+          </div>
+        </div>
+        </div>
+      )}
+
+      {/* Tour Tooltip */}
+      {language && currentStep && currentSection?.id !== 'complete' && (
+    <div 
+          className={`absolute ${getPositionClasses(currentStep.position, showTaskModal)} pointer-events-auto transition-all duration-300 ease-out ${
+            isAnimating ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
+          }`}
+      style={{ 
+            maxWidth: '380px',
+            animation: !isAnimating ? 'float-in 0.4s ease-out' : undefined
+          }}
+        >
+          <style>{`
+            @keyframes float-in {
+              0% { opacity: 0; transform: translateY(10px) scale(0.97); }
+              100% { opacity: 1; transform: translateY(0) scale(1); }
+            }
+            @keyframes pulse-ring {
+              0% { transform: scale(1); opacity: 0.8; }
+              50% { transform: scale(1.05); opacity: 0.4; }
+              100% { transform: scale(1); opacity: 0.8; }
+            }
+          `}</style>
+          
+          <div 
+            className="rounded-2xl overflow-hidden shadow-2xl"
+        style={{
+              background: isDark 
+                ? 'linear-gradient(135deg, rgba(30,41,59,0.97) 0%, rgba(15,23,42,0.97) 100%)'
+                : 'linear-gradient(135deg, rgba(255,255,255,0.97) 0%, rgba(250,250,252,0.97) 100%)',
+              backdropFilter: 'blur(20px)',
+              border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(200,200,200,0.3)',
+              boxShadow: isDark
+                ? '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.05)'
+                : '0 25px 50px -12px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255,255,255,0.8)'
+            }}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-3 border-b"
+              style={{ borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }}
+            >
+              <div className="flex items-center gap-2">
+                <div className="flex gap-1.5">
+                  {allTourSections.map((section, idx) => (
+                    <div
+                      key={section.id}
+                      className="w-6 h-1.5 rounded-full transition-all duration-300"
+            style={{
+                        backgroundColor: idx <= currentSectionIndex ? accentColor : (isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)'),
+                        opacity: idx === currentSectionIndex ? 1 : 0.5
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+              
+              <button
+                onClick={handleSkip}
+                className={`text-sm px-3 py-1.5 rounded-lg transition-colors ${
+                  isDark ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-700/50' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                {language === 'de' ? 'Schließen' : 'Close'}
           </button>
         </div>
         
-        <div className="flex flex-col md:flex-row h-full relative overflow-hidden">
-          {/* Band Animation Container */}
-          <div className="relative w-full h-full overflow-hidden">
-            <div 
-              className="flex h-full transition-transform duration-600 ease-in-out"
-              style={{
-                width: `${steps.length * 100}%`,
-                transform: `translateX(-${(currentStep / steps.length) * 100}%)`
-              }}
-            >
-              {steps.map((step, index) => (
-                <div key={step.id} className="flex flex-col md:flex-row h-full flex-shrink-0" style={{ width: `${100 / steps.length}%` }}>
-                  {/* Fox Side - Dark Mode Only */}
-                  <div className="md:w-1/2 bg-gradient-to-br from-gray-900/40 to-gray-800/50 dark:from-gray-900/40 dark:to-gray-800/50 backdrop-blur-xl p-6 flex flex-col justify-center relative"
-                       style={{
-                         background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3))',
-                         borderRight: '1px solid rgba(255, 255, 255, 0.1)'
-                       }}>
-                    {/* Fox Message Speech Bubble - Compact & Elegant */}
-                    <div className="speech-bubble-container max-w-xs mx-auto mb-3">
-                      <div className="backdrop-blur-2xl p-4 relative speech-bubble"
-                            style={{
-                              background: 'linear-gradient(145deg, rgba(30, 30, 30, 0.5), rgba(20, 20, 20, 0.4))',
-                              borderRadius: '16px 16px 16px 4px',
-                              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
-                              border: '1px solid rgba(255, 255, 255, 0.2)',
-                              minHeight: '80px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center'
-                            }}>
-                        <p className="text-white text-base leading-relaxed font-normal text-center"
-                           style={{
-                             textShadow: '0 2px 4px rgba(0, 0, 0, 0.7)',
-                             fontSize: '16px',
-                             fontWeight: '500',
-                             textAlign: 'center',
-                             letterSpacing: '0px'
-                           }}>
-                          {step.foxMessage}
+            {/* Content */}
+            <div className="px-5 py-4">
+              <div className="flex items-start gap-3 mb-3">
+                <div 
+                  className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-lg"
+                  style={{ backgroundColor: accentColor, animation: 'pulse-ring 2s ease-in-out infinite' }}
+                >
+                  {getStepIcon()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className={`font-bold text-base leading-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                    {t(currentStep.title)}
+                  </h3>
+                  <p className={`text-sm mt-1.5 leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                    {t(currentStep.text)}
                         </p>
                       </div>
                     </div>
                     
-                    {/* Fox Icon - Modern Lucide Icon */}
-                    <div className={`transform transition-all duration-300 ${foxAnimating && index === currentStep ? 'scale-110 rotate-12' : 'scale-100'}`}>
-                      <div className="flex justify-center">
-                        <img 
-                          src="/3d_fox.png" 
-                          alt="TaskFuchs" 
-                          className="w-32 h-32 object-contain drop-shadow-lg"
-                        />
+              {/* Fox Message - with image instead of emoji */}
+              {currentStep.foxMessage && (
+                <div 
+                  className="flex items-center gap-3 p-3 rounded-xl mt-3"
+                  style={{ backgroundColor: `${accentColor}15` }}
+                >
+                  <img 
+                    src={getFoxImagePath()}
+                    alt="" 
+                    className="w-7 h-7 object-contain flex-shrink-0"
+                    onError={(e) => {
+                      const img = e.target as HTMLImageElement;
+                      if (img.src.includes('/3d_fox.png')) img.src = './3d_fox.png';
+                    }}
+                  />
+                  <p className="text-sm font-medium" style={{ color: accentColor }}>
+                    {t(currentStep.foxMessage)}
+                  </p>
                       </div>
-                    </div>
-                  </div>
-                  
-                  {/* Content Side */}
-                  <div className="md:w-1/2 p-6 flex flex-col">
-                    {/* Header */}
-                    <div className="mb-4">
-                      <div>
-                        <h2 className="text-xl font-bold text-white mb-2" style={{ textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)' }}>
-                          {step.title}
-                        </h2>
-                        <p className="text-sm text-white/90" style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)' }}>
-                          {step.subtitle}
+              )}
+              
+              {/* Task Modal hint */}
+              {currentStep.openTaskModal && (
+                <div className={`flex items-center gap-2 mt-3 p-2.5 rounded-lg ${isDark ? 'bg-gray-800/50' : 'bg-gray-100/50'}`}>
+                  <FileText className="w-4 h-4 flex-shrink-0" style={{ color: accentColor }} />
+                  <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                    {language === 'de' ? 'Schau dir die Beispielaufgabe rechts an!' : 'Check out the sample task on the right!'}
                         </p>
                       </div>
-                    </div>
-                    
-                    {/* Description */}
-                    <div className="flex-1 mb-4">
-                      <p className="text-white text-sm leading-relaxed mb-3" style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)' }}>
-                        {step.description}
-                      </p>
-                      
-                      {/* Features List */}
-                      {step.features && (
-                        <div className="space-y-1.5">
-                          {step.features.map((feature, featureIndex) => (
-                            <div 
-                              key={featureIndex} 
-                              className="flex items-center space-x-2 text-white"
-                              style={{ animationDelay: `${featureIndex * 0.1}s` }}
-                            >
-                              <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-orange-400 shadow-lg" />
-                              <span className="text-sm" style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)' }}>{feature}</span>
-                            </div>
-                          ))}
+              )}
+              
+              {/* Sidebar hint for relevant sections */}
+              {(currentSection.id === 'tasks' || currentSection.id === 'projects' || currentSection.id === 'pins') && currentStepIndex === 0 && (
+                <div className={`flex items-center gap-2 mt-3 p-2.5 rounded-lg ${isDark ? 'bg-gray-800/50' : 'bg-gray-100/50'}`}>
+                  <PanelLeftOpen className="w-4 h-4 flex-shrink-0" style={{ color: accentColor }} />
+                  <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                    {language === 'de' ? 'Tipp: Die Sidebar lässt sich ein- und ausklappen.' : 'Tip: The sidebar can be expanded and collapsed.'}
+                  </p>
                         </div>
                       )}
+              
+              {/* Styling Preview - shows current settings during styling demo */}
+              {currentStep.stylingDemo && (currentStep.applyStyling || currentStep.restoreOriginalStyling) && (
+                <div className="mt-4 p-4 rounded-xl" style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' }}>
+                  <div className="flex items-center justify-between gap-4">
+                    {/* Theme indicator */}
+                    <div className="flex flex-col items-center gap-1">
+                      <div 
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                          isDark ? 'bg-gray-800' : 'bg-gray-100'
+                        }`}
+                      >
+                        {isDark ? (
+                          <Moon className="w-5 h-5 text-blue-400" />
+                        ) : (
+                          <Sun className="w-5 h-5 text-yellow-500" />
+                        )}
+                            </div>
+                      <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                        {isDark ? 'Dark' : 'Light'}
+                      </span>
+                        </div>
+                    
+                    {/* Background preview */}
+                    <div className="flex flex-col items-center gap-1">
+                      <div 
+                        className="w-10 h-10 rounded-xl border-2 overflow-hidden"
+                        style={{ borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)' }}
+                      >
+                        {state.preferences.backgroundImage ? (
+                          <img 
+                            src={state.preferences.backgroundImage.startsWith('/') 
+                              ? state.preferences.backgroundImage 
+                              : `/backgrounds/${state.preferences.backgroundImage}`}
+                            alt="BG"
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const img = e.target as HTMLImageElement;
+                              img.style.display = 'none';
+                            }}
+                          />
+                        ) : (
+                          <div className={`w-full h-full ${isDark ? 'bg-gray-800' : 'bg-gray-200'}`} />
+                        )}
+                      </div>
+                      <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                        {language === 'de' ? 'Hinter.' : 'BG'}
+                      </span>
                     </div>
                     
-                    {/* Navigation */}
-                    {index === currentStep && (
-                      <div className="space-y-3">
+                    {/* Accent color */}
+                    <div className="flex flex-col items-center gap-1">
+                      <div 
+                        className="w-10 h-10 rounded-xl shadow-lg"
+                          style={{
+                          backgroundColor: accentColor,
+                          boxShadow: `0 4px 12px ${accentColor}50`
+                        }}
+                      />
+                      <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                        {language === 'de' ? 'Farbe' : 'Color'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+                    </div>
+                    
+            {/* Footer */}
+            <div className="px-5 py-3 border-t"
+                          style={{
+                borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.02)'
+              }}
+            >
+              {/* Checkbox on last step */}
+              {isLastStep && (
+                <label className={`flex items-center gap-2 mb-3 cursor-pointer ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                  <input
+                    type="checkbox"
+                    checked={dontShowAgain}
+                    onChange={(e) => setDontShowAgain(e.target.checked)}
+                    className="w-4 h-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                    style={{ accentColor }}
+                  />
+                  <span className="text-sm">
+                    {language === 'de' ? 'Onboarding nicht mehr anzeigen' : 'Don\'t show onboarding again'}
+                          </span>
+                </label>
+              )}
+              
                       <div className="flex items-center justify-between">
                         <button
-                          onClick={prevStep}
-                          disabled={currentStep === 0}
-                          className="flex items-center space-x-1 px-3 py-2 text-white hover:text-white hover:bg-white/20 backdrop-blur-xl rounded-lg border border-white/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
-                          style={{
-                            background: 'linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))',
-                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
-                          }}
-                        >
-                          <ArrowLeft className="w-3 h-3" />
-                            <span className="text-sm">{t('onboarding.navigation.previous')}</span>
+                  onClick={handlePrev}
+                  disabled={isFirstStep}
+                  className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                    isFirstStep ? 'opacity-30 cursor-not-allowed' : isDark ? 'text-gray-300 hover:bg-gray-700/50' : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  <ChevronLeft className="w-4 h-4" />
                         </button>
                         
+                <span className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                  {currentTotalStep} / {totalSteps}
+                </span>
+                
+                {isLastStep ? (
+                  <button
+                    onClick={handleComplete}
+                    className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-semibold text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    style={{ backgroundColor: accentColor }}
+                  >
+                    <Check className="w-4 h-4" />
+                    <span>{language === 'de' ? 'Fertig' : 'Done'}</span>
+                  </button>
+                ) : (
                         <button
-                          onClick={nextStep}
-                          className="flex items-center space-x-2 px-4 py-2 text-white rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 backdrop-blur-xl border border-orange-400/25"
-                          style={{
-                            background: 'linear-gradient(145deg, rgba(251, 146, 60, 0.8), rgba(234, 88, 12, 0.9))',
-                            boxShadow: '0 6px 24px rgba(251, 146, 60, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.background = 'linear-gradient(145deg, rgba(251, 146, 60, 0.9), rgba(234, 88, 12, 1))';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.background = 'linear-gradient(145deg, rgba(251, 146, 60, 0.8), rgba(234, 88, 12, 0.9))';
-                          }}
-                        >
-                            <span className="font-medium text-sm">
-                            {index === steps.length - 1 ? t('onboarding.navigation.finish') : t('onboarding.navigation.next')}
-                          </span>
-                          <ArrowRight className="w-3 h-3" />
+                    onClick={handleNext}
+                    className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-semibold text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    style={{ backgroundColor: accentColor }}
+                  >
+                    <span>{language === 'de' ? 'Weiter' : 'Next'}</span>
+                    <ChevronRight className="w-4 h-4" />
                         </button>
+                )}
+              </div>
                         </div>
-                        
-                        {/* Step Counter - Between buttons */}
-                        <div className="text-center">
-                          <p className="text-xs text-white/70" style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)' }}>
-                            Schritt {index + 1} von {steps.length}
-                          </p>
                         </div>
                       </div>
                     )}
                   </div>
+  );
+  
+  return createPortal(content, document.body);
+}
+
+// Splash Modal Component - shows for 5 seconds on app start
+interface SplashModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onStartOnboarding: () => void;
+  showOnboardingOption: boolean;
+}
+
+export function SplashModal({ isOpen, onClose, onStartOnboarding, showOnboardingOption }: SplashModalProps) {
+  const { state } = useApp();
+  const accentColor = state.preferences.accentColor;
+  
+  // Reactive dark mode detection - updates instantly when theme changes
+  const isDark = state.preferences.theme === 'dark' || 
+    (state.preferences.theme === 'system' && typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  
+  // Auto-close after 5 seconds for returning users (no onboarding)
+  useEffect(() => {
+    if (!isOpen || showOnboardingOption) return;
+    
+    const timer = setTimeout(() => {
+      onClose();
+    }, 5000);
+    
+    return () => clearTimeout(timer);
+  }, [isOpen, onClose, showOnboardingOption]);
+  
+  // ESC key handler
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+  
+  if (!isOpen) return null;
+  
+  const content = (
+    <div className="fixed inset-0 z-[999998] flex items-center justify-center pointer-events-auto">
+      <div 
+        className="absolute inset-0 bg-black/20"
+        onClick={onClose}
+      />
+      <div 
+        className="relative w-full max-w-xs mx-4 rounded-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 fade-in duration-500"
+        style={{
+          background: isDark 
+            ? 'linear-gradient(135deg, rgba(30,41,59,0.98) 0%, rgba(15,23,42,0.98) 100%)'
+            : 'linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(250,250,252,0.98) 100%)',
+          border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.8)',
+        }}
+      >
+        {/* Fox with animation */}
+        <div className="flex justify-center pt-6 pb-3">
+          <img 
+            src={getFoxImagePath()}
+            alt="TaskFuchs" 
+            className="w-20 h-20 object-contain"
+            onError={(e) => {
+              const img = e.target as HTMLImageElement;
+              if (img.src.includes('/3d_fox.png')) img.src = './3d_fox.png';
+            }}
+            style={{ animation: 'bounce-gentle 2s ease-in-out infinite' }}
+          />
                 </div>
-                             ))}
+        
+        {/* Title */}
+        <div className="text-center px-6 pb-4">
+          <h1 className={`text-xl font-bold mb-1 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+            TaskFuchs
+          </h1>
+          <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+            {showOnboardingOption ? 'Bereit für die Einführung?' : 'Willkommen zurück!'}
+          </p>
              </div>
+        
+        {/* Actions */}
+        <div className="px-6 pb-6">
+          {showOnboardingOption ? (
+            <div className="flex gap-2">
+              <button
+                onClick={onClose}
+                className={`flex-1 py-2.5 px-3 rounded-xl font-medium text-sm transition-all ${
+                  isDark ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                Überspringen
+              </button>
+              <button
+                onClick={onStartOnboarding}
+                className="flex-1 py-2.5 px-3 rounded-xl font-semibold text-white text-sm transition-all hover:scale-[1.02]"
+                style={{ backgroundColor: accentColor }}
+              >
+                Einführung
+              </button>
            </div>
+          ) : (
+            <p className={`text-center text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+              Klicken oder ESC zum Schließen
+            </p>
+          )}
         </div>
       </div>
-    </div>,
-    document.body
+    </div>
   );
+  
+  return createPortal(content, document.body);
 } 

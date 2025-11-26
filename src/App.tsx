@@ -316,8 +316,12 @@ function MainApp() {
     };
 
     window.addEventListener('navigate-to-focus', handleNavigateToFocus as EventListener);
-    // Handle Onboarding start from anywhere
-    const handleStartOnboarding = () => setShowOnboarding(true);
+    // Handle Onboarding start from anywhere - clear stored state to start fresh
+    const handleStartOnboarding = () => {
+      // Clear any stored onboarding state so it starts from the beginning
+      sessionStorage.removeItem('taskfuchs-onboarding-state');
+      setShowOnboarding(true);
+    };
     window.addEventListener('start-onboarding', handleStartOnboarding as EventListener);
     
     // Handle User Guide open from anywhere
@@ -574,17 +578,17 @@ function MainApp() {
     handleViewChange(lastViewBeforeFocus);
   };
 
-  // Check if user should see language selection or onboarding (only first start)
+  // Check if user should see onboarding (only first start)
   React.useEffect(() => {
-    const hasSeen = localStorage.getItem('taskfuchs-onboarding-complete') === 'true' || state.preferences.hasCompletedOnboarding;
-    if (!hasSeen) {
-      if (!state.preferences.language) {
-        setShowLanguageSelection(true);
-      } else {
-        setShowOnboarding(true);
-      }
+    const hasCompletedOnboarding = localStorage.getItem('taskfuchs-onboarding-complete') === 'true' || state.preferences.hasCompletedOnboarding;
+    const alreadyShownThisSession = sessionStorage.getItem('taskfuchs-onboarding-shown') === 'true';
+    
+    // Show onboarding directly for first-time users (no splash modal)
+    if (!hasCompletedOnboarding && !alreadyShownThisSession) {
+      setShowOnboarding(true);
+      sessionStorage.setItem('taskfuchs-onboarding-shown', 'true');
     }
-  }, [state.preferences.hasCompletedOnboarding, state.preferences.language]);
+  }, [state.preferences.hasCompletedOnboarding]);
 
   // Handle language selection completion
   const handleLanguageSelected = (language: 'de' | 'en') => {
@@ -1107,23 +1111,34 @@ function MainApp() {
         colors={colors}
       />
 
-      {/* PWA Update Banner */}
+      {/* PWA Update Banner - Nutzer entscheidet */}
       {pwaUpdateAvailable && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[100000]">
-          <div className="flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl border backdrop-blur-md bg-white/90 dark:bg-gray-900/90 border-gray-200 dark:border-gray-700">
-            <span className="text-sm text-gray-800 dark:text-gray-200">Neue Version verfügbar</span>
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[100000] animate-slide-in-from-bottom">
+          <div className="flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-2xl border backdrop-blur-xl bg-white/95 dark:bg-gray-900/95 border-gray-200/50 dark:border-gray-700/50">
+            <div className="flex items-center gap-2">
+              <div 
+                className="w-2 h-2 rounded-full animate-pulse"
+                style={{ backgroundColor: colors.primary }}
+              />
+              <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                {t('pwa.update_available') || 'Neue Version verfügbar'}
+              </span>
+            </div>
             <button
-              onClick={() => { try { (window as any).__taskfuchs_applyUpdate?.(); } catch {} }}
-              className="px-3 py-1.5 rounded-lg text-white text-sm"
+              onClick={() => { 
+                try { (window as any).__taskfuchs_applyUpdate?.(); } catch {} 
+              }}
+              className="px-4 py-2 rounded-xl text-white text-sm font-medium transition-all hover:scale-105 hover:shadow-lg"
               style={{ backgroundColor: colors.primary }}
             >
-              Anwenden & Neu starten
+              {t('pwa.update_now') || 'Jetzt aktualisieren'}
             </button>
             <button
               onClick={() => setPwaUpdateAvailable(false)}
-              className="px-2 py-1.5 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              title={t('pwa.update_later') || 'Später'}
             >
-              Später
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -1187,13 +1202,18 @@ function MainApp() {
               setSelectedTaskForModal(id);
             }
           };
+          const handleCloseTaskModal = () => {
+            setSelectedTaskForModal(null);
+          };
           const handleOpenBackupSetup = () => {
             setShowBackupSetup(true);
           };
           window.addEventListener('open-task-modal', handleOpenTaskModal as any);
+          window.addEventListener('close-task-modal', handleCloseTaskModal);
           window.addEventListener('open-backup-setup', handleOpenBackupSetup as any);
           return () => {
             window.removeEventListener('open-task-modal', handleOpenTaskModal as any);
+            window.removeEventListener('close-task-modal', handleCloseTaskModal);
             window.removeEventListener('open-backup-setup', handleOpenBackupSetup as any);
             try { delete (window as any).__taskfuchs_openTask; } catch {}
           };
@@ -1334,10 +1354,12 @@ function MainApp() {
         onLanguageSelected={handleLanguageSelected}
       />
       
+      
       {/* Onboarding Tour */}
       <OnboardingTour
         isOpen={showOnboarding}
         onClose={() => setShowOnboarding(false)}
+        onNavigate={(view) => handleViewChange(view as ViewType)}
       />
       
       {/* User Guide */}
@@ -1399,19 +1421,38 @@ function MainApp() {
 // App Router Component
 function AppRouter() {
   const { state } = useAuth();
-  const [guestMode, setGuestMode] = React.useState(false);
+  
+  // Check if user has used the app before (has saved data in localStorage)
+  const hasUsedAppBefore = React.useMemo(() => {
+    try {
+      // Check for any stored app data that indicates returning user
+      const hasPreferences = localStorage.getItem('taskfuchs-preferences');
+      const hasTasks = localStorage.getItem('taskfuchs-tasks');
+      const hasSeenSplash = localStorage.getItem('taskfuchs-splash-seen');
+      const hasGuestMode = localStorage.getItem('taskfuchs-guest-mode');
+      return !!(hasPreferences || hasTasks || hasSeenSplash || hasGuestMode);
+    } catch {
+      return false;
+    }
+  }, []);
+  
+  // Auto-enter guest mode for returning users
+  const [guestMode, setGuestMode] = React.useState(hasUsedAppBefore);
 
   // Handle guest mode
   const handleGuestMode = () => {
+    try {
+      localStorage.setItem('taskfuchs-guest-mode', 'true');
+    } catch {}
     setGuestMode(true);
   };
 
-  // Show welcome screen if not authenticated and not in guest mode
+  // Show welcome screen ONLY for first-time users who are not authenticated
   if (!state.isAuthenticated && !guestMode) {
     return <WelcomeScreen onGuestMode={handleGuestMode} />;
   }
 
-  // Show main app if authenticated or in guest mode
+  // Show main app if authenticated or in guest mode (including returning users)
   return (
     <AppProvider>
       <MainApp />
