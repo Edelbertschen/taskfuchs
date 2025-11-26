@@ -66,8 +66,23 @@ export function InboxView() {
   // Only tasks WITHOUT a date AND WITHOUT a project are considered "true" inbox tasks
   const [sessionEditedTaskIds, setSessionEditedTaskIds] = useState<Set<string>>(new Set());
 
+  // Define inboxTasks early so it can be used in functions below
+  // Tasks in inbox: columnId='inbox' AND no date AND no project
+  // OR tasks edited during this session (stay visible until leaving the area)
+  const inboxTasks = useMemo(() => state.tasks
+    .filter(task => {
+      // True inbox task: columnId is inbox AND no date AND no project assigned
+      const isTrueInbox = task.columnId === 'inbox' && !task.reminderDate && !task.projectId;
+      // Or it was edited this session (stays visible until user leaves)
+      const isSessionEdited = sessionEditedTaskIds.has(task.id);
+      return isTrueInbox || isSessionEdited;
+    })
+    .filter(task => !task.completed) // Exclude completed tasks
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
+  [state.tasks, sessionEditedTaskIds]);
+
   const openInboxTaskAt = (idx: number) => {
-    const flat = inboxTasks; // already sorted newest first
+    const flat = inboxTasks;
     if (idx < 0 || idx >= flat.length) return;
     setSelectedTaskForModal(flat[idx]);
     setModalTaskIndex(idx);
@@ -254,20 +269,6 @@ export function InboxView() {
     setShowBulkActions(false);
     setShowBulkCalendar(false);
   };
-
-  // Get inbox tasks - include tasks that were originally in inbox when user entered the view
-  // Tasks in inbox: columnId='inbox' AND no date AND no project
-  // OR tasks edited during this session (stay visible until leaving the area)
-  const inboxTasks = state.tasks
-    .filter(task => {
-      // True inbox task: columnId is inbox AND no date AND no project assigned
-      const isTrueInbox = task.columnId === 'inbox' && !task.reminderDate && !task.projectId;
-      // Or it was edited this session (stays visible until user leaves)
-      const isSessionEdited = sessionEditedTaskIds.has(task.id);
-      return isTrueInbox || isSessionEdited;
-    })
-    .filter(task => !task.completed) // Exclude completed tasks
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   // Group tasks by created date
   const groupedTasks = useMemo(() => {
