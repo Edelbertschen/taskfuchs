@@ -1164,16 +1164,21 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
         toView: nextView
       });
       
-      // Always navigate directly (simpler and more reliable)
-      navigateToView(nextView);
-      setCurrentSectionIndex(currentSectionIndex + 1);
-      setCurrentStepIndex(0);
-      setTimeout(() => setIsAnimating(false), 300);
+      // Show guide cursor when navigating to a different view
+      if (currentView !== nextView) {
+        navigateToViewWithCursor(nextView, currentSectionIndex + 1, 0);
+      } else {
+        // Same view - navigate directly
+        navigateToView(nextView);
+        setCurrentSectionIndex(currentSectionIndex + 1);
+        setCurrentStepIndex(0);
+        setTimeout(() => setIsAnimating(false), 300);
+      }
     } else {
       // No more sections
       setTimeout(() => setIsAnimating(false), 200);
     }
-  }, [currentStepIndex, currentSectionIndex, allTourSections, navigateToView, isAnimating]);
+  }, [currentStepIndex, currentSectionIndex, allTourSections, navigateToView, navigateToViewWithCursor, isAnimating]);
   
   // Go to previous step or section - stable version without stale closures
   const handlePrev = useCallback(() => {
