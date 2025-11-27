@@ -3,48 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TaskFuchs – Focus. Plan. Achieve.</title>
-  <meta name="description" content="TaskFuchs ist der minimalistische Task-Manager, der dir hilft, fokussiert zu bleiben. Keine Ablenkungen. Nur das Wesentliche.">
+  <title>TaskFuchs – Der Task-Manager, der Spaß macht</title>
+  <meta name="description" content="TaskFuchs ist der elegante, minimalistische Task-Manager für alle, die fokussiert arbeiten wollen. Open Source. Kostenlos.">
   
-  <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="assets/images/Fuchs.svg">
-  
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <style>
     :root {
       --accent: #0ea5e9;
-      --accent-hover: #0284c7;
-      --bg-light: #fafafa;
-      --bg-dark: #0a0a0a;
-      --glass-light: rgba(255, 255, 255, 0.7);
-      --glass-dark: rgba(24, 24, 27, 0.7);
-      --text-light: #18181b;
-      --text-dark: #fafafa;
-      --text-muted-light: #71717a;
-      --text-muted-dark: #a1a1aa;
+      --bg: #f8fafc;
+      --bg-dark: #0c0c0c;
+      --card: rgba(255, 255, 255, 0.6);
+      --card-dark: rgba(30, 30, 35, 0.6);
+      --text: #1e293b;
+      --text-dark: #f1f5f9;
+      --muted: #64748b;
+      --muted-dark: #94a3b8;
+      --border: rgba(0, 0, 0, 0.08);
+      --border-dark: rgba(255, 255, 255, 0.1);
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
     html {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      scroll-behavior: smooth;
     }
 
     body {
-      background: var(--bg-light);
-      color: var(--text-light);
-      min-height: 100vh;
-      transition: background 0.3s, color 0.3s;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
     }
 
     body.dark {
@@ -52,44 +45,75 @@
       color: var(--text-dark);
     }
 
-    /* Background Pattern */
-    .bg-pattern {
+    /* Animated Background */
+    .bg-animation {
       position: fixed;
       inset: 0;
       z-index: -1;
       overflow: hidden;
     }
 
-    .bg-pattern::before {
-      content: '';
+    .bg-orb {
       position: absolute;
-      width: 150%;
-      height: 150%;
-      top: -25%;
-      left: -25%;
-      background: 
-        radial-gradient(circle at 20% 20%, var(--accent) 0%, transparent 40%),
-        radial-gradient(circle at 80% 80%, var(--accent) 0%, transparent 40%);
-      opacity: 0.05;
-      animation: float 20s ease-in-out infinite;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.4;
+      animation: float 15s ease-in-out infinite;
+    }
+
+    .bg-orb-1 {
+      width: 600px;
+      height: 600px;
+      background: var(--accent);
+      top: -200px;
+      right: -100px;
+      animation-delay: 0s;
+    }
+
+    .bg-orb-2 {
+      width: 400px;
+      height: 400px;
+      background: var(--accent);
+      bottom: 20%;
+      left: -100px;
+      animation-delay: -5s;
+    }
+
+    .bg-orb-3 {
+      width: 300px;
+      height: 300px;
+      background: var(--accent);
+      top: 50%;
+      right: 20%;
+      animation-delay: -10s;
+      opacity: 0.2;
     }
 
     @keyframes float {
-      0%, 100% { transform: translate(0, 0) rotate(0deg); }
-      50% { transform: translate(2%, 2%) rotate(3deg); }
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -30px) scale(1.05); }
+      66% { transform: translate(-20px, 20px) scale(0.95); }
     }
 
-    /* Glass Effect */
+    /* Glass Card */
     .glass {
-      background: var(--glass-light);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: var(--card);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border);
+      box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.05),
+        0 10px 20px -5px rgba(0, 0, 0, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
     }
 
     body.dark .glass {
-      background: var(--glass-dark);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: var(--card-dark);
+      border-color: var(--border-dark);
+      box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.3),
+        0 10px 20px -5px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
     }
 
     /* Header */
@@ -98,48 +122,80 @@
       top: 0;
       left: 0;
       right: 0;
-      z-index: 100;
-      padding: 1rem 2rem;
+      z-index: 1000;
+      padding: 1rem;
     }
 
     .header-inner {
-      max-width: 1200px;
+      max-width: 1100px;
       margin: 0 auto;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.75rem 1.5rem;
-      border-radius: 100px;
+      padding: 0.75rem 1.25rem;
+      border-radius: 9999px;
     }
 
     .logo {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.625rem;
       text-decoration: none;
       color: inherit;
+      font-weight: 600;
+      font-size: 1.125rem;
     }
 
     .logo img {
-      width: 32px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
+      animation: wiggle 3s ease-in-out infinite;
     }
 
-    .logo span {
-      font-weight: 600;
-      font-size: 1.125rem;
-      letter-spacing: -0.02em;
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-5deg); }
+      75% { transform: rotate(5deg); }
     }
 
-    .header-controls {
+    .nav-links {
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
 
+    .nav-links a {
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      text-decoration: none;
+      color: inherit;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .nav-links a:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    body.dark .nav-links a:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-links a.github {
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+    }
+
+    .controls {
+      display: flex;
+      gap: 0.25rem;
+    }
+
     .control-btn {
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
       border: none;
       background: transparent;
@@ -148,11 +204,14 @@
       align-items: center;
       justify-content: center;
       color: inherit;
-      transition: background 0.2s;
+      transition: all 0.2s;
+      font-size: 0.75rem;
+      font-weight: 600;
     }
 
     .control-btn:hover {
       background: rgba(0, 0, 0, 0.05);
+      transform: scale(1.05);
     }
 
     body.dark .control-btn:hover {
@@ -164,119 +223,113 @@
       height: 20px;
     }
 
-    .lang-btn {
-      font-size: 0.75rem;
-      font-weight: 600;
-      width: auto;
-      padding: 0 0.75rem;
-      border-radius: 100px;
-    }
-
-    /* Color Picker */
+    /* Color Dropdown */
     .color-picker {
       position: relative;
     }
 
-    .color-picker-dropdown {
+    .color-dropdown {
       position: absolute;
-      top: 100%;
+      top: calc(100% + 8px);
       right: 0;
-      margin-top: 0.5rem;
       padding: 0.75rem;
-      border-radius: 12px;
+      border-radius: 16px;
       display: none;
-      gap: 0.5rem;
       flex-wrap: wrap;
-      width: 160px;
+      gap: 0.5rem;
+      width: 170px;
+      animation: dropIn 0.2s ease-out;
     }
 
-    .color-picker-dropdown.show {
-      display: flex;
+    .color-dropdown.show { display: flex; }
+
+    @keyframes dropIn {
+      from { opacity: 0; transform: translateY(-8px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     .color-swatch {
-      width: 28px;
-      height: 28px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
-      border: 2px solid transparent;
+      border: 3px solid transparent;
       cursor: pointer;
-      transition: transform 0.2s, border-color 0.2s;
+      transition: all 0.2s;
     }
 
-    .color-swatch:hover {
-      transform: scale(1.1);
-    }
+    .color-swatch:hover { transform: scale(1.15); }
+    .color-swatch.active { border-color: var(--text); transform: scale(1.1); }
+    body.dark .color-swatch.active { border-color: var(--text-dark); }
 
-    .color-swatch.active {
-      border-color: var(--text-light);
-    }
-
-    body.dark .color-swatch.active {
-      border-color: var(--text-dark);
-    }
-
-    /* Hero Section */
+    /* Hero */
     .hero {
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      padding: 8rem 1.5rem 4rem;
       text-align: center;
-      padding: 8rem 2rem 4rem;
+    }
+
+    .fox-container {
       position: relative;
-    }
-
-    .hero-content {
-      max-width: 800px;
-    }
-
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      border-radius: 100px;
-      font-size: 0.875rem;
-      font-weight: 500;
       margin-bottom: 2rem;
-      color: var(--accent);
-      border: 1px solid var(--accent);
-      opacity: 0.9;
+    }
+
+    .fox-main {
+      width: 140px;
+      height: 140px;
+      animation: bounce 2s ease-in-out infinite;
+      filter: drop-shadow(0 20px 40px rgba(14, 165, 233, 0.3));
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+
+    .fox-ring {
+      position: absolute;
+      inset: -20px;
+      border-radius: 50%;
+      border: 2px dashed var(--accent);
+      opacity: 0.3;
+      animation: spin 20s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
 
     .hero h1 {
-      font-size: clamp(2.5rem, 8vw, 5rem);
+      font-size: clamp(2.5rem, 7vw, 4.5rem);
       font-weight: 700;
       letter-spacing: -0.03em;
       line-height: 1.1;
       margin-bottom: 1.5rem;
+      max-width: 800px;
     }
 
-    .hero h1 .gradient {
-      background: linear-gradient(135deg, var(--accent), #a855f7);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    .hero h1 .accent {
+      color: var(--accent);
     }
 
     .hero p {
       font-size: clamp(1.125rem, 2vw, 1.375rem);
-      color: var(--text-muted-light);
-      max-width: 600px;
-      margin: 0 auto 3rem;
-      line-height: 1.6;
+      color: var(--muted);
+      max-width: 550px;
+      margin-bottom: 2.5rem;
     }
 
-    body.dark .hero p {
-      color: var(--text-muted-dark);
-    }
+    body.dark .hero p { color: var(--muted-dark); }
 
     .hero-buttons {
       display: flex;
       gap: 1rem;
-      justify-content: center;
       flex-wrap: wrap;
+      justify-content: center;
     }
 
     .btn {
@@ -284,68 +337,145 @@
       align-items: center;
       gap: 0.5rem;
       padding: 1rem 2rem;
-      border-radius: 100px;
+      border-radius: 9999px;
       font-size: 1rem;
       font-weight: 600;
       text-decoration: none;
-      transition: transform 0.2s, box-shadow 0.2s;
-      cursor: pointer;
       border: none;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .btn:hover {
-      transform: translateY(-2px);
-    }
+    .btn svg { width: 20px; height: 20px; }
 
     .btn-primary {
       background: var(--accent);
       color: white;
-      box-shadow: 0 4px 20px rgba(14, 165, 233, 0.3);
+      box-shadow: 0 8px 30px -5px var(--accent);
     }
 
     .btn-primary:hover {
-      box-shadow: 0 8px 30px rgba(14, 165, 233, 0.4);
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 15px 40px -5px var(--accent);
     }
 
     .btn-secondary {
       background: transparent;
       color: inherit;
-      border: 1px solid rgba(0, 0, 0, 0.1);
+      border: 2px solid var(--border);
     }
 
-    body.dark .btn-secondary {
-      border-color: rgba(255, 255, 255, 0.2);
+    body.dark .btn-secondary { border-color: var(--border-dark); }
+
+    .btn-secondary:hover {
+      background: rgba(0, 0, 0, 0.03);
+      transform: translateY(-2px);
     }
 
-    .btn svg {
-      width: 20px;
-      height: 20px;
+    body.dark .btn-secondary:hover { background: rgba(255, 255, 255, 0.05); }
+
+    /* Try Banner */
+    .try-banner {
+      padding: 0 1.5rem;
+      margin-bottom: 6rem;
     }
 
-    /* Screenshot Section */
-    .screenshot-section {
-      padding: 0 2rem 8rem;
+    .try-banner-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 2.5rem;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      flex-wrap: wrap;
     }
 
-    .screenshot-wrapper {
+    .try-banner h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .try-banner p {
+      color: var(--muted);
+      margin-top: 0.25rem;
+    }
+
+    body.dark .try-banner p { color: var(--muted-dark); }
+
+    /* Screenshots Showcase */
+    .showcase {
+      padding: 4rem 1.5rem 8rem;
+    }
+
+    .showcase-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .showcase-header h2 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .showcase-header p {
+      color: var(--muted);
+      font-size: 1.125rem;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    body.dark .showcase-header p { color: var(--muted-dark); }
+
+    .screenshot-grid {
       max-width: 1200px;
       margin: 0 auto;
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: 
-        0 50px 100px -20px rgba(0, 0, 0, 0.25),
-        0 30px 60px -30px rgba(0, 0, 0, 0.3);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
     }
 
-    .screenshot-wrapper img {
+    .screenshot-card {
+      border-radius: 20px;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .screenshot-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.2);
+    }
+
+    body.dark .screenshot-card:hover {
+      box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.5);
+    }
+
+    .screenshot-card img {
       width: 100%;
       height: auto;
       display: block;
     }
 
-    /* Features Section */
+    .screenshot-card .label {
+      padding: 1.25rem;
+      font-weight: 600;
+      font-size: 1.125rem;
+    }
+
+    .screenshot-card .desc {
+      padding: 0 1.25rem 1.25rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: -0.5rem;
+    }
+
+    body.dark .screenshot-card .desc { color: var(--muted-dark); }
+
+    /* Features */
     .features {
-      padding: 8rem 2rem;
+      padding: 6rem 1.5rem;
       position: relative;
     }
 
@@ -353,161 +483,132 @@
       content: '';
       position: absolute;
       top: 0;
-      left: 0;
-      right: 0;
+      left: 10%;
+      right: 10%;
       height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent);
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
     }
 
     body.dark .features::before {
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      background: linear-gradient(90deg, transparent, var(--border-dark), transparent);
     }
 
     .features-inner {
-      max-width: 1200px;
+      max-width: 1000px;
       margin: 0 auto;
     }
 
-    .section-header {
+    .features-header {
       text-align: center;
-      margin-bottom: 5rem;
+      margin-bottom: 4rem;
     }
 
-    .section-header h2 {
+    .features-header h2 {
       font-size: clamp(2rem, 5vw, 3rem);
       font-weight: 700;
-      letter-spacing: -0.02em;
       margin-bottom: 1rem;
-    }
-
-    .section-header p {
-      color: var(--text-muted-light);
-      font-size: 1.125rem;
-      max-width: 500px;
-      margin: 0 auto;
-    }
-
-    body.dark .section-header p {
-      color: var(--text-muted-dark);
     }
 
     .features-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 2rem;
+      gap: 1.5rem;
     }
 
-    .feature-card {
+    .feature {
       padding: 2rem;
       border-radius: 20px;
-      transition: transform 0.3s, box-shadow 0.3s;
+      transition: all 0.3s;
     }
 
-    .feature-card:hover {
+    .feature:hover {
       transform: translateY(-4px);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    }
-
-    body.dark .feature-card:hover {
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     }
 
     .feature-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 1.25rem;
-      background: linear-gradient(135deg, var(--accent), #a855f7);
-    }
-
-    .feature-icon svg {
-      width: 24px;
-      height: 24px;
+      background: var(--accent);
       color: white;
     }
 
-    .feature-card h3 {
+    .feature-icon svg { width: 26px; height: 26px; }
+
+    .feature h3 {
       font-size: 1.25rem;
       font-weight: 600;
-      margin-bottom: 0.75rem;
-      letter-spacing: -0.01em;
+      margin-bottom: 0.5rem;
     }
 
-    .feature-card p {
-      color: var(--text-muted-light);
-      line-height: 1.6;
+    .feature p {
+      color: var(--muted);
+      font-size: 0.95rem;
     }
 
-    body.dark .feature-card p {
-      color: var(--text-muted-dark);
-    }
+    body.dark .feature p { color: var(--muted-dark); }
 
-    /* CTA Section */
+    /* CTA */
     .cta {
-      padding: 8rem 2rem;
+      padding: 6rem 1.5rem;
       text-align: center;
     }
 
     .cta-inner {
-      max-width: 800px;
+      max-width: 700px;
       margin: 0 auto;
-      padding: 4rem;
-      border-radius: 32px;
-      position: relative;
-      overflow: hidden;
     }
 
-    .cta-inner::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, var(--accent), #a855f7);
-      opacity: 0.1;
+    .cta-fox {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 1.5rem;
+      animation: wiggle 3s ease-in-out infinite;
     }
 
     .cta h2 {
       font-size: clamp(1.75rem, 4vw, 2.5rem);
       font-weight: 700;
       margin-bottom: 1rem;
-      position: relative;
     }
 
     .cta p {
-      color: var(--text-muted-light);
-      margin-bottom: 2rem;
+      color: var(--muted);
       font-size: 1.125rem;
-      position: relative;
+      margin-bottom: 2rem;
     }
 
-    body.dark .cta p {
-      color: var(--text-muted-dark);
+    body.dark .cta p { color: var(--muted-dark); }
+
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
     }
 
-    .cta .btn {
-      position: relative;
+    /* Downloads */
+    .downloads {
+      padding: 4rem 1.5rem 6rem;
     }
 
-    /* Download Section */
-    .download {
-      padding: 4rem 2rem 8rem;
-    }
-
-    .download-inner {
+    .downloads-inner {
       max-width: 600px;
       margin: 0 auto;
       text-align: center;
     }
 
-    .download h2 {
-      font-size: 1.5rem;
+    .downloads h3 {
+      font-size: 1.25rem;
       font-weight: 600;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
     }
 
-    .download-buttons {
+    .download-btns {
       display: flex;
       gap: 1rem;
       justify-content: center;
@@ -518,38 +619,30 @@
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      padding: 1rem 1.5rem;
-      border-radius: 12px;
+      padding: 0.875rem 1.5rem;
+      border-radius: 14px;
       text-decoration: none;
       color: inherit;
-      transition: transform 0.2s;
+      font-weight: 500;
+      transition: all 0.2s;
     }
 
     .download-btn:hover {
       transform: translateY(-2px);
     }
 
-    .download-btn img {
-      width: 24px;
-      height: 24px;
-    }
-
-    .download-btn span {
-      font-weight: 500;
-    }
+    .download-btn img { width: 22px; height: 22px; }
 
     /* Footer */
     footer {
-      padding: 3rem 2rem;
-      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      padding: 2rem 1.5rem;
+      border-top: 1px solid var(--border);
     }
 
-    body.dark footer {
-      border-top-color: rgba(255, 255, 255, 0.05);
-    }
+    body.dark footer { border-color: var(--border-dark); }
 
     .footer-inner {
-      max-width: 1200px;
+      max-width: 1100px;
       margin: 0 auto;
       display: flex;
       justify-content: space-between;
@@ -564,49 +657,34 @@
     }
 
     .footer-links a {
-      color: var(--text-muted-light);
+      color: var(--muted);
       text-decoration: none;
       font-size: 0.875rem;
       transition: color 0.2s;
     }
 
-    body.dark .footer-links a {
-      color: var(--text-muted-dark);
-    }
-
-    .footer-links a:hover {
-      color: var(--accent);
-    }
+    body.dark .footer-links a { color: var(--muted-dark); }
+    .footer-links a:hover { color: var(--accent); }
 
     .footer-copy {
-      color: var(--text-muted-light);
+      color: var(--muted);
       font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
-    body.dark .footer-copy {
-      color: var(--text-muted-dark);
-    }
+    body.dark .footer-copy { color: var(--muted-dark); }
+
+    .footer-copy img { width: 18px; height: 18px; }
 
     /* Responsive */
     @media (max-width: 768px) {
-      header {
-        padding: 0.5rem 1rem;
-      }
-
-      .header-inner {
-        padding: 0.5rem 1rem;
-      }
-
-      .hero {
-        padding: 7rem 1.5rem 3rem;
-      }
-
-      .features, .cta, .download {
-        padding: 4rem 1.5rem;
-      }
-
-      .cta-inner {
-        padding: 2.5rem 1.5rem;
+      .nav-links { display: none; }
+      
+      .try-banner-inner {
+        flex-direction: column;
+        text-align: center;
       }
 
       .footer-inner {
@@ -615,30 +693,26 @@
       }
     }
 
-    /* Animations */
-    @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    /* Animations on scroll */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .animate-fade-up {
-      animation: fadeUp 0.6s ease-out forwards;
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
     }
-
-    .delay-1 { animation-delay: 0.1s; }
-    .delay-2 { animation-delay: 0.2s; }
-    .delay-3 { animation-delay: 0.3s; }
-    .delay-4 { animation-delay: 0.4s; }
   </style>
 </head>
 <body>
-  <div class="bg-pattern"></div>
+  <!-- Animated Background -->
+  <div class="bg-animation">
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="bg-orb bg-orb-3"></div>
+  </div>
 
   <!-- Header -->
   <header>
@@ -647,149 +721,208 @@
         <img src="assets/images/Fuchs.svg" alt="TaskFuchs">
         <span>TaskFuchs</span>
       </a>
-      <div class="header-controls">
-        <!-- Color Picker -->
+      
+      <nav class="nav-links">
+        <a href="#showcase" data-i18n="nav.features">Features</a>
+        <a href="#download" data-i18n="nav.download">Download</a>
+        <a href="https://github.com/malteviergutz/taskfuchs" target="_blank" class="github">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          <span>GitHub</span>
+        </a>
+      </nav>
+
+      <div class="controls">
         <div class="color-picker">
-          <button class="control-btn" id="colorBtn" title="Accent Color">
+          <button class="control-btn" id="colorBtn" title="Farbe">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+              <circle cx="12" cy="12" r="10" stroke-width="2"/>
+              <circle cx="12" cy="12" r="4" fill="currentColor"/>
             </svg>
           </button>
-          <div class="color-picker-dropdown glass" id="colorDropdown">
-            <button class="color-swatch active" style="background: #0ea5e9" data-color="#0ea5e9"></button>
-            <button class="color-swatch" style="background: #8b5cf6" data-color="#8b5cf6"></button>
-            <button class="color-swatch" style="background: #ec4899" data-color="#ec4899"></button>
-            <button class="color-swatch" style="background: #f97316" data-color="#f97316"></button>
-            <button class="color-swatch" style="background: #22c55e" data-color="#22c55e"></button>
-            <button class="color-swatch" style="background: #06b6d4" data-color="#06b6d4"></button>
-            <button class="color-swatch" style="background: #f43f5e" data-color="#f43f5e"></button>
-            <button class="color-swatch" style="background: #eab308" data-color="#eab308"></button>
+          <div class="color-dropdown glass" id="colorDropdown">
+            <button class="color-swatch active" style="background:#0ea5e9" data-color="#0ea5e9"></button>
+            <button class="color-swatch" style="background:#8b5cf6" data-color="#8b5cf6"></button>
+            <button class="color-swatch" style="background:#ec4899" data-color="#ec4899"></button>
+            <button class="color-swatch" style="background:#f97316" data-color="#f97316"></button>
+            <button class="color-swatch" style="background:#22c55e" data-color="#22c55e"></button>
+            <button class="color-swatch" style="background:#06b6d4" data-color="#06b6d4"></button>
+            <button class="color-swatch" style="background:#f43f5e" data-color="#f43f5e"></button>
+            <button class="color-swatch" style="background:#eab308" data-color="#eab308"></button>
           </div>
         </div>
-        
-        <!-- Theme Toggle -->
-        <button class="control-btn" id="themeBtn" title="Toggle Theme">
-          <svg class="sun" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+        <button class="control-btn" id="themeBtn" title="Theme">
+          <svg class="icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="5" stroke-width="2"/>
+            <path stroke-width="2" stroke-linecap="round" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
           </svg>
-          <svg class="moon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          <svg class="icon-moon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:none">
+            <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
           </svg>
         </button>
-        
-        <!-- Language Toggle -->
-        <button class="control-btn lang-btn" id="langBtn">EN</button>
+        <button class="control-btn" id="langBtn">EN</button>
       </div>
     </div>
   </header>
 
-  <!-- Hero Section -->
+  <!-- Hero -->
   <section class="hero">
-    <div class="hero-content">
-      <div class="hero-badge animate-fade-up">
-        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+    <div class="fox-container">
+      <div class="fox-ring"></div>
+      <img src="assets/images/Fuchs.svg" alt="TaskFuchs" class="fox-main">
+    </div>
+    
+    <h1>
+      <span data-i18n="hero.line1">Aufgaben erledigen</span><br>
+      <span data-i18n="hero.line2">kann auch</span> <span class="accent" data-i18n="hero.line3">Spaß machen</span>
+    </h1>
+    
+    <p data-i18n="hero.subtitle">
+      TaskFuchs ist dein persönlicher, minimalistischer Task-Manager. Open Source, kostenlos und mit Liebe zum Detail.
+    </p>
+    
+    <div class="hero-buttons">
+      <a href="https://app.taskfuchs.com" class="btn btn-primary">
+        <span data-i18n="hero.tryNow">Jetzt ausprobieren</span>
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
         </svg>
-        <span data-i18n="badge">Fokussiert bleiben</span>
-      </div>
-      
-      <h1 class="animate-fade-up delay-1">
-        <span data-i18n="hero.title1">Weniger Chaos.</span><br>
-        <span class="gradient" data-i18n="hero.title2">Mehr Fokus.</span>
-      </h1>
-      
-      <p class="animate-fade-up delay-2" data-i18n="hero.subtitle">
-        TaskFuchs ist der minimalistische Task-Manager, der dir hilft, das Wesentliche im Blick zu behalten. Plane deinen Tag. Erreiche deine Ziele.
-      </p>
-      
-      <div class="hero-buttons animate-fade-up delay-3">
-        <a href="https://app.taskfuchs.com" class="btn btn-primary" data-i18n="hero.cta">
-          Jetzt starten
-        </a>
-        <a href="#features" class="btn btn-secondary glass">
-          <span data-i18n="hero.learnMore">Mehr erfahren</span>
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-          </svg>
-        </a>
-      </div>
+      </a>
+      <a href="https://github.com/malteviergutz/taskfuchs" target="_blank" class="btn btn-secondary glass">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+        <span>GitHub</span>
+      </a>
     </div>
   </section>
 
-  <!-- Screenshot -->
-  <section class="screenshot-section">
-    <div class="screenshot-wrapper glass">
-      <img src="assets/screenshots/Planer.png" alt="TaskFuchs App" loading="lazy">
+  <!-- Try Banner -->
+  <section class="try-banner">
+    <div class="try-banner-inner glass">
+      <div>
+        <h3 data-i18n="banner.title">🚀 Probier's direkt im Browser aus!</h3>
+        <p data-i18n="banner.subtitle">Kein Account nötig. Deine Daten bleiben lokal auf deinem Gerät.</p>
+      </div>
+      <a href="https://app.taskfuchs.com" class="btn btn-primary" data-i18n="banner.button">
+        Los geht's
+      </a>
+    </div>
+  </section>
+
+  <!-- Screenshots Showcase -->
+  <section class="showcase" id="showcase">
+    <div class="showcase-header fade-up">
+      <h2 data-i18n="showcase.title">So sieht TaskFuchs aus</h2>
+      <p data-i18n="showcase.subtitle">Elegant, aufgeräumt und immer im Blick.</p>
+    </div>
+
+    <div class="screenshot-grid">
+      <div class="screenshot-card glass fade-up">
+        <img src="assets/screenshots/Planer.png" alt="Wochenplaner" loading="lazy">
+        <div class="label" data-i18n="showcase.planner.title">📅 Wochenplaner</div>
+        <div class="desc" data-i18n="showcase.planner.desc">Deine ganze Woche auf einen Blick. Per Drag & Drop verschieben.</div>
+      </div>
+
+      <div class="screenshot-card glass fade-up">
+        <img src="assets/screenshots/Heute.png" alt="Heute" loading="lazy">
+        <div class="label" data-i18n="showcase.today.title">☀️ Heute</div>
+        <div class="desc" data-i18n="showcase.today.desc">Fokus auf das Wesentliche: Was steht heute an?</div>
+      </div>
+
+      <div class="screenshot-card glass fade-up">
+        <img src="assets/screenshots/Aufgabendetails.png" alt="Aufgabendetails" loading="lazy">
+        <div class="label" data-i18n="showcase.details.title">✏️ Aufgabendetails</div>
+        <div class="desc" data-i18n="showcase.details.desc">Unteraufgaben, Zeitschätzung, Prioritäten und mehr.</div>
+      </div>
+
+      <div class="screenshot-card glass fade-up">
+        <img src="assets/screenshots/Timer.png" alt="Timer" loading="lazy">
+        <div class="label" data-i18n="showcase.timer.title">⏱️ Timer</div>
+        <div class="desc" data-i18n="showcase.timer.desc">Tracke deine Arbeitszeit direkt in der App.</div>
+      </div>
+
+      <div class="screenshot-card glass fade-up">
+        <img src="assets/screenshots/Tag beenden.png" alt="Tagesabschluss" loading="lazy">
+        <div class="label" data-i18n="showcase.endday.title">🌙 Tagesabschluss</div>
+        <div class="desc" data-i18n="showcase.endday.desc">Reflektiere deinen Tag und plane den nächsten.</div>
+      </div>
+
+      <div class="screenshot-card glass fade-up">
+        <img src="assets/screenshots/Theme-Konfiguration.png" alt="Themes" loading="lazy">
+        <div class="label" data-i18n="showcase.themes.title">🎨 Dein Style</div>
+        <div class="desc" data-i18n="showcase.themes.desc">Farben, Hintergründe und Dark Mode nach deinem Geschmack.</div>
+      </div>
     </div>
   </section>
 
   <!-- Features -->
-  <section class="features" id="features">
+  <section class="features">
     <div class="features-inner">
-      <div class="section-header">
-        <h2 data-i18n="features.title">Einfach. Klar. Effektiv.</h2>
-        <p data-i18n="features.subtitle">Alles was du brauchst. Nichts, was dich ablenkt.</p>
+      <div class="features-header fade-up">
+        <h2 data-i18n="features.title">Was TaskFuchs kann</h2>
       </div>
-      
+
       <div class="features-grid">
-        <div class="feature-card glass">
+        <div class="feature glass fade-up">
           <div class="feature-icon">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
             </svg>
           </div>
           <h3 data-i18n="features.inbox.title">Inbox</h3>
-          <p data-i18n="features.inbox.desc">Sammle alle Aufgaben an einem Ort. Sortiere später.</p>
+          <p data-i18n="features.inbox.desc">Schnell Aufgaben erfassen, später sortieren.</p>
         </div>
-        
-        <div class="feature-card glass">
+
+        <div class="feature glass fade-up">
           <div class="feature-icon">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
             </svg>
           </div>
           <h3 data-i18n="features.planner.title">Wochenplaner</h3>
-          <p data-i18n="features.planner.desc">Plane deine Woche. Verschiebe Aufgaben per Drag & Drop.</p>
+          <p data-i18n="features.planner.desc">Plane deine Woche visuell mit Drag & Drop.</p>
         </div>
-        
-        <div class="feature-card glass">
+
+        <div class="feature glass fade-up">
           <div class="feature-icon">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
           </div>
-          <h3 data-i18n="features.timer.title">Timer</h3>
-          <p data-i18n="features.timer.desc">Tracke deine Zeit. Sieh deinen Fortschritt.</p>
+          <h3 data-i18n="features.timer.title">Zeiterfassung</h3>
+          <p data-i18n="features.timer.desc">Tracke wie lange du an Aufgaben arbeitest.</p>
         </div>
-        
-        <div class="feature-card glass">
+
+        <div class="feature glass fade-up">
           <div class="feature-icon">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7"/>
             </svg>
           </div>
-          <h3 data-i18n="features.kanban.title">Projekte</h3>
-          <p data-i18n="features.kanban.desc">Organisiere größere Vorhaben mit Kanban-Boards.</p>
+          <h3 data-i18n="features.projects.title">Projekte</h3>
+          <p data-i18n="features.projects.desc">Größere Vorhaben mit Kanban-Boards organisieren.</p>
         </div>
-        
-        <div class="feature-card glass">
+
+        <div class="feature glass fade-up">
           <div class="feature-icon">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
             </svg>
           </div>
           <h3 data-i18n="features.pins.title">Pins</h3>
-          <p data-i18n="features.pins.desc">Halte wichtige Aufgaben immer im Blick.</p>
+          <p data-i18n="features.pins.desc">Wichtiges dauerhaft im Blick behalten.</p>
         </div>
-        
-        <div class="feature-card glass">
+
+        <div class="feature glass fade-up">
           <div class="feature-icon">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
             </svg>
           </div>
-          <h3 data-i18n="features.themes.title">Dein Style</h3>
-          <p data-i18n="features.themes.desc">Passe Farben, Hintergründe und Themes an.</p>
+          <h3 data-i18n="features.themes.title">Custom Themes</h3>
+          <p data-i18n="features.themes.desc">Hintergründe, Farben, Dark Mode – alles anpassbar.</p>
         </div>
       </div>
     </div>
@@ -797,30 +930,39 @@
 
   <!-- CTA -->
   <section class="cta">
-    <div class="cta-inner glass">
-      <h2 data-i18n="cta.title">Bereit, fokussiert zu arbeiten?</h2>
-      <p data-i18n="cta.subtitle">Starte jetzt kostenlos. Keine Kreditkarte erforderlich.</p>
-      <a href="https://app.taskfuchs.com" class="btn btn-primary" data-i18n="cta.button">
-        TaskFuchs starten
-      </a>
+    <div class="cta-inner fade-up">
+      <img src="assets/images/Fuchs.svg" alt="" class="cta-fox">
+      <h2 data-i18n="cta.title">Bereit, produktiver zu werden?</h2>
+      <p data-i18n="cta.subtitle">TaskFuchs ist kostenlos, Open Source und respektiert deine Privatsphäre.</p>
+      <div class="cta-buttons">
+        <a href="https://app.taskfuchs.com" class="btn btn-primary" data-i18n="cta.button">
+          Jetzt starten – kostenlos
+        </a>
+        <a href="https://github.com/malteviergutz/taskfuchs" target="_blank" class="btn btn-secondary glass">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          <span data-i18n="cta.github">Auf GitHub ansehen</span>
+        </a>
+      </div>
     </div>
   </section>
 
-  <!-- Download -->
-  <section class="download" id="download">
-    <div class="download-inner">
-      <h2 data-i18n="download.title">Auch als Desktop-App</h2>
-      <div class="download-buttons">
+  <!-- Downloads -->
+  <section class="downloads" id="download">
+    <div class="downloads-inner fade-up">
+      <h3 data-i18n="downloads.title">📦 Desktop-Apps (Electron)</h3>
+      <div class="download-btns">
         <a href="#" class="download-btn glass">
-          <img src="assets/images/apple.svg" alt="macOS">
+          <img src="assets/images/apple.svg" alt="">
           <span>macOS</span>
         </a>
         <a href="#" class="download-btn glass">
-          <img src="assets/images/windows.svg" alt="Windows">
+          <img src="assets/images/windows.svg" alt="">
           <span>Windows</span>
         </a>
         <a href="#" class="download-btn glass">
-          <img src="assets/images/linux.svg" alt="Linux">
+          <img src="assets/images/linux.svg" alt="">
           <span>Linux</span>
         </a>
       </div>
@@ -831,189 +973,219 @@
   <footer>
     <div class="footer-inner">
       <div class="footer-links">
-        <a href="impressum.html" data-i18n="footer.imprint">Impressum</a>
-        <a href="datenschutz.html" data-i18n="footer.privacy">Datenschutz</a>
+        <a href="impressum.html" id="imprintLink" data-i18n="footer.imprint">Impressum</a>
+        <a href="datenschutz.html" id="privacyLink" data-i18n="footer.privacy">Datenschutz</a>
+        <a href="https://github.com/malteviergutz/taskfuchs" target="_blank">GitHub</a>
       </div>
       <div class="footer-copy">
-        © 2025 TaskFuchs
+        <span>© 2025</span>
+        <img src="assets/images/Fuchs.svg" alt="">
+        <span>TaskFuchs</span>
       </div>
     </div>
   </footer>
 
   <script>
     // Translations
-    const translations = {
+    const i18n = {
       de: {
-        badge: "Fokussiert bleiben",
-        "hero.title1": "Weniger Chaos.",
-        "hero.title2": "Mehr Fokus.",
-        "hero.subtitle": "TaskFuchs ist der minimalistische Task-Manager, der dir hilft, das Wesentliche im Blick zu behalten. Plane deinen Tag. Erreiche deine Ziele.",
-        "hero.cta": "Jetzt starten",
-        "hero.learnMore": "Mehr erfahren",
-        "features.title": "Einfach. Klar. Effektiv.",
-        "features.subtitle": "Alles was du brauchst. Nichts, was dich ablenkt.",
+        "nav.features": "Features",
+        "nav.download": "Download",
+        "hero.line1": "Aufgaben erledigen",
+        "hero.line2": "kann auch",
+        "hero.line3": "Spaß machen",
+        "hero.subtitle": "TaskFuchs ist dein persönlicher, minimalistischer Task-Manager. Open Source, kostenlos und mit Liebe zum Detail.",
+        "hero.tryNow": "Jetzt ausprobieren",
+        "banner.title": "🚀 Probier's direkt im Browser aus!",
+        "banner.subtitle": "Kein Account nötig. Deine Daten bleiben lokal auf deinem Gerät.",
+        "banner.button": "Los geht's",
+        "showcase.title": "So sieht TaskFuchs aus",
+        "showcase.subtitle": "Elegant, aufgeräumt und immer im Blick.",
+        "showcase.planner.title": "📅 Wochenplaner",
+        "showcase.planner.desc": "Deine ganze Woche auf einen Blick. Per Drag & Drop verschieben.",
+        "showcase.today.title": "☀️ Heute",
+        "showcase.today.desc": "Fokus auf das Wesentliche: Was steht heute an?",
+        "showcase.details.title": "✏️ Aufgabendetails",
+        "showcase.details.desc": "Unteraufgaben, Zeitschätzung, Prioritäten und mehr.",
+        "showcase.timer.title": "⏱️ Timer",
+        "showcase.timer.desc": "Tracke deine Arbeitszeit direkt in der App.",
+        "showcase.endday.title": "🌙 Tagesabschluss",
+        "showcase.endday.desc": "Reflektiere deinen Tag und plane den nächsten.",
+        "showcase.themes.title": "🎨 Dein Style",
+        "showcase.themes.desc": "Farben, Hintergründe und Dark Mode nach deinem Geschmack.",
+        "features.title": "Was TaskFuchs kann",
         "features.inbox.title": "Inbox",
-        "features.inbox.desc": "Sammle alle Aufgaben an einem Ort. Sortiere später.",
+        "features.inbox.desc": "Schnell Aufgaben erfassen, später sortieren.",
         "features.planner.title": "Wochenplaner",
-        "features.planner.desc": "Plane deine Woche. Verschiebe Aufgaben per Drag & Drop.",
-        "features.timer.title": "Timer",
-        "features.timer.desc": "Tracke deine Zeit. Sieh deinen Fortschritt.",
-        "features.kanban.title": "Projekte",
-        "features.kanban.desc": "Organisiere größere Vorhaben mit Kanban-Boards.",
+        "features.planner.desc": "Plane deine Woche visuell mit Drag & Drop.",
+        "features.timer.title": "Zeiterfassung",
+        "features.timer.desc": "Tracke wie lange du an Aufgaben arbeitest.",
+        "features.projects.title": "Projekte",
+        "features.projects.desc": "Größere Vorhaben mit Kanban-Boards organisieren.",
         "features.pins.title": "Pins",
-        "features.pins.desc": "Halte wichtige Aufgaben immer im Blick.",
-        "features.themes.title": "Dein Style",
-        "features.themes.desc": "Passe Farben, Hintergründe und Themes an.",
-        "cta.title": "Bereit, fokussiert zu arbeiten?",
-        "cta.subtitle": "Starte jetzt kostenlos. Keine Kreditkarte erforderlich.",
-        "cta.button": "TaskFuchs starten",
-        "download.title": "Auch als Desktop-App",
+        "features.pins.desc": "Wichtiges dauerhaft im Blick behalten.",
+        "features.themes.title": "Custom Themes",
+        "features.themes.desc": "Hintergründe, Farben, Dark Mode – alles anpassbar.",
+        "cta.title": "Bereit, produktiver zu werden?",
+        "cta.subtitle": "TaskFuchs ist kostenlos, Open Source und respektiert deine Privatsphäre.",
+        "cta.button": "Jetzt starten – kostenlos",
+        "cta.github": "Auf GitHub ansehen",
+        "downloads.title": "📦 Desktop-Apps (Electron)",
         "footer.imprint": "Impressum",
         "footer.privacy": "Datenschutz"
       },
       en: {
-        badge: "Stay focused",
-        "hero.title1": "Less chaos.",
-        "hero.title2": "More focus.",
-        "hero.subtitle": "TaskFuchs is the minimalist task manager that helps you focus on what matters. Plan your day. Achieve your goals.",
-        "hero.cta": "Get started",
-        "hero.learnMore": "Learn more",
-        "features.title": "Simple. Clear. Effective.",
-        "features.subtitle": "Everything you need. Nothing to distract you.",
+        "nav.features": "Features",
+        "nav.download": "Download",
+        "hero.line1": "Getting things done",
+        "hero.line2": "can actually",
+        "hero.line3": "be fun",
+        "hero.subtitle": "TaskFuchs is your personal, minimalist task manager. Open source, free, and crafted with love.",
+        "hero.tryNow": "Try it now",
+        "banner.title": "🚀 Try it right in your browser!",
+        "banner.subtitle": "No account needed. Your data stays local on your device.",
+        "banner.button": "Let's go",
+        "showcase.title": "This is TaskFuchs",
+        "showcase.subtitle": "Elegant, clean, always in sight.",
+        "showcase.planner.title": "📅 Weekly Planner",
+        "showcase.planner.desc": "Your entire week at a glance. Drag & drop to reschedule.",
+        "showcase.today.title": "☀️ Today",
+        "showcase.today.desc": "Focus on what matters: What's on for today?",
+        "showcase.details.title": "✏️ Task Details",
+        "showcase.details.desc": "Subtasks, time estimates, priorities and more.",
+        "showcase.timer.title": "⏱️ Timer",
+        "showcase.timer.desc": "Track your work time right in the app.",
+        "showcase.endday.title": "🌙 End of Day",
+        "showcase.endday.desc": "Reflect on your day and plan the next.",
+        "showcase.themes.title": "🎨 Your Style",
+        "showcase.themes.desc": "Colors, backgrounds and dark mode to your liking.",
+        "features.title": "What TaskFuchs can do",
         "features.inbox.title": "Inbox",
-        "features.inbox.desc": "Collect all tasks in one place. Sort them later.",
+        "features.inbox.desc": "Capture tasks quickly, sort them later.",
         "features.planner.title": "Weekly Planner",
-        "features.planner.desc": "Plan your week. Move tasks with drag & drop.",
-        "features.timer.title": "Timer",
-        "features.timer.desc": "Track your time. See your progress.",
-        "features.kanban.title": "Projects",
-        "features.kanban.desc": "Organize bigger projects with Kanban boards.",
+        "features.planner.desc": "Plan your week visually with drag & drop.",
+        "features.timer.title": "Time Tracking",
+        "features.timer.desc": "Track how long you work on tasks.",
+        "features.projects.title": "Projects",
+        "features.projects.desc": "Organize bigger projects with Kanban boards.",
         "features.pins.title": "Pins",
         "features.pins.desc": "Keep important tasks always in sight.",
-        "features.themes.title": "Your Style",
-        "features.themes.desc": "Customize colors, backgrounds and themes.",
-        "cta.title": "Ready to work focused?",
-        "cta.subtitle": "Start for free. No credit card required.",
-        "cta.button": "Start TaskFuchs",
-        "download.title": "Also as Desktop App",
+        "features.themes.title": "Custom Themes",
+        "features.themes.desc": "Backgrounds, colors, dark mode – all customizable.",
+        "cta.title": "Ready to be more productive?",
+        "cta.subtitle": "TaskFuchs is free, open source and respects your privacy.",
+        "cta.button": "Get started – free",
+        "cta.github": "View on GitHub",
+        "downloads.title": "📦 Desktop Apps (Electron)",
         "footer.imprint": "Imprint",
         "footer.privacy": "Privacy Policy"
       }
     };
 
-    let currentLang = localStorage.getItem('tf-lang') || 'de';
-    let currentTheme = localStorage.getItem('tf-theme') || 'light';
-    let currentColor = localStorage.getItem('tf-color') || '#0ea5e9';
+    let lang = localStorage.getItem('tf-lang') || 'de';
+    let theme = localStorage.getItem('tf-theme') || 'light';
+    let color = localStorage.getItem('tf-color') || '#0ea5e9';
 
-    // Initialize
+    // Apply everything on load
     document.addEventListener('DOMContentLoaded', () => {
-      applyTheme(currentTheme);
-      applyLanguage(currentLang);
-      applyColor(currentColor);
+      setTheme(theme);
+      setLang(lang);
+      setColor(color);
+      initScrollAnimations();
     });
 
-    // Theme Toggle
+    // Theme
     const themeBtn = document.getElementById('themeBtn');
-    const sunIcon = themeBtn.querySelector('.sun');
-    const moonIcon = themeBtn.querySelector('.moon');
+    const sunIcon = themeBtn.querySelector('.icon-sun');
+    const moonIcon = themeBtn.querySelector('.icon-moon');
 
-    function applyTheme(theme) {
-      if (theme === 'dark') {
-        document.body.classList.add('dark');
-        sunIcon.style.display = 'none';
-        moonIcon.style.display = 'block';
-      } else {
-        document.body.classList.remove('dark');
-        sunIcon.style.display = 'block';
-        moonIcon.style.display = 'none';
-      }
-      localStorage.setItem('tf-theme', theme);
-      currentTheme = theme;
+    function setTheme(t) {
+      theme = t;
+      document.body.classList.toggle('dark', t === 'dark');
+      sunIcon.style.display = t === 'dark' ? 'none' : 'block';
+      moonIcon.style.display = t === 'dark' ? 'block' : 'none';
+      localStorage.setItem('tf-theme', t);
     }
 
-    themeBtn.addEventListener('click', () => {
-      applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
-    });
+    themeBtn.onclick = () => setTheme(theme === 'dark' ? 'light' : 'dark');
 
-    // Language Toggle
+    // Language
     const langBtn = document.getElementById('langBtn');
 
-    function applyLanguage(lang) {
-      const t = translations[lang];
+    function setLang(l) {
+      lang = l;
+      const t = i18n[l];
       document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
+        const key = el.dataset.i18n;
         if (t[key]) el.textContent = t[key];
       });
-      document.documentElement.lang = lang;
-      langBtn.textContent = lang === 'de' ? 'EN' : 'DE';
-      localStorage.setItem('tf-lang', lang);
-      currentLang = lang;
+      document.documentElement.lang = l;
+      langBtn.textContent = l === 'de' ? 'EN' : 'DE';
+      localStorage.setItem('tf-lang', l);
       
       // Update links
-      document.querySelector('a[href="impressum.html"]')?.setAttribute('href', lang === 'en' ? 'imprint.html' : 'impressum.html');
-      document.querySelector('a[href="datenschutz.html"]')?.setAttribute('href', lang === 'en' ? 'privacy-policy.html' : 'datenschutz.html');
-      document.querySelector('a[href="imprint.html"]')?.setAttribute('href', lang === 'en' ? 'imprint.html' : 'impressum.html');
-      document.querySelector('a[href="privacy-policy.html"]')?.setAttribute('href', lang === 'en' ? 'privacy-policy.html' : 'datenschutz.html');
+      document.getElementById('imprintLink').href = l === 'en' ? 'imprint.html' : 'impressum.html';
+      document.getElementById('privacyLink').href = l === 'en' ? 'privacy-policy.html' : 'datenschutz.html';
     }
 
-    langBtn.addEventListener('click', () => {
-      applyLanguage(currentLang === 'de' ? 'en' : 'de');
-    });
+    langBtn.onclick = () => setLang(lang === 'de' ? 'en' : 'de');
 
-    // Color Picker
+    // Colors
     const colorBtn = document.getElementById('colorBtn');
     const colorDropdown = document.getElementById('colorDropdown');
-    const colorSwatches = document.querySelectorAll('.color-swatch');
+    const swatches = document.querySelectorAll('.color-swatch');
 
-    function applyColor(color) {
-      document.documentElement.style.setProperty('--accent', color);
-      // Update button colors
+    function setColor(c) {
+      color = c;
+      document.documentElement.style.setProperty('--accent', c);
+      swatches.forEach(s => s.classList.toggle('active', s.dataset.color === c));
+      
+      // Update button shadows
       document.querySelectorAll('.btn-primary').forEach(btn => {
-        btn.style.background = color;
-        btn.style.boxShadow = `0 4px 20px ${color}4d`;
+        btn.style.background = c;
+        btn.style.boxShadow = `0 8px 30px -5px ${c}66`;
       });
+      
       // Update feature icons
       document.querySelectorAll('.feature-icon').forEach(icon => {
-        icon.style.background = `linear-gradient(135deg, ${color}, #a855f7)`;
+        icon.style.background = c;
       });
-      // Update active swatch
-      colorSwatches.forEach(s => {
-        s.classList.toggle('active', s.dataset.color === color);
+      
+      // Update orbs
+      document.querySelectorAll('.bg-orb').forEach(orb => {
+        orb.style.background = c;
       });
-      localStorage.setItem('tf-color', color);
-      currentColor = color;
+      
+      localStorage.setItem('tf-color', c);
     }
 
-    colorBtn.addEventListener('click', (e) => {
+    colorBtn.onclick = e => {
       e.stopPropagation();
       colorDropdown.classList.toggle('show');
-    });
+    };
 
-    colorSwatches.forEach(swatch => {
-      swatch.addEventListener('click', () => {
-        applyColor(swatch.dataset.color);
+    swatches.forEach(s => {
+      s.onclick = () => {
+        setColor(s.dataset.color);
         colorDropdown.classList.remove('show');
-      });
+      };
     });
 
-    document.addEventListener('click', () => {
-      colorDropdown.classList.remove('show');
-    });
+    document.onclick = () => colorDropdown.classList.remove('show');
+    colorDropdown.onclick = e => e.stopPropagation();
 
-    colorDropdown.addEventListener('click', (e) => {
-      e.stopPropagation();
-    });
+    // Scroll animations
+    function initScrollAnimations() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
-    // Smooth scroll for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-          target.scrollIntoView({ behavior: 'smooth' });
-        }
-      });
-    });
+      document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+    }
   </script>
 </body>
 </html>
