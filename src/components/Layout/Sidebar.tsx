@@ -897,12 +897,6 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
               >
                 <HardDrive className="w-5 h-5" />
               </button>
-              {/* Show directory name below icon */}
-              {backupDirName && (
-                <div className="mt-1 text-[9px] text-center truncate max-w-[48px] text-gray-500 dark:text-gray-400" title={backupDirName}>
-                  {backupDirName}
-                </div>
-              )}
             </div>
           )}
           {/* Backup Warning Icon - show when backup is not configured */}
@@ -942,7 +936,10 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
       {backupContextMenu && createPortal(
         <div 
           className="fixed z-[99999] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-1 min-w-[180px] animate-in fade-in zoom-in-95 duration-150"
-          style={{ left: backupContextMenu.x, top: backupContextMenu.y }}
+          style={{ 
+            left: Math.min(backupContextMenu.x, window.innerWidth - 200),
+            top: Math.min(backupContextMenu.y, window.innerHeight - 100),
+          }}
           onClick={(e) => e.stopPropagation()}
         >
           <button
