@@ -101,13 +101,24 @@ const buildTourSections = (): TourSection[] => {
         title: { de: 'Backups sind wichtig!', en: 'Backups are important!' },
         text: { de: 'Da deine Daten nur lokal im Browser gespeichert werden, solltest du regelmäßig Backups erstellen. Gehe dazu in die Einstellungen → Daten und exportiere deine Daten als JSON-Datei oder richte Dropbox-Sync ein.', en: 'Since your data is stored locally in the browser, you should create regular backups. Go to Settings → Data and export your data as JSON file or set up Dropbox sync.' },
         foxMessage: { de: 'Lieber einmal zu oft sichern!', en: 'Better safe than sorry!' },
-        position: 'center'
+        position: 'bottom-left',
+        showGuideCursor: true,
+        guideCursorTarget: '[data-nav-item="settings"]',
+        guideCursorClickAnimation: false
+      },
+      {
+        title: { de: 'Zur Inbox!', en: 'To the Inbox!' },
+        text: { de: 'Lass uns zur Inbox wechseln und deine Aufgaben verwalten.', en: 'Let\'s switch to the Inbox and manage your tasks.' },
+        position: 'bottom-left',
+        showGuideCursor: true,
+        guideCursorTarget: '[data-nav-item="inbox"]',
+        guideCursorClickAnimation: true
       }
       ]
     });
   }
   
-  // Inbox section
+  // Inbox section  
   sections.push({
       id: 'inbox',
     view: 'inbox',
@@ -221,13 +232,13 @@ const tourSections: TourSection[] = [
         position: 'bottom-right',
         showGuideCursor: true,
         guideCursorTarget: '[data-end-day-button]',
-        guideCursorClickAnimation: true
+        guideCursorClickAnimation: true,
+        openEndOfDayModal: true
       },
       {
         title: { de: 'Tagesabschluss', en: 'End of Day' },
         text: { de: 'Hier siehst du deine Leistung und kannst ein Backup erstellen. Perfekt für den Tagesabschluss!', en: 'Here you can see your performance and create a backup. Perfect for closing out your day!' },
-        position: 'center-right',
-        openEndOfDayModal: true
+        position: 'center-right'
       },
       {
         title: { de: 'Weiter geht\'s', en: 'Let\'s continue' },
