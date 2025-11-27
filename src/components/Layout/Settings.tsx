@@ -5476,49 +5476,14 @@ const Settings = React.memo(() => {
                     onChange={() => dispatch({
                       type: 'UPDATE_PREFERENCES',
                       payload: { 
-                        pomodoro: { 
-                          ...state.preferences.pomodoro, 
-                          enabled: !state.preferences.pomodoro.enabled 
-                        } 
+                        enableFocusMode: !state.preferences.enableFocusMode 
                       }
                     })} 
                   />
                 </div>
-
-                {state.preferences.pomodoro.enabled && (
-                  <div className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                        <div className="font-medium text-gray-900 dark:text-white mb-2">
-                          Arbeitszeit: {state.preferences.pomodoro.workDuration} Min
-                        </div>
-                        <input
-                          type="range"
-                          min="15"
-                          max="60"
-                          step="5"
-                          value={state.preferences.pomodoro.workDuration}
-                          onChange={(e) => dispatch({
-                            type: 'UPDATE_PREFERENCES',
-                            payload: { 
-                              pomodoro: { 
-                                ...state.preferences.pomodoro, 
-                                workDuration: parseInt(e.target.value) 
-                              } 
-                            }
-                          })}
-                          className="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
-                        />
-                        <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          <span>15</span>
-                          <span>60</span>
-                        </div>
-                      </div>
-
-                      <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                        <div className="font-medium text-gray-900 dark:text-white mb-2">
-                          Kurze Pause: {state.preferences.pomodoro.shortBreakDuration} Min
-                        </div>
+              </div>
+            </div>
+            {/* Toggl Integration (moved from Integrationen) */}
                         <input
                           type="range"
                           min="3"
