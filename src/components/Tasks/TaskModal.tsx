@@ -8,7 +8,7 @@ import {
   CalendarDays, FolderOpen, ChevronDown, Target, Zap, Search, GripHorizontal,
   Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Code, Quote, 
   Minus, CheckSquare, HelpCircle, EyeOff, Pin, Edit2, ChevronLeft, ChevronRight,
-  ArrowLeftRight, Inbox, Bell, Maximize, Minimize, ChevronUp, GripVertical, Pencil, Expand, Save
+  ArrowLeftRight, Inbox, Bell, Maximize, Minimize, ChevronUp, GripVertical, Pencil, Expand, Save, Check
 } from 'lucide-react';
 import { MarkdownRenderer } from '../Common/MarkdownRenderer';
 import type { Task, Subtask, Column, RecurrenceRule, TaskReminder } from '../../types';
@@ -2124,25 +2124,25 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
               
                 {/* Date & Project in Header - Elegant Pills */}
                 <div className="flex items-center space-x-2 flex-shrink-0">
-                  {/* Date */}
-                  <div className="relative dropdown-container">
+                {/* Date */}
+                <div className="relative dropdown-container">
                     <div className="flex items-center gap-1.5">
-                      <button
-                        onClick={() => {
-                          setShowInlineCalendar(!showInlineCalendar);
-                          setShowInlineProjectSelector(false);
-                          setExpandedProject(null);
-                        }}
+                    <button
+                      onClick={() => {
+                        setShowInlineCalendar(!showInlineCalendar);
+                        setShowInlineProjectSelector(false);
+                        setExpandedProject(null);
+                      }}
                         className="flex items-center space-x-2 px-3.5 py-2 text-sm rounded-xl transition-all duration-200 bg-white/60 dark:bg-gray-800/60 hover:bg-white dark:hover:bg-gray-800 border border-gray-200/50 dark:border-gray-700/50 hover:shadow-sm font-medium backdrop-blur-sm"
-                      >
+                    >
                         <CalendarDays className="w-4 h-4 text-gray-400" />
                         <span className="text-gray-700 dark:text-gray-200">
-                          {formData.reminderDate 
-                            ? format(new Date(formData.reminderDate), 'dd.MM.yyyy', { locale: de })
-                            : taskModal.dateSelect()
-                          }
-                        </span>
-                      </button>
+                        {formData.reminderDate 
+                          ? format(new Date(formData.reminderDate), 'dd.MM.yyyy', { locale: de })
+                          : taskModal.dateSelect()
+                        }
+                      </span>
+                    </button>
                     
                     {/* Remove Date Button */}
                     {formData.reminderDate && (
@@ -2759,7 +2759,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                       <BookOpen className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                       <label className="text-sm font-medium text-gray-600 dark:text-gray-400">
                         Description
-                      </label>
+                  </label>
                     </div>
                     <div className="flex items-center space-x-1">
                       {/* Fullscreen button */}
@@ -2772,25 +2772,25 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                       </button>
                       {/* Edit toggle button */}
                       {isDescriptionPreviewMode ? (
-                        <button
+                      <button
                           onClick={() => setIsDescriptionPreviewMode(false)}
                           className="p-1.5 hover:bg-gray-100/80 dark:hover:bg-gray-800/80 rounded-lg transition-all duration-200"
                           title="Bearbeiten"
                         >
                           <Pencil className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-                        </button>
+                      </button>
                       ) : (
-                        <button
-                          onClick={() => {
-                            setIsDescriptionPreviewMode(true);
-                            setIsDescriptionExpanded(false);
-                          }}
+                      <button
+                        onClick={() => {
+                          setIsDescriptionPreviewMode(true);
+                          setIsDescriptionExpanded(false);
+                        }}
                           className="p-1.5 hover:bg-gray-100/80 dark:hover:bg-gray-800/80 rounded-lg transition-all duration-200"
                           title="Bearbeitung beenden"
-                        >
+                      >
                           <Eye className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-                        </button>
-                      )}
+                      </button>
+                    )}
                     </div>
                   </div>
 
@@ -3019,23 +3019,66 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                       </div>
                     </div>
                     
-                    {/* Tracked Time */}
+                    {/* Tracked Time - Editable */}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <Timer className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm text-gray-600 dark:text-gray-400">Verbraucht</span>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">{t('tasks.time_tracked')}</span>
                       </div>
-                      <span className="text-sm font-medium text-gray-900 dark:text-white">
-                        {(() => {
-                          const trackedTime = getCurrentTrackedTime();
-                          if (trackedTime === 0) return '0 min';
-                          const roundedTime = Math.round(trackedTime);
-                          const hours = Math.floor(roundedTime / 60);
-                          const mins = roundedTime % 60;
-                          if (hours > 0) return `${hours}h ${mins}min`;
-                          return `${mins} min`;
-                        })()}
-                      </span>
+                      {isEditingTime ? (
+                        <div className="flex items-center space-x-1">
+                          <input
+                            type="number"
+                            min="0"
+                            value={editTimeHours}
+                            onChange={(e) => setEditTimeHours(Math.max(0, parseInt(e.target.value) || 0))}
+                            className="w-12 px-1.5 py-0.5 text-sm text-center border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1"
+                            style={{ '--tw-ring-color': state.preferences.accentColor } as React.CSSProperties}
+                          />
+                          <span className="text-xs text-gray-400">h</span>
+                          <input
+                            type="number"
+                            min="0"
+                            max="59"
+                            value={editTimeMinutes}
+                            onChange={(e) => setEditTimeMinutes(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))}
+                            className="w-12 px-1.5 py-0.5 text-sm text-center border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1"
+                            style={{ '--tw-ring-color': state.preferences.accentColor } as React.CSSProperties}
+                          />
+                          <span className="text-xs text-gray-400">min</span>
+                          <button
+                            onClick={saveEditedTime}
+                            className="p-1 text-green-500 hover:text-green-600 transition-colors"
+                            title={t('common.save')}
+                          >
+                            <Check className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={cancelTimeEditing}
+                            className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                            title={t('common.cancel')}
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={startTimeEditing}
+                          className="text-sm font-medium text-gray-900 dark:text-white hover:underline cursor-pointer transition-colors"
+                          style={{ color: state.preferences.accentColor }}
+                          title={t('tasks.time_tracked_edit')}
+                        >
+                          {(() => {
+                            const trackedTime = getCurrentTrackedTime();
+                            if (trackedTime === 0) return '0 min';
+                            const roundedTime = Math.round(trackedTime);
+                            const hours = Math.floor(roundedTime / 60);
+                            const mins = roundedTime % 60;
+                            if (hours > 0) return `${hours}h ${mins}min`;
+                            return `${mins} min`;
+                          })()}
+                        </button>
+                      )}
                     </div>
                     
                     {/* Progress Bar (if estimated time is set) */}
