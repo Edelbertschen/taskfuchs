@@ -9,7 +9,7 @@ website/
 ├── index.php                 # Haupt-Webseite
 ├── assets/
 │   ├── images/              # Logo und Icons
-│   │   ├── Fuchs.svg        # TaskFuchs Logo
+│   │   ├── 3d_fox.png       # TaskFuchs Logo
 │   │   └── icon-512.png     # App Icon
 │   └── screenshots/         # App Screenshots
 │       ├── dashboard.png    # Dashboard Screenshot

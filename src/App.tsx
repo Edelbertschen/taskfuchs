@@ -207,8 +207,6 @@ function MainApp() {
   const [showLanguageSelection, setShowLanguageSelection] = React.useState(false);
   const [showOnboarding, setShowOnboarding] = React.useState(false);
   const [pwaUpdateAvailable, setPwaUpdateAvailable] = React.useState(false);
-  const [userExitedFocus, setUserExitedFocus] = React.useState(false); // Track if user manually exited focus mode
-  const [showFocusPrompt, setShowFocusPrompt] = React.useState<{visible: boolean; taskId?: string}>({ visible: false });
   const [showBackupSetup, setShowBackupSetup] = React.useState(false);
   const [showUserGuide, setShowUserGuide] = React.useState(false);
   
@@ -334,19 +332,6 @@ function MainApp() {
       window.removeEventListener('open-user-guide', handleOpenUserGuide as EventListener);
     };
   }, [currentView, dispatch]);
-
-  // Listen for focus prompt events (timer started)
-  useEffect(() => {
-    const handler = (e: any) => {
-      // Don't show focus prompt during onboarding
-      if (showOnboarding) return;
-      
-      setShowFocusPrompt({ visible: true, taskId: e?.detail?.taskId });
-      setTimeout(() => setShowFocusPrompt({ visible: false }), 3000);
-    };
-    window.addEventListener('show-focus-prompt', handler as EventListener);
-    return () => window.removeEventListener('show-focus-prompt', handler as EventListener);
-  }, [showOnboarding]);
 
   // Handle separate timer window (Electron + PWA)
   useEffect(() => {
@@ -1145,35 +1130,6 @@ function MainApp() {
             </button>
           </div>
         </div>
-      )}
-
-      {/* Focus Mode Prompt */}
-      {showFocusPrompt.visible && createPortal(
-        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[999999] pointer-events-auto animate-in slide-in-from-top-2 duration-300">
-          <div className="glass-effect rounded-xl border border-white/20 px-4 py-3 shadow-2xl flex items-center space-x-3">
-            <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: state.preferences.accentColor }} />
-            <span className="text-sm font-medium text-gray-900 dark:text-white">Fokusmodus starten?</span>
-            <button
-              onClick={() => {
-                dispatch({ type: 'SET_FOCUS_MODE', payload: true });
-                setShowFocusPrompt({ visible: false });
-                setLastViewBeforeFocus(currentView);
-                setCurrentView('focus');
-              }}
-              className="ml-2 px-3 py-1.5 text-sm rounded-lg text-white hover:opacity-90"
-              style={{ backgroundColor: state.preferences.accentColor }}
-            >
-              Start
-            </button>
-            <button
-              onClick={() => setShowFocusPrompt({ visible: false })}
-              className="px-3 py-1.5 text-sm rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-            >
-              Nein
-            </button>
-          </div>
-        </div>,
-        document.body
       )}
 
       {/* Smart Task Modal */}

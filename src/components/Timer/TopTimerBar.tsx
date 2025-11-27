@@ -214,15 +214,6 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
     }
   };
 
-
-  const handleEnterFocusMode = () => {
-    try {
-      window.dispatchEvent(new CustomEvent('navigate-to-focus'));
-    } catch {
-      dispatch({ type: 'SET_FOCUS_MODE', payload: true });
-    }
-  };
-
   const task = state.tasks.find(t => t.id === activeTimer?.taskId);
   const progressPercentage = activeTimer ? getProgressPercentage() : 0;
   const isOvertime = !!activeTimer && task?.estimatedTime && activeTimer.elapsedTime > task.estimatedTime;
@@ -230,103 +221,92 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
   return (
     <>
       <div className="relative w-full z-50 top-timer-bar" style={{ zIndex: 40 }}>
-        {/* Progress Bar */}
+        {/* Elegant Progress Bar - thin accent line at top */}
         <div 
-          className={`absolute top-0 left-0 h-0.5 timer-progress-bar ${isOvertime ? 'overtime' : ''}`}
+          className="absolute top-0 left-0 h-[2px] transition-all duration-300"
           style={{ 
             width: `${progressPercentage}%`,
-            backgroundColor: isOvertime ? '#ef4444' : state.preferences.accentColor,
-            opacity: 0.8
+            background: isOvertime 
+              ? 'linear-gradient(90deg, #ef4444 0%, #f87171 100%)' 
+              : `linear-gradient(90deg, ${state.preferences.accentColor} 0%, ${state.preferences.accentColor}99 100%)`
           }}
         />
         
-        {/* Timer Bar */}
+        {/* Compact Timer Bar */}
         <div 
-          className="w-full timer-container border-b border-gray-200 dark:border-gray-700"
+          className="w-full border-b border-gray-100 dark:border-gray-800/50"
           style={{
-            height: '44px',
-            backgroundColor: isDarkMode ? 'rgba(17, 24, 39, 0.92)' : 'rgba(255, 255, 255, 0.98)',
-            backdropFilter: 'blur(16px)',
-            WebkitBackdropFilter: 'blur(16px)',
+            height: '36px',
+            backgroundColor: isDarkMode ? 'rgba(17, 24, 39, 0.95)' : 'rgba(255, 255, 255, 0.98)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
           }}
         >
-          <div className="h-full flex items-center justify-center">
-            <div className="max-w-4xl w-full flex items-center justify-between px-6">
-            {/* Left: Task Info */}
-            <div className="flex items-center space-x-3 flex-1 min-w-0">
-              {activeTimer && (
-                <>
-                  <Target className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
-                  <button
-                    onClick={handleOpenTask}
-                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:opacity-80 transition-opacity truncate"
-                    style={{ color: state.preferences.accentColor }}
-                  >
-                    {task?.title || 'Unbekannte Aufgabe'}
-                  </button>
-                </>
+          <div className="h-full flex items-center justify-center px-4">
+            <div className="max-w-5xl w-full flex items-center justify-center gap-6">
+              
+              {/* Task Title - left aligned */}
+              {activeTimer && task && (
+                <button
+                  onClick={handleOpenTask}
+                  className="text-xs font-medium truncate max-w-[200px] hover:opacity-80 transition-opacity"
+                  style={{ color: state.preferences.accentColor }}
+                  title={task.title}
+                >
+                  {task.title}
+                </button>
               )}
-            </div>
 
-            {/* Center: Timer Display */}
-            <div className="flex items-center space-x-4">
-              {/* Task Timer (if present) */}
+              {/* Timer Display - elegant center */}
               {activeTimer && (
-                <div className="flex items-center space-x-2">
-                  <span className={`text-lg font-mono font-semibold ${isOvertime ? 'text-red-500' : (isDarkMode ? 'text-white' : 'text-gray-900')}`}>
+                <div className="flex items-center gap-2">
+                  <span 
+                    className={`text-base font-semibold tracking-tight ${isOvertime ? 'text-red-500' : ''}`}
+                    style={{ 
+                      fontVariantNumeric: 'tabular-nums',
+                      color: isOvertime ? undefined : (isDarkMode ? '#f4f4f5' : '#18181b'),
+                      letterSpacing: '-0.02em'
+                    }}
+                  >
                     {formatTimeWithSecondsExact(activeTimer.elapsedTime || 0)}
                   </span>
                   {activeTimer.estimatedTime && (
-                    <span className="text-xs text-gray-400">
+                    <span className="text-[10px] text-gray-400 font-medium">
                       / {formatTimeShort(activeTimer.estimatedTime)}
                     </span>
                   )}
                   {isOvertime && (
-                    <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
+                    <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-red-100 dark:bg-red-950/50">
+                      <AlertTriangle className="w-2.5 h-2.5 text-red-500" />
+                    </div>
                   )}
                 </div>
               )}
-            </div>
 
-            {/* Right: Controls */}
-            <div className="flex items-center space-x-2 flex-1 justify-end">
-              {/* Task Timer Controls */}
+              {/* Controls - compact pill style */}
               {activeTimer && (
-                <>
+                <div className="flex items-center gap-1 p-0.5 rounded-full bg-gray-100 dark:bg-gray-800/80">
                   <button
                     onClick={handlePlayPause}
-                    className="w-7 h-7 rounded-full flex items-center justify-center transition-all duration-200 text-white shadow-sm hover:opacity-80"
+                    className="w-6 h-6 rounded-full flex items-center justify-center transition-all text-white hover:scale-105 active:scale-95"
                     style={{ backgroundColor: state.preferences.accentColor }}
                     title={isRunning ? 'Pausieren' : 'Fortsetzen'}
                   >
                     {isRunning ? (
-                      <Pause className="w-3.5 h-3.5" />
+                      <Pause className="w-3 h-3" />
                     ) : (
-                      <Play className="w-3.5 h-3.5" />
+                      <Play className="w-3 h-3 ml-0.5" />
                     )}
                   </button>
                   <button
                     onClick={handleStop}
-                    className="w-7 h-7 rounded-full bg-gray-400 text-white flex items-center justify-center transition-all duration-200 shadow-sm hover:opacity-80 hover:bg-gray-500"
-                    title="Aufgabentimer stoppen"
+                    className="w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                    title="Timer stoppen"
                   >
-                    <Square className="w-3 h-3" />
+                    <Square className="w-2.5 h-2.5" fill="currentColor" />
                   </button>
-                </>
+                </div>
               )}
-              {/* Sync badge removed from header; relocated to sidebar */}
-              {/* Focus minutes display removed */}
-              {/* Focus Mode Button */}
-              <button
-                onClick={handleEnterFocusMode}
-                className="hidden sm:flex items-center space-x-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 hover:opacity-90"
-                style={{ backgroundColor: state.preferences.accentColor, color: 'white' }}
-                title={t('focus.focus_mode') || 'Fokusmodus'}
-              >
-                <Target className="w-3.5 h-3.5" />
-                <span>Fokus</span>
-              </button>
-            </div>
             </div>
           </div>
         </div>

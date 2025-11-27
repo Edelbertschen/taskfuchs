@@ -152,7 +152,10 @@
         /* Hero Section */
         .hero {
             min-height: 100vh;
-            background: linear-gradient(135deg, #faf9f7 0%, #f8f4f0 50%, #f0e8e0 100%);
+            background:
+                radial-gradient(1000px circle at 10% 20%, rgba(224, 102, 16, 0.10), transparent 60%),
+                radial-gradient(800px circle at 85% 80%, rgba(224, 102, 16, 0.08), transparent 55%),
+                linear-gradient(135deg, #faf9f7 0%, #f8f4f0 50%, #f0e8e0 100%);
             display: flex;
             align-items: center;
             position: relative;
@@ -166,8 +169,24 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="0.5" fill="%23e06610" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            background:
+                radial-gradient(circle at 20% 30%, rgba(224, 102, 16, 0.10) 0%, transparent 55%),
+                radial-gradient(circle at 80% 70%, rgba(224, 102, 16, 0.08) 0%, transparent 55%),
+                radial-gradient(circle at 60% 20%, rgba(224, 102, 16, 0.06) 0%, transparent 45%);
             z-index: 1;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            inset: -10%;
+            background:
+                radial-gradient(700px circle at 75% 35%, rgba(224, 102, 16, 0.14), transparent 60%),
+                radial-gradient(600px circle at 25% 85%, rgba(224, 102, 16, 0.10), transparent 55%);
+            filter: blur(10px);
+            z-index: 1;
+            pointer-events: none;
+            animation: heroGlow 12s ease-in-out infinite;
         }
 
         .hero-container {
@@ -236,9 +255,21 @@
             align-items: center;
         }
 
+        .hero-visual::before {
+            content: '';
+            position: absolute;
+            width: 560px;
+            height: 560px;
+            background: radial-gradient(circle, rgba(224, 102, 16, 0.22) 0%, rgba(224, 102, 16, 0) 60%);
+            filter: blur(22px);
+            z-index: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+        }
+
         .floating-fox {
-            width: 300px;
-            height: 300px;
+            width: 400px;
+            height: 400px;
             animation: float 3s ease-in-out infinite;
             filter: drop-shadow(0 20px 40px rgba(224, 102, 16, 0.2));
         }
@@ -246,6 +277,11 @@
         @keyframes float {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
             50% { transform: translateY(-20px) rotate(2deg); }
+        }
+
+        @keyframes heroGlow {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 1; }
+            50% { transform: translateY(-8px) scale(1.02); opacity: 0.95; }
         }
 
         .speech-bubble {
@@ -1028,7 +1064,7 @@
     <nav class="nav" id="navbar">
         <div class="nav-container">
             <a href="#home" class="logo">
-                <img src="assets/images/Fuchs.svg" alt="TaskFuchs Logo">
+                <img src="assets/images/3d_fox.png" alt="TaskFuchs Logo">
                 TaskFuchs
             </a>
             <ul class="nav-links">
@@ -1067,7 +1103,7 @@
                 </a>
             </div>
             <div class="hero-visual parallax-element">
-                <img src="assets/images/Fuchs.svg" alt="TaskFuchs Maskottchen" class="floating-fox">
+                <img src="assets/images/3d_fox.png" alt="TaskFuchs Maskottchen" class="floating-fox">
                 <div class="speech-bubble" data-i18n="hero-speech">
                     Lass uns deine Produktivität revolutionieren
                 </div>

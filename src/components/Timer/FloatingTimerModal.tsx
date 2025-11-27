@@ -86,81 +86,106 @@ export function FloatingTimerModal({ isVisible, onOpenTask }: FloatingTimerModal
 
   if (!isVisible || !activeTimer?.isActive) return null;
 
+  const accentColor = state.preferences.accentColor;
+
   return (
     <div
-      className={`fixed z-[9998] rounded-lg shadow-2xl ${
+      className={`fixed z-[9998] overflow-hidden ${
         isDarkMode 
-          ? 'bg-zinc-900 border border-zinc-800' 
-          : 'bg-white border border-gray-200'
+          ? 'bg-zinc-900/95 border border-zinc-700/50' 
+          : 'bg-white/95 border border-gray-200/80'
       }`}
       style={{
         left: `${position.x}px`,
         top: `${position.y}px`,
-        width: '240px',
-        cursor: isDragging ? 'grabbing' : 'grab'
+        width: '200px',
+        cursor: isDragging ? 'grabbing' : 'grab',
+        borderRadius: '16px',
+        boxShadow: isDarkMode 
+          ? '0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05)' 
+          : '0 8px 32px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.02)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
       }}
       onMouseDown={handleMouseDown}
     >
-      <div className="p-4">
+      {/* Progress indicator at top */}
+      {activeTimer.estimatedTime && (
+        <div className="h-0.5 bg-gray-100 dark:bg-zinc-800">
+          <div 
+            className="h-full transition-all duration-500"
+            style={{ 
+              width: `${Math.min(100, (activeTimer.elapsedTime / activeTimer.estimatedTime) * 100)}%`,
+              backgroundColor: isOvertime ? '#ef4444' : accentColor,
+            }}
+          />
+        </div>
+      )}
+
+      <div className="p-3">
         {/* Task Title */}
         {task && (
-          <div 
-            className="text-xs font-medium mb-3 truncate cursor-pointer hover:opacity-70 transition-opacity"
-            style={{ color: '#71717a' }}
+          <button 
+            className="text-[10px] font-medium mb-2 truncate block w-full text-left cursor-pointer hover:opacity-70 transition-opacity uppercase tracking-wide"
+            style={{ color: accentColor }}
             onClick={() => onOpenTask?.(task.id)}
             title={task.title}
           >
             {task.title}
-          </div>
+          </button>
         )}
 
-        {/* Main Timer */}
-        <div className="flex items-center justify-between mb-3">
+        {/* Timer Display - Large and elegant */}
+        <div className="flex items-end justify-between">
           <div>
-            <div className={`text-3xl font-semibold tracking-tight ${
-              isOvertime ? 'text-red-500' : (isDarkMode ? 'text-zinc-50' : 'text-zinc-900')
-            }`} style={{ fontVariantNumeric: 'tabular-nums' }}>
+            <div 
+              className={`text-2xl font-semibold ${isOvertime ? 'text-red-500' : ''}`}
+              style={{ 
+                fontVariantNumeric: 'tabular-nums',
+                letterSpacing: '-0.03em',
+                color: isOvertime ? undefined : (isDarkMode ? '#fafafa' : '#18181b')
+              }}
+            >
               {formatTimeWithSecondsExact(activeTimer.elapsedTime || 0)}
             </div>
-            <div className="flex items-center gap-1.5 mt-1">
-              {activeTimer.estimatedTime && (
-                <span className="text-xs text-zinc-400" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                  / {formatTimeShort(activeTimer.estimatedTime)}
+            {activeTimer.estimatedTime && (
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="text-[10px] text-zinc-400">
+                  von {formatTimeShort(activeTimer.estimatedTime)}
                 </span>
-              )}
-              {isOvertime && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400">
-                  <AlertTriangle className="w-3 h-3" />
-                  OVER
-                </span>
-              )}
-            </div>
+                {isOvertime && (
+                  <span className="text-[9px] font-bold text-red-500 uppercase tracking-wider">
+                    Überschritten
+                  </span>
+                )}
+              </div>
+            )}
           </div>
 
-          {/* Controls */}
-          <div className="flex items-center gap-1.5">
+          {/* Compact Controls */}
+          <div className="flex items-center gap-1">
             <button
               onClick={handlePlayPause}
-              className="w-7 h-7 rounded-md flex items-center justify-center transition-all hover:opacity-90 hover:scale-105 active:scale-95"
-              style={{ backgroundColor: state.preferences.accentColor }}
-              title={activeTimer.isPaused ? 'Resume' : 'Pause'}
+              className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+              style={{ backgroundColor: accentColor }}
+              title={activeTimer.isPaused ? 'Fortsetzen' : 'Pause'}
             >
               {activeTimer.isPaused ? (
-                <Play className="w-3.5 h-3.5 text-white" fill="white" />
+                <Play className="w-3.5 h-3.5 text-white ml-0.5" fill="white" />
               ) : (
                 <Pause className="w-3.5 h-3.5 text-white" />
               )}
             </button>
             <button
               onClick={handleStop}
-              className={`w-7 h-7 rounded-md flex items-center justify-center transition-all hover:scale-105 active:scale-95 ${
+              className={`w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95 ${
                 isDarkMode 
-                  ? 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700' 
-                  : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
+                  ? 'text-zinc-500 hover:text-zinc-300' 
+                  : 'text-zinc-400 hover:text-zinc-600'
               }`}
-              title="Stop"
+              title="Stoppen"
             >
-              <Square className="w-3 h-3" fill="currentColor" />
+              <Square className="w-2.5 h-2.5" fill="currentColor" />
             </button>
           </div>
         </div>
