@@ -648,9 +648,14 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                     <span className={`text-xs leading-none text-center whitespace-nowrap ${isActive ? "text-white" : "text-gray-900 dark:text-gray-300"}`}>
                       {item.label}
                     </span>
-                    {/* Inbox count badge */}
+                    {/* Inbox count badge - only count true inbox tasks (no date, no project, not completed) */}
                     {item.id === 'inbox' && (() => {
-                      const inboxCount = (state.tasks || []).filter(t => t.columnId === 'inbox').length;
+                      const inboxCount = (state.tasks || []).filter(t => 
+                        t.columnId === 'inbox' && 
+                        !t.reminderDate && 
+                        !t.projectId && 
+                        !t.completed
+                      ).length;
                       return inboxCount > 0 ? (
                         <span className="absolute top-[2px] right-[2px] text-[11px] min-w-[20px] h-[20px] px-1.5 rounded-full flex items-center justify-center text-white shadow font-semibold dark:text-white"
                           style={{ backgroundColor: state.preferences.accentColor }}>
