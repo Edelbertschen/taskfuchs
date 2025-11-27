@@ -1306,3 +1306,61 @@ input, textarea, [contenteditable="true"] {
     animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   }
 }
+
+/* ============================================
+   Onboarding Highlights & Animations
+   ============================================ */
+
+/* Highlight elements during onboarding */
+.onboarding-highlight {
+  position: relative;
+  animation: onboarding-pulse 2s ease-in-out infinite;
+  z-index: 9999;
+}
+
+.onboarding-highlight::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border: 3px solid var(--accent-color, #f97316);
+  border-radius: 12px;
+  pointer-events: none;
+  animation: onboarding-border-pulse 2s ease-in-out infinite;
+  box-shadow: 0 0 20px var(--accent-color, #f97316);
+}
+
+@keyframes onboarding-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes onboarding-border-pulse {
+  0%, 100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+/* Pulsing icons during onboarding */
+.onboarding-pulse-icons [data-task-icon] {
+  animation: icon-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes icon-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+}

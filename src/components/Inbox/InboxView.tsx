@@ -942,6 +942,7 @@ export function InboxView() {
           <div className="mb-6 flex items-center justify-end">
             <button
               onClick={() => setShowSmartTaskModal(true)}
+              data-quick-add-button
               className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200 hover:shadow-lg active:scale-95 ${isMinimalDesign ? `isDarkMode ? 'text-white' : 'text-gray-900'` : 'text-white backdrop-blur-xl border border-white/20'}`}
               style={{ 
                 backgroundColor: `${accentColor}E6`,

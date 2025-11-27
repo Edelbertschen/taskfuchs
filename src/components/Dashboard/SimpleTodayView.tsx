@@ -1546,6 +1546,7 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
             {state.preferences.enableEndOfDay && (
               <button
                 onClick={() => setShowEndOfDayModal(true)}
+                data-end-day-button
                 className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 backdrop-blur-lg ${
                   isMinimalDesign
                     ? 'bg-white/90 dark:bg-gray-50/90 border border-white/50 dark:border-gray-200/50 hover:bg-white/95 dark:hover:bg-gray-50/95'

@@ -625,6 +625,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                   <button
                     ref={isDropTarget ? item.dropRef : undefined}
                     onClick={item.onClick}
+                    data-nav-item={item.id}
                     className={`w-full flex flex-col items-center justify-center rounded-lg text-xs font-medium sidebar-item py-3 px-1 gap-1 btn-hover smooth-transform transition-all duration-200 min-h-[60px] ${
                       isActive
                         ? 'bg-[var(--accent-color)] text-white active'
@@ -813,6 +814,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
               <button 
                 onClick={handleManualBackup}
                 disabled={backupRunning}
+                data-backup-button
                 className={`
                   relative w-10 h-10 rounded-full flex items-center justify-center 
                   transition-all duration-200

@@ -4,6 +4,7 @@ import { ChevronRight, ChevronLeft, X, Inbox, CalendarDays, LayoutGrid, FolderKa
 import { useApp } from '../../context/AppContext';
 import { format } from 'date-fns';
 import type { Task } from '../../types';
+import { GuideCursor } from './GuideCursor';
 
 // Preload images for smooth transitions
 const preloadImages = (urls: string[]) => {
@@ -52,9 +53,18 @@ interface TourSubStep {
   title: { de: string; en: string };
   text: { de: string; en: string };
   foxMessage?: { de: string; en: string };
-  position: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left' | 'center-right' | 'center-left' | 'center';
+  position: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left' | 'center-right' | 'center-left' | 'center' | 'bottom-center';
   openTaskModal?: boolean;
+  closeTaskModal?: boolean;
   openEndOfDayModal?: boolean;
+  closeEndOfDayModal?: boolean;
+  showGuideCursor?: boolean; // Show guide cursor pointing to element
+  guideCursorTarget?: string; // CSS selector for guide cursor target
+  guideCursorClickAnimation?: boolean; // Whether to animate click
+  highlightElements?: string[]; // CSS selectors of elements to highlight
+  createExampleTask?: boolean; // Create example task in Inbox
+  moveTaskToNextDay?: boolean; // Move example task from today to next day
+  createExampleProject?: boolean; // Create example project with columns
   stylingDemo?: boolean; // For the styling demo step
   applyStyling?: StylingConfig; // Styling to apply when entering this step
   restoreOriginalStyling?: boolean; // Restore original styling when entering this step
@@ -86,12 +96,15 @@ const buildTourSections = (): TourSection[] => {
           foxMessage: { de: 'Schnell, sicher und überall verfügbar!', en: 'Fast, secure, and available everywhere!' },
           position: 'center'
         },
-        {
-          title: { de: 'Backups sind wichtig!', en: 'Backups are important!' },
-          text: { de: 'Da deine Daten nur lokal gespeichert werden, solltest du regelmäßig Backups erstellen. Klicke am Ende jedes Arbeitstages auf den Backup-Button unten in der Sidebar.', en: 'Since your data is stored locally only, you should create regular backups. Click the backup button at the bottom of the sidebar at the end of each work day.' },
-          foxMessage: { de: 'Lieber einmal zu oft sichern!', en: 'Better safe than sorry!' },
-          position: 'bottom-left'
-        },
+      {
+        title: { de: 'Backups sind wichtig!', en: 'Backups are important!' },
+        text: { de: 'Da deine Daten nur lokal gespeichert werden, solltest du regelmäßig Backups erstellen. Klicke am Ende jedes Arbeitstages auf den Backup-Button unten in der Sidebar.', en: 'Since your data is stored locally only, you should create regular backups. Click the backup button at the bottom of the sidebar at the end of each work day.' },
+        foxMessage: { de: 'Lieber einmal zu oft sichern!', en: 'Better safe than sorry!' },
+        position: 'bottom-left',
+        showGuideCursor: true,
+        guideCursorTarget: '[data-backup-button]',
+        guideCursorClickAnimation: false
+      },
         {
           title: { de: 'Backup einrichten', en: 'Setup Backup' },
           text: { de: 'Beim ersten Klick auf den Backup-Button wählst du einen Speicherort. Danach reicht ein Klick, um ein Backup zu erstellen. Wiederherstellung erfolgt über Einstellungen → Daten.', en: 'On first click, you choose a save location. After that, one click creates a backup. Restore via Settings → Data.' },
@@ -115,13 +128,18 @@ const buildTourSections = (): TourSection[] => {
       },
       {
         title: { de: 'Schnelle Eingabe', en: 'Quick Input' },
-        text: { de: 'Nutze das Eingabefeld oben für eine blitzschnelle Aufgabenerfassung.', en: 'Use the input field at the top for lightning-fast task entry.' },
-        position: 'top-right'
+        text: { de: 'Nutze das Eingabefeld für eine blitzschnelle Aufgabenerfassung.', en: 'Use the input field for lightning-fast task entry.' },
+        position: 'bottom-center',
+        showGuideCursor: true,
+        guideCursorTarget: '[data-quick-add-button]',
+        guideCursorClickAnimation: true,
+        createExampleTask: true
       },
       {
         title: { de: 'Aufgaben organisieren', en: 'Organize Tasks' },
         text: { de: 'Weise Datum, Projekt oder Pin zu – per Icon auf der Karte.', en: 'Assign date, project, or pin – via icons on the card.' },
-        position: 'center-right'
+        position: 'center-right',
+        highlightElements: ['[data-onboarding-task-icons]']
       }
     ]
   });
@@ -143,13 +161,18 @@ const tourSections: TourSection[] = [
       },
       {
         title: { de: 'Schnelle Eingabe', en: 'Quick Input' },
-        text: { de: 'Nutze das Eingabefeld oben für eine blitzschnelle Aufgabenerfassung.', en: 'Use the input field at the top for lightning-fast task entry.' },
-        position: 'top-right'
+        text: { de: 'Nutze das Eingabefeld für eine blitzschnelle Aufgabenerfassung.', en: 'Use the input field for lightning-fast task entry.' },
+        position: 'bottom-center',
+        showGuideCursor: true,
+        guideCursorTarget: '[data-quick-add-button]',
+        guideCursorClickAnimation: true,
+        createExampleTask: true
       },
       {
         title: { de: 'Aufgaben organisieren', en: 'Organize Tasks' },
         text: { de: 'Weise Datum, Projekt oder Pin zu – per Icon auf der Karte.', en: 'Assign date, project, or pin – via icons on the card.' },
-        position: 'center-right'
+        position: 'center-right',
+        highlightElements: ['[data-onboarding-task-icons]']
       }
     ]
   },
@@ -160,22 +183,32 @@ const tourSections: TourSection[] = [
     steps: [
       {
         title: { de: 'Die Aufgabenansicht', en: 'The Task View' },
-        text: { de: 'Klicke auf eine Aufgabe, um sie im Detail zu bearbeiten. Hier siehst du alle Optionen auf einen Blick.', en: 'Click on a task to edit it in detail. Here you can see all options at a glance.' },
+        text: { de: 'Klicke auf eine Aufgabe, um sie im Detail zu bearbeiten.', en: 'Click on a task to edit it in detail.' },
         foxMessage: { de: 'Diese Beispielaufgabe zeigt dir alles!', en: 'This sample task shows you everything!' },
-        position: 'center',
-        openTaskModal: true
+        position: 'center-right',
+        showGuideCursor: true,
+        guideCursorTarget: `[data-task-id="${SAMPLE_TASK_ID}"]`,
+        guideCursorClickAnimation: true
       },
       {
         title: { de: 'Prioritäten & Beschreibung', en: 'Priorities & Description' },
         text: { de: 'Setze Prioritäten (niedrig, mittel, hoch) und nutze die Beschreibung für Details. Markdown wird unterstützt!', en: 'Set priorities (low, medium, high) and use the description for details. Markdown is supported!' },
         position: 'center',
-        openTaskModal: true
+        openTaskModal: true,
+        highlightElements: ['[data-task-priority]', '[data-task-description]']
       },
       {
         title: { de: 'Unteraufgaben', en: 'Subtasks' },
         text: { de: 'Teile große Aufgaben in kleine Schritte auf. Unteraufgaben können einzeln abgehakt werden.', en: 'Break big tasks into small steps. Subtasks can be checked off individually.' },
         position: 'center',
-        openTaskModal: true
+        openTaskModal: true,
+        highlightElements: ['[data-task-subtasks]']
+      },
+      {
+        title: { de: 'Weiter geht\'s', en: 'Let\'s continue' },
+        text: { de: 'Schließe die Aufgabenansicht und entdecke weitere Funktionen.', en: 'Close the task view and discover more features.' },
+        position: 'center',
+        closeTaskModal: true
       }
     ]
   },
@@ -192,10 +225,24 @@ const tourSections: TourSection[] = [
       },
       {
         title: { de: 'Tag beenden', en: 'End Day' },
-        text: { de: 'Am Ende des Tages kannst du über "Tag beenden" erledigte Aufgaben archivieren und offene verschieben. Perfekt auch für dein tägliches Backup!', en: 'At the end of the day, you can archive completed tasks and move open ones via "End Day". Perfect for your daily backup too!' },
+        text: { de: 'Am Ende des Tages kannst du erledigte Aufgaben archivieren und offene verschieben.', en: 'At the end of the day, you can archive completed tasks and move open ones.' },
         foxMessage: { de: 'Vergiss nicht, ein Backup zu machen!', en: 'Don\'t forget to backup!' },
-        position: 'center-right',
+        position: 'bottom-right',
+        showGuideCursor: true,
+        guideCursorTarget: '[data-end-day-button]',
+        guideCursorClickAnimation: true
+      },
+      {
+        title: { de: 'Tagesabschluss', en: 'End of Day' },
+        text: { de: 'Hier siehst du deine Leistung und kannst ein Backup erstellen. Perfekt für den Tagesabschluss!', en: 'Here you can see your performance and create a backup. Perfect for closing out your day!' },
+        position: 'center',
         openEndOfDayModal: true
+      },
+      {
+        title: { de: 'Weiter geht\'s', en: 'Let\'s continue' },
+        text: { de: 'Entdecke jetzt, wie du deine Aufgaben zeitlich planst.', en: 'Now discover how to plan your tasks by time.' },
+        position: 'center',
+        closeEndOfDayModal: true
       }
     ]
   },
@@ -272,7 +319,8 @@ const tourSections: TourSection[] = [
         title: { de: 'Zeitplanung', en: 'Time Planning' },
         text: { de: 'Gib bei Aufgaben eine geschätzte Zeit an. Die Gesamtzeit wird oben in jeder Spalte angezeigt – so siehst du sofort, ob dein Tag realistisch geplant ist.', en: 'Add estimated time to tasks. Total time is shown at the top of each column – so you can see if your day is realistically planned.' },
         foxMessage: { de: 'Plane realistisch, schaffe mehr!', en: 'Plan realistically, achieve more!' },
-        position: 'top-right'
+        position: 'top-right',
+        highlightElements: ['[data-column-time-today]']
       },
       {
         title: { de: 'Der Timer', en: 'The Timer' },
@@ -281,13 +329,14 @@ const tourSections: TourSection[] = [
       },
       {
         title: { de: 'Die Sidebar', en: 'The Sidebar' },
-        text: { de: 'Links findest du unverplante Projekt-Aufgaben. Die Sidebar ist auf- und zuklappbar.', en: 'On the left you\'ll find unscheduled project tasks. The sidebar can be expanded and collapsed.' },
+        text: { de: 'Links findest du unverplante Projekt-Aufgaben. Die Sidebar lässt sich ein- und ausklappen.', en: 'On the left you\'ll find unscheduled project tasks. The sidebar can be expanded and collapsed.' },
         position: 'top-left'
       },
       {
         title: { de: 'Drag & Drop', en: 'Drag & Drop' },
-        text: { de: 'Ziehe Aufgaben zwischen Tagen hin und her, um umzuplanen.', en: 'Drag tasks between days to reschedule.' },
-        position: 'center-left'
+        text: { de: 'Ziehe Aufgaben zwischen Tagen hin und her, um umzuplanen. Schau zu!', en: 'Drag tasks between days to reschedule. Watch!' },
+        position: 'center-left',
+        moveTaskToNextDay: true
       }
     ]
   },
@@ -300,7 +349,8 @@ const tourSections: TourSection[] = [
         title: { de: 'Projekte organisieren', en: 'Organize Projects' },
         text: { de: 'Gruppiere zusammengehörige Aufgaben in Projekten.', en: 'Group related tasks in projects.' },
         foxMessage: { de: 'Große Ziele, kleine Schritte!', en: 'Big goals, small steps!' },
-        position: 'bottom-right'
+        position: 'bottom-right',
+        createExampleProject: true
       },
       {
         title: { de: 'Kanban-Workflow', en: 'Kanban Workflow' },
@@ -430,7 +480,10 @@ const pwaSections: TourSection[] = isPWA() ? [
         title: { de: 'Backups sind wichtig!', en: 'Backups are important!' },
         text: { de: 'Da deine Daten lokal gespeichert werden, solltest du regelmäßig Backups erstellen. Am Ende jedes Arbeitstages ein Klick auf den Backup-Button in der Sidebar reicht!', en: 'Since your data is stored locally, you should create regular backups. At the end of each work day, just click the backup button in the sidebar!' },
         foxMessage: { de: 'Lieber einmal zu oft sichern!', en: 'Better safe than sorry!' },
-        position: 'bottom-left'
+        position: 'bottom-left',
+        showGuideCursor: true,
+        guideCursorTarget: '[data-backup-button]',
+        guideCursorClickAnimation: false
       },
       {
         title: { de: 'Backup einrichten', en: 'Setup Backup' },
@@ -569,6 +622,11 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
   const [sampleTaskCreated, setSampleTaskCreated] = useState(storedState?.sampleTaskCreated || false);
   const [showTaskModal, setShowTaskModal] = useState(false);
   
+  // Guide cursor state
+  const [showGuideCursor, setShowGuideCursor] = useState(false);
+  const [guideCursorTarget, setGuideCursorTarget] = useState<string>('');
+  const pendingNavigationRef = useRef<{ view: string; sectionIndex: number; stepIndex: number } | null>(null);
+  
   // Styling demo state - save original settings when entering styling section
   const originalSettingsRef = useRef<{
     theme: 'light' | 'dark' | 'system';
@@ -606,21 +664,19 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
       return;
     }
     
-    // Opening - check if we should reset to initial state
+    // Opening - ALWAYS reset to initial state (onboarding always starts from beginning)
     if (isOpen && !wasOpen) {
-      // Check for stored state NOW (not from initial render)
-      const currentStoredState = sessionStorage.getItem('taskfuchs-onboarding-state');
+      // Reset everything for a fresh start
+      setLanguage(null);
+      setCurrentSectionIndex(0);
+      setCurrentStepIndex(0);
+      setDontShowAgain(false);
+      setSampleTaskCreated(false);
+      setShowTaskModal(false);
+      originalSettingsRef.current = null;
       
-      if (!currentStoredState) {
-        // No stored state - this is a fresh start, reset everything
-        setLanguage(null);
-        setCurrentSectionIndex(0);
-        setCurrentStepIndex(0);
-        setDontShowAgain(false);
-        setSampleTaskCreated(false);
-        setShowTaskModal(false);
-        originalSettingsRef.current = null;
-      }
+      // Clear sessionStorage to ensure fresh start
+      sessionStorage.removeItem('taskfuchs-onboarding-state');
       
       // Preload demo background images for smooth transitions
       preloadImages(DEMO_BACKGROUND_IMAGES);
@@ -749,6 +805,27 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
     }
   }, [isOpen, language]);
   
+  // Handle guide cursor for step-specific UI highlights
+  useEffect(() => {
+    if (!isOpen || !language) return;
+    
+    const currentSection = allTourSections[currentSectionIndex];
+    const currentStep = currentSection?.steps[currentStepIndex];
+    
+    if (currentStep?.showGuideCursor && currentStep?.guideCursorTarget) {
+      // Small delay to ensure DOM is ready
+      const timer = setTimeout(() => {
+        setShowGuideCursor(true);
+        setGuideCursorTarget(currentStep.guideCursorTarget || '');
+      }, 300);
+      
+      return () => clearTimeout(timer);
+    } else {
+      setShowGuideCursor(false);
+      setGuideCursorTarget('');
+    }
+  }, [isOpen, language, currentSectionIndex, currentStepIndex, allTourSections]);
+  
   // Handle task modal visibility based on current step
   useEffect(() => {
     const currentSection = allTourSections[currentSectionIndex];
@@ -762,8 +839,8 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
         detail: { taskId: SAMPLE_TASK_ID } 
       }));
       setShowTaskModal(true);
-    } else if (showTaskModal) {
-      // Remove class and close the task modal when leaving the taskmodal section
+    } else if (currentStep?.closeTaskModal || (showTaskModal && !currentStep?.openTaskModal)) {
+      // Remove class and close the task modal
       document.body.classList.remove('onboarding-taskmodal-active');
       window.dispatchEvent(new CustomEvent('close-task-modal'));
       setShowTaskModal(false);
@@ -772,7 +849,7 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
     return () => {
       document.body.classList.remove('onboarding-taskmodal-active');
     };
-  }, [currentSectionIndex, currentStepIndex, sampleTaskCreated, showTaskModal]);
+  }, [currentSectionIndex, currentStepIndex, sampleTaskCreated, showTaskModal, allTourSections]);
   
   // Handle End of Day modal visibility based on current step
   useEffect(() => {
@@ -782,8 +859,70 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
     if (currentStep?.openEndOfDayModal) {
       // Open the End of Day modal
       window.dispatchEvent(new CustomEvent('open-end-of-day-modal'));
+    } else if (currentStep?.closeEndOfDayModal) {
+      // Close the End of Day modal
+      window.dispatchEvent(new CustomEvent('close-end-of-day-modal'));
     }
-  }, [currentSectionIndex, currentStepIndex]);
+  }, [currentSectionIndex, currentStepIndex, allTourSections]);
+  
+  // Handle element highlights
+  useEffect(() => {
+    const currentSection = allTourSections[currentSectionIndex];
+    const currentStep = currentSection?.steps[currentStepIndex];
+    
+    if (currentStep?.highlightElements) {
+      // Add highlight class to specified elements
+      const elements = currentStep.highlightElements.map(selector => 
+        document.querySelector(selector)
+      ).filter(Boolean);
+      
+      elements.forEach(el => {
+        el?.classList.add('onboarding-highlight');
+      });
+      
+      return () => {
+        elements.forEach(el => {
+          el?.classList.remove('onboarding-highlight');
+        });
+      };
+    }
+  }, [currentSectionIndex, currentStepIndex, allTourSections]);
+  
+  // Example project creation - TODO: Implement properly with correct project structure
+  // useEffect(() => {
+  //   const currentSection = allTourSections[currentSectionIndex];
+  //   const currentStep = currentSection?.steps[currentStepIndex];
+  //   
+  //   if (currentStep?.createExampleProject) {
+  //     // TODO: Create example project with proper structure
+  //   }
+  // }, [currentSectionIndex, currentStepIndex, allTourSections]);
+  
+  // Handle task move to next day (for DnD demo)
+  useEffect(() => {
+    const currentSection = allTourSections[currentSectionIndex];
+    const currentStep = currentSection?.steps[currentStepIndex];
+    
+    if (currentStep?.moveTaskToNextDay) {
+      // Find sample task and move it to next day
+      const sampleTask = state.tasks.find(t => t.id === SAMPLE_TASK_ID);
+      if (sampleTask) {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowStr = format(tomorrow, 'yyyy-MM-dd');
+        
+        // Update task with tomorrow's date
+        dispatch({
+          type: 'UPDATE_TASK',
+          payload: {
+            ...sampleTask,
+            reminderDate: tomorrowStr,
+            columnId: `date-${tomorrowStr}`
+          }
+        });
+      }
+    }
+  }, [currentSectionIndex, currentStepIndex, state.tasks, dispatch, allTourSections]);
   
   // Calculate total progress
   const totalSteps = allTourSections.reduce((acc, section) => acc + section.steps.length, 0);
@@ -792,12 +931,67 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
   const currentSection = allTourSections[currentSectionIndex];
   const currentStep = currentSection?.steps[currentStepIndex];
   
+  // Map view to sidebar button selector
+  const getViewSelector = useCallback((view: string): string | null => {
+    switch (view) {
+      case 'inbox':
+        return '[data-nav-item="inbox"]';
+      case 'today':
+        return '[data-nav-item="today"]';
+      case 'tasks':
+        return '[data-nav-item="tasks"]';
+      case 'kanban':
+        return '[data-nav-item="kanban"]';
+      case 'pins':
+        return '[data-nav-item="pins"]';
+      default:
+        return null;
+    }
+  }, []);
+
   // Navigate to the current section's view
   const navigateToView = useCallback((view: string) => {
     if (onNavigate) {
       onNavigate(view);
     }
   }, [onNavigate]);
+  
+  // Navigate with guide cursor animation
+  const navigateToViewWithCursor = useCallback((view: string, sectionIndex: number, stepIndex: number) => {
+    const selector = getViewSelector(view);
+    
+    if (!selector) {
+      // No cursor needed, navigate directly
+      navigateToView(view);
+      setCurrentSectionIndex(sectionIndex);
+      setCurrentStepIndex(stepIndex);
+      return;
+    }
+    
+    // Store pending navigation
+    pendingNavigationRef.current = { view, sectionIndex, stepIndex };
+    
+    // Show guide cursor
+    setGuideCursorTarget(selector);
+    setShowGuideCursor(true);
+  }, [getViewSelector, navigateToView]);
+  
+  // Handle guide cursor animation complete
+  const handleGuideCursorComplete = useCallback(() => {
+    setShowGuideCursor(false);
+    
+    // Execute pending navigation
+    if (pendingNavigationRef.current) {
+      const { view, sectionIndex, stepIndex } = pendingNavigationRef.current;
+      navigateToView(view);
+      setCurrentSectionIndex(sectionIndex);
+      setCurrentStepIndex(stepIndex);
+      pendingNavigationRef.current = null;
+    }
+    
+    // Reset animation state
+    setTimeout(() => setIsAnimating(false), 200);
+  }, [navigateToView]);
   
   // Go to next step or section - stable version without stale closures
   const handleNext = useCallback(() => {
@@ -811,21 +1005,29 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
     setIsAnimating(true);
     
     if (currentStepIndex < stepsCount - 1) {
-      // More steps in current section
+      // More steps in current section - no navigation needed
       setCurrentStepIndex(currentStepIndex + 1);
+      setTimeout(() => setIsAnimating(false), 200);
     } else if (currentSectionIndex < allTourSections.length - 1) {
-      // Move to next section
+      // Move to next section with guide cursor
       const nextSection = allTourSections[currentSectionIndex + 1];
-      setCurrentSectionIndex(currentSectionIndex + 1);
-      setCurrentStepIndex(0);
-      if (nextSection) {
-        navigateToView(nextSection.view);
+      const currentView = section.view;
+      const nextView = nextSection.view;
+      
+      if (nextSection && currentView !== nextView) {
+        // Different view - show guide cursor
+        navigateToViewWithCursor(nextView, currentSectionIndex + 1, 0);
+      } else {
+        // Same view - direct navigation
+        setCurrentSectionIndex(currentSectionIndex + 1);
+        setCurrentStepIndex(0);
+        setTimeout(() => setIsAnimating(false), 200);
       }
+    } else {
+      // No more sections
+      setTimeout(() => setIsAnimating(false), 200);
     }
-    
-    // Reset animation state after a short delay
-    setTimeout(() => setIsAnimating(false), 200);
-  }, [currentStepIndex, currentSectionIndex, allTourSections, navigateToView, isAnimating]);
+  }, [currentStepIndex, currentSectionIndex, allTourSections, navigateToViewWithCursor, isAnimating]);
   
   // Go to previous step or section - stable version without stale closures
   const handlePrev = useCallback(() => {
@@ -834,21 +1036,30 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
     setIsAnimating(true);
     
     if (currentStepIndex > 0) {
-      // Previous step in current section
+      // Previous step in current section - no navigation needed
       setCurrentStepIndex(currentStepIndex - 1);
+      setTimeout(() => setIsAnimating(false), 200);
     } else if (currentSectionIndex > 0) {
-      // Move to previous section, last step
+      // Move to previous section, last step with guide cursor
       const prevSection = allTourSections[currentSectionIndex - 1];
-      if (prevSection) {
+      const currentSection = allTourSections[currentSectionIndex];
+      const currentView = currentSection?.view;
+      const prevView = prevSection?.view;
+      
+      if (prevSection && currentView !== prevView) {
+        // Different view - show guide cursor
+        navigateToViewWithCursor(prevView, currentSectionIndex - 1, prevSection.steps.length - 1);
+      } else if (prevSection) {
+        // Same view - direct navigation
         setCurrentSectionIndex(currentSectionIndex - 1);
         setCurrentStepIndex(prevSection.steps.length - 1);
-        navigateToView(prevSection.view);
+        setTimeout(() => setIsAnimating(false), 200);
       }
+    } else {
+      // Already at first step
+      setTimeout(() => setIsAnimating(false), 200);
     }
-    
-    // Reset animation state after a short delay
-    setTimeout(() => setIsAnimating(false), 200);
-  }, [currentStepIndex, currentSectionIndex, allTourSections, navigateToView, isAnimating]);
+  }, [currentStepIndex, currentSectionIndex, allTourSections, navigateToViewWithCursor, isAnimating]);
   
   const handleComplete = useCallback(() => {
     // Close task modal if open
@@ -875,15 +1086,25 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
   
   const handleLanguageSelect = useCallback((lang: Language) => {
     setLanguage(lang);
-    // Reset indices to ensure we start from the beginning
-    setCurrentSectionIndex(0);
-    setCurrentStepIndex(0);
-    // Navigate to first section's view
+    
+    // Navigate to first section's view with guide cursor
     const firstSection = allTourSections[0];
     if (firstSection) {
-      navigateToView(firstSection.view);
+      const selector = getViewSelector(firstSection.view);
+      
+      if (selector) {
+        // Show guide cursor for first navigation
+        pendingNavigationRef.current = { view: firstSection.view, sectionIndex: 0, stepIndex: 0 };
+        setGuideCursorTarget(selector);
+        setShowGuideCursor(true);
+      } else {
+        // Direct navigation if no selector
+        setCurrentSectionIndex(0);
+        setCurrentStepIndex(0);
+        navigateToView(firstSection.view);
+      }
     }
-  }, [navigateToView, allTourSections]);
+  }, [navigateToView, allTourSections, getViewSelector]);
   
   // Keyboard navigation
   useEffect(() => {
@@ -939,6 +1160,7 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
     switch (position) {
       case 'bottom-right': return 'bottom-6 right-6';
       case 'bottom-left': return 'bottom-6 left-6 sm:left-24';
+      case 'bottom-center': return 'bottom-6 left-1/2 -translate-x-1/2';
       case 'top-right': return 'top-24 right-6';
       case 'top-left': return 'top-24 left-6 sm:left-24';
       case 'center-right': return 'top-1/2 -translate-y-1/2 right-6';
@@ -1333,6 +1555,18 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
                         </div>
                       </div>
                     )}
+      
+      {/* Guide Cursor Animation */}
+      {showGuideCursor && guideCursorTarget && (
+        <GuideCursor
+          targetSelector={guideCursorTarget}
+          accentColor={accentColor}
+          onAnimationComplete={() => setShowGuideCursor(false)}
+          delay={300}
+          showClick={currentStep?.guideCursorClickAnimation ?? true}
+          holdDuration={1500}
+        />
+      )}
                   </div>
   );
   

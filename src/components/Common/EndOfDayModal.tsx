@@ -92,6 +92,16 @@ export function EndOfDayModal({ isOpen, onClose }: EndOfDayModalProps) {
   
   const skillLevel = getSkillLevel();
 
+  // Listen for close event from onboarding
+  useEffect(() => {
+    const handleCloseEndOfDayModal = () => {
+      onClose();
+    };
+    
+    window.addEventListener('close-end-of-day-modal', handleCloseEndOfDayModal);
+    return () => window.removeEventListener('close-end-of-day-modal', handleCloseEndOfDayModal);
+  }, [onClose]);
+  
   // Initialize sync status monitoring
   useEffect(() => {
     if (!isOpen) return;
