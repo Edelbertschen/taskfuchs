@@ -65,7 +65,8 @@ import {
   Info,
   Target,
   Zap,
-  MoreHorizontal
+  MoreHorizontal,
+  FolderOpen
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { DeleteConfirmationModal } from '../Common/DeleteConfirmationModal';
@@ -99,6 +100,66 @@ const getGradientDirections = (t) => [
   { value: 'to bottom left', label: t('settings_appearance.gradients.bottomLeft'), icon: ArrowDownLeft },
   { value: 'to top left', label: t('settings_appearance.gradients.topLeft'), icon: ArrowUpLeft }
 ];
+
+// Helper component to show backup directory status
+const BackupDirectoryStatus = () => {
+  const { t } = useTranslation();
+  const { state } = useApp();
+  const [dirName, setDirName] = React.useState<string | null>(null);
+  const [isConfigured, setIsConfigured] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkStatus = async () => {
+      try {
+        const { backupService } = await import('../../utils/backupService');
+        setDirName(backupService.getDirectoryName());
+        setIsConfigured(backupService.isConfigured());
+        
+        const unsubscribe = backupService.subscribe(() => {
+          setDirName(backupService.getDirectoryName());
+          setIsConfigured(backupService.isConfigured());
+        });
+        return unsubscribe;
+      } catch {
+        setDirName(null);
+        setIsConfigured(false);
+      }
+    };
+    checkStatus();
+  }, []);
+
+  return (
+    <div className={`mb-4 p-3 rounded-lg border ${
+      isConfigured 
+        ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' 
+        : 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800'
+    }`}>
+      <div className="flex items-center gap-2">
+        {isConfigured ? (
+          <>
+            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            <div className="flex-1">
+              <div className="text-sm font-medium text-green-800 dark:text-green-200">
+                {t('settings_data.backupConfigured') || 'Backup konfiguriert'}
+              </div>
+              <div className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1 mt-0.5">
+                <FolderOpen className="w-3 h-3" />
+                <span className="font-mono">{dirName}</span>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="w-2 h-2 rounded-full bg-amber-500" />
+            <div className="text-sm text-amber-800 dark:text-amber-200">
+              {t('settings_data.noBackupConfigured') || 'Kein Backup-Verzeichnis gewählt'}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const Settings = React.memo(() => {
   const { t, i18n } = useTranslation();
@@ -7203,6 +7264,9 @@ const Settings = React.memo(() => {
                     className="w-28 px-2 py-1 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800"
                   />
                 </div>
+
+                {/* Selected Directory Display */}
+                <BackupDirectoryStatus />
 
                 <div className="flex items-center gap-3 mb-3">
                   <button

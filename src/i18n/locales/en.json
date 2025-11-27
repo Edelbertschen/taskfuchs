@@ -1623,6 +1623,8 @@
     "noBackupDirSelected": "No backup directory selected.",
     "backupNow": "Backup Now",
     "lastBackup": "Last Backup",
+    "backupConfigured": "Backup configured",
+    "noBackupConfigured": "No backup directory selected",
     "invalidBackupFile": "Invalid backup file.",
     "restore": "Restore",
     "restoreDesc": "Default: last backup in the selected folder. Without a folder, a file selection dialog appears.",
@@ -1706,7 +1708,10 @@
     "no_folder_selected": "No backup folder selected",
     "failed": "Backup failed",
     "success_title": "Backup successful",
-    "success_message": "Your data has been saved securely"
+    "success_message": "Your data has been saved securely",
+    "configure": "Configure backup",
+    "backup_now": "Backup now",
+    "setup_backup": "Setup backup"
   },
   "pwa": {
     "update_available": "New version available",

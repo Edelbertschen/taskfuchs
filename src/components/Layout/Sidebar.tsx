@@ -56,6 +56,8 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
   const [backupButtonPressed, setBackupButtonPressed] = useState(false);
   const [backupRunning, setBackupRunning] = useState(false);
   const [showBackupSuccess, setShowBackupSuccess] = useState(false);
+  const [backupContextMenu, setBackupContextMenu] = useState<{ x: number; y: number } | null>(null);
+  const [backupDirName, setBackupDirName] = useState<string | null>(null);
   
   // Reactive dark mode check based on theme preference
   const isDarkMode = state.preferences.theme === 'dark' || 
@@ -89,15 +91,18 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
         const { backupService } = await import('../../utils/backupService');
         const isConfigured = backupService.isConfigured();
         setCanLocalBackup(isConfigured);
+        setBackupDirName(backupService.getDirectoryName());
         
         // Subscribe to changes
         const unsubscribe = backupService.subscribe(() => {
           setCanLocalBackup(backupService.isConfigured());
+          setBackupDirName(backupService.getDirectoryName());
         });
         
         return unsubscribe;
       } catch {
         setCanLocalBackup(false);
+        setBackupDirName(null);
       }
     };
     
@@ -241,6 +246,26 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
       alert(t('backup.failed') || 'Backup fehlgeschlagen.');
     }
   }, [state, t, dispatch]);
+
+  // Handle right-click on backup button to show context menu
+  const handleBackupContextMenu = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setBackupContextMenu({ x: e.clientX, y: e.clientY });
+  }, []);
+
+  // Close backup context menu when clicking outside
+  useEffect(() => {
+    if (!backupContextMenu) return;
+    const handleClick = () => setBackupContextMenu(null);
+    const handleEsc = (e: KeyboardEvent) => { if (e.key === 'Escape') setBackupContextMenu(null); };
+    document.addEventListener('click', handleClick);
+    document.addEventListener('keydown', handleEsc);
+    return () => {
+      document.removeEventListener('click', handleClick);
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, [backupContextMenu]);
 
   // Drop target for planner
   const {
@@ -847,9 +872,10 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
             </div>
           )}
           {canLocalBackup && (
-            <div className="mt-2 flex items-center justify-center px-1">
+            <div className="mt-2 flex flex-col items-center px-1">
               <button 
                 onClick={handleManualBackup}
+                onContextMenu={handleBackupContextMenu}
                 disabled={backupRunning}
                 data-backup-button
                 className={`
@@ -866,11 +892,17 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                   focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2
                   dark:focus:ring-offset-gray-900
                 `}
-                title={t('backup.manual_backup') || 'Backup jetzt sichern'} 
+                title={`${t('backup.manual_backup') || 'Backup jetzt sichern'}${backupDirName ? ` (${backupDirName})` : ''}`} 
                 aria-label={t('backup.manual_backup') || 'Backup jetzt sichern'}
               >
                 <HardDrive className="w-5 h-5" />
               </button>
+              {/* Show directory name below icon */}
+              {backupDirName && (
+                <div className="mt-1 text-[9px] text-center truncate max-w-[48px] text-gray-500 dark:text-gray-400" title={backupDirName}>
+                  {backupDirName}
+                </div>
+              )}
             </div>
           )}
           {/* Backup Warning Icon - show when backup is not configured */}
@@ -878,6 +910,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
             <div className="mt-2 flex items-center justify-center px-1">
               <button 
                 onClick={() => window.dispatchEvent(new CustomEvent('open-backup-setup'))}
+                onContextMenu={handleBackupContextMenu}
                 className={`
                   relative w-10 h-10 rounded-full flex items-center justify-center 
                   transition-all duration-200 hover:scale-105
@@ -905,6 +938,39 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
 
 
       
+      {/* Backup Context Menu */}
+      {backupContextMenu && createPortal(
+        <div 
+          className="fixed z-[99999] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-1 min-w-[180px] animate-in fade-in zoom-in-95 duration-150"
+          style={{ left: backupContextMenu.x, top: backupContextMenu.y }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            className="w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors"
+            onClick={() => {
+              setBackupContextMenu(null);
+              window.dispatchEvent(new CustomEvent('open-backup-setup'));
+            }}
+          >
+            <HardDrive className="w-4 h-4" style={{ color: state.preferences.accentColor }} />
+            {t('backup.configure') || 'Backup konfigurieren'}
+          </button>
+          {canLocalBackup && (
+            <button
+              className="w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors"
+              onClick={() => {
+                setBackupContextMenu(null);
+                handleManualBackup();
+              }}
+            >
+              <Download className="w-4 h-4" style={{ color: state.preferences.accentColor }} />
+              {t('backup.backup_now') || 'Jetzt sichern'}
+            </button>
+          )}
+        </div>,
+        document.body
+      )}
+
       {/* End-of-Day Modal */}
       <EndOfDayModal 
         isOpen={showEndOfDayModal}

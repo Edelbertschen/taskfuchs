@@ -2188,6 +2188,8 @@
     "noBackupDirSelected": "Kein Backup‑Verzeichnis gewählt.",
     "backupNow": "Jetzt sichern",
     "lastBackup": "Letztes Backup",
+    "backupConfigured": "Backup konfiguriert",
+    "noBackupConfigured": "Kein Backup-Verzeichnis gewählt",
     "invalidBackupFile": "Ungültige Backup-Datei.",
     "restore": "Wiederherstellen",
     "restoreDesc": "Standard: letztes Backup im gewählten Ordner. Ohne Ordner erscheint ein Dateiauswahldialog.",
@@ -2266,7 +2268,10 @@
     "no_folder_selected": "Kein Backup-Ordner gewählt",
     "failed": "Backup fehlgeschlagen",
     "success_title": "Backup erfolgreich",
-    "success_message": "Deine Daten wurden sicher gespeichert"
+    "success_message": "Deine Daten wurden sicher gespeichert",
+    "configure": "Backup konfigurieren",
+    "backup_now": "Jetzt sichern",
+    "setup_backup": "Backup einrichten"
   },
   "pwa": {
     "update_available": "Neue Version verfügbar",
