@@ -68,6 +68,8 @@ interface TourSubStep {
   stylingDemo?: boolean; // For the styling demo step
   applyStyling?: StylingConfig; // Styling to apply when entering this step
   restoreOriginalStyling?: boolean; // Restore original styling when entering this step
+  startTimer?: boolean; // Start timer for sample task
+  openSidebar?: 'tasks' | 'projects' | 'pins'; // Open specific sidebar
 }
 
 interface TourSection {
@@ -235,7 +237,7 @@ const tourSections: TourSection[] = [
       {
         title: { de: 'Tagesabschluss', en: 'End of Day' },
         text: { de: 'Hier siehst du deine Leistung und kannst ein Backup erstellen. Perfekt für den Tagesabschluss!', en: 'Here you can see your performance and create a backup. Perfect for closing out your day!' },
-        position: 'center',
+        position: 'center-right',
         openEndOfDayModal: true
       },
       {
@@ -325,7 +327,8 @@ const tourSections: TourSection[] = [
       {
         title: { de: 'Der Timer', en: 'The Timer' },
         text: { de: 'Starte den Timer bei einer Aufgabe, um fokussiert zu arbeiten. Die Zeit wird getrackt und am Ende des Tages ausgewertet.', en: 'Start the timer on a task to work focused. Time is tracked and evaluated at the end of the day.' },
-        position: 'center-right'
+        position: 'center-right',
+        startTimer: true
       },
       {
         title: { de: 'Die Sidebar', en: 'The Sidebar' },
@@ -945,6 +948,44 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
       }
     }
   }, [currentSectionIndex, currentStepIndex, state.tasks, dispatch, allTourSections]);
+  
+  // Handle timer start/stop based on current step
+  useEffect(() => {
+    const currentSection = allTourSections[currentSectionIndex];
+    const currentStep = currentSection?.steps[currentStepIndex];
+    
+    if (currentStep?.startTimer) {
+      // Temporarily set timer display mode to floatingWidget
+      const originalTimerMode = state.preferences.timerDisplayMode;
+      dispatch({
+        type: 'UPDATE_PREFERENCES',
+        payload: { timerDisplayMode: 'floatingWidget' }
+      });
+      
+      // Find sample task
+      const sampleTask = state.tasks.find(t => t.id === SAMPLE_TASK_ID);
+      if (sampleTask) {
+        // Start timer for sample task
+        dispatch({
+          type: 'START_TIMER',
+          payload: {
+            taskId: sampleTask.id
+          }
+        });
+      }
+      
+      // Restore original timer mode when leaving this step
+      return () => {
+        if (state.activeTimer?.isActive) {
+          dispatch({ type: 'STOP_TIMER' });
+        }
+        dispatch({
+          type: 'UPDATE_PREFERENCES',
+          payload: { timerDisplayMode: originalTimerMode }
+        });
+      };
+    }
+  }, [currentSectionIndex, currentStepIndex, state.tasks, state.activeTimer, state.preferences.timerDisplayMode, dispatch, allTourSections]);
   
   // Calculate total progress
   const totalSteps = allTourSections.reduce((acc, section) => acc + section.steps.length, 0);
