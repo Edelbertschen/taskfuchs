@@ -62,6 +62,8 @@ interface TourSubStep {
   guideCursorTarget?: string; // CSS selector for guide cursor target
   guideCursorClickAnimation?: boolean; // Whether to animate click
   highlightElements?: string[]; // CSS selectors of elements to highlight
+  zoomElement?: string; // CSS selector for element to zoom (magnifying glass effect)
+  timerScale?: number; // Scale factor for floating timer (e.g., 2 for 200%)
   moveTaskToNextDay?: boolean; // Move example task from today to next day
   createExampleProject?: boolean; // Create example project with columns
   stylingDemo?: boolean; // For the styling demo step
@@ -90,12 +92,12 @@ const tourSections: TourSection[] = [
         title: { de: 'Willkommen in der Inbox!', en: 'Welcome to the Inbox!' },
         text: { de: 'Hier landen alle neuen Aufgaben. Die Inbox ist der zentrale Sammelplatz für spontane Ideen.', en: 'All new tasks land here. The Inbox is the central collection point for spontaneous ideas.' },
         foxMessage: { de: 'Alles an einem Ort – ich helfe beim Sortieren!', en: 'Everything in one place – I\'ll help sort!' },
-        position: 'bottom-right'
+        position: 'center'
       },
       {
         title: { de: 'Schnelle Eingabe', en: 'Quick Input' },
         text: { de: 'Das Eingabefeld ermöglicht eine blitzschnelle Aufgabenerfassung.', en: 'The input field enables lightning-fast task entry.' },
-        position: 'bottom-center',
+        position: 'center',
         showGuideCursor: true,
         guideCursorTarget: '[data-quick-add-button]',
         guideCursorClickAnimation: true
@@ -117,7 +119,7 @@ const tourSections: TourSection[] = [
         title: { de: 'Die Aufgabenansicht', en: 'The Task View' },
         text: { de: 'Jede Aufgabe kann im Detail bearbeitet werden. Die Detailansicht bietet viele Möglichkeiten zur Organisation.', en: 'Each task can be edited in detail. The detail view offers many organizational options.' },
         foxMessage: { de: 'Diese Beispielaufgabe zeigt dir alles!', en: 'This sample task shows you everything!' },
-        position: 'center-right',
+        position: 'center',
         showGuideCursor: true,
         guideCursorTarget: `[data-task-id="${SAMPLE_TASK_ID}"]`,
         guideCursorClickAnimation: true
@@ -153,14 +155,14 @@ const tourSections: TourSection[] = [
         title: { de: 'Dein Tagesüberblick', en: 'Your Daily Overview' },
         text: { de: 'In der Heute-Ansicht werden alle Aufgaben für den aktuellen Tag angezeigt. Am Ende des Tages bietet der Tagesabschluss einen Überblick über die Leistung.', en: 'The Today view shows all tasks for the current day. At the end of the day, the daily summary provides an overview of performance.' },
         foxMessage: { de: 'Ein Schritt nach dem anderen!', en: 'One step at a time!' },
-        position: 'bottom-right',
+        position: 'center-left',
         openEndOfDayModal: true
       },
       {
         title: { de: 'Tagesabschluss', en: 'End of Day' },
         text: { de: 'Die Tagesabschluss-Übersicht zeigt erledigte Aufgaben, Zeiterfassung und bietet Backup-Optionen. Erledigte Aufgaben werden archiviert, offene können verschoben werden.', en: 'The end-of-day overview shows completed tasks, time tracking, and offers backup options. Completed tasks are archived, open ones can be moved.' },
         foxMessage: { de: 'Regelmäßige Backups empfohlen!', en: 'Regular backups recommended!' },
-        position: 'center-right'
+        position: 'center-left'
       },
       {
         title: { de: 'Weiter geht\'s', en: 'Let\'s continue' },
@@ -243,19 +245,20 @@ const tourSections: TourSection[] = [
         title: { de: 'Zeitplanung', en: 'Time Planning' },
         text: { de: 'Bei Aufgaben kann eine geschätzte Zeit angegeben werden. Die Gesamtzeit wird oben in jeder Spalte angezeigt – für eine realistische Tagesplanung.', en: 'Estimated time can be added to tasks. Total time is shown at the top of each column – for realistic daily planning.' },
         foxMessage: { de: 'Realistische Planung bringt mehr Erfolg!', en: 'Realistic planning brings more success!' },
-        position: 'top-right',
+        position: 'bottom-left',
         highlightElements: ['[data-column-time-today]']
       },
       {
         title: { de: 'Der Timer', en: 'The Timer' },
         text: { de: 'Der Timer kann bei jeder Aufgabe gestartet werden, um fokussiert zu arbeiten. Die Zeit wird getrackt und am Ende des Tages ausgewertet.', en: 'The timer can be started for any task to work focused. Time is tracked and evaluated at the end of the day.' },
-        position: 'center-right',
-        startTimer: true
+        position: 'bottom-left',
+        startTimer: true,
+        timerScale: 2
       },
       {
         title: { de: 'Die Sidebar', en: 'The Sidebar' },
         text: { de: 'Links werden unverplante Projekt-Aufgaben angezeigt. Die Sidebar kann ein- und ausgeklappt werden.', en: 'Unscheduled project tasks are shown on the left. The sidebar can be expanded and collapsed.' },
-        position: 'top-left'
+        position: 'bottom-left'
       },
       {
         title: { de: 'Drag & Drop', en: 'Drag & Drop' },
@@ -274,13 +277,13 @@ const tourSections: TourSection[] = [
         title: { de: 'Projekte organisieren', en: 'Organize Projects' },
         text: { de: 'Zusammengehörige Aufgaben können in Projekten gruppiert werden. Ideal für größere Vorhaben.', en: 'Related tasks can be grouped in projects. Ideal for larger initiatives.' },
         foxMessage: { de: 'Große Ziele, kleine Schritte!', en: 'Big goals, small steps!' },
-        position: 'bottom-right',
+        position: 'center',
         createExampleProject: true
       },
       {
         title: { de: 'Kanban-Workflow', en: 'Kanban Workflow' },
         text: { de: 'Eigene Spalten wie "To Do", "In Arbeit", "Fertig" können erstellt werden. Die Projekt-Sidebar lässt sich auf- und zuklappen.', en: 'Custom columns like "To Do", "In Progress", "Done" can be created. The project sidebar can be expanded and collapsed.' },
-        position: 'center-right'
+        position: 'center'
       }
     ]
   },
@@ -293,12 +296,12 @@ const tourSections: TourSection[] = [
         title: { de: 'Dein Fokus-Board', en: 'Your Focus Board' },
         text: { de: 'Wichtige Aufgaben können hier angepinnt werden – unabhängig von Projekt oder Datum. Perfekt für den täglichen Fokus.', en: 'Important tasks can be pinned here – regardless of project or date. Perfect for daily focus.' },
         foxMessage: { de: 'Was wichtig ist, verdient Aufmerksamkeit!', en: 'What\'s important deserves attention!' },
-        position: 'bottom-right'
+        position: 'center'
       },
       {
         title: { de: 'Eigene Pin-Spalten', en: 'Custom Pin Columns' },
         text: { de: 'Spalten wie "Diese Woche" oder "Dringend" können individuell erstellt werden. Die Aufgaben-Sidebar lässt sich auf- und zuklappen.', en: 'Columns like "This Week" or "Urgent" can be created individually. The task sidebar can be expanded and collapsed.' },
-        position: 'center-right'
+        position: 'center'
       }
     ]
   },
@@ -405,10 +408,8 @@ const pwaSections: TourSection[] = isPWA() ? [
         title: { de: 'Backups sind wichtig!', en: 'Backups are important!' },
         text: { de: 'Da deine Daten lokal gespeichert werden, empfehlen sich regelmäßige Backups. Der Backup-Button in der Sidebar ermöglicht schnelles Sichern am Ende jedes Arbeitstages.', en: 'Since your data is stored locally, regular backups are recommended. The backup button in the sidebar enables quick saving at the end of each work day.' },
         foxMessage: { de: 'Lieber einmal zu oft sichern!', en: 'Better safe than sorry!' },
-        position: 'bottom-left',
-        showGuideCursor: true,
-        guideCursorTarget: '[data-backup-button]',
-        guideCursorClickAnimation: false
+        position: 'center',
+        zoomElement: '[data-backup-button]'
       },
       {
         title: { de: 'Backup einrichten', en: 'Setup Backup' },
@@ -913,22 +914,28 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
     }
   }, [currentSectionIndex, currentStepIndex, state.tasks, dispatch, allTourSections]);
   
-  // Handle timer start/stop based on current step
+  // Ref to track if timer was started during onboarding (to avoid re-starting)
+  const timerStartedRef = useRef(false);
+  const originalTimerModeRef = useRef<'topBar' | 'floatingWidget' | 'separateWindow' | null>(null);
+  
+  // Handle timer start based on current step - don't stop on step change
   useEffect(() => {
     const currentSection = allTourSections[currentSectionIndex];
     const currentStep = currentSection?.steps[currentStepIndex];
     
-    if (currentStep?.startTimer) {
-      // Temporarily set timer display mode to floatingWidget
-      const originalTimerMode = state.preferences.timerDisplayMode;
-    dispatch({ 
-      type: 'UPDATE_PREFERENCES', 
+    if (currentStep?.startTimer && !timerStartedRef.current) {
+      // Store original timer mode
+      originalTimerModeRef.current = state.preferences.timerDisplayMode;
+      
+      // Set timer display mode to floatingWidget
+      dispatch({ 
+        type: 'UPDATE_PREFERENCES', 
         payload: { timerDisplayMode: 'floatingWidget' }
       });
       
       // Find sample task
       const sampleTask = state.tasks.find(t => t.id === SAMPLE_TASK_ID);
-      if (sampleTask) {
+      if (sampleTask && !state.activeTimer?.isActive) {
         // Start timer for sample task
         dispatch({
           type: 'START_TIMER',
@@ -936,20 +943,114 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
             taskId: sampleTask.id
           }
         });
+        timerStartedRef.current = true;
       }
-      
-      // Restore original timer mode when leaving this step
-      return () => {
-        if (state.activeTimer?.isActive) {
-          dispatch({ type: 'STOP_TIMER' });
+    }
+    // No cleanup here - timer stays running until onboarding ends
+  }, [currentSectionIndex, currentStepIndex, state.tasks, state.activeTimer?.isActive, state.preferences.timerDisplayMode, dispatch, allTourSections]);
+  
+  // Zoom effect for elements (Asterix-style magnifying glass effect)
+  useEffect(() => {
+    const currentSection = allTourSections[currentSectionIndex];
+    const currentStep = currentSection?.steps[currentStepIndex];
+    
+    if (currentStep?.zoomElement) {
+      const timer = setTimeout(() => {
+        const el = document.querySelector(currentStep.zoomElement!) as HTMLElement;
+        if (el) {
+          // Create zoom overlay
+          const overlay = document.createElement('div');
+          overlay.id = 'onboarding-zoom-overlay';
+          overlay.style.cssText = `
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9998;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+          `;
+          
+          // Create zoom container
+          const zoomContainer = document.createElement('div');
+          zoomContainer.id = 'onboarding-zoom-container';
+          
+          // Get element position
+          const rect = el.getBoundingClientRect();
+          const centerX = window.innerWidth / 2;
+          const centerY = window.innerHeight / 2;
+          
+          zoomContainer.style.cssText = `
+            position: fixed;
+            left: ${centerX}px;
+            top: ${centerY}px;
+            transform: translate(-50%, -50%) scale(3);
+            z-index: 9999;
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px var(--accent-color, #22d3ee), 0 0 60px rgba(0,0,0,0.5);
+            overflow: hidden;
+            width: 120px;
+            height: 120px;
+            transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            animation: zoom-pulse 2s ease-in-out infinite;
+          `;
+          
+          // Clone the element
+          const clone = el.cloneNode(true) as HTMLElement;
+          clone.style.cssText = `
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+          `;
+          
+          zoomContainer.appendChild(clone);
+          document.body.appendChild(overlay);
+          document.body.appendChild(zoomContainer);
+          
+          // Add animation keyframes if not exists
+          if (!document.getElementById('zoom-keyframes')) {
+            const style = document.createElement('style');
+            style.id = 'zoom-keyframes';
+            style.textContent = `
+              @keyframes zoom-pulse {
+                0%, 100% { box-shadow: 0 0 0 4px var(--accent-color, #22d3ee), 0 0 60px rgba(0,0,0,0.5); }
+                50% { box-shadow: 0 0 0 6px var(--accent-color, #22d3ee), 0 0 80px rgba(0,0,0,0.6); }
+              }
+            `;
+            document.head.appendChild(style);
+          }
         }
-        dispatch({
-          type: 'UPDATE_PREFERENCES',
-          payload: { timerDisplayMode: originalTimerMode }
-        });
+      }, 300);
+      
+      return () => {
+        clearTimeout(timer);
+        document.getElementById('onboarding-zoom-overlay')?.remove();
+        document.getElementById('onboarding-zoom-container')?.remove();
       };
     }
-  }, [currentSectionIndex, currentStepIndex, state.tasks, state.activeTimer, state.preferences.timerDisplayMode, dispatch, allTourSections]);
+  }, [currentSectionIndex, currentStepIndex, allTourSections]);
+  
+  // Timer scale effect
+  useEffect(() => {
+    const currentSection = allTourSections[currentSectionIndex];
+    const currentStep = currentSection?.steps[currentStepIndex];
+    
+    const timerWidget = document.querySelector('[data-floating-timer]') as HTMLElement;
+    if (timerWidget) {
+      if (currentStep?.timerScale) {
+        timerWidget.style.transform = `scale(${currentStep.timerScale})`;
+        timerWidget.style.transition = 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)';
+      } else {
+        timerWidget.style.transform = '';
+      }
+    }
+    
+    return () => {
+      if (timerWidget) {
+        timerWidget.style.transform = '';
+      }
+    };
+  }, [currentSectionIndex, currentStepIndex, allTourSections]);
   
   // Calculate total progress
   const totalSteps = allTourSections.reduce((acc, section) => acc + section.steps.length, 0);
@@ -1111,10 +1212,17 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
       window.dispatchEvent(new CustomEvent('close-task-modal'));
     }
     
-    // Stop timer if running
+    // Stop timer if running and restore original mode
     if (state.activeTimer?.isActive) {
       dispatch({ type: 'STOP_TIMER' });
     }
+    if (originalTimerModeRef.current) {
+      dispatch({
+        type: 'UPDATE_PREFERENCES',
+        payload: { timerDisplayMode: originalTimerModeRef.current }
+      });
+    }
+    timerStartedRef.current = false;
     
     // Delete sample task
     const sampleTask = state.tasks.find(t => t.id === SAMPLE_TASK_ID);
@@ -1137,10 +1245,17 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
       window.dispatchEvent(new CustomEvent('close-task-modal'));
     }
     
-    // Stop timer if running
+    // Stop timer if running and restore original mode
     if (state.activeTimer?.isActive) {
       dispatch({ type: 'STOP_TIMER' });
     }
+    if (originalTimerModeRef.current) {
+      dispatch({
+        type: 'UPDATE_PREFERENCES',
+        payload: { timerDisplayMode: originalTimerModeRef.current }
+      });
+    }
+    timerStartedRef.current = false;
     
     // Delete sample task
     const sampleTask = state.tasks.find(t => t.id === SAMPLE_TASK_ID);

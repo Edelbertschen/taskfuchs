@@ -90,6 +90,7 @@ export function FloatingTimerModal({ isVisible, onOpenTask }: FloatingTimerModal
 
   return (
     <div
+      data-floating-timer
       className={`fixed z-[9998] overflow-hidden ${
         isDarkMode 
           ? 'bg-zinc-900/95 border border-zinc-700/50' 
