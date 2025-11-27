@@ -372,6 +372,7 @@
   },
   "settings": {
     "title": "Settings",
+    "description": "Customize TaskFuchs to your preferences",
     "theme": "Theme",
     "light": "Light",
     "dark": "Dark",

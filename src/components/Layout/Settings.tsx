@@ -501,7 +501,7 @@ const Settings = React.memo(() => {
       
       const { dropboxSync } = await import('../../utils/dropboxSync');
       const { getDropboxClient } = await import('../../utils/dropboxClient');
-      
+
       const prefs = state.preferences.dropbox || {} as any;
       if (!prefs.appKey) throw new Error('App-Key nicht konfiguriert');
       
@@ -534,7 +534,7 @@ const Settings = React.memo(() => {
         setDropboxStatus('error');
         setDropboxMessage(result.message);
       } else {
-        setDropboxStatus('connected');
+      setDropboxStatus('connected');
         setDropboxMessage(result.message);
       }
     } catch (e: any) {
@@ -3993,13 +3993,13 @@ const Settings = React.memo(() => {
                           onClick={() => handleColorChange('accent', colorOption)}
                           title={colorOption}
                         >
-                          {customAccentColor === colorOption && (
+                            {customAccentColor === colorOption && (
                             <Check className="w-4 h-4 text-white absolute inset-0 m-auto drop-shadow-md" />
-                          )}
+                            )}
                         </button>
                       ))}
-                    </div>
-                  </div>
+                          </div>
+                        </div>
                   
                   {/* Color Palette Grid - Dark Mode */}
                   <div className="mb-4">

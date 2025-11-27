@@ -366,6 +366,7 @@
   },
   "settings": {
     "title": "Einstellungen",
+    "description": "Passe TaskFuchs nach deinen Wünschen an",
     "theme": "Design",
     "light": "Hell",
     "dark": "Dunkel",
