@@ -453,45 +453,6 @@ Oder:
     });
   }
 
-  // Pomodoro session end notification
-  showPomodoroSessionEnd(sessionType: 'work' | 'shortBreak' | 'longBreak', nextSession: string, onClick?: () => void): void {
-    const titles = {
-      work: 'Arbeitsphase beendet',
-      shortBreak: 'Kurze Pause beendet',
-      longBreak: 'Lange Pause beendet'
-    };
-
-    const bodies = {
-      work: `Zeit für eine wohlverdiente Pause. Als nächstes: ${nextSession}`,
-      shortBreak: `Bereit für die nächste Arbeitsphase. Als nächstes: ${nextSession}`,
-      longBreak: `Vollständig erholt für produktive Arbeit. Als nächstes: ${nextSession}`
-    };
-
-    this.showNotification({
-      title: titles[sessionType],
-      body: bodies[sessionType],
-      icon: '/Fuchs.svg',
-      tag: `pomodoro-${sessionType}-${Date.now()}`,
-      requireInteraction: true,
-      onClick
-    });
-  }
-
-  // Pomodoro break start notification
-  showPomodoroBreakStart(breakType: 'short' | 'long', duration: number): void {
-    const title = breakType === 'short' ? 'Kurze Pause gestartet' : 'Lange Pause gestartet';
-    const durationText = duration === 1 ? '1 Minute' : `${duration} Minuten`;
-    const body = `${durationText} Pause - Zeit zum Entspannen.`;
-
-    this.showNotification({
-      title,
-      body,
-      icon: '/Fuchs.svg',
-      tag: `pomodoro-break-${breakType}-${Date.now()}`,
-      requireInteraction: true
-    });
-  }
-
   // Timer warning notification (e.g., 5 minutes before estimated time)
   showTimerWarning(taskTitle: string, minutesLeft: number, onClick?: () => void): void {
     const timeText = minutesLeft === 1 ? '1 Minute' : `${minutesLeft} Minuten`;

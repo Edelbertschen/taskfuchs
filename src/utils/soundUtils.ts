@@ -1,6 +1,6 @@
 // Sound utility functions for task completion feedback
 
-export type SoundType = 'bell' | 'chime' | 'yeah' | 'alarm' | 'pomodoro_alarm' | 'notice' | 'none';
+export type SoundType = 'bell' | 'chime' | 'yeah' | 'alarm' | 'notice' | 'none';
 export type WhiteNoiseType = 'clock' | 'none';
 
 // Audio context for Web Audio API
@@ -384,42 +384,6 @@ export const playCompletionSound = async (soundType: SoundType, volume: number =
             }, j * 200);
           }
         }, 2500);
-        break;
-        
-      case 'pomodoro_alarm':
-        // Pomodoro alarm sound - VERY penetrating session end tone (distinct from task alarm)
-        console.log('Playing ENHANCED Pomodoro alarm sound');
-        // Main Pomodoro alarm sequence - uses different frequencies for distinction
-        for (let i = 0; i < 8; i++) {
-          setTimeout(() => {
-            // Lower, warmer but still penetrating tones for Pomodoro
-            generateTone(800, 0.4, 'sine', volume * 0.7);
-            setTimeout(() => generateTone(1000, 0.35, 'triangle', volume * 0.6), 200);
-            setTimeout(() => generateTone(600, 0.3, 'square', volume * 0.5), 400);
-          }, i * 500);
-        }
-        
-        // Additional celebratory sequence for Pomodoro completion
-        setTimeout(() => {
-          // Three-tone celebratory pattern
-          for (let j = 0; j < 4; j++) {
-            setTimeout(() => {
-              generateTone(659, 0.2, 'sine', volume * 0.8); // E5
-              setTimeout(() => generateTone(784, 0.2, 'sine', volume * 0.8), 120); // G5
-              setTimeout(() => generateTone(1047, 0.25, 'sine', volume * 0.9), 240); // C6
-            }, j * 300);
-          }
-        }, 4200);
-        
-        // Final attention-grabbing crescendo
-        setTimeout(() => {
-          for (let k = 0; k < 3; k++) {
-            setTimeout(() => {
-              generateTone(1200, 0.2, 'triangle', volume * 0.9);
-              setTimeout(() => generateTone(1400, 0.15, 'sawtooth', volume * 0.8), 100);
-            }, k * 150);
-          }
-        }, 5500);
         break;
 
       case 'notice': {

@@ -149,12 +149,7 @@
     "expand": "Expand",
     "minimize": "Minimize",
     "close": "Close",
-    "sessionRemaining": "remaining in session",
-    "pomodoro": {
-      "work": "Work Time",
-      "shortBreak": "Short Break",
-      "longBreak": "Long Break"
-    }
+    "sessionRemaining": "remaining in session"
   },
   "search": {
     "placeholder": "Search tasks and notes...",
@@ -415,7 +410,7 @@
         "description": "Sounds & behavior"
       },
       "timer": {
-        "title": "Timer & Pomodoro",
+        "title": "Timer",
         "description": "Timer settings"
       },
       "integrations": {
@@ -675,7 +670,7 @@
           },
           "timer": {
             "title": "Integrated Timer",
-            "description": "Built-in Pomodoro timer with sound effects and white noise."
+            "description": "Built-in timer with sound effects and white noise."
           },
           "pins": {
             "title": "Quick Access Pins",
@@ -1595,8 +1590,8 @@
     "showsPriorityIndicators": "Shows priority indicators in tasks"
   },
   "settings_timer": {
-    "title": "Time Tracking & Pomodoro",
-    "description": "Set the timer display, configure Pomodoro intervals, and connect optional time integrations.",
+    "title": "Time Tracking",
+    "description": "Set the timer display and connect optional time integrations.",
     "timerDisplay": "Timer Display",
     "timerDisplayMode": "Timer Display Mode",
     "chooseTimerDisplay": "Choose how the timer should be displayed",
@@ -1604,9 +1599,6 @@
     "topBarDesc": "Shows the timer in a fixed bar at the top of the screen",
     "floatingWidget": "Floating Widget",
     "floatingWidgetDesc": "Movable timer widget with minimal display",
-    "pomodoroTechnique": "Pomodoro Technique",
-    "pomodoroEnabled": "Pomodoro enabled",
-    "pomodoroDesc": "Enables structured work and break times",
     "focusMode": "Focus Mode",
     "focusModeEnable": "Enable Focus Mode",
     "focusModeDesc": "Enables the use of Focus Mode for concentrated work",

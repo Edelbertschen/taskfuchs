@@ -157,12 +157,7 @@
     "expand": "Vergrößern",
     "minimize": "Minimieren",
     "close": "Schließen",
-    "sessionRemaining": "verbleibend in Session",
-    "pomodoro": {
-      "work": "Arbeitszeit",
-      "shortBreak": "Kurze Pause",
-      "longBreak": "Lange Pause"
-    }
+    "sessionRemaining": "verbleibend in Session"
   },
   "search": {
     "placeholder": "Aufgaben durchsuchen...",
@@ -410,7 +405,7 @@
         "description": "Sounds & Verhalten"
       },
       "timer": {
-        "title": "Timer & Pomodoro",
+        "title": "Timer",
         "description": "Timer-Einstellungen"
       },
       "integrations": {
@@ -723,7 +718,7 @@
           },
           "timer": {
             "title": "Integrierter Timer",
-            "description": "Integrierte Pomodoro-Timer mit Soundeffekten und weißem Rauschen."
+            "description": "Integrierter Timer mit Soundeffekten und weißem Rauschen."
           },
           "pins": {
             "title": "Schnellzugriff-Pins",
@@ -1202,10 +1197,10 @@
       "title": "Fokusmodus",
       "subtitle": "Konzentriert arbeiten",
       "description": "Aktiviere den Fokusmodus für ablenkungsfreies Arbeiten mit integriertem Timer.",
-      "fox_message": "Zeit für Deep Work! Im Fokusmodus siehst du nur deine aktuelle Aufgabe und einen Timer. Perfekt für Pomodoro-Sessions oder wenn du dich richtig konzentrieren willst!",
+      "fox_message": "Zeit für Deep Work! Im Fokusmodus siehst du nur deine aktuelle Aufgabe und einen Timer. Perfekt wenn du dich richtig konzentrieren willst!",
       "features": [
         "Ablenkungsfreie Oberfläche",
-        "Pomodoro-Timer",
+        "Timer",
         "Zeiterfassung",
         "Vollbild-Modus"
       ]
@@ -1237,10 +1232,10 @@
     "timer": {
       "title": "Timer & Zeiterfassung",
       "subtitle": "Zeit im Blick behalten",
-      "description": "Erfasse deine Arbeitszeit und nutze Pomodoro-Techniken für bessere Produktivität.",
-      "fox_message": "Tick, tock! Der Timer hilft dir dabei, deine Zeit bewusst zu nutzen. Starte ihn für Aufgaben, nutze Pomodoro-Sessions und sieh, wie produktiv du wirklich bist!",
+      "description": "Erfasse deine Arbeitszeit für bessere Produktivität.",
+      "fox_message": "Tick, tock! Der Timer hilft dir dabei, deine Zeit bewusst zu nutzen. Starte ihn für Aufgaben und sieh, wie produktiv du wirklich bist!",
       "features": [
-        "Pomodoro-Timer",
+        "Timer",
         "Automatische Zeiterfassung",
         "Pausen-Erinnerungen",
         "Produktivitäts-Statistiken"
@@ -2152,8 +2147,8 @@
     "showsPriorityIndicators": "Zeigt Prioritäts-Indikatoren in Aufgaben"
   },
   "settings_timer": {
-    "title": "Zeiterfassung & Pomodoro",
-    "description": "Stelle die Timer-Anzeige ein, konfiguriere Pomodoro-Intervalle und verbinde optionale Zeit-Integrationen.",
+    "title": "Zeiterfassung",
+    "description": "Stelle die Timer-Anzeige ein und verbinde optionale Zeit-Integrationen.",
     "timerDisplay": "Timer-Anzeige",
     "timerDisplayMode": "Timer-Anzeigemodus",
     "chooseTimerDisplay": "Wählen Sie, wie der Timer angezeigt werden soll",
@@ -2161,9 +2156,6 @@
     "topBarDesc": "Zeigt den Timer in einer festen Leiste am oberen Bildschirmrand",
     "floatingWidget": "Schwebendes Widget",
     "floatingWidgetDesc": "Verschiebares Timer-Widget mit minimaler Anzeige",
-    "pomodoroTechnique": "Pomodoro-Technik",
-    "pomodoroEnabled": "Pomodoro aktiviert",
-    "pomodoroDesc": "Aktiviert strukturierte Arbeits- und Pausenzeiten",
     "focusMode": "Fokusmodus",
     "focusModeEnable": "Fokusmodus aktivieren",
     "focusModeDesc": "Ermöglicht die Nutzung des Fokusmodus für konzentriertes Arbeiten",
@@ -2233,7 +2225,7 @@
       },
       "timer": {
         "title": "Integrierter Timer",
-        "desc": "Pomodoro & Zeiterfassung"
+        "desc": "Zeiterfassung"
       }
     },
     "why_section": "Warum TaskFuchs?",
