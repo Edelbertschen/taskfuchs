@@ -110,8 +110,8 @@ const WIDGET_STYLES = {
   container: "p-6 rounded-2xl transition-all duration-300 h-[450px] flex flex-col",
   
   // Header Styles  
-  header: "flex items-center space-x-3 mb-4",
-  iconContainer: "w-16 h-16 rounded-full flex items-center justify-center shadow-lg",
+  header: "flex items-center gap-4 mb-4",
+  iconContainer: "w-16 h-16 rounded-full flex items-center justify-center shadow-lg flex-shrink-0",
   title: "text-xl font-semibold text-left",
   
   // Content Styles
@@ -143,49 +143,47 @@ const StandardWidget = ({
   accentColor, 
   children, 
   isMinimalDesign,
-  headerAction
+  footerAction
 }: {
   icon: string;
   title: string;
   accentColor: string;
   children: React.ReactNode;
   isMinimalDesign: boolean;
-  headerAction?: React.ReactNode;
+  footerAction?: React.ReactNode;
 }) => (
   <div className={`${WIDGET_STYLES.container} ${
     isMinimalDesign 
       ? 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg'
       : 'glass-effect'
   }`}>
-    <div className={`${WIDGET_STYLES.header} flex items-center justify-between`}>
-      <div className="flex items-center">
-        <div 
-          className={`${WIDGET_STYLES.iconContainer} ${
-            isMinimalDesign
-              ? 'bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600'
-              : ''
-          }`}
-          style={!isMinimalDesign ? {
-            background: `${accentColor}20`,
-            border: `1px solid ${accentColor}30`
-          } : undefined}
-        >
-          <MaterialIcon name={icon} size={32} style={{ color: accentColor }} />
-        </div>
-        <h3 className={`${WIDGET_STYLES.title} text-gray-900 dark:text-white`} 
-            style={{ fontFamily: "'Roboto', sans-serif" }}>
-          {title}
-        </h3>
+    <div className={WIDGET_STYLES.header}>
+      <div 
+        className={`${WIDGET_STYLES.iconContainer} ${
+          isMinimalDesign
+            ? 'bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600'
+            : ''
+        }`}
+        style={!isMinimalDesign ? {
+          background: `${accentColor}20`,
+          border: `1px solid ${accentColor}30`
+        } : undefined}
+      >
+        <MaterialIcon name={icon} size={32} style={{ color: accentColor }} />
       </div>
-      {headerAction && (
-        <div className="ml-auto">
-          {headerAction}
-        </div>
-      )}
+      <h3 className={`${WIDGET_STYLES.title} text-gray-900 dark:text-white`} 
+          style={{ fontFamily: "'Roboto', sans-serif" }}>
+        {title}
+      </h3>
     </div>
     <div className={WIDGET_STYLES.content}>
       {children}
     </div>
+    {footerAction && (
+      <div className="mt-4 pt-3 border-t border-gray-200/50 dark:border-gray-700/50 flex justify-end">
+        {footerAction}
+      </div>
+    )}
   </div>
 );
 
@@ -1722,32 +1720,26 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
             title={t('dashboard.todays_tasks')}
             accentColor={state.preferences.accentColor}
             isMinimalDesign={isMinimalDesign}
-            headerAction={state.preferences.enableEndOfDay && (
+            footerAction={state.preferences.enableEndOfDay && (
               <button
                 onClick={() => setShowEndOfDayModal(true)}
                 data-end-day-button
-                className={`group flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-medium transition-all duration-200 ${
-                  isMinimalDesign
-                    ? 'bg-gradient-to-r hover:shadow-md'
-                    : 'bg-white/20 hover:bg-white/30 backdrop-blur-sm'
-                }`}
-                style={isMinimalDesign ? {
-                  background: `linear-gradient(135deg, ${state.preferences.accentColor}15, ${state.preferences.accentColor}25)`,
-                  color: state.preferences.accentColor,
-                  border: `1px solid ${state.preferences.accentColor}30`
-                } : {
-                  color: 'white'
+                className="group flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+                style={{
+                  background: `linear-gradient(135deg, ${state.preferences.accentColor}, ${state.preferences.accentColor}dd)`,
+                  color: 'white',
+                  boxShadow: `0 2px 8px ${state.preferences.accentColor}40`
                 }}
                 title={simpleTodayView.endDay()}
               >
                 <span className="text-base">🌙</span>
-                <span className="hidden sm:inline">
+                <span>
                   {i18n.language === 'en' ? 'End Day' : 'Tagesabschluss'}
                 </span>
                 <MaterialIcon 
                   name="chevron_right" 
                   size={16} 
-                  className="opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" 
+                  className="opacity-80 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" 
                 />
               </button>
             )}
