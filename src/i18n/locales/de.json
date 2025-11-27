@@ -191,6 +191,17 @@
     "select_date": "Datum auswählen"
   },
   "task_modal": {
+    "time_section": "Zeit",
+    "time_estimated": "Geschätzt",
+    "time_select": "Zeit auswählen",
+    "priority": "Priorität",
+    "description": "Beschreibung",
+    "subtasks": "Unteraufgaben",
+    "status": "Status",
+    "tags": "Tags",
+    "reminder": "Erinnerung",
+    "deadline": "Deadline",
+    "recurrence": "Wiederholung",
     "description_expand": "Beschreibung erweitern",
     "description_collapse": "Beschreibung einklappen",
     "description_edit": "Beschreibung bearbeiten",

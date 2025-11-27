@@ -183,6 +183,9 @@
     "select_date": "Select date"
   },
   "task_modal": {
+    "time_section": "Time",
+    "time_estimated": "Estimated",
+    "time_select": "Select time",
     "description_expand": "Expand description",
     "description_collapse": "Collapse description", 
     "description_edit": "Edit description",

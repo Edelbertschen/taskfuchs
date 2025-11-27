@@ -2992,14 +2992,14 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                 {/* Time Management - Estimated & Tracked Time */}
                 <div>
                   <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">
-                    Zeit
+                    {taskModal.time_section()}
                   </label>
                   <div className="space-y-3">
                     {/* Estimated Time */}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <Clock className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm text-gray-600 dark:text-gray-400">Geschätzt</span>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">{taskModal.time_estimated()}</span>
                       </div>
                       <div className="flex items-center space-x-1">
                         <input
@@ -3385,7 +3385,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                               setHasUnsavedChanges(true);
                             }}
                             className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white/65 dark:bg-gray-800/40 backdrop-blur-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 hover:bg-white/90 dark:hover:bg-gray-800/80"
-                            placeholder="Zeit auswählen"
+                            placeholder={taskModal.time_select()}
                           />
                           <div className="col-span-2 flex items-center justify-end space-x-2">
                             <button

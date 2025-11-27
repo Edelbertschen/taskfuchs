@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Repeat, Calendar, Clock, ChevronDown, ChevronUp, Check, X, AlertCircle, Info } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { useAppTranslation } from '../../utils/i18nHelpers';
 import { recurrenceService } from '../../utils/recurrenceService';
 import { format, addDays, startOfWeek, endOfWeek, addWeeks, addMonths } from 'date-fns';
-import { de } from 'date-fns/locale';
+import { de, enUS } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
 import type { Task, RecurrenceRule, RecurrencePattern, RecurrenceEnd, WeekDay } from '../../types';
 
 interface RecurringTaskSectionProps {
@@ -14,6 +16,9 @@ interface RecurringTaskSectionProps {
 
 export function RecurringTaskSection({ task, onRecurrenceChange, className = '' }: RecurringTaskSectionProps) {
   const { state } = useApp();
+  const { taskModal } = useAppTranslation();
+  const { i18n } = useTranslation();
+  const currentLocale = i18n.language === 'de' ? de : enUS;
   const [isEnabled, setIsEnabled] = useState(false);
   const [showRecurrenceFields, setShowRecurrenceFields] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -248,7 +253,7 @@ export function RecurringTaskSection({ task, onRecurrenceChange, className = '' 
     <div className={`${className}`}>
       <div className="flex items-center justify-between mb-3">
         <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-          Wiederholung
+          {taskModal.recurrence()}
         </label>
         {!showRecurrenceFields && (
           <button
