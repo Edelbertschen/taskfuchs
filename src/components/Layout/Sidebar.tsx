@@ -78,9 +78,34 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
   const dropboxConnected = !!state.preferences.dropbox?.enabled && 
     !!state.preferences.dropbox?.appKey && 
     !!(state.preferences.dropbox?.accessToken || state.preferences.dropbox?.refreshToken);
-  const canLocalBackup = !!state.preferences.backup?.enabled && !!(window as any).__taskfuchs_backup_dir__;
+  const [canLocalBackup, setCanLocalBackup] = useState(false);
   const [dropboxSyncStatus, setDropboxSyncStatus] = useState<'idle'|'syncing'|'success'|'error'>('idle');
   const [dropboxSyncMessage, setDropboxSyncMessage] = useState('');
+
+  // Check backup configuration status
+  useEffect(() => {
+    const checkBackupStatus = async () => {
+      try {
+        const { backupService } = await import('../../utils/backupService');
+        const isConfigured = backupService.isConfigured();
+        setCanLocalBackup(isConfigured);
+        
+        // Subscribe to changes
+        const unsubscribe = backupService.subscribe(() => {
+          setCanLocalBackup(backupService.isConfigured());
+        });
+        
+        return unsubscribe;
+      } catch {
+        setCanLocalBackup(false);
+      }
+    };
+    
+    let unsubscribe: (() => void) | undefined;
+    checkBackupStatus().then(unsub => { unsubscribe = unsub; });
+    
+    return () => { unsubscribe?.(); };
+  }, []);
 
   // Handle Dropbox sync
   const handleDropboxSync = useCallback(async () => {
@@ -160,15 +185,16 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
     setBackupRunning(true);
     
     try {
-      const dir: any = (window as any).__taskfuchs_backup_dir__;
-      if (!dir) { 
-        alert(t('backup.no_folder_selected') || 'Kein Backup-Ordner gewählt.'); 
+      const { backupService } = await import('../../utils/backupService');
+      
+      if (!backupService.isConfigured()) { 
+        // Open backup setup modal instead of alert
+        window.dispatchEvent(new CustomEvent('open-backup-setup'));
         setBackupRunning(false);
         return; 
       }
       
-      const { exportToJSON, writeBackupToDirectory } = await import('../../utils/importExport');
-      const data: any = {
+      const data = {
         tasks: state.tasks,
         archivedTasks: state.archivedTasks || [],
         columns: state.columns,
@@ -179,27 +205,42 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
         projectKanbanColumns: state.viewState?.projectKanban?.columns || [],
         projectKanbanState: state.viewState?.projectKanban || {},
         pinColumns: state.pinColumns || [],
+        recurrence: (state as any).recurrence || {},
         events: state.events || [],
         calendarSources: state.calendarSources || [],
         exportDate: new Date().toISOString(),
         version: '3.0'
       };
-      const json = exportToJSON(data);
-      const filename = `TaskFuchs_${new Date().toISOString().replace(/[:]/g,'-').slice(0,19)}.json`;
-      await writeBackupToDirectory(dir, filename, json);
+      
+      const result = await backupService.createBackup(data);
       
       // Backup complete
       setBackupRunning(false);
       
-      // Show success (green) for 10 seconds
-      setShowBackupSuccess(true);
-      setTimeout(() => setShowBackupSuccess(false), 10000);
+      if (result.success) {
+        // Update last backup time in preferences
+        dispatch({ 
+          type: 'UPDATE_PREFERENCES', 
+          payload: { 
+            backup: { 
+              ...state.preferences.backup, 
+              lastSuccess: result.timestamp 
+            } 
+          } 
+        });
+        
+        // Show success (green) for 10 seconds
+        setShowBackupSuccess(true);
+        setTimeout(() => setShowBackupSuccess(false), 10000);
+      } else {
+        alert((t('backup.failed') || 'Backup fehlgeschlagen: ') + result.error);
+      }
     } catch (e) {
       console.error('Manual backup failed', e);
       setBackupRunning(false);
       alert(t('backup.failed') || 'Backup fehlgeschlagen.');
     }
-  }, [state, t]);
+  }, [state, t, dispatch]);
 
   // Drop target for planner
   const {

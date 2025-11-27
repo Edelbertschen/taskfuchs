@@ -1183,21 +1183,34 @@ function MainApp() {
           };
         }, []);
 
-  // Automated local JSON backup scheduler (File System Access API)
+  // Initialize and manage backup service
   React.useEffect(() => {
-    if (backupIntervalIdRef.current) {
-      clearInterval(backupIntervalIdRef.current);
-      backupIntervalIdRef.current = null;
-    }
-    const prefs = state.preferences;
-    if (!prefs?.backup?.enabled) return;
-    const minutes = Math.max(1, prefs.backup.intervalMinutes || 60);
-    const runBackup = async () => {
+    const initBackup = async () => {
       try {
-        const handle = (window as any).__taskfuchs_backup_dir__ as FileSystemDirectoryHandle | undefined;
-        if (!handle) return;
-        const { exportToJSON, writeBackupToDirectory } = await import('./utils/importExport');
-        const data: any = {
+        const { backupService } = await import('./utils/backupService');
+        await backupService.initialize();
+      } catch (e) {
+        console.warn('Failed to initialize backup service:', e);
+      }
+    };
+    initBackup();
+  }, []);
+
+  // Automated local JSON backup scheduler using BackupService
+  React.useEffect(() => {
+    const setupAutoBackup = async () => {
+      try {
+        const { backupService } = await import('./utils/backupService');
+        const prefs = state.preferences;
+        
+        if (!prefs?.backup?.enabled || !backupService.isConfigured()) {
+          backupService.stopAutoBackup();
+          return;
+        }
+        
+        const minutes = Math.max(1, prefs.backup.intervalMinutes || 60);
+        
+        const getBackupData = () => ({
           tasks: state.tasks,
           archivedTasks: (state as any).archivedTasks || [],
           columns: state.columns,
@@ -1208,26 +1221,43 @@ function MainApp() {
           projectKanbanColumns: (state as any).viewState?.projectKanban?.columns || [],
           projectKanbanState: (state as any).viewState?.projectKanban || {},
           pinColumns: (state as any).pinColumns || [],
+          recurrence: (state as any).recurrence || {},
           events: (state as any).events || [],
           calendarSources: (state as any).calendarSources || [],
           exportDate: new Date().toISOString(),
           version: '3.0'
-        };
-        const json = exportToJSON(data);
-        const filename = `TaskFuchs_${new Date().toISOString().replace(/[:]/g,'-').slice(0,19)}.json`;
-        await writeBackupToDirectory(handle, filename, json);
-        (window as any).__taskfuchs_backup_toast__ = true;
-        const prev = prefs.backup || { enabled: true, intervalMinutes: minutes, notify: true };
-        dispatch({ type: 'UPDATE_PREFERENCES', payload: { backup: { enabled: prev.enabled, intervalMinutes: prev.intervalMinutes, notify: prev.notify, lastSuccess: new Date().toISOString() } } });
-      } catch {}
+        });
+        
+        backupService.startAutoBackup(
+          minutes, 
+          getBackupData,
+          (result) => {
+            if (result.success && result.timestamp) {
+              dispatch({ 
+                type: 'UPDATE_PREFERENCES', 
+                payload: { 
+                  backup: { 
+                    ...prefs.backup, 
+                    lastSuccess: result.timestamp 
+                  } 
+                } 
+              });
+            }
+          }
+        );
+      } catch (e) {
+        console.warn('Failed to setup auto-backup:', e);
+      }
     };
-    const id = window.setInterval(runBackup, minutes * 60 * 1000);
-    backupIntervalIdRef.current = id;
+    
+    setupAutoBackup();
+    
     return () => {
-      if (backupIntervalIdRef.current) clearInterval(backupIntervalIdRef.current);
-      backupIntervalIdRef.current = null;
+      import('./utils/backupService').then(({ backupService }) => {
+        backupService.stopAutoBackup();
+      }).catch(() => {});
     };
-  }, [state.preferences.backup?.enabled, state.preferences.backup?.intervalMinutes, state.tasks, state.columns, state.tags, (state as any).notes, (state as any).viewState]);
+  }, [state.preferences.backup?.enabled, state.preferences.backup?.intervalMinutes, state.tasks, state.columns, state.tags, (state as any).viewState]);
 
   // Dropbox auto-sync scheduler
   React.useEffect(() => {
@@ -1282,32 +1312,8 @@ function MainApp() {
         <BackupSetupModal
           isOpen={true}
           onClose={() => setShowBackupSetup(false)}
-          onChooseDirectory={async () => {
-            const { pickBackupDirectory } = await import('./utils/importExport');
-            // @ts-ignore
-            const handle = await pickBackupDirectory();
-            if (handle) {
-              try {
-                // @ts-ignore
-                const perm = await (handle as any).requestPermission?.({ mode: 'readwrite' });
-                if (perm === 'granted' || perm === undefined) {
-                  (window as any).__taskfuchs_backup_dir__ = handle;
-                  try {
-                    const name = (handle as any)?.name || '';
-                    window.dispatchEvent(new CustomEvent('backup-dir-selected', { detail: { name } }));
-                  } catch {}
-                  // Auto-activate backups if not enabled yet
-                  const prev = state.preferences.backup || { enabled: false, intervalMinutes: 60, notify: true };
-                  if (!prev.enabled) {
-                    dispatch({ type: 'UPDATE_PREFERENCES', payload: { backup: { enabled: true, intervalMinutes: prev.intervalMinutes || 60, notify: prev.notify ?? true, lastSuccess: prev.lastSuccess } } });
-                  }
-                }
-              } catch {}
-            }
-          }}
         />
       )}
-      {(() => { try { (window as any).__force_backup_modal_rerender__ = () => setShowBackupSetup(s => s); } catch {} return null; })()}
 
       {/* Notification Manager */}
       <NotificationManager />

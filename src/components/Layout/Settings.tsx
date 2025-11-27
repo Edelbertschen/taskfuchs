@@ -7209,19 +7209,11 @@ const Settings = React.memo(() => {
                     className="px-3 py-1.5 rounded-md text-white"
                     style={{ backgroundColor: state.preferences.accentColor }}
                     onClick={async () => {
-                      const { pickBackupDirectory } = await import('../../utils/importExport');
-                      // @ts-ignore
-                      const handle = await pickBackupDirectory();
-                      if (handle) {
-                        try {
-                          // @ts-ignore
-                          const perm = await (handle as any).requestPermission?.({ mode: 'readwrite' });
-                          if (perm === 'granted' || perm === undefined) {
-                            (window as any).__taskfuchs_backup_dir__ = handle;
-                            dispatch({ type: 'UPDATE_PREFERENCES', payload: { backup: { ...(state.preferences.backup||{ intervalMinutes: 60, notify: true }), enabled: true } } });
-                          }
-                        } catch {}
-                      } else {
+                      const { backupService } = await import('../../utils/backupService');
+                      const success = await backupService.pickDirectory();
+                      if (success) {
+                        dispatch({ type: 'UPDATE_PREFERENCES', payload: { backup: { ...(state.preferences.backup||{ intervalMinutes: 60, notify: true }), enabled: true } } });
+                      } else if (!backupService.supportsFileSystemAPI()) {
                         alert(t('settings_data.browserNoSupport'));
                       }
                     }}
@@ -7230,10 +7222,12 @@ const Settings = React.memo(() => {
                   <button
                     className="px-3 py-1.5 rounded-md border"
                     onClick={async () => {
-                      const handle = (window as any).__taskfuchs_backup_dir__ as FileSystemDirectoryHandle | undefined;
-                      if (!handle) { alert(t('settings_data.noBackupDirSelected')); return; }
-                      const { exportToJSON, writeBackupToDirectory } = await import('../../utils/importExport');
-                      const data: any = {
+                      const { backupService } = await import('../../utils/backupService');
+                      if (!backupService.isConfigured()) { 
+                        alert(t('settings_data.noBackupDirSelected')); 
+                        return; 
+                      }
+                      const data = {
                         tasks: state.tasks,
                         archivedTasks: state.archivedTasks || [],
                         columns: state.columns,
@@ -7244,17 +7238,19 @@ const Settings = React.memo(() => {
                         projectKanbanColumns: state.viewState?.projectKanban?.columns || [],
                         projectKanbanState: state.viewState?.projectKanban || {},
                         pinColumns: state.pinColumns || [],
+                        recurrence: (state as any).recurrence || {},
                         events: state.events || [],
                         calendarSources: state.calendarSources || [],
                         exportDate: new Date().toISOString(),
                         version: '3.0'
                       };
-                      const json = exportToJSON(data);
-                      const filename = `TaskFuchs_${new Date().toISOString().replace(/[:]/g,'-').slice(0,19)}.json`;
-                      await writeBackupToDirectory(handle, filename, json);
-                      (window as any).__taskfuchs_backup_toast__ = true;
-                      const prev = state.preferences.backup || { enabled: true, intervalMinutes: 60, notify: true };
-                      dispatch({ type: 'UPDATE_PREFERENCES', payload: { backup: { enabled: prev.enabled, intervalMinutes: prev.intervalMinutes, notify: prev.notify, lastSuccess: new Date().toISOString() } } });
+                      const result = await backupService.createBackup(data);
+                      if (result.success) {
+                        const prev = state.preferences.backup || { enabled: true, intervalMinutes: 60, notify: true };
+                        dispatch({ type: 'UPDATE_PREFERENCES', payload: { backup: { enabled: prev.enabled, intervalMinutes: prev.intervalMinutes, notify: prev.notify, lastSuccess: result.timestamp } } });
+                      } else {
+                        alert(result.error || 'Backup failed');
+                      }
                     }}
                   >{t('settings_data.backupNow')}</button>
                 </div>
