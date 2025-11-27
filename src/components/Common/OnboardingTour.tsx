@@ -62,7 +62,6 @@ interface TourSubStep {
   guideCursorTarget?: string; // CSS selector for guide cursor target
   guideCursorClickAnimation?: boolean; // Whether to animate click
   highlightElements?: string[]; // CSS selectors of elements to highlight
-  createExampleTask?: boolean; // Create example task in Inbox
   moveTaskToNextDay?: boolean; // Move example task from today to next day
   createExampleProject?: boolean; // Create example project with columns
   stylingDemo?: boolean; // For the styling demo step
@@ -126,12 +125,11 @@ const buildTourSections = (): TourSection[] => {
         position: 'bottom-center',
         showGuideCursor: true,
         guideCursorTarget: '[data-quick-add-button]',
-        guideCursorClickAnimation: true,
-        createExampleTask: true
+        guideCursorClickAnimation: true
       },
       {
         title: { de: 'Aufgaben organisieren', en: 'Organize Tasks' },
-        text: { de: 'Weise Datum, Projekt oder Pin zu – per Icon auf der Karte.', en: 'Assign date, project, or pin – via icons on the card.' },
+        text: { de: 'Die Beispielaufgabe unten zeigt dir alle Icons. Weise Datum, Projekt oder Pin zu – per Icon auf der Karte.', en: 'The sample task below shows you all icons. Assign date, project, or pin – via icons on the card.' },
         position: 'center-right',
         highlightElements: ['[data-onboarding-task-icons]']
       }
@@ -142,8 +140,8 @@ const buildTourSections = (): TourSection[] => {
 };
 
 const tourSections: TourSection[] = [
-  {
-    id: 'inbox',
+    {
+      id: 'inbox',
     view: 'inbox',
     icon: <Inbox className="w-5 h-5" />,
     steps: [
@@ -159,8 +157,7 @@ const tourSections: TourSection[] = [
         position: 'bottom-center',
         showGuideCursor: true,
         guideCursorTarget: '[data-quick-add-button]',
-        guideCursorClickAnimation: true,
-        createExampleTask: true
+        guideCursorClickAnimation: true
       },
       {
         title: { de: 'Aufgaben organisieren', en: 'Organize Tasks' },
@@ -400,7 +397,7 @@ const createSampleTask = (pinColumnId?: string, withDate: boolean = false): Task
   
   return {
     id: SAMPLE_TASK_ID,
-    title: 'Welcome to TaskFuchs!',
+    title: 'Example Inbox task',
     description: `## Your First Task 🦊
 
 This is a **sample task** to show you how TaskFuchs works.
@@ -415,7 +412,7 @@ This is a **sample task** to show you how TaskFuchs works.
     completed: false,
     priority: 'high',
     estimatedTime: 30,
-    tags: ['onboarding', 'demo'],
+    tags: ['demo'],
     subtasks: [
       {
         id: 'subtask-1',
@@ -442,7 +439,7 @@ This is a **sample task** to show you how TaskFuchs works.
         updatedAt: now
       }
     ],
-    columnId: withDate ? `date-${today}` : undefined,
+    columnId: withDate ? `date-${today}` : 'inbox',
     reminderDate: withDate ? today : undefined,
     pinColumnId: pinColumnId,
     pinned: !!pinColumnId,
@@ -779,13 +776,17 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
       // Create WITHOUT pinColumnId so it appears in Inbox
       const sampleTask = createSampleTask(undefined, false); // No pin, no date (for Inbox)
       
+      console.log('[Onboarding] Creating sample task:', sampleTask);
+      
       // Check if sample task already exists
       const existingTask = state.tasks.find(t => t.id === SAMPLE_TASK_ID);
       if (!existingTask) {
         dispatch({ type: 'ADD_TASK', payload: sampleTask });
+        console.log('[Onboarding] Sample task added');
       } else {
         // Reset it to inbox state (no date, no pin)
         dispatch({ type: 'UPDATE_TASK', payload: sampleTask });
+        console.log('[Onboarding] Sample task updated');
       }
       setSampleTaskCreated(true);
     }
@@ -802,7 +803,7 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
     }
   }, [isOpen, sampleTaskCreated, state.tasks, dispatch]);
   
-  // Add date to sample task when entering "today" section
+  // Add date to sample task when entering "today" section, remove when back in inbox
   useEffect(() => {
     const currentSection = allTourSections[currentSectionIndex];
     
@@ -816,6 +817,19 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
             ...sampleTask,
             reminderDate: today,
             columnId: `date-${today}`
+          }
+        });
+      }
+    } else if (currentSection?.id === 'inbox' && sampleTaskCreated) {
+      // Remove date when back in inbox section
+      const sampleTask = state.tasks.find(t => t.id === SAMPLE_TASK_ID);
+      if (sampleTask && sampleTask.reminderDate) {
+        dispatch({
+          type: 'UPDATE_TASK',
+          payload: {
+            ...sampleTask,
+            reminderDate: undefined,
+            columnId: 'inbox'
           }
         });
       }
@@ -966,8 +980,8 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
     if (currentStep?.startTimer) {
       // Temporarily set timer display mode to floatingWidget
       const originalTimerMode = state.preferences.timerDisplayMode;
-      dispatch({
-        type: 'UPDATE_PREFERENCES',
+    dispatch({ 
+      type: 'UPDATE_PREFERENCES', 
         payload: { timerDisplayMode: 'floatingWidget' }
       });
       
@@ -1655,7 +1669,7 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
           showClick={currentStep?.guideCursorClickAnimation ?? true}
           holdDuration={1500}
         />
-      )}
+                    )}
                   </div>
   );
   
