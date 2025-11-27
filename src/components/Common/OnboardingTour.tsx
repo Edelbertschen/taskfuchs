@@ -787,17 +787,13 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
       // Create WITHOUT pinColumnId so it appears in Inbox
       const sampleTask = createSampleTask(undefined, false); // No pin, no date (for Inbox)
       
-      console.log('[Onboarding] Creating sample task:', sampleTask);
-      
       // Check if sample task already exists
       const existingTask = state.tasks.find(t => t.id === SAMPLE_TASK_ID);
       if (!existingTask) {
         dispatch({ type: 'ADD_TASK', payload: sampleTask });
-        console.log('[Onboarding] Sample task added');
       } else {
         // Reset it to inbox state (no date, no pin)
         dispatch({ type: 'UPDATE_TASK', payload: sampleTask });
-        console.log('[Onboarding] Sample task updated');
       }
       setSampleTaskCreated(true);
     }

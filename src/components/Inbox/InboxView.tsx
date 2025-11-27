@@ -69,35 +69,17 @@ export function InboxView() {
   // Define inboxTasks early so it can be used in functions below
   // Tasks in inbox: columnId='inbox' AND no date AND no project
   // OR tasks edited during this session (stay visible until leaving the area)
-  const inboxTasks = useMemo(() => {
-    const filtered = state.tasks
-      .filter(task => {
-        // True inbox task: columnId is inbox AND no date AND no project assigned
-        const isTrueInbox = task.columnId === 'inbox' && !task.reminderDate && !task.projectId;
-        // Or it was edited this session (stays visible until user leaves)
-        const isSessionEdited = sessionEditedTaskIds.has(task.id);
-        
-        // Debug: Log onboarding sample task
-        if (task.id === 'onboarding-sample-task') {
-          console.log('[Inbox] Sample task filter check:', {
-            id: task.id,
-            title: task.title,
-            columnId: task.columnId,
-            reminderDate: task.reminderDate,
-            projectId: task.projectId,
-            isTrueInbox,
-            isSessionEdited,
-            willShow: isTrueInbox || isSessionEdited
-          });
-        }
-        
-        return isTrueInbox || isSessionEdited;
-      })
-      .filter(task => !task.completed) // Exclude completed tasks
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    
-    return filtered;
-  }, [state.tasks, sessionEditedTaskIds]);
+  const inboxTasks = useMemo(() => state.tasks
+    .filter(task => {
+      // True inbox task: columnId is inbox AND no date AND no project assigned
+      const isTrueInbox = task.columnId === 'inbox' && !task.reminderDate && !task.projectId;
+      // Or it was edited this session (stays visible until user leaves)
+      const isSessionEdited = sessionEditedTaskIds.has(task.id);
+      return isTrueInbox || isSessionEdited;
+    })
+    .filter(task => !task.completed) // Exclude completed tasks
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
+  [state.tasks, sessionEditedTaskIds]);
 
   const openInboxTaskAt = (idx: number) => {
     const flat = inboxTasks;
