@@ -805,14 +805,16 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
     }
   }, [isOpen, language]);
   
-  // Handle guide cursor for step-specific UI highlights
+  // Handle guide cursor for step-specific UI highlights (not for navigation)
   useEffect(() => {
     if (!isOpen || !language) return;
     
     const currentSection = allTourSections[currentSectionIndex];
     const currentStep = currentSection?.steps[currentStepIndex];
     
-    if (currentStep?.showGuideCursor && currentStep?.guideCursorTarget) {
+    // Only show guide cursor if it's NOT a navigation cursor (pendingNavigationRef is null)
+    // and the step has showGuideCursor flag
+    if (currentStep?.showGuideCursor && currentStep?.guideCursorTarget && !pendingNavigationRef.current) {
       // Small delay to ensure DOM is ready
       const timer = setTimeout(() => {
         setShowGuideCursor(true);
@@ -820,7 +822,8 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
       }, 300);
       
       return () => clearTimeout(timer);
-    } else {
+    } else if (!pendingNavigationRef.current) {
+      // Only hide if not during navigation
       setShowGuideCursor(false);
       setGuideCursorTarget('');
     }
@@ -980,17 +983,18 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
   const handleGuideCursorComplete = useCallback(() => {
     setShowGuideCursor(false);
     
-    // Execute pending navigation
+    // Execute pending navigation (for view transitions)
     if (pendingNavigationRef.current) {
       const { view, sectionIndex, stepIndex } = pendingNavigationRef.current;
       navigateToView(view);
       setCurrentSectionIndex(sectionIndex);
       setCurrentStepIndex(stepIndex);
       pendingNavigationRef.current = null;
+      
+      // Reset animation state after navigation
+      setTimeout(() => setIsAnimating(false), 200);
     }
-    
-    // Reset animation state
-    setTimeout(() => setIsAnimating(false), 200);
+    // For non-navigation cursors (UI highlights), don't reset isAnimating
   }, [navigateToView]);
   
   // Go to next step or section - stable version without stale closures
@@ -1561,7 +1565,7 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
         <GuideCursor
           targetSelector={guideCursorTarget}
           accentColor={accentColor}
-          onAnimationComplete={() => setShowGuideCursor(false)}
+          onAnimationComplete={handleGuideCursorComplete}
           delay={300}
           showClick={currentStep?.guideCursorClickAnimation ?? true}
           holdDuration={1500}
