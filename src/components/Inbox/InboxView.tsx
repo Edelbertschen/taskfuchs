@@ -1767,9 +1767,13 @@ function InboxTaskCard({
 
   const [isHovered, setIsHovered] = useState(false);
 
+  // Check if this is the onboarding sample task
+  const isOnboardingSampleTask = task.id === 'onboarding-sample-task';
+  
   return (
     <>
     <div 
+      data-task-id={task.id}
       className="group rounded-xl transition-all duration-200 cursor-pointer backdrop-blur-2xl"
       style={{
         // Dark mode: use much darker glass so text is readable over backgrounds
@@ -1864,16 +1868,20 @@ function InboxTaskCard({
           </button>
 
           {/* Actions - Icons light up permanently when set */}
-          <div className="flex items-center space-x-2">
+          <div 
+            className={`flex items-center space-x-2 ${isOnboardingSampleTask ? 'onboarding-pulse-icons' : ''}`}
+            data-onboarding-task-icons={isOnboardingSampleTask ? 'true' : undefined}
+          >
             {/* Date button - always visible if date set, otherwise on hover */}
             <button
+              data-task-icon="date"
               onClick={(e) => {
                 e.stopPropagation();
                 onDateSelect();
               }}
               onPointerDown={(e) => e.stopPropagation()}
               className={`p-2 rounded-lg backdrop-blur-xl border transition-all duration-200 hover:scale-110 ${
-                task.reminderDate 
+                task.reminderDate || isOnboardingSampleTask
                   ? 'opacity-100' 
                   : 'opacity-0 group-hover:opacity-100'
               }`}
@@ -1888,13 +1896,14 @@ function InboxTaskCard({
             </button>
             {/* Project button - always visible if project set, otherwise on hover */}
             <button
+              data-task-icon="project"
               onClick={(e) => {
                 e.stopPropagation();
                 onProjectSelect();
               }}
               onPointerDown={(e) => e.stopPropagation()}
               className={`p-2 rounded-lg backdrop-blur-xl border transition-all duration-200 hover:scale-110 ${
-                task.projectId 
+                task.projectId || isOnboardingSampleTask
                   ? 'opacity-100' 
                   : 'opacity-0 group-hover:opacity-100'
               }`}
@@ -1909,6 +1918,7 @@ function InboxTaskCard({
             </button>
             {/* Pin button - always visible if pinned, otherwise on hover */}
             <button
+              data-task-icon="pin"
               onClick={(e) => {
                 e.stopPropagation();
                 if (task.pinColumnId) {
@@ -1924,7 +1934,7 @@ function InboxTaskCard({
               }}
               onPointerDown={(e) => e.stopPropagation()}
               className={`p-2 rounded-lg backdrop-blur-xl border transition-all duration-200 hover:scale-110 ${
-                task.pinColumnId 
+                task.pinColumnId || isOnboardingSampleTask
                   ? 'opacity-100' 
                   : 'opacity-0 group-hover:opacity-100'
               }`}

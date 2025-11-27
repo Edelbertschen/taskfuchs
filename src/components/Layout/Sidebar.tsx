@@ -589,15 +589,6 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                 </button>
                 <button
                   onClick={() => {
-                    window.dispatchEvent(new CustomEvent('open-user-guide'));
-                    setShowPlannerUserMenu(false);
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                >
-                  {t('header.user_guide')}
-                </button>
-                <button
-                  onClick={() => {
                     window.dispatchEvent(new CustomEvent('start-onboarding'));
                     setShowPlannerUserMenu(false);
                   }}
