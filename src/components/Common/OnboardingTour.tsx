@@ -80,76 +80,6 @@ interface TourSection {
 
 const SAMPLE_TASK_ID = 'onboarding-sample-task';
 
-// Build tour sections dynamically based on platform
-const buildTourSections = (): TourSection[] => {
-  const sections: TourSection[] = [];
-  
-  // PWA section - only for web apps
-  if (isPWA()) {
-    sections.push({
-      id: 'pwa',
-      view: 'today',
-      icon: <Smartphone className="w-5 h-5" />,
-      steps: [
-        {
-          title: { de: 'TaskFuchs als Web-App', en: 'TaskFuchs as Web App' },
-          text: { de: 'TaskFuchs ist eine Progressive Web App (PWA). Das bedeutet, sie läuft direkt in deinem Browser – ohne Installation. Deine Daten werden lokal auf deinem Gerät gespeichert.', en: 'TaskFuchs is a Progressive Web App (PWA). It runs directly in your browser – no installation needed. Your data is stored locally on your device.' },
-          foxMessage: { de: 'Schnell, sicher und überall verfügbar!', en: 'Fast, secure, and available everywhere!' },
-          position: 'center'
-        },
-      {
-        title: { de: 'Backups sind wichtig!', en: 'Backups are important!' },
-        text: { de: 'Da deine Daten nur lokal im Browser gespeichert werden, empfiehlt sich eine regelmäßige Datensicherung. In den Einstellungen → Daten findest du die Backup-Optionen: JSON-Export oder Dropbox-Sync.', en: 'Since your data is stored locally in the browser, regular backups are recommended. In Settings → Data you\'ll find backup options: JSON export or Dropbox sync.' },
-        foxMessage: { de: 'Lieber einmal zu oft sichern!', en: 'Better safe than sorry!' },
-        position: 'bottom-left',
-        showGuideCursor: true,
-        guideCursorTarget: '[data-nav-item="settings"]',
-        guideCursorClickAnimation: false
-      },
-      {
-        title: { de: 'Die Inbox', en: 'The Inbox' },
-        text: { de: 'In der Inbox landen alle neuen Aufgaben. Hier wird alles gesammelt, bevor es organisiert wird.', en: 'All new tasks land in the Inbox. Everything is collected here before being organized.' },
-        position: 'bottom-left',
-        showGuideCursor: true,
-        guideCursorTarget: '[data-nav-item="inbox"]',
-        guideCursorClickAnimation: true
-      }
-      ]
-    });
-  }
-  
-  // Inbox section  
-  sections.push({
-      id: 'inbox',
-    view: 'inbox',
-    icon: <Inbox className="w-5 h-5" />,
-    steps: [
-      {
-        title: { de: 'Willkommen in der Inbox!', en: 'Welcome to the Inbox!' },
-        text: { de: 'Hier landen alle neuen Aufgaben. Die Inbox ist der zentrale Sammelplatz für alles, was dir einfällt.', en: 'All new tasks land here. The Inbox is the central collection point for everything that comes to mind.' },
-        foxMessage: { de: 'Alles an einem Ort – ich helfe beim Sortieren!', en: 'Everything in one place – I\'ll help sort!' },
-        position: 'bottom-right'
-      },
-      {
-        title: { de: 'Schnelle Eingabe', en: 'Quick Input' },
-        text: { de: 'Das Eingabefeld oben ermöglicht eine blitzschnelle Aufgabenerfassung. Einfach Titel eingeben und hinzufügen.', en: 'The input field above enables lightning-fast task entry. Just enter a title and add it.' },
-        position: 'bottom-center',
-        showGuideCursor: true,
-        guideCursorTarget: '[data-quick-add-button]',
-        guideCursorClickAnimation: true
-      },
-      {
-        title: { de: 'Aufgaben organisieren', en: 'Organize Tasks' },
-        text: { de: 'Die Beispielaufgabe zeigt alle verfügbaren Icons. Über die Icons können Datum, Projekt oder Pin zugewiesen werden.', en: 'The sample task shows all available icons. Date, project, or pin can be assigned via the icons.' },
-        position: 'center-right',
-        highlightElements: ['[data-onboarding-task-icons]']
-      }
-    ]
-  });
-  
-  return sections;
-};
-
 const tourSections: TourSection[] = [
     {
       id: 'inbox',
@@ -197,14 +127,14 @@ const tourSections: TourSection[] = [
         text: { de: 'Prioritäten können in drei Stufen gesetzt werden (niedrig, mittel, hoch). Die Beschreibung unterstützt Markdown-Formatierung für detaillierte Notizen.', en: 'Priorities can be set in three levels (low, medium, high). The description supports Markdown formatting for detailed notes.' },
         position: 'center',
         openTaskModal: true,
-        highlightElements: ['[data-task-priority]', '[data-task-description]']
+        highlightElements: ['[data-onboarding-priority]', '[data-onboarding-description]']
       },
       {
         title: { de: 'Unteraufgaben', en: 'Subtasks' },
         text: { de: 'Große Aufgaben lassen sich in kleine Schritte aufteilen. Jede Unteraufgabe kann separat abgehakt werden.', en: 'Large tasks can be broken down into small steps. Each subtask can be checked off separately.' },
         position: 'center',
         openTaskModal: true,
-        highlightElements: ['[data-task-subtasks]']
+        highlightElements: ['[data-onboarding-subtasks]']
       },
       {
         title: { de: 'Weiter geht\'s', en: 'Let\'s continue' },
@@ -918,17 +848,29 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
     const currentStep = currentSection?.steps[currentStepIndex];
     
     if (currentStep?.highlightElements) {
-      // Add highlight class to specified elements
-      const elements = currentStep.highlightElements.map(selector => 
-        document.querySelector(selector)
-      ).filter(Boolean);
-      
-      elements.forEach(el => {
-        el?.classList.add('onboarding-highlight');
-      });
+      // Add delay to ensure DOM is ready
+      const timer = setTimeout(() => {
+        // Add highlight class to specified elements
+        const elements = currentStep.highlightElements!.map(selector => {
+          const el = document.querySelector(selector);
+          if (!el) {
+            console.warn(`[Onboarding] Highlight element not found: ${selector}`);
+          }
+          return el;
+        }).filter(Boolean);
+        
+        console.log(`[Onboarding] Highlighting ${elements.length} elements:`, currentStep.highlightElements);
+        
+        elements.forEach(el => {
+          el?.classList.add('onboarding-highlight');
+        });
+      }, 300);
       
       return () => {
-        elements.forEach(el => {
+        clearTimeout(timer);
+        // Remove highlight class
+        currentStep.highlightElements!.forEach(selector => {
+          const el = document.querySelector(selector);
           el?.classList.remove('onboarding-highlight');
         });
       };
