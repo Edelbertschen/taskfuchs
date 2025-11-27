@@ -89,153 +89,6 @@ class TimerService {
     }
   }
 
-  // Start a new Pomodoro session (independent of tasks)
-  startPomodoroSession(): void {
-    if (!this.preferences?.pomodoro?.enabled) return;
-
-    console.log('Starting new Pomodoro session');
-    const now = Date.now();
-    this.globalPomodoro = {
-      type: 'work',
-      sessionNumber: 1,
-      sessionStartTime: now,
-      accumulatedPauseMs: 0,
-      pausedAt: null,
-      sessionElapsedTime: 0,
-      sessionRemainingTime: this.preferences.pomodoro.workDuration || 25,
-      isActive: true,
-      isPaused: false,
-      sessionEndHandled: false
-    };
-
-    this.startPomodoroInterval();
-    
-    // Start white noise if enabled
-    if (this.preferences.pomodoro.whiteNoiseEnabled && this.preferences.pomodoro.whiteNoiseType !== 'none') {
-      startWhiteNoise(this.preferences.pomodoro.whiteNoiseType, this.preferences.pomodoro.whiteNoiseVolume);
-    }
-  }
-
-  // Stop the global Pomodoro session
-  stopPomodoroSession(): void {
-    if (this.globalPomodoro) {
-      this.stopPomodoroInterval();
-      this.globalPomodoro = null;
-      
-      // Stop white noise
-      stopWhiteNoise();
-      
-      // Update task timer reference
-      if (this.activeTimer) {
-        this.activeTimer.pomodoroSession = null;
-      }
-    }
-  }
-
-  // Pause/Resume Pomodoro session
-  pausePomodoroSession(): void {
-    if (this.globalPomodoro && !this.globalPomodoro.isPaused) {
-      this.globalPomodoro.isPaused = true;
-      this.globalPomodoro.pausedAt = Date.now();
-      this.stopPomodoroInterval();
-      
-      // Stop white noise when paused
-      stopWhiteNoise();
-    }
-  }
-
-  resumePomodoroSession(): void {
-    if (this.globalPomodoro && this.globalPomodoro.isPaused) {
-      this.globalPomodoro.isPaused = false;
-      if (this.globalPomodoro.pausedAt) {
-        this.globalPomodoro.accumulatedPauseMs += Date.now() - this.globalPomodoro.pausedAt;
-        this.globalPomodoro.pausedAt = null;
-      }
-      this.startPomodoroInterval();
-      
-      // Resume white noise if enabled
-      if (this.preferences?.pomodoro?.whiteNoiseEnabled && this.preferences.pomodoro.whiteNoiseType !== 'none') {
-        startWhiteNoise(this.preferences.pomodoro.whiteNoiseType, this.preferences.pomodoro.whiteNoiseVolume);
-      }
-    }
-  }
-
-  // Skip current Pomodoro phase to the next and keep timer running
-  skipPomodoroPhase(): void {
-    if (!this.globalPomodoro || !this.preferences?.pomodoro?.enabled) return;
-
-    // If currently in work, start a break immediately (keeps running)
-    if (this.globalPomodoro.type === 'work') {
-      this.startManualBreak();
-      return;
-    }
-
-    // If currently in a break, end break and start a work session (keeps running)
-    this.endPomodoroBreak();
-  }
-
-  // End current Pomodoro break and start work session
-  endPomodoroBreak(): void {
-    if (!this.globalPomodoro || !this.preferences?.pomodoro?.enabled) return;
-
-    const session = this.globalPomodoro;
-    
-    // Only allow ending break sessions
-    if (session.type === 'shortBreak' || session.type === 'longBreak') {
-      // Force break to end
-      session.sessionRemainingTime = 0;
-      session.type = 'work';
-      session.sessionNumber += 1;
-      session.sessionStartTime = Date.now();
-      session.accumulatedPauseMs = 0;
-      session.pausedAt = null;
-      session.sessionElapsedTime = 0;
-      session.sessionRemainingTime = this.getSessionDuration('work');
-      session.sessionEndHandled = false; // Reset flag for new session
-      
-      // Auto-resume if paused
-      if (session.isPaused) {
-        this.resumePomodoroSession();
-      }
-      
-      // Start white noise for work session if enabled
-      if (this.preferences.pomodoro.whiteNoiseEnabled && this.preferences.pomodoro.whiteNoiseType !== 'none') {
-        startWhiteNoise(this.preferences.pomodoro.whiteNoiseType, this.preferences.pomodoro.whiteNoiseVolume);
-      }
-    }
-  }
-
-  // Start a manual break after work session completion
-  startManualBreak(): void {
-    if (!this.globalPomodoro || !this.preferences?.pomodoro?.enabled) return;
-
-    const session = this.globalPomodoro;
-    
-    // Only allow starting break after work session
-    if (session.type === 'work') {
-      // Stop white noise when starting break (breaks are silent)
-      stopWhiteNoise();
-      
-      // Determine break type based on session number
-      const shouldTakeLongBreak = session.sessionNumber % this.preferences.pomodoro.longBreakInterval === 0;
-      const breakType = shouldTakeLongBreak ? 'longBreak' : 'shortBreak';
-      
-      // Transition to break
-      session.type = breakType;
-      session.sessionStartTime = Date.now();
-      session.accumulatedPauseMs = 0;
-      session.pausedAt = null;
-      session.sessionElapsedTime = 0;
-      session.sessionRemainingTime = this.getSessionDuration(breakType);
-      session.sessionEndHandled = false; // Reset flag for new session
-      
-      // Auto-resume if paused
-      if (session.isPaused) {
-        this.resumePomodoroSession();
-      }
-    }
-  }
-
   // Pause the active task timer
   pauseTimer(): ActiveTimerContext | null {
     if (!this.activeTimer || this.activeTimer.isPaused) return this.activeTimer;
@@ -257,9 +110,6 @@ class TimerService {
     this.activeTimer.isPaused = false;
     this.startTaskInterval();
     
-    // Update Pomodoro reference
-    this.activeTimer.pomodoroSession = this.getPomodoroSessionForTimer();
-    
     // Sync with Toggl
     this.syncTogglResume(this.activeTimer.taskId, this.activeTimer.taskTitle, this.activeTimer.elapsedTime);
     
@@ -267,17 +117,8 @@ class TimerService {
     return this.activeTimer;
   }
 
-  // Stop the active task timer and Pomodoro session
+  // Stop the active timer
   stopTimer(reason: 'completed' | 'overtime' | 'stopped' = 'stopped'): void {
-    this.stopTaskTimer(reason);
-    // Also stop Pomodoro when user explicitly stops timer
-    if (reason === 'stopped') {
-      this.stopPomodoroSession();
-    }
-  }
-
-  // Private method to stop only the task timer
-  private stopTaskTimer(reason: 'completed' | 'overtime' | 'stopped' = 'stopped'): void {
     if (!this.activeTimer) return;
 
     const timerContext = { ...this.activeTimer };
@@ -299,10 +140,6 @@ class TimerService {
 
   // Get current timer context
   getActiveTimer(): ActiveTimerContext | null {
-    // Always update with latest Pomodoro info
-    if (this.activeTimer) {
-      this.activeTimer.pomodoroSession = this.getPomodoroSessionForTimer();
-    }
     return this.activeTimer;
   }
 
@@ -347,19 +184,9 @@ class TimerService {
     }
   }
 
-  // Get current Pomodoro session info
-  getGlobalPomodoroSession(): GlobalPomodoroSession | null {
-    return this.globalPomodoro;
-  }
-
   // Check if timer is running
   isTimerActive(): boolean {
     return this.activeTimer?.isActive && !this.activeTimer?.isPaused;
-  }
-
-  // Check if Pomodoro is running
-  isPomodoroActive(): boolean {
-    return this.globalPomodoro?.isActive && !this.globalPomodoro?.isPaused;
   }
 
   // Private methods for task timer
@@ -398,7 +225,6 @@ class TimerService {
           this.activeTimer.remainingTime = 0;
           this.activeTimer.isOvertime = false;
         }
-        this.activeTimer.pomodoroSession = this.getPomodoroSessionForTimer();
         this.callbacks.onTick?.(this.activeTimer);
       } else {
         this.tickTask();
@@ -413,40 +239,10 @@ class TimerService {
     }
   }
 
-  // Private methods for Pomodoro timer
-  private startPomodoroInterval() {
-    this.stopPomodoroInterval();
-    this.pomodoroLastTickWallClock = Date.now();
-    this.pomodoroIntervalId = window.setInterval(() => {
-      const now = Date.now();
-      const last = this.pomodoroLastTickWallClock || now;
-      const deltaMs = now - last;
-      this.pomodoroLastTickWallClock = now;
-      // Always tick; internal logic uses wall clock for accuracy
-      const stepMinutes = deltaMs > 1500 ? deltaMs / 60000 : 1 / 60;
-      this.tickPomodoro(stepMinutes);
-    }, 1000);
-  }
-
-  private stopPomodoroInterval() {
-    if (this.pomodoroIntervalId) {
-      clearInterval(this.pomodoroIntervalId);
-      this.pomodoroIntervalId = null;
-    }
-    this.pomodoroLastTickWallClock = null;
-  }
-
   // Separate tick for task timer
   private tickTask() {
     try {
       if (!this.activeTimer || this.activeTimer.isPaused) return;
-
-      // Check if Pomodoro is in break mode - if so, pause the task timer
-      if (this.globalPomodoro && 
-          (this.globalPomodoro.type === 'shortBreak' || this.globalPomodoro.type === 'longBreak')) {
-        // Don't increment task timer during Pomodoro breaks
-        return;
-      }
 
       // Add 1/60 minute (1 second) to elapsed time
       this.activeTimer.elapsedTime += 1/60;
@@ -495,85 +291,10 @@ class TimerService {
         this.activeTimer.isOvertime = false;
       }
 
-      // Update Pomodoro reference for display
-      this.activeTimer.pomodoroSession = this.getPomodoroSessionForTimer();
-
       // Trigger tick callback
       this.callbacks.onTick?.(this.activeTimer);
     } catch (error) {
       console.error('Error in task timer tick:', error);
-    }
-  }
-
-  // Separate tick for Pomodoro timer (runs independently)
-  private tickPomodoro(deltaMinutes: number = 1/60) {
-    try {
-      if (!this.globalPomodoro || this.globalPomodoro.isPaused) return;
-
-      // Recompute elapsed from wall clock for robustness
-      const now = Date.now();
-      const pausedMs = this.globalPomodoro.pausedAt ? (now - this.globalPomodoro.pausedAt) : 0;
-      const wallElapsedMs = now - this.globalPomodoro.sessionStartTime - this.globalPomodoro.accumulatedPauseMs - pausedMs;
-      const elapsedMinutes = wallElapsedMs / 60000;
-      this.globalPomodoro.sessionElapsedTime = Math.max(0, elapsedMinutes);
-
-      const sessionDuration = this.getSessionDuration(this.globalPomodoro.type);
-      // Allow negative time for overtime (don't clamp below zero here)
-      this.globalPomodoro.sessionRemainingTime = sessionDuration - this.globalPomodoro.sessionElapsedTime;
-
-      // Check if Pomodoro session is completed (only handle once when reaching 0)
-      if (this.globalPomodoro.sessionRemainingTime <= 0 && !this.globalPomodoro.sessionEndHandled) {
-        // Mark as handled to prevent multiple notifications
-        this.globalPomodoro.sessionEndHandled = true;
-        
-        // Only handle session end for work sessions automatically
-        // Break sessions should NOT auto-end
-        if (this.globalPomodoro.type === 'work') {
-          this.handlePomodoroSessionEnd();
-        }
-      }
-
-      // Update task timer if it exists
-      if (this.activeTimer) {
-        this.activeTimer.pomodoroSession = this.getPomodoroSessionForTimer();
-        this.callbacks.onTick?.(this.activeTimer);
-      }
-    } catch (error) {
-      console.error('Error in Pomodoro timer tick:', error);
-    }
-  }
-
-  private handlePomodoroSessionEnd() {
-    if (!this.globalPomodoro || !this.preferences?.pomodoro.enabled) return;
-
-    const session = this.globalPomodoro;
-    
-    // Double-check to prevent multiple notifications
-    if (session.sessionEndHandled) {
-      console.log('Session end already handled, skipping duplicate notification');
-      return;
-    }
-    
-    console.log('Handling Pomodoro session end for:', session.type, session.sessionNumber);
-
-    // Notify about session end BEFORE any transitions
-    this.callbacks.onPomodoroSessionEnd?.(session.type, session.sessionNumber);
-
-    // Only handle work session ends automatically
-    // Break sessions should NEVER auto-end - they continue until manually ended
-    if (session.type === 'work') {
-      // Stop white noise when work session ends, then play distinctive Pomodoro alarm
-      stopWhiteNoise();
-      if (this.preferences.pomodoro.soundEnabled) {
-        playCompletionSound('pomodoro_alarm', this.preferences.soundVolume).catch(console.warn);
-      }
-      
-      // Work session completed - pause and wait for manual break start
-      // Timer goes into overtime mode (negative time) until user takes a break
-      console.log('Work session completed - waiting for manual break start');
-      
-      // Do NOT auto-start break - user must start it manually
-      // Session continues in overtime mode
     }
   }
 
@@ -583,7 +304,7 @@ class TimerService {
     console.log('Handling task time end for:', this.activeTimer.taskTitle);
 
     // Play notice sound for task deadline
-    if (this.preferences?.pomodoro.soundEnabled) {
+    if (this.preferences?.timer?.soundEnabled) {
       playCompletionSound('notice', this.preferences.soundVolume).catch(console.warn);
     }
 
@@ -618,35 +339,6 @@ class TimerService {
     this.callbacks.onTaskTimeEnd?.(this.activeTimer);
     
     // Task timer continues running in overtime mode (negative time)
-    // Pomodoro session continues running independently
-  }
-
-  // Helper method to get Pomodoro info for task timer display
-  private getPomodoroSessionForTimer(): ActiveTimerContext['pomodoroSession'] | null {
-    if (!this.globalPomodoro) return null;
-
-    return {
-      type: this.globalPomodoro.type,
-      sessionNumber: this.globalPomodoro.sessionNumber,
-      totalSessions: 0, // Not used in new logic
-      sessionStartTime: this.globalPomodoro.sessionStartTime,
-      sessionElapsedTime: this.globalPomodoro.sessionElapsedTime,
-      sessionRemainingTime: this.globalPomodoro.sessionRemainingTime,
-    };
-  }
-
-  // Get session duration helper (public method)
-  getSessionDuration(sessionType: 'work' | 'shortBreak' | 'longBreak'): number {
-    if (!this.preferences?.pomodoro.enabled) return 0;
-
-    switch (sessionType) {
-      case 'work':
-        return this.preferences.pomodoro.workDuration;
-      case 'shortBreak':
-        return this.preferences.pomodoro.shortBreakDuration;
-      case 'longBreak':
-        return this.preferences.pomodoro.longBreakDuration;
-    }
   }
 
   // Utility methods
@@ -938,8 +630,7 @@ class TimerService {
 
   // Cleanup method
   destroy() {
-    this.stopTaskTimer('stopped');
-    this.stopPomodoroSession();
+    this.stopTimer('stopped');
     this.callbacks = {};
     this.preferences = null;
   }
