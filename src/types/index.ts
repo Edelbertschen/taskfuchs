@@ -148,8 +148,6 @@ export interface TimerState {
   pausedTime?: number;
   elapsedTime?: number;
   remainingTime?: number;
-  mode: 'normal' | 'pomodoro';
-  pomodoroSettings?: PomodoroSettings;
 }
 
 export interface ActiveTimerContext {
@@ -161,24 +159,6 @@ export interface ActiveTimerContext {
   isActive: boolean;
   isPaused: boolean;
   isOvertime?: boolean;
-  mode: 'normal' | 'pomodoro';
-  pomodoroSession?: {
-    type: 'work' | 'shortBreak' | 'longBreak';
-    sessionNumber: number;
-    totalSessions: number;
-    sessionStartTime: number;
-    sessionElapsedTime: number;
-    sessionRemainingTime: number;
-  };
-}
-
-export interface PomodoroSettings {
-  workDuration: number; // in minutes
-  breakDuration: number; // in minutes
-  longBreakDuration: number; // in minutes
-  longBreakInterval: number; // after how many work sessions
-  currentSession: number;
-  totalSessions: number;
 }
 
 export interface Tag {
@@ -266,24 +246,7 @@ export interface UserPreferences {
   hasCompletedOnboarding?: boolean;
   // Focus mode setting
   enableFocusMode: boolean; // Whether focus mode is enabled
-  // Timer and Pomodoro settings
-  pomodoro: {
-    enabled: boolean;
-    workDuration: number; // in minutes
-    shortBreakDuration: number; // in minutes
-    longBreakDuration: number; // in minutes
-    longBreakInterval: number; // after how many work sessions
-    autoStartBreaks: boolean;
-    autoStartWork: boolean;
-    soundEnabled: boolean;
-    pomodoroSound: 'bell' | 'chime' | 'yeah' | 'none';
-    breakSound: 'bell' | 'chime' | 'yeah' | 'none';
-    taskSound: 'bell' | 'chime' | 'yeah' | 'none';
-    // White noise settings
-    whiteNoiseEnabled: boolean;
-    whiteNoiseType: 'clock' | 'none';
-    whiteNoiseVolume: number; // 0-1
-  };
+  // Timer settings
   timer: {
     showOverlay: boolean;
     overlayPosition: { x: number; y: number };
@@ -291,6 +254,12 @@ export interface UserPreferences {
     autoOpenTaskOnStart: boolean;
     showRemainingTime: boolean;
     dimControlsWhenNoTask: boolean;
+    soundEnabled: boolean;
+    taskSound: 'bell' | 'chime' | 'yeah' | 'none';
+    // White noise settings
+    whiteNoiseEnabled: boolean;
+    whiteNoiseType: 'clock' | 'none';
+    whiteNoiseVolume: number; // 0-1
   };
   // Daily Notes template
   dailyNoteTemplate?: string; // Template content for new daily notes
@@ -375,7 +344,6 @@ export interface Statistics {
   totalTasks: number;
   completedTasks: number;
   totalTime: number;
-  pomodoroSessions: number;
   dailyStats: DailyStats[];
   weeklyStats: WeeklyStats[];
   monthlyStats: MonthlyStats[];
@@ -385,21 +353,18 @@ export interface DailyStats {
   date: string;
   tasksCompleted: number;
   timeTracked: number;
-  pomodoroSessions: number;
 }
 
 export interface WeeklyStats {
   weekStart: string;
   tasksCompleted: number;
   timeTracked: number;
-  pomodoroSessions: number;
 }
 
 export interface MonthlyStats {
   month: string;
   tasksCompleted: number;
   timeTracked: number;
-  pomodoroSessions: number;
 }
 
 export interface Attachment {

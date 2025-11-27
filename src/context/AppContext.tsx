@@ -75,7 +75,7 @@ type AppAction =
   | { type: 'SET_TAG_FILTERS'; payload: string[] }
   | { type: 'SET_PRIORITY_FILTERS'; payload: string[] }
   | { type: 'SET_ACTIVE_TIMER'; payload: ActiveTimerContext | null }
-  | { type: 'START_TIMER'; payload: { taskId: string; mode?: 'normal' | 'pomodoro' } }
+  | { type: 'START_TIMER'; payload: { taskId: string } }
   | { type: 'PAUSE_TIMER' }
   | { type: 'RESUME_TIMER' }
   | { type: 'STOP_TIMER' }
@@ -317,18 +317,15 @@ const initialState: AppState = {
     enableEndOfDay: true,
     // Focus mode setting
     enableFocusMode: true,
-    // Timer and Pomodoro settings
-    pomodoro: {
-      enabled: false,
-      workDuration: 25,
-      shortBreakDuration: 5,
-      longBreakDuration: 15,
-      longBreakInterval: 4,
-      autoStartBreaks: false,
-      autoStartWork: false,
+    // Timer settings
+    timer: {
+      showOverlay: true,
+      overlayPosition: { x: window.innerWidth - 350, y: 80 },
+      overlayMinimized: false,
+      autoOpenTaskOnStart: true,
+      showRemainingTime: true,
+      dimControlsWhenNoTask: false,
       soundEnabled: true,
-      pomodoroSound: 'chime',
-      breakSound: 'bell',
       taskSound: 'yeah',
       whiteNoiseEnabled: false,
       whiteNoiseType: 'clock',
@@ -527,17 +524,11 @@ function appReducer(state: AppState, action: AppAction): AppState {
         task.id === updatedTask.id ? updatedTask : task
       );
     
-      // Stop task timer automatically when task is completed, but keep Pomodoro running
+      // Stop task timer automatically when task is completed
       let newActiveTimer = state.activeTimer;
       if (updatedTask.completed && state.activeTimer?.taskId === updatedTask.id) {
         try {
           timerService.stopTimer('completed');
-          // Ensure Pomodoro session (if enabled) continues running
-          try {
-            if (state.preferences?.pomodoro?.enabled && timerService.isPomodoroActive()) {
-              timerService.resumePomodoroSession();
-            }
-          } catch {}
           newActiveTimer = null;
         } catch (error) {
           console.error('Error stopping timer on task completion:', error);
@@ -745,9 +736,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
           elapsedTime: trackedTime,
           remainingTime: effectiveEstimated > 0 ? (effectiveEstimated - trackedTime) : 0,
           isActive: true,
-          isPaused: false,
-          mode: action.payload.mode || 'normal',
-          pomodoroSession: null
+          isPaused: false
         };
 
         // Start timer service asynchronously to avoid blocking UI
@@ -756,8 +745,6 @@ function appReducer(state: AppState, action: AppAction): AppState {
             task.id,
             task.title,
             effectiveEstimated,
-            action.payload.mode || 'normal',
-            undefined,
             trackedTime
           );
         }, 0);
@@ -1109,7 +1096,6 @@ function appReducer(state: AppState, action: AppAction): AppState {
         // Stop any active task timer
         if (timerService) {
           try {
-            // stopTimer only affects the task timer and preserves Pomodoro session
             timerService.stopTimer('stopped');
           } catch {}
         }
@@ -3494,43 +3480,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             console.error('Error in timer onTick callback:', error);
           }
         },
-        onPomodoroSessionEnd: (sessionType, sessionNumber) => {
-          try {
-            console.log('Pomodoro session ended:', sessionType, 'Session:', sessionNumber);
-            
-            // Determine next session type
-            let nextSession = '';
-            if (sessionType === 'work') {
-              // Work session completed - time for a break
-              console.log('Work session completed! Time for a break.');
-              if (sessionNumber % 4 === 0) {
-                nextSession = 'Lange Pause';
-                notificationService.showPomodoroBreakStart('long', state.preferences.pomodoro?.longBreakDuration || 15);
-              } else {
-                nextSession = 'Kurze Pause';
-                notificationService.showPomodoroBreakStart('short', state.preferences.pomodoro?.shortBreakDuration || 5);
-              }
-            } else {
-              // Break completed - time to get back to work
-              console.log('Break completed! Time to get back to work.');
-              nextSession = 'Arbeitsphase';
-            }
-            
-            // Show desktop notification for Pomodoro session end
-            notificationService.showPomodoroSessionEnd(sessionType, nextSession, () => {
-              // Focus window when notification is clicked
-              window.focus();
-            });
-            
-            // Update timer context to reflect the new session
-            const activeTimer = timerService.getActiveTimer();
-            if (activeTimer) {
-              dispatch({ type: 'UPDATE_TIMER_CONTEXT', payload: activeTimer });
-            }
-          } catch (error) {
-            console.error('Error in onPomodoroSessionEnd callback:', error);
-          }
-        },
         onTaskTimeEnd: (context) => {
           try {
             console.log('Task time completed:', context.taskTitle);
@@ -3948,34 +3897,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         const active = timerService.getActiveTimer();
         if (active) {
           dispatch({ type: 'UPDATE_TIMER_CONTEXT', payload: active });
-        }
-        // Also push a Pomodoro-only context update if no active task is running
-        if (!active && timerService.isPomodoroActive()) {
-          // Create a minimal synthetic context for UI components reading timer from context
-          const session = timerService.getGlobalPomodoroSession();
-          if (session) {
-            dispatch({
-              type: 'UPDATE_TIMER_CONTEXT',
-              payload: {
-                taskId: '__pomodoro__',
-                taskTitle: 'Pomodoro',
-                estimatedTime: timerService.getSessionDuration(session.type),
-                elapsedTime: session.sessionElapsedTime,
-                remainingTime: session.sessionRemainingTime,
-                isActive: true,
-                isPaused: false,
-                mode: 'pomodoro',
-                pomodoroSession: {
-                  type: session.type,
-                  sessionNumber: session.sessionNumber,
-                  totalSessions: 0,
-                  sessionStartTime: session.sessionStartTime,
-                  sessionElapsedTime: session.sessionElapsedTime,
-                  sessionRemainingTime: session.sessionRemainingTime,
-                }
-              }
-            } as any);
-          }
         }
       } catch {}
     };
