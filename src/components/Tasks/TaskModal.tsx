@@ -8,7 +8,7 @@ import {
   CalendarDays, FolderOpen, ChevronDown, Target, Zap, Search, GripHorizontal,
   Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Code, Quote, 
   Minus, CheckSquare, HelpCircle, EyeOff, Pin, Edit2, ChevronLeft, ChevronRight,
-  ArrowLeftRight, Inbox, Bell, Maximize, Minimize, ChevronUp, GripVertical, Pencil, Expand
+  ArrowLeftRight, Inbox, Bell, Maximize, Minimize, ChevronUp, GripVertical, Pencil, Expand, Save
 } from 'lucide-react';
 import { MarkdownRenderer } from '../Common/MarkdownRenderer';
 import type { Task, Subtask, Column, RecurrenceRule, TaskReminder } from '../../types';
@@ -3622,18 +3622,32 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   {t('common.cancel')}
                 </button>
                 
-                {/* Task Completed Button - Premium */}
+                {/* Mark Complete Button - Outline Style */}
                 <button
                   onClick={task?.completed ? handleToggleComplete : handleCompleteAndClose}
+                  className={`flex items-center space-x-2 px-4 py-2 text-sm font-medium rounded-xl transition-all duration-200 border-2 ${
+                    task?.completed 
+                      ? 'border-amber-400 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20' 
+                      : 'border-emerald-400 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
+                  }`}
+                  title={task?.completed ? t('tasks.mark_incomplete') : t('tasks.mark_complete')}
+                >
+                  <CheckSquare className="w-4 h-4" />
+                  <span className="hidden sm:inline">{task?.completed ? t('tasks.mark_incomplete') : t('tasks.mark_complete')}</span>
+                </button>
+                
+                {/* Save Button - Primary */}
+                <button
+                  onClick={handleClose}
                   className="flex items-center space-x-2 px-5 py-2.5 text-sm font-medium text-white rounded-xl transition-all duration-300 hover:shadow-lg"
                   style={{ 
                     backgroundColor: state.preferences.accentColor,
                     boxShadow: `0 4px 14px -3px ${state.preferences.accentColor}50`
                   }}
-                  title={task?.completed ? t('tasks.mark_incomplete') : t('tasks.mark_complete')}
+                  title={t('common.save')}
                 >
-                  <CheckSquare className="w-4 h-4" />
-                  <span>{task?.completed ? t('tasks.mark_incomplete') : t('tasks.mark_complete')}</span>
+                  <Save className="w-4 h-4" />
+                  <span>{t('common.save')}</span>
                 </button>
               </div>
             </div>
