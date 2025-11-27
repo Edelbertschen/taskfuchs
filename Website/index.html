@@ -516,13 +516,30 @@
       margin-bottom: 1.5rem;
       border-radius: 16px;
       overflow: hidden;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       cursor: pointer;
       display: inline-block;
       width: 100%;
       vertical-align: top;
-      opacity: 1 !important;
-      transform: none !important;
+      opacity: 0;
+      transform: translateY(30px) scale(0.97);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out, box-shadow 0.4s ease;
+    }
+
+    /* Staggered animation delays */
+    .screenshot-card:nth-child(1) { transition-delay: 0s; }
+    .screenshot-card:nth-child(2) { transition-delay: 0.08s; }
+    .screenshot-card:nth-child(3) { transition-delay: 0.16s; }
+    .screenshot-card:nth-child(4) { transition-delay: 0.24s; }
+    .screenshot-card:nth-child(5) { transition-delay: 0.32s; }
+    .screenshot-card:nth-child(6) { transition-delay: 0.4s; }
+    .screenshot-card:nth-child(7) { transition-delay: 0.48s; }
+    .screenshot-card:nth-child(8) { transition-delay: 0.56s; }
+    .screenshot-card:nth-child(9) { transition-delay: 0.64s; }
+
+    /* Visible state - triggered by JS */
+    .screenshot-card.card-visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
     }
 
     .screenshot-card:first-child,
@@ -532,7 +549,7 @@
     }
 
     .screenshot-card:hover {
-      transform: translateY(-8px);
+      transform: translateY(-8px) scale(1.02) !important;
       box-shadow: 
         0 30px 60px -15px rgba(0, 0, 0, 0.15),
         0 15px 30px -10px rgba(0, 0, 0, 0.1);
@@ -891,7 +908,7 @@
       transform: translateX(0);
     }
 
-    /* Screenshot cards - remove any transition delays */
+    /* Screenshot cards animation complete */
     </style>
 </head>
 <body>
@@ -1390,6 +1407,7 @@
     // Scroll animations
     function initScrollAnimations() {
       const elements = document.querySelectorAll('.slide-in, .slide-in-left, .slide-in-right');
+      const screenshotCards = document.querySelectorAll('.screenshot-card');
       
       // Check if element is in viewport
       function isInViewport(el) {
@@ -1404,10 +1422,10 @@
         }
       });
       
-      // Observer for elements that scroll into view
-                const observer = new IntersectionObserver((entries) => {
+      // Observer for slide-in elements
+      const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-                        if (entry.isIntersecting) {
+          if (entry.isIntersecting) {
             entry.target.classList.add('visible');
           }
         });
@@ -1416,6 +1434,26 @@
       elements.forEach(el => {
         if (!el.classList.contains('visible')) {
           observer.observe(el);
+        }
+      });
+
+      // Observer for screenshot cards - staggered reveal
+      const cardObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('card-visible');
+            cardObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+      // Observe each card individually
+      screenshotCards.forEach(card => {
+        if (isInViewport(card)) {
+          // Already visible - show immediately
+          card.classList.add('card-visible');
+        } else {
+          cardObserver.observe(card);
         }
       });
     }
