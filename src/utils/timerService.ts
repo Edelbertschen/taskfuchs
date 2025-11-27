@@ -4,13 +4,11 @@ import { notificationService } from './notificationService';
 
 type TimerCallback = (context: ActiveTimerContext) => void;
 type TimerEndCallback = (context: ActiveTimerContext, reason: 'completed' | 'overtime' | 'stopped') => void;
-type PomodoroCallback = (sessionType: 'work' | 'shortBreak' | 'longBreak', sessionNumber: number) => void;
 // New callback type for timer persistence
 type TimerPersistenceCallback = (taskId: string, elapsedTime: number) => void;
 
 interface TimerEventCallbacks {
   onTick?: TimerCallback;
-  onPomodoroSessionEnd?: PomodoroCallback;
   onTaskTimeEnd?: TimerCallback;
   onPause?: TimerCallback;
   onResume?: TimerCallback;
@@ -21,27 +19,9 @@ interface TimerEventCallbacks {
   onTimeAdded?: (taskId: string, addedMinutes: number, newEstimatedTime: number) => void;
 }
 
-// Global Pomodoro Session (independent of tasks)
-interface GlobalPomodoroSession {
-  type: 'work' | 'shortBreak' | 'longBreak';
-  sessionNumber: number;
-  sessionStartTime: number;
-  // Wall-clock anchored accounting
-  accumulatedPauseMs: number;
-  pausedAt?: number | null;
-  sessionElapsedTime: number;
-  sessionRemainingTime: number;
-  isActive: boolean;
-  isPaused: boolean;
-  sessionEndHandled: boolean; // Flag to prevent multiple session end notifications
-}
-
 class TimerService {
   private activeTimer: ActiveTimerContext | null = null;
-  private globalPomodoro: GlobalPomodoroSession | null = null;
   private intervalId: number | null = null;
-  private pomodoroIntervalId: number | null = null;
-  private pomodoroLastTickWallClock: number | null = null;
   private callbacks: TimerEventCallbacks = {};
   private preferences: UserPreferences | null = null;
   private warningNotificationSent: boolean = false;
@@ -68,24 +48,22 @@ class TimerService {
     taskId: string,
     taskTitle: string,
     estimatedTime: number,
-    mode: 'normal' | 'pomodoro' = 'normal',
-    resumeData?: { elapsedTime: number },
     trackedTime?: number
   ): ActiveTimerContext {
     try {
-      // Stop any existing TASK timer (but preserve Pomodoro session)
-      this.stopTaskTimer('stopped');
+      // Stop any existing timer
+      this.stopTimer('stopped');
 
       // Reset notification flags for new timer
       this.warningNotificationSent = false;
       this.overtimeNotificationSent = false;
 
       const now = Date.now();
-      // Use trackedTime from task if available, otherwise use resumeData or start from 0
-      const elapsedTime = trackedTime || resumeData?.elapsedTime || 0;
+      // Use trackedTime from task if available, otherwise start from 0
+      const elapsedTime = trackedTime || 0;
       const remainingTime = Math.max(0, estimatedTime - elapsedTime);
 
-      // Create task timer (without Pomodoro session - that's global now)
+      // Create task timer
       this.activeTimer = {
         taskId,
         taskTitle,
@@ -93,15 +71,8 @@ class TimerService {
         elapsedTime,
         remainingTime,
         isActive: true,
-        isPaused: false,
-        mode: this.preferences?.pomodoro?.enabled ? 'pomodoro' : mode,
-        pomodoroSession: this.getPomodoroSessionForTimer() // Reference to global session
+        isPaused: false
       };
-
-      // Always start Pomodoro if enabled; if already running keep it running
-      if (this.preferences?.pomodoro?.enabled && !this.globalPomodoro) {
-        this.startPomodoroSession();
-      }
 
       this.startTaskInterval();
       
