@@ -288,9 +288,15 @@ export function EndOfDayModal({ isOpen, onClose }: EndOfDayModalProps) {
 
   if (!isOpen) return null;
 
+  // Check if onboarding is active (check for onboarding modal in DOM)
+  const isOnboardingActive = typeof document !== 'undefined' && 
+    document.querySelector('[data-onboarding-modal="true"]') !== null;
+
   return (
     <div 
-      className="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in duration-300"
+      className={`fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-300 ${
+        isOnboardingActive ? 'z-[999990]' : 'z-50'
+      }`}
       onMouseDown={(e) => {
         // Do not close while dragging tasks or archiving
         const dragging = (window as any).__taskfuchs_isDraggingTasks;
@@ -617,7 +623,9 @@ export function EndOfDayModal({ isOpen, onClose }: EndOfDayModalProps) {
 
       {/* Archive Confirmation */}
       {showArchiveConfirm && (
-        <div className="fixed inset-0 bg-black/80 z-60 flex items-center justify-center p-4 animate-in fade-in duration-200">
+        <div className={`fixed inset-0 bg-black/80 flex items-center justify-center p-4 animate-in fade-in duration-200 ${
+          isOnboardingActive ? 'z-[999991]' : 'z-60'
+        }`}>
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full shadow-2xl animate-in slide-in-from-bottom-4 duration-300">
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
               {i18n.language === 'en' ? 'Archive Tasks' : 'Aufgaben archivieren'}
@@ -648,7 +656,9 @@ export function EndOfDayModal({ isOpen, onClose }: EndOfDayModalProps) {
 
       {/* Move Confirmation */}
       {showMoveConfirm && (
-        <div className="fixed inset-0 bg-black/80 z-60 flex items-center justify-center p-4 animate-in fade-in duration-200">
+        <div className={`fixed inset-0 bg-black/80 flex items-center justify-center p-4 animate-in fade-in duration-200 ${
+          isOnboardingActive ? 'z-[999991]' : 'z-60'
+        }`}>
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full shadow-2xl animate-in slide-in-from-bottom-4 duration-300">
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
               {i18n.language === 'en' ? 'Move Tasks' : 'Aufgaben verschieben'}

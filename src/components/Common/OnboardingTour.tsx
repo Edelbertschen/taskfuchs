@@ -1290,7 +1290,7 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
     (state.preferences.theme === 'system' && typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
   
   const content = (
-    <div className="fixed inset-0 z-[999999999] pointer-events-none">
+    <div className="fixed inset-0 z-[999999999] pointer-events-none" data-onboarding-modal="true">
       {/* Subtle vignette overlay */}
       <div 
         className="absolute inset-0 pointer-events-none"
