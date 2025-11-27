@@ -1774,6 +1774,7 @@ function InboxTaskCard({
     <>
     <div 
       data-task-id={task.id}
+      data-onboarding-task-card={isOnboardingSampleTask ? 'true' : undefined}
       className="group rounded-xl transition-all duration-200 cursor-pointer backdrop-blur-2xl"
       style={{
         // Dark mode: use much darker glass so text is readable over backgrounds

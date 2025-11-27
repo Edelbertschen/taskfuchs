@@ -2752,7 +2752,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                           <div className="flex-1 p-5 overflow-y-auto">
                 <div className="space-y-5">
                 {/* Description */}
-                <div>
+                <div data-onboarding-description="true" data-task-description="true">
                   {/* Header with edit/fullscreen icons */}
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-2">
@@ -2864,7 +2864,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                 </div>
 
                 {/* Subtasks - Collapsible - Elegant */}
-                <div>
+                <div data-onboarding-subtasks="true" data-task-subtasks="true">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-2">
                       <label className="text-sm font-medium text-gray-600 dark:text-gray-400">
@@ -2948,7 +2948,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
               `}</style>
                               <div className="space-y-5">
                 {/* Priority Buttons - Elegant Pills */}
-                <div>
+                <div data-onboarding-priority="true" data-task-priority="true">
                   <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">
                     Priority
                   </label>
