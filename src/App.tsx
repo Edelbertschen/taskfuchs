@@ -558,14 +558,26 @@ function MainApp() {
   };
 
   // Check if user should see onboarding (only first start)
+  // Use a ref to ensure this only runs once per mount
+  const onboardingCheckedRef = React.useRef(false);
+  
   React.useEffect(() => {
+    // Only check once per component mount to prevent race conditions
+    if (onboardingCheckedRef.current) return;
+    
     const hasCompletedOnboarding = localStorage.getItem('taskfuchs-onboarding-complete') === 'true' || state.preferences.hasCompletedOnboarding;
     const alreadyShownThisSession = sessionStorage.getItem('taskfuchs-onboarding-shown') === 'true';
     
     // Show onboarding directly for first-time users (no splash modal)
     if (!hasCompletedOnboarding && !alreadyShownThisSession) {
-      setShowOnboarding(true);
-      sessionStorage.setItem('taskfuchs-onboarding-shown', 'true');
+      onboardingCheckedRef.current = true;
+      // Small delay to ensure DOM is fully ready
+      setTimeout(() => {
+        setShowOnboarding(true);
+        sessionStorage.setItem('taskfuchs-onboarding-shown', 'true');
+      }, 100);
+    } else {
+      onboardingCheckedRef.current = true;
     }
   }, [state.preferences.hasCompletedOnboarding]);
 
@@ -684,7 +696,9 @@ function MainApp() {
         } else if (showLanguageSelection) {
           setShowLanguageSelection(false);
         } else if (showOnboarding) {
-          setShowOnboarding(false);
+          // Don't close onboarding on ESC - users should use the skip button
+          // This prevents accidental closure
+          // setShowOnboarding(false);
         }
       }
     };

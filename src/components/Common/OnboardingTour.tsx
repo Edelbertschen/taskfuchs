@@ -1321,13 +1321,22 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
 
   if (!isOpen) return null;
   
-  // Safety check - ensure we have valid section and step
-  if (!currentSection || !currentStep) {
+  // Safety check - ensure we have valid section and step (only when language is selected)
+  // When language is null, we show the language selection modal, so don't return null
+  if (language && (!currentSection || !currentStep)) {
     // Reset to beginning if something went wrong
     if (currentSectionIndex !== 0 || currentStepIndex !== 0) {
       setCurrentSectionIndex(0);
       setCurrentStepIndex(0);
     }
+    // Don't return null immediately - wait for state to update
+    // This prevents the onboarding from flickering off
+    return null;
+  }
+  
+  // If allTourSections is empty (shouldn't happen), show a fallback
+  if (allTourSections.length === 0) {
+    console.error('[Onboarding] No tour sections available!');
     return null;
   }
 
