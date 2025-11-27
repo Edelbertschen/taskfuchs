@@ -329,6 +329,9 @@
     .fox-container {
             position: relative;
       margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .fox-main {
@@ -336,7 +339,9 @@
       height: 160px;
       animation: bounce 2.5s ease-in-out infinite;
       filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.25));
-    }
+      position: relative;
+            z-index: 1;
+        }
 
     @keyframes bounce {
       0%, 100% { transform: translateY(0); }
@@ -345,8 +350,12 @@
 
     .fox-ring {
             position: absolute;
-      inset: -25px;
-            border-radius: 50%;
+      width: 210px;
+      height: 210px;
+      top: 50%;
+            left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
       border: 2px dashed var(--accent);
                 opacity: 0.4;
       animation: spin 25s linear infinite;
@@ -505,7 +514,7 @@
       break-inside: avoid;
       margin-bottom: 1.5rem;
       border-radius: 16px;
-      overflow: hidden;
+            overflow: hidden;
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       cursor: pointer;
       display: inline-block;
@@ -987,59 +996,59 @@
 
     <div class="screenshot-masonry">
       <div class="screenshot-card glass-premium slide-in" onclick="openLightbox(this)">
-        <img src="assets/screenshots/Planer.png" alt="Wochenplaner" loading="lazy" data-screenshot="Planer">
+        <img src="assets/screenshots/Planer.png" alt="Wochenplaner" data-screenshot="Planer">
         <div class="label" data-i18n="showcase.planner.title">Wochenplaner</div>
         <div class="desc" data-i18n="showcase.planner.desc">Deine ganze Woche auf einen Blick. Per Drag & Drop verschieben.</div>
       </div>
 
       <div class="screenshot-card glass-premium slide-in" onclick="openLightbox(this)">
-        <img src="assets/screenshots/Heute.png" alt="Heute" loading="lazy" data-screenshot="Heute">
+        <img src="assets/screenshots/Heute.png" alt="Heute" data-screenshot="Heute">
         <div class="label" data-i18n="showcase.today.title">Heute</div>
         <div class="desc" data-i18n="showcase.today.desc">Fokus auf das Wesentliche: Was steht heute an?</div>
       </div>
 
       <div class="screenshot-card glass-premium slide-in" onclick="openLightbox(this)">
-        <img src="assets/screenshots/Aufgabendetails.png" alt="Aufgabendetails" loading="lazy" data-screenshot="Aufgabendetails">
+        <img src="assets/screenshots/Aufgabendetails.png" alt="Aufgabendetails" data-screenshot="Aufgabendetails">
         <div class="label" data-i18n="showcase.details.title">Aufgabendetails</div>
         <div class="desc" data-i18n="showcase.details.desc">Unteraufgaben, Zeitschätzung, Prioritäten und mehr.</div>
       </div>
 
       <div class="screenshot-card glass-premium slide-in" onclick="openLightbox(this)">
-        <img src="assets/screenshots/Timer.png" alt="Timer" loading="lazy" data-screenshot="Timer">
+        <img src="assets/screenshots/Timer.png" alt="Timer" data-screenshot="Timer">
         <div class="label" data-i18n="showcase.timer.title">Timer</div>
         <div class="desc" data-i18n="showcase.timer.desc">Tracke deine Arbeitszeit direkt in der App.</div>
       </div>
 
       <div class="screenshot-card glass-premium slide-in" onclick="openLightbox(this)">
-        <img src="assets/screenshots/Tag beenden.png" alt="Tagesabschluss" loading="lazy" data-screenshot="Tag beenden">
+        <img src="assets/screenshots/Tag beenden.png" alt="Tagesabschluss" data-screenshot="Tag beenden">
         <div class="label" data-i18n="showcase.endday.title">Tagesabschluss</div>
         <div class="desc" data-i18n="showcase.endday.desc">Reflektiere deinen Tag und plane den nächsten.</div>
       </div>
 
       <div class="screenshot-card glass-premium slide-in" onclick="openLightbox(this)">
-        <img src="assets/screenshots/Theme-Konfiguration_l.png" alt="Themes" loading="lazy" data-screenshot="Theme-Konfiguration">
+        <img src="assets/screenshots/Theme-Konfiguration_l.png" alt="Themes" data-screenshot="Theme-Konfiguration">
         <div class="label" data-i18n="showcase.themes.title">Dein Style</div>
         <div class="desc" data-i18n="showcase.themes.desc">Farben, Hintergründe und Dark Mode nach deinem Geschmack.</div>
       </div>
 
       <div class="screenshot-card glass-premium slide-in" onclick="openLightbox(this)">
-        <img src="assets/screenshots/settings.png" alt="Einstellungen" loading="lazy" data-screenshot="settings">
+        <img src="assets/screenshots/settings.png" alt="Einstellungen" data-screenshot="settings">
         <div class="label" data-i18n="showcase.settings.title">Einstellungen</div>
         <div class="desc" data-i18n="showcase.settings.desc">Passe TaskFuchs ganz nach deinen Wünschen an.</div>
       </div>
 
       <div class="screenshot-card glass-premium slide-in" onclick="openLightbox(this)">
-        <img src="assets/screenshots/smart aufgabe erstellen.png" alt="Smart Aufgabe" loading="lazy" data-screenshot="smart aufgabe erstellen">
+        <img src="assets/screenshots/smart aufgabe erstellen_l.png" alt="Smart Aufgabe" data-screenshot="smart aufgabe erstellen">
         <div class="label" data-i18n="showcase.smart.title">Schnelle Eingabe</div>
         <div class="desc" data-i18n="showcase.smart.desc">Aufgaben blitzschnell mit natürlicher Sprache erstellen.</div>
       </div>
 
       <div class="screenshot-card glass-premium slide-in" onclick="openLightbox(this)">
-        <img src="assets/screenshots/Reports.png" alt="Reports" loading="lazy" data-screenshot="Reports">
+        <img src="assets/screenshots/Reports.png" alt="Reports" data-screenshot="Reports">
         <div class="label" data-i18n="showcase.reports.title">Statistiken</div>
         <div class="desc" data-i18n="showcase.reports.desc">Behalte den Überblick über deine Produktivität.</div>
       </div>
-    </div>
+                </div>
   </section>
 
   <!-- Lightbox -->
@@ -1222,8 +1231,8 @@
         "downloads.title": "Desktop-Apps (Electron)",
         "footer.imprint": "Impressum",
         "footer.privacy": "Datenschutz"
-      },
-      en: {
+            },
+            en: {
         "hero.line1": "Getting things done",
         "hero.line2": "can actually",
         "hero.line3": "be fun",
@@ -1290,23 +1299,8 @@
     // Theme Toggle
     const themeToggle = document.getElementById('themeToggle');
 
-    // Cache for available themed screenshots
-    const themedScreenshots = new Set();
-    
-    // Check which screenshots have themed variants
-    async function checkThemedScreenshots() {
-      const screenshots = document.querySelectorAll('img[data-screenshot]');
-      for (const img of screenshots) {
-        const baseName = img.dataset.screenshot;
-        // Check if _l and _d variants exist by trying to load them
-        const testImg = new Image();
-        testImg.src = `assets/screenshots/${baseName}_l.png`;
-        testImg.onload = () => themedScreenshots.add(baseName);
-      }
-    }
-    
-    // Known themed screenshots (faster than checking each time)
-    const knownThemedScreenshots = ['Theme-Konfiguration'];
+    // Known themed screenshots (have _l and _d variants)
+    const knownThemedScreenshots = ['Theme-Konfiguration', 'smart aufgabe erstellen'];
 
     function setTheme(t) {
       theme = t;
@@ -1318,7 +1312,11 @@
       document.querySelectorAll('img[data-screenshot]').forEach(img => {
         const baseName = img.dataset.screenshot;
         if (knownThemedScreenshots.includes(baseName)) {
-          img.src = `assets/screenshots/${baseName}${suffix}.png`;
+          const newSrc = `assets/screenshots/${baseName}${suffix}.png`;
+          // Only update if src is different to avoid flicker
+          if (img.src !== newSrc && !img.src.endsWith(newSrc)) {
+            img.src = newSrc;
+          }
         }
       });
     }
@@ -1381,13 +1379,13 @@
       lightboxImg.src = img.src;
       lightboxImg.alt = img.alt;
       lightbox.classList.add('show');
-            document.body.style.overflow = 'hidden';
+                document.body.style.overflow = 'hidden';
         }
 
         function closeLightbox() {
       document.getElementById('lightbox').classList.remove('show');
-      document.body.style.overflow = '';
-    }
+            document.body.style.overflow = '';
+        }
 
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') closeLightbox();
