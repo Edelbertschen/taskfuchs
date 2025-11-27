@@ -399,7 +399,7 @@ const getFoxImagePath = () => {
 };
 
 // Create a sample task for the onboarding
-const createSampleTask = (pinColumnId?: string): Task => {
+const createSampleTask = (pinColumnId?: string, withDate: boolean = false): Task => {
   const today = format(new Date(), 'yyyy-MM-dd');
   const now = new Date().toISOString();
   
@@ -447,8 +447,8 @@ This is a **sample task** to show you how TaskFuchs works.
         updatedAt: now
       }
     ],
-    columnId: `date-${today}`,
-    reminderDate: today,
+    columnId: withDate ? `date-${today}` : undefined,
+    reminderDate: withDate ? today : undefined,
     pinColumnId: pinColumnId,
     pinned: !!pinColumnId,
     createdAt: now,
@@ -625,6 +625,7 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
   // Guide cursor state
   const [showGuideCursor, setShowGuideCursor] = useState(false);
   const [guideCursorTarget, setGuideCursorTarget] = useState<string>('');
+  const [isNavigationCursor, setIsNavigationCursor] = useState(false); // Distinguish navigation vs step-specific cursor
   const pendingNavigationRef = useRef<{ view: string; sectionIndex: number; stepIndex: number } | null>(null);
   
   // Styling demo state - save original settings when entering styling section
@@ -777,24 +778,44 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSectionIndex, currentStepIndex]);
   
-  // Create sample task when language is selected
+  // Create sample task when language is selected (without date for Inbox)
   useEffect(() => {
     if (isOpen && language && !sampleTaskCreated) {
       // Find an existing pin column or use the first one
       const pinColumn = state.pinColumns?.[0];
-      const sampleTask = createSampleTask(pinColumn?.id);
+      const sampleTask = createSampleTask(pinColumn?.id, false); // Create WITHOUT date (for Inbox)
       
       // Check if sample task already exists
       const existingTask = state.tasks.find(t => t.id === SAMPLE_TASK_ID);
       if (!existingTask) {
         dispatch({ type: 'ADD_TASK', payload: sampleTask });
       } else {
-        // Update it to have today's date
+        // Reset it to inbox state (no date)
         dispatch({ type: 'UPDATE_TASK', payload: sampleTask });
       }
       setSampleTaskCreated(true);
     }
   }, [isOpen, language, sampleTaskCreated, state.pinColumns, state.tasks, dispatch]);
+  
+  // Add date to sample task when entering "today" section
+  useEffect(() => {
+    const currentSection = allTourSections[currentSectionIndex];
+    
+    if (currentSection?.id === 'today' && sampleTaskCreated) {
+      const sampleTask = state.tasks.find(t => t.id === SAMPLE_TASK_ID);
+      if (sampleTask && !sampleTask.reminderDate) {
+        const today = format(new Date(), 'yyyy-MM-dd');
+        dispatch({
+          type: 'UPDATE_TASK',
+          payload: {
+            ...sampleTask,
+            reminderDate: today,
+            columnId: `date-${today}`
+          }
+        });
+      }
+    }
+  }, [currentSectionIndex, sampleTaskCreated, state.tasks, dispatch, allTourSections]);
   
   // Expand all sidebars when tour starts
   useEffect(() => {
@@ -807,14 +828,13 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
   
   // Handle guide cursor for step-specific UI highlights (not for navigation)
   useEffect(() => {
-    if (!isOpen || !language) return;
+    if (!isOpen || !language || isNavigationCursor) return;
     
     const currentSection = allTourSections[currentSectionIndex];
     const currentStep = currentSection?.steps[currentStepIndex];
     
-    // Only show guide cursor if it's NOT a navigation cursor (pendingNavigationRef is null)
-    // and the step has showGuideCursor flag
-    if (currentStep?.showGuideCursor && currentStep?.guideCursorTarget && !pendingNavigationRef.current) {
+    // Show guide cursor for step-specific highlights
+    if (currentStep?.showGuideCursor && currentStep?.guideCursorTarget) {
       // Small delay to ensure DOM is ready
       const timer = setTimeout(() => {
         setShowGuideCursor(true);
@@ -822,12 +842,11 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
       }, 300);
       
       return () => clearTimeout(timer);
-    } else if (!pendingNavigationRef.current) {
-      // Only hide if not during navigation
+    } else {
       setShowGuideCursor(false);
       setGuideCursorTarget('');
     }
-  }, [isOpen, language, currentSectionIndex, currentStepIndex, allTourSections]);
+  }, [isOpen, language, currentSectionIndex, currentStepIndex, allTourSections, isNavigationCursor]);
   
   // Handle task modal visibility based on current step
   useEffect(() => {
@@ -974,7 +993,8 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
     // Store pending navigation
     pendingNavigationRef.current = { view, sectionIndex, stepIndex };
     
-    // Show guide cursor
+    // Show guide cursor for navigation
+    setIsNavigationCursor(true);
     setGuideCursorTarget(selector);
     setShowGuideCursor(true);
   }, [getViewSelector, navigateToView]);
@@ -984,18 +1004,19 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
     setShowGuideCursor(false);
     
     // Execute pending navigation (for view transitions)
-    if (pendingNavigationRef.current) {
+    if (isNavigationCursor && pendingNavigationRef.current) {
       const { view, sectionIndex, stepIndex } = pendingNavigationRef.current;
       navigateToView(view);
       setCurrentSectionIndex(sectionIndex);
       setCurrentStepIndex(stepIndex);
       pendingNavigationRef.current = null;
+      setIsNavigationCursor(false);
       
       // Reset animation state after navigation
       setTimeout(() => setIsAnimating(false), 200);
     }
-    // For non-navigation cursors (UI highlights), don't reset isAnimating
-  }, [navigateToView]);
+    // For non-navigation cursors (UI highlights), cursor just disappears
+  }, [navigateToView, isNavigationCursor]);
   
   // Go to next step or section - stable version without stale closures
   const handleNext = useCallback(() => {
@@ -1099,6 +1120,7 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
       if (selector) {
         // Show guide cursor for first navigation
         pendingNavigationRef.current = { view: firstSection.view, sectionIndex: 0, stepIndex: 0 };
+        setIsNavigationCursor(true);
         setGuideCursorTarget(selector);
         setShowGuideCursor(true);
       } else {
