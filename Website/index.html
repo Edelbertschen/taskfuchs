@@ -979,59 +979,59 @@
 
     <div class="screenshot-masonry">
       <div class="screenshot-card glass-premium slide-in" onclick="openLightbox(this)">
-        <img src="assets/screenshots/Planer.png" alt="Wochenplaner" loading="lazy">
+        <img src="assets/screenshots/Planer.png" alt="Wochenplaner" loading="lazy" data-screenshot="Planer">
         <div class="label" data-i18n="showcase.planner.title">Wochenplaner</div>
         <div class="desc" data-i18n="showcase.planner.desc">Deine ganze Woche auf einen Blick. Per Drag & Drop verschieben.</div>
-                </div>
+      </div>
 
       <div class="screenshot-card glass-premium slide-in" onclick="openLightbox(this)">
-        <img src="assets/screenshots/Heute.png" alt="Heute" loading="lazy">
+        <img src="assets/screenshots/Heute.png" alt="Heute" loading="lazy" data-screenshot="Heute">
         <div class="label" data-i18n="showcase.today.title">Heute</div>
         <div class="desc" data-i18n="showcase.today.desc">Fokus auf das Wesentliche: Was steht heute an?</div>
-                </div>
+      </div>
 
       <div class="screenshot-card glass-premium slide-in" onclick="openLightbox(this)">
-        <img src="assets/screenshots/Aufgabendetails.png" alt="Aufgabendetails" loading="lazy">
+        <img src="assets/screenshots/Aufgabendetails.png" alt="Aufgabendetails" loading="lazy" data-screenshot="Aufgabendetails">
         <div class="label" data-i18n="showcase.details.title">Aufgabendetails</div>
         <div class="desc" data-i18n="showcase.details.desc">Unteraufgaben, Zeitschätzung, Prioritäten und mehr.</div>
-                </div>
+      </div>
 
       <div class="screenshot-card glass-premium slide-in" onclick="openLightbox(this)">
-        <img src="assets/screenshots/Timer.png" alt="Timer" loading="lazy">
+        <img src="assets/screenshots/Timer.png" alt="Timer" loading="lazy" data-screenshot="Timer">
         <div class="label" data-i18n="showcase.timer.title">Timer</div>
         <div class="desc" data-i18n="showcase.timer.desc">Tracke deine Arbeitszeit direkt in der App.</div>
-                </div>
+      </div>
 
       <div class="screenshot-card glass-premium slide-in" onclick="openLightbox(this)">
-        <img src="assets/screenshots/Tag beenden.png" alt="Tagesabschluss" loading="lazy">
+        <img src="assets/screenshots/Tag beenden.png" alt="Tagesabschluss" loading="lazy" data-screenshot="Tag beenden">
         <div class="label" data-i18n="showcase.endday.title">Tagesabschluss</div>
         <div class="desc" data-i18n="showcase.endday.desc">Reflektiere deinen Tag und plane den nächsten.</div>
-                </div>
+      </div>
 
       <div class="screenshot-card glass-premium slide-in" onclick="openLightbox(this)">
-        <img src="assets/screenshots/Theme-Konfiguration.png" alt="Themes" loading="lazy">
+        <img src="assets/screenshots/Theme-Konfiguration_l.png" alt="Themes" loading="lazy" data-screenshot="Theme-Konfiguration">
         <div class="label" data-i18n="showcase.themes.title">Dein Style</div>
         <div class="desc" data-i18n="showcase.themes.desc">Farben, Hintergründe und Dark Mode nach deinem Geschmack.</div>
-                    </div>
+      </div>
 
       <div class="screenshot-card glass-premium slide-in" onclick="openLightbox(this)">
-        <img src="assets/screenshots/settings.png" alt="Einstellungen" loading="lazy">
+        <img src="assets/screenshots/settings.png" alt="Einstellungen" loading="lazy" data-screenshot="settings">
         <div class="label" data-i18n="showcase.settings.title">Einstellungen</div>
         <div class="desc" data-i18n="showcase.settings.desc">Passe TaskFuchs ganz nach deinen Wünschen an.</div>
-        </div>
-        
+      </div>
+
       <div class="screenshot-card glass-premium slide-in" onclick="openLightbox(this)">
-        <img src="assets/screenshots/smart aufgabe erstellen.png" alt="Smart Aufgabe" loading="lazy">
+        <img src="assets/screenshots/smart aufgabe erstellen.png" alt="Smart Aufgabe" loading="lazy" data-screenshot="smart aufgabe erstellen">
         <div class="label" data-i18n="showcase.smart.title">Schnelle Eingabe</div>
         <div class="desc" data-i18n="showcase.smart.desc">Aufgaben blitzschnell mit natürlicher Sprache erstellen.</div>
-            </div>
-            
+      </div>
+
       <div class="screenshot-card glass-premium slide-in" onclick="openLightbox(this)">
-        <img src="assets/screenshots/Reports.png" alt="Reports" loading="lazy">
+        <img src="assets/screenshots/Reports.png" alt="Reports" loading="lazy" data-screenshot="Reports">
         <div class="label" data-i18n="showcase.reports.title">Statistiken</div>
         <div class="desc" data-i18n="showcase.reports.desc">Behalte den Überblick über deine Produktivität.</div>
-                    </div>
-                </div>
+      </div>
+    </div>
   </section>
 
   <!-- Lightbox -->
@@ -1282,10 +1282,37 @@
     // Theme Toggle
     const themeToggle = document.getElementById('themeToggle');
 
+    // Cache for available themed screenshots
+    const themedScreenshots = new Set();
+    
+    // Check which screenshots have themed variants
+    async function checkThemedScreenshots() {
+      const screenshots = document.querySelectorAll('img[data-screenshot]');
+      for (const img of screenshots) {
+        const baseName = img.dataset.screenshot;
+        // Check if _l and _d variants exist by trying to load them
+        const testImg = new Image();
+        testImg.src = `assets/screenshots/${baseName}_l.png`;
+        testImg.onload = () => themedScreenshots.add(baseName);
+      }
+    }
+    
+    // Known themed screenshots (faster than checking each time)
+    const knownThemedScreenshots = ['Theme-Konfiguration'];
+
     function setTheme(t) {
       theme = t;
       document.body.classList.toggle('dark', t === 'dark');
       localStorage.setItem('tf-theme', t);
+      
+      // Update screenshots with themed variants
+      const suffix = t === 'dark' ? '_d' : '_l';
+      document.querySelectorAll('img[data-screenshot]').forEach(img => {
+        const baseName = img.dataset.screenshot;
+        if (knownThemedScreenshots.includes(baseName)) {
+          img.src = `assets/screenshots/${baseName}${suffix}.png`;
+        }
+      });
     }
 
     themeToggle.onclick = () => setTheme(theme === 'dark' ? 'light' : 'dark');
