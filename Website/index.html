@@ -315,37 +315,6 @@
             background: rgba(255, 255, 255, 0.15);
     }
 
-    /* Header Download Button */
-    .header-download {
-      display: flex;
-      align-items: center;
-      gap: 0.375rem;
-      padding: 0.5rem 1rem;
-      border-radius: 9999px;
-      background: var(--accent);
-      color: white;
-      text-decoration: none;
-      font-size: 0.8rem;
-      font-weight: 600;
-      transition: all 0.25s;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    }
-
-    .header-download:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-
-    .header-download svg {
-      width: 14px;
-      height: 14px;
-    }
-
-    @media (max-width: 640px) {
-      .header-download span { display: none; }
-      .header-download { padding: 0.5rem; }
-    }
-
     /* Hero */
     .hero {
       min-height: 100vh;
@@ -380,15 +349,16 @@
     }
 
     .fox-ring {
-            position: absolute;
+      position: absolute;
       width: 210px;
       height: 210px;
       top: 50%;
-            left: 50%;
-      transform: translate(-50%, -50%);
+      left: 50%;
+      margin-top: -105px;
+      margin-left: -105px;
       border-radius: 50%;
       border: 2px dashed var(--accent);
-                opacity: 0.4;
+      opacity: 0.4;
       animation: spin 25s linear infinite;
     }
 
@@ -956,13 +926,6 @@
                     </div>
 
       <div class="controls">
-        <!-- Download Button -->
-        <a href="#download" class="header-download" data-i18n-title="Download">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                        </svg>
-          <span data-i18n="nav.download">Download</span>
-        </a>
         <!-- Toggle Switch -->
         <button class="theme-toggle" id="themeToggle" title="Theme wechseln">
           <svg class="toggle-icon icon-sun" viewBox="0 0 24 24" fill="currentColor">
@@ -1033,59 +996,59 @@
                 </div>
 
     <div class="screenshot-masonry">
-      <div class="screenshot-card glass-premium slide-in" onclick="openLightbox(this)">
+      <div class="screenshot-card glass-premium" onclick="openLightbox(this)">
         <img src="assets/screenshots/Planer.png" alt="Wochenplaner" data-screenshot="Planer">
         <div class="label" data-i18n="showcase.planner.title">Wochenplaner</div>
         <div class="desc" data-i18n="showcase.planner.desc">Deine ganze Woche auf einen Blick. Per Drag & Drop verschieben.</div>
-                </div>
+      </div>
 
-      <div class="screenshot-card glass-premium slide-in" onclick="openLightbox(this)">
+      <div class="screenshot-card glass-premium" onclick="openLightbox(this)">
         <img src="assets/screenshots/Heute.png" alt="Heute" data-screenshot="Heute">
         <div class="label" data-i18n="showcase.today.title">Heute</div>
         <div class="desc" data-i18n="showcase.today.desc">Fokus auf das Wesentliche: Was steht heute an?</div>
-                </div>
+      </div>
 
-      <div class="screenshot-card glass-premium slide-in" onclick="openLightbox(this)">
+      <div class="screenshot-card glass-premium" onclick="openLightbox(this)">
         <img src="assets/screenshots/Aufgabendetails.png" alt="Aufgabendetails" data-screenshot="Aufgabendetails">
         <div class="label" data-i18n="showcase.details.title">Aufgabendetails</div>
         <div class="desc" data-i18n="showcase.details.desc">Unteraufgaben, Zeitschätzung, Prioritäten und mehr.</div>
-                </div>
+      </div>
 
-      <div class="screenshot-card glass-premium slide-in" onclick="openLightbox(this)">
+      <div class="screenshot-card glass-premium" onclick="openLightbox(this)">
         <img src="assets/screenshots/Timer.png" alt="Timer" data-screenshot="Timer">
         <div class="label" data-i18n="showcase.timer.title">Timer</div>
         <div class="desc" data-i18n="showcase.timer.desc">Tracke deine Arbeitszeit direkt in der App.</div>
-                </div>
+      </div>
 
-      <div class="screenshot-card glass-premium slide-in" onclick="openLightbox(this)">
+      <div class="screenshot-card glass-premium" onclick="openLightbox(this)">
         <img src="assets/screenshots/Tag beenden.png" alt="Tagesabschluss" data-screenshot="Tag beenden">
         <div class="label" data-i18n="showcase.endday.title">Tagesabschluss</div>
         <div class="desc" data-i18n="showcase.endday.desc">Reflektiere deinen Tag und plane den nächsten.</div>
-                </div>
+      </div>
 
-      <div class="screenshot-card glass-premium slide-in" onclick="openLightbox(this)">
+      <div class="screenshot-card glass-premium" onclick="openLightbox(this)">
         <img src="assets/screenshots/Theme-Konfiguration_l.png" alt="Themes" data-screenshot="Theme-Konfiguration">
         <div class="label" data-i18n="showcase.themes.title">Dein Style</div>
         <div class="desc" data-i18n="showcase.themes.desc">Farben, Hintergründe und Dark Mode nach deinem Geschmack.</div>
-                    </div>
+      </div>
 
-      <div class="screenshot-card glass-premium slide-in" onclick="openLightbox(this)">
+      <div class="screenshot-card glass-premium" onclick="openLightbox(this)">
         <img src="assets/screenshots/settings.png" alt="Einstellungen" data-screenshot="settings">
         <div class="label" data-i18n="showcase.settings.title">Einstellungen</div>
         <div class="desc" data-i18n="showcase.settings.desc">Passe TaskFuchs ganz nach deinen Wünschen an.</div>
-        </div>
-        
-      <div class="screenshot-card glass-premium slide-in" onclick="openLightbox(this)">
+      </div>
+
+      <div class="screenshot-card glass-premium" onclick="openLightbox(this)">
         <img src="assets/screenshots/smart aufgabe erstellen_l.png" alt="Smart Aufgabe" data-screenshot="smart aufgabe erstellen">
         <div class="label" data-i18n="showcase.smart.title">Schnelle Eingabe</div>
         <div class="desc" data-i18n="showcase.smart.desc">Aufgaben blitzschnell mit natürlicher Sprache erstellen.</div>
-            </div>
-            
-      <div class="screenshot-card glass-premium slide-in" onclick="openLightbox(this)">
+      </div>
+
+      <div class="screenshot-card glass-premium" onclick="openLightbox(this)">
         <img src="assets/screenshots/Reports.png" alt="Reports" data-screenshot="Reports">
         <div class="label" data-i18n="showcase.reports.title">Statistiken</div>
         <div class="desc" data-i18n="showcase.reports.desc">Behalte den Überblick über deine Produktivität.</div>
-                    </div>
+      </div>
                 </div>
   </section>
 
