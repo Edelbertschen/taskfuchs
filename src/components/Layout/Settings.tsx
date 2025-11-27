@@ -139,7 +139,7 @@ const Settings = React.memo(() => {
     },
     {
       id: 'timer',
-      title: 'Zeiterfassung & Pomodoro',
+      title: 'Zeiterfassung',
       icon: Clock,
       description: t('settings.sections.timer.description')
     },
@@ -1449,7 +1449,7 @@ const Settings = React.memo(() => {
         <div className="mt-6">
           {activeIntegrationTab === 'simple-apis' && renderSimpleApisSection()}
           {activeIntegrationTab === 'dropbox' && renderDropboxSection()}
-          {/* Toggl removed from Integrations; now under Timer & Pomodoro */}
+          {/* Toggl removed from Integrations; now under Timer */}
           {activeIntegrationTab === 'ical' && renderICalSection()}
         </div>
       </div>
@@ -5464,17 +5464,15 @@ const Settings = React.memo(() => {
             </div>
 
             <div className="settings-card p-6 border">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">{settings_timer.pomodoroTechnique()}</h3>
-              </div>
-              <div className="space-y-6">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Fokusmodus</h3>
+              <div className="space-y-4">
                 <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <div>
-                    <div className="font-medium text-gray-900 dark:text-white">{settings_timer.pomodoroEnabled()}</div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">{settings_timer.pomodoroDesc()}</div>
+                    <div className="font-medium text-gray-900 dark:text-white">{settings_timer.focusModeEnable()}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">{settings_timer.focusModeDesc()}</div>
                   </div>
                   <Toggle 
-                    enabled={state.preferences.pomodoro.enabled} 
+                    enabled={state.preferences.enableFocusMode || false} 
                     onChange={() => dispatch({
                       type: 'UPDATE_PREFERENCES',
                       payload: { 
@@ -5616,10 +5614,8 @@ const Settings = React.memo(() => {
               </div>
             </div>
 
-            {/* White Noise Settings - only show when Pomodoro enabled */}
-            {state.preferences.pomodoro.enabled && (
             <div className="settings-card p-6 border">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">White Noise</h3>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Fokusmodus</h3>
               <div className="space-y-6">
                 <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <div>
