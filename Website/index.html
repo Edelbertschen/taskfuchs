@@ -522,25 +522,27 @@
       width: 100%;
       vertical-align: top;
       opacity: 0;
-      transform: translateY(30px) scale(0.97);
-      transition: opacity 0.6s ease-out, transform 0.6s ease-out, box-shadow 0.4s ease;
+      transform: translateY(16px);
+      transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1), 
+                  transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), 
+                  box-shadow 0.4s ease;
     }
 
-    /* Staggered animation delays */
+    /* Staggered animation delays - subtle cascade */
     .screenshot-card:nth-child(1) { transition-delay: 0s; }
-    .screenshot-card:nth-child(2) { transition-delay: 0.08s; }
-    .screenshot-card:nth-child(3) { transition-delay: 0.16s; }
-    .screenshot-card:nth-child(4) { transition-delay: 0.24s; }
-    .screenshot-card:nth-child(5) { transition-delay: 0.32s; }
-    .screenshot-card:nth-child(6) { transition-delay: 0.4s; }
-    .screenshot-card:nth-child(7) { transition-delay: 0.48s; }
-    .screenshot-card:nth-child(8) { transition-delay: 0.56s; }
-    .screenshot-card:nth-child(9) { transition-delay: 0.64s; }
+    .screenshot-card:nth-child(2) { transition-delay: 0.06s; }
+    .screenshot-card:nth-child(3) { transition-delay: 0.12s; }
+    .screenshot-card:nth-child(4) { transition-delay: 0.18s; }
+    .screenshot-card:nth-child(5) { transition-delay: 0.24s; }
+    .screenshot-card:nth-child(6) { transition-delay: 0.3s; }
+    .screenshot-card:nth-child(7) { transition-delay: 0.36s; }
+    .screenshot-card:nth-child(8) { transition-delay: 0.42s; }
+    .screenshot-card:nth-child(9) { transition-delay: 0.48s; }
 
     /* Visible state - triggered by JS */
     .screenshot-card.card-visible {
       opacity: 1;
-      transform: translateY(0) scale(1);
+      transform: translateY(0);
     }
 
     .screenshot-card:first-child,
@@ -550,16 +552,16 @@
     }
 
     .screenshot-card:hover {
-      transform: translateY(-8px) scale(1.02) !important;
+      transform: translateY(-4px) !important;
       box-shadow: 
-        0 30px 60px -15px rgba(0, 0, 0, 0.15),
-        0 15px 30px -10px rgba(0, 0, 0, 0.1);
+        0 20px 40px -15px rgba(0, 0, 0, 0.12),
+        0 8px 16px -8px rgba(0, 0, 0, 0.08);
     }
 
     body.dark .screenshot-card:hover {
       box-shadow: 
-        0 30px 60px -15px rgba(0, 0, 0, 0.5),
-        0 15px 30px -10px rgba(0, 0, 0, 0.4);
+        0 20px 40px -15px rgba(0, 0, 0, 0.4),
+        0 8px 16px -8px rgba(0, 0, 0, 0.3);
     }
 
     .screenshot-card img {
@@ -570,7 +572,7 @@
     }
 
     .screenshot-card:hover img {
-      transform: scale(1.03);
+      transform: scale(1.015);
     }
 
     .screenshot-card .label {
@@ -875,11 +877,11 @@
       margin-bottom: 1rem;
     }
 
-    /* Slide animations */
+    /* Slide animations - elegant & smooth */
     .slide-in {
       opacity: 0;
-      transform: translateY(40px);
-      transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: translateY(20px);
+      transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .slide-in.visible {
@@ -889,8 +891,8 @@
 
     .slide-in-left {
       opacity: 0;
-      transform: translateX(-40px);
-      transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: translateX(-20px);
+      transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .slide-in-left.visible {
@@ -900,14 +902,22 @@
 
     .slide-in-right {
             opacity: 0;
-      transform: translateX(40px);
-      transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: translateX(20px);
+      transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .slide-in-right.visible {
       opacity: 1;
       transform: translateX(0);
     }
+
+    /* Feature cards staggered animation */
+    .feature:nth-child(1) { transition-delay: 0s; }
+    .feature:nth-child(2) { transition-delay: 0.08s; }
+    .feature:nth-child(3) { transition-delay: 0.16s; }
+    .feature:nth-child(4) { transition-delay: 0.24s; }
+    .feature:nth-child(5) { transition-delay: 0.32s; }
+    .feature:nth-child(6) { transition-delay: 0.4s; }
 
     /* Screenshot cards animation complete */
     </style>
@@ -1077,7 +1087,7 @@
                 </div>
 
       <div class="features-grid">
-        <div class="feature glass slide-in-left">
+        <div class="feature glass slide-in">
                     <div class="feature-icon">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
@@ -1097,7 +1107,7 @@
           <p data-i18n="features.planner.desc">Plane deine Woche visuell mit Drag & Drop.</p>
                 </div>
 
-        <div class="feature glass slide-in-right">
+        <div class="feature glass slide-in">
                     <div class="feature-icon">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -1107,7 +1117,7 @@
           <p data-i18n="features.timer.desc">Tracke wie lange du an Aufgaben arbeitest.</p>
                 </div>
 
-        <div class="feature glass slide-in-left">
+        <div class="feature glass slide-in">
                     <div class="feature-icon">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7"/>
@@ -1127,7 +1137,7 @@
           <p data-i18n="features.pins.desc">Wichtiges dauerhaft im Blick behalten.</p>
                 </div>
 
-        <div class="feature glass slide-in-right">
+        <div class="feature glass slide-in">
                     <div class="feature-icon">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
