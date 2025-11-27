@@ -15,20 +15,9 @@ export function FloatingTimerModal({ isVisible, onOpenTask }: FloatingTimerModal
   const [position, setPosition] = useState({ x: window.innerWidth - 280, y: 100 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [pomodoroSession, setPomodoroSession] = useState(timerService.getGlobalPomodoroSession());
 
   const activeTimer = state.activeTimer;
   const isDarkMode = document.documentElement.classList.contains('dark');
-
-  // Update Pomodoro session state every second
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const newSession = timerService.getGlobalPomodoroSession();
-      setPomodoroSession(newSession);
-    }, 1000);
-    
-    return () => clearInterval(interval);
-  }, []);
 
   const task = activeTimer?.taskId 
     ? state.tasks?.find(t => t.id === activeTimer.taskId)
@@ -38,26 +27,6 @@ export function FloatingTimerModal({ isVisible, onOpenTask }: FloatingTimerModal
     ? activeTimer.elapsedTime > activeTimer.estimatedTime
     : false;
 
-  const getPomodoroColor = () => {
-    if (!pomodoroSession) return state.preferences.accentColor;
-    if (pomodoroSession.type === 'work') {
-      return pomodoroSession.sessionRemainingTime <= 0 ? '#f97316' : '#ef4444';
-    }
-    return '#10b981';
-  };
-
-  const getPomodoroProgress = () => {
-    if (!pomodoroSession) return 0;
-    const total = pomodoroSession.sessionRemainingTime + pomodoroSession.sessionElapsedTime;
-    if (total <= 0) return 0;
-    // Inverted: starts at 100 (full ring), decreases to 0 (empty)
-    return Math.min(100, 100 - ((pomodoroSession.sessionElapsedTime / total) * 100));
-  };
-
-  const handlePomodoroSkip = () => {
-    if (!pomodoroSession) return;
-    timerService.skipPomodoroPhase();
-  };
 
   const formatTimeShort = (minutes: number): string => {
     if (!minutes || minutes <= 0) return '0m';
@@ -80,8 +49,10 @@ export function FloatingTimerModal({ isVisible, onOpenTask }: FloatingTimerModal
     dispatch({ type: 'STOP_TIMER' });
   };
 
-  // Dragging logic
+  // Dragging logic - only handle left mouse button, ignore right-click for context menu
   const handleMouseDown = (e: React.MouseEvent) => {
+    // Ignore right-click (button 2) and middle-click (button 1) - only handle left-click (button 0)
+    if (e.button !== 0) return;
     if ((e.target as HTMLElement).closest('button')) return;
     setIsDragging(true);
     setDragOffset({
@@ -115,11 +86,9 @@ export function FloatingTimerModal({ isVisible, onOpenTask }: FloatingTimerModal
 
   if (!isVisible || !activeTimer?.isActive) return null;
 
-  const hasPomodoro = !!pomodoroSession && pomodoroSession.isActive;
-
   return (
     <div
-      className={`fixed z-[9999] rounded-lg shadow-2xl ${
+      className={`fixed z-[9998] rounded-lg shadow-2xl ${
         isDarkMode 
           ? 'bg-zinc-900 border border-zinc-800' 
           : 'bg-white border border-gray-200'
@@ -195,84 +164,6 @@ export function FloatingTimerModal({ isVisible, onOpenTask }: FloatingTimerModal
             </button>
           </div>
         </div>
-
-        {/* Pomodoro Section */}
-        {hasPomodoro && pomodoroSession && (
-          <div className={`pt-3 border-t ${isDarkMode ? 'border-zinc-800' : 'border-zinc-100'}`}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                {/* Progress Ring */}
-                <div className="relative w-14 h-14">
-                  <svg width="56" height="56" viewBox="0 0 56 56" style={{ transform: 'rotate(-90deg)' }}>
-                    <circle
-                      cx="28"
-                      cy="28"
-                      r="24"
-                      fill="none"
-                      stroke={isDarkMode ? '#27272a' : '#f4f4f5'}
-                      strokeWidth="2"
-                    />
-                    <circle
-                      cx="28"
-                      cy="28"
-                      r="24"
-                      fill="none"
-                      stroke={getPomodoroColor()}
-                      strokeWidth="2"
-                      strokeDasharray={`${(getPomodoroProgress() / 100) * 150.80} 150.80`}
-                      strokeLinecap="round"
-                      style={{ transition: 'stroke-dasharray 0.3s ease, stroke 0.2s ease' }}
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center text-xl">
-                    {pomodoroSession.type === 'work' ? '🍅' : '☕'}
-                  </div>
-                </div>
-                
-                {/* Info */}
-                <div className="flex flex-col">
-                  <span className="text-xs font-semibold uppercase tracking-wider" style={{ 
-                    fontSize: '9px', 
-                    color: '#a1a1aa',
-                    letterSpacing: '0.05em'
-                  }}>
-                    {pomodoroSession.type === 'work' ? 'Pomodoro' : 'Break'}
-                  </span>
-                  <span className="text-sm font-semibold" style={{ 
-                    color: pomodoroSession.type === 'work' && pomodoroSession.sessionRemainingTime <= 1.0
-                      ? '#ef4444' 
-                      : (isDarkMode ? '#fafafa' : '#09090b'),
-                    fontVariantNumeric: 'tabular-nums'
-                  }}>
-                    {formatTimeWithSecondsExact(Math.max(0, pomodoroSession.sessionRemainingTime || 0))}
-                  </span>
-                </div>
-                
-                {/* Session badge */}
-                <span className="text-xs px-1.5 py-0.5 rounded font-semibold text-white" style={{ 
-                  backgroundColor: getPomodoroColor(),
-                  fontSize: '9px'
-                }}>
-                  #{pomodoroSession.sessionNumber}
-                </span>
-              </div>
-
-              {/* Skip button */}
-              <button
-                onClick={handlePomodoroSkip}
-                className="w-7 h-7 rounded-md flex items-center justify-center transition-all hover:scale-105 active:scale-95 border"
-                style={{ 
-                  backgroundColor: 'transparent',
-                  borderColor: getPomodoroColor(),
-                  color: getPomodoroColor()
-                }}
-                title="Skip phase"
-              >
-                <SkipForward className="w-3 h-3" />
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
