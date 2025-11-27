@@ -105,7 +105,7 @@ const tourSections: TourSection[] = [
       {
         title: { de: 'Aufgaben organisieren', en: 'Organize Tasks' },
         text: { de: 'Über die Icons können Datum, Projekt oder Pin zugewiesen werden.', en: 'Date, project, or pin can be assigned via the icons.' },
-        position: 'center-right',
+        position: 'center',
         highlightElements: ['[data-onboarding-task-icons]']
       }
     ]
@@ -162,7 +162,8 @@ const tourSections: TourSection[] = [
         title: { de: 'Tagesabschluss', en: 'End of Day' },
         text: { de: 'Die Tagesabschluss-Übersicht zeigt erledigte Aufgaben, Zeiterfassung und bietet Backup-Optionen. Erledigte Aufgaben werden archiviert, offene können verschoben werden.', en: 'The end-of-day overview shows completed tasks, time tracking, and offers backup options. Completed tasks are archived, open ones can be moved.' },
         foxMessage: { de: 'Regelmäßige Backups empfohlen!', en: 'Regular backups recommended!' },
-        position: 'center-left'
+        position: 'center-left',
+        openEndOfDayModal: true
       },
       {
         title: { de: 'Weiter geht\'s', en: 'Let\'s continue' },
@@ -239,26 +240,26 @@ const tourSections: TourSection[] = [
         title: { de: 'Der Wochenplaner', en: 'The Weekly Planner' },
         text: { de: 'Deine Aufgaben in Spalten nach Datum – für die perfekte Übersicht.', en: 'Your tasks in columns by date – for the perfect overview.' },
         foxMessage: { de: 'Gute Planung = weniger Stress!', en: 'Good planning = less stress!' },
-        position: 'bottom-left'
+        position: 'center'
       },
       {
         title: { de: 'Zeitplanung', en: 'Time Planning' },
         text: { de: 'Bei Aufgaben kann eine geschätzte Zeit angegeben werden. Die Gesamtzeit wird oben in jeder Spalte angezeigt – für eine realistische Tagesplanung.', en: 'Estimated time can be added to tasks. Total time is shown at the top of each column – for realistic daily planning.' },
         foxMessage: { de: 'Realistische Planung bringt mehr Erfolg!', en: 'Realistic planning brings more success!' },
-        position: 'bottom-left',
+        position: 'center',
         highlightElements: ['[data-column-time-today]']
       },
       {
         title: { de: 'Der Timer', en: 'The Timer' },
         text: { de: 'Der Timer kann bei jeder Aufgabe gestartet werden, um fokussiert zu arbeiten. Die Zeit wird getrackt und am Ende des Tages ausgewertet.', en: 'The timer can be started for any task to work focused. Time is tracked and evaluated at the end of the day.' },
-        position: 'bottom-left',
+        position: 'center',
         startTimer: true,
         timerScale: 2
       },
       {
         title: { de: 'Die Sidebar', en: 'The Sidebar' },
         text: { de: 'Links werden unverplante Projekt-Aufgaben angezeigt. Die Sidebar kann ein- und ausgeklappt werden.', en: 'Unscheduled project tasks are shown on the left. The sidebar can be expanded and collapsed.' },
-        position: 'bottom-left'
+        position: 'center-left'
       },
       {
         title: { de: 'Drag & Drop', en: 'Drag & Drop' },
@@ -414,7 +415,7 @@ const pwaSections: TourSection[] = isPWA() ? [
       {
         title: { de: 'Backup einrichten', en: 'Setup Backup' },
         text: { de: 'Beim ersten Klick wird ein Speicherort ausgewählt. Danach genügt ein Klick für schnelle Backups. Wiederherstellung über Einstellungen → Daten.', en: 'On first click, a save location is selected. After that, one click creates quick backups. Restore via Settings → Data.' },
-        position: 'bottom-left'
+        position: 'center'
       }
     ]
   }
@@ -928,8 +929,8 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
       originalTimerModeRef.current = state.preferences.timerDisplayMode;
       
       // Set timer display mode to floatingWidget
-      dispatch({ 
-        type: 'UPDATE_PREFERENCES', 
+    dispatch({ 
+      type: 'UPDATE_PREFERENCES', 
         payload: { timerDisplayMode: 'floatingWidget' }
       });
       
