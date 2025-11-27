@@ -99,7 +99,7 @@ const buildTourSections = (): TourSection[] => {
         },
       {
         title: { de: 'Backups sind wichtig!', en: 'Backups are important!' },
-        text: { de: 'Da deine Daten nur lokal im Browser gespeichert werden, solltest du regelmäßig Backups erstellen. Gehe dazu in die Einstellungen → Daten und exportiere deine Daten als JSON-Datei oder richte Dropbox-Sync ein.', en: 'Since your data is stored locally in the browser, you should create regular backups. Go to Settings → Data and export your data as JSON file or set up Dropbox sync.' },
+        text: { de: 'Da deine Daten nur lokal im Browser gespeichert werden, empfiehlt sich eine regelmäßige Datensicherung. In den Einstellungen → Daten findest du die Backup-Optionen: JSON-Export oder Dropbox-Sync.', en: 'Since your data is stored locally in the browser, regular backups are recommended. In Settings → Data you\'ll find backup options: JSON export or Dropbox sync.' },
         foxMessage: { de: 'Lieber einmal zu oft sichern!', en: 'Better safe than sorry!' },
         position: 'bottom-left',
         showGuideCursor: true,
@@ -107,8 +107,8 @@ const buildTourSections = (): TourSection[] => {
         guideCursorClickAnimation: false
       },
       {
-        title: { de: 'Zur Inbox!', en: 'To the Inbox!' },
-        text: { de: 'Lass uns zur Inbox wechseln und deine Aufgaben verwalten.', en: 'Let\'s switch to the Inbox and manage your tasks.' },
+        title: { de: 'Die Inbox', en: 'The Inbox' },
+        text: { de: 'In der Inbox landen alle neuen Aufgaben. Hier wird alles gesammelt, bevor es organisiert wird.', en: 'All new tasks land in the Inbox. Everything is collected here before being organized.' },
         position: 'bottom-left',
         showGuideCursor: true,
         guideCursorTarget: '[data-nav-item="inbox"]',
@@ -126,13 +126,13 @@ const buildTourSections = (): TourSection[] => {
     steps: [
       {
         title: { de: 'Willkommen in der Inbox!', en: 'Welcome to the Inbox!' },
-        text: { de: 'Hier landen alle neuen Aufgaben. Sammle hier alles, was dir einfällt.', en: 'All new tasks land here. Collect everything that comes to mind.' },
-        foxMessage: { de: 'Wirf alles rein – ich helfe beim Sortieren!', en: 'Throw everything in – I\'ll help sort!' },
+        text: { de: 'Hier landen alle neuen Aufgaben. Die Inbox ist der zentrale Sammelplatz für alles, was dir einfällt.', en: 'All new tasks land here. The Inbox is the central collection point for everything that comes to mind.' },
+        foxMessage: { de: 'Alles an einem Ort – ich helfe beim Sortieren!', en: 'Everything in one place – I\'ll help sort!' },
         position: 'bottom-right'
       },
       {
         title: { de: 'Schnelle Eingabe', en: 'Quick Input' },
-        text: { de: 'Nutze das Eingabefeld für eine blitzschnelle Aufgabenerfassung.', en: 'Use the input field for lightning-fast task entry.' },
+        text: { de: 'Das Eingabefeld oben ermöglicht eine blitzschnelle Aufgabenerfassung. Einfach Titel eingeben und hinzufügen.', en: 'The input field above enables lightning-fast task entry. Just enter a title and add it.' },
         position: 'bottom-center',
         showGuideCursor: true,
         guideCursorTarget: '[data-quick-add-button]',
@@ -140,7 +140,7 @@ const buildTourSections = (): TourSection[] => {
       },
       {
         title: { de: 'Aufgaben organisieren', en: 'Organize Tasks' },
-        text: { de: 'Die Beispielaufgabe unten zeigt dir alle Icons. Weise Datum, Projekt oder Pin zu – per Icon auf der Karte.', en: 'The sample task below shows you all icons. Assign date, project, or pin – via icons on the card.' },
+        text: { de: 'Die Beispielaufgabe zeigt alle verfügbaren Icons. Über die Icons können Datum, Projekt oder Pin zugewiesen werden.', en: 'The sample task shows all available icons. Date, project, or pin can be assigned via the icons.' },
         position: 'center-right',
         highlightElements: ['[data-onboarding-task-icons]']
       }
@@ -158,13 +158,13 @@ const tourSections: TourSection[] = [
     steps: [
       {
         title: { de: 'Willkommen in der Inbox!', en: 'Welcome to the Inbox!' },
-        text: { de: 'Hier landen alle neuen Aufgaben. Sammle hier alles, was dir einfällt.', en: 'All new tasks land here. Collect everything that comes to mind.' },
-        foxMessage: { de: 'Wirf alles rein – ich helfe beim Sortieren!', en: 'Throw everything in – I\'ll help sort!' },
+        text: { de: 'Hier landen alle neuen Aufgaben. Die Inbox ist der zentrale Sammelplatz für spontane Ideen.', en: 'All new tasks land here. The Inbox is the central collection point for spontaneous ideas.' },
+        foxMessage: { de: 'Alles an einem Ort – ich helfe beim Sortieren!', en: 'Everything in one place – I\'ll help sort!' },
         position: 'bottom-right'
       },
       {
         title: { de: 'Schnelle Eingabe', en: 'Quick Input' },
-        text: { de: 'Nutze das Eingabefeld für eine blitzschnelle Aufgabenerfassung.', en: 'Use the input field for lightning-fast task entry.' },
+        text: { de: 'Das Eingabefeld ermöglicht eine blitzschnelle Aufgabenerfassung.', en: 'The input field enables lightning-fast task entry.' },
         position: 'bottom-center',
         showGuideCursor: true,
         guideCursorTarget: '[data-quick-add-button]',
@@ -172,7 +172,7 @@ const tourSections: TourSection[] = [
       },
       {
         title: { de: 'Aufgaben organisieren', en: 'Organize Tasks' },
-        text: { de: 'Weise Datum, Projekt oder Pin zu – per Icon auf der Karte.', en: 'Assign date, project, or pin – via icons on the card.' },
+        text: { de: 'Über die Icons können Datum, Projekt oder Pin zugewiesen werden.', en: 'Date, project, or pin can be assigned via the icons.' },
         position: 'center-right',
         highlightElements: ['[data-onboarding-task-icons]']
       }
@@ -185,7 +185,7 @@ const tourSections: TourSection[] = [
     steps: [
       {
         title: { de: 'Die Aufgabenansicht', en: 'The Task View' },
-        text: { de: 'Klicke auf eine Aufgabe, um sie im Detail zu bearbeiten.', en: 'Click on a task to edit it in detail.' },
+        text: { de: 'Jede Aufgabe kann im Detail bearbeitet werden. Die Detailansicht bietet viele Möglichkeiten zur Organisation.', en: 'Each task can be edited in detail. The detail view offers many organizational options.' },
         foxMessage: { de: 'Diese Beispielaufgabe zeigt dir alles!', en: 'This sample task shows you everything!' },
         position: 'center-right',
         showGuideCursor: true,
@@ -194,21 +194,21 @@ const tourSections: TourSection[] = [
       },
       {
         title: { de: 'Prioritäten & Beschreibung', en: 'Priorities & Description' },
-        text: { de: 'Setze Prioritäten (niedrig, mittel, hoch) und nutze die Beschreibung für Details. Markdown wird unterstützt!', en: 'Set priorities (low, medium, high) and use the description for details. Markdown is supported!' },
+        text: { de: 'Prioritäten können in drei Stufen gesetzt werden (niedrig, mittel, hoch). Die Beschreibung unterstützt Markdown-Formatierung für detaillierte Notizen.', en: 'Priorities can be set in three levels (low, medium, high). The description supports Markdown formatting for detailed notes.' },
         position: 'center',
         openTaskModal: true,
         highlightElements: ['[data-task-priority]', '[data-task-description]']
       },
       {
         title: { de: 'Unteraufgaben', en: 'Subtasks' },
-        text: { de: 'Teile große Aufgaben in kleine Schritte auf. Unteraufgaben können einzeln abgehakt werden.', en: 'Break big tasks into small steps. Subtasks can be checked off individually.' },
+        text: { de: 'Große Aufgaben lassen sich in kleine Schritte aufteilen. Jede Unteraufgabe kann separat abgehakt werden.', en: 'Large tasks can be broken down into small steps. Each subtask can be checked off separately.' },
         position: 'center',
         openTaskModal: true,
         highlightElements: ['[data-task-subtasks]']
       },
       {
         title: { de: 'Weiter geht\'s', en: 'Let\'s continue' },
-        text: { de: 'Schließe die Aufgabenansicht und entdecke weitere Funktionen.', en: 'Close the task view and discover more features.' },
+        text: { de: 'Jetzt geht es weiter zu den täglichen Funktionen.', en: 'Now we continue with the daily features.' },
         position: 'center',
         closeTaskModal: true
       }
@@ -221,14 +221,14 @@ const tourSections: TourSection[] = [
     steps: [
       {
         title: { de: 'Dein Tagesüberblick', en: 'Your Daily Overview' },
-        text: { de: 'Hier siehst du alle Aufgaben für heute auf einen Blick.', en: 'See all tasks for today at a glance.' },
+        text: { de: 'In der Heute-Ansicht werden alle Aufgaben für den aktuellen Tag angezeigt.', en: 'The Today view shows all tasks for the current day.' },
         foxMessage: { de: 'Ein Schritt nach dem anderen!', en: 'One step at a time!' },
         position: 'bottom-right'
       },
       {
         title: { de: 'Tag beenden', en: 'End Day' },
-        text: { de: 'Am Ende des Tages kannst du erledigte Aufgaben archivieren und offene verschieben.', en: 'At the end of the day, you can archive completed tasks and move open ones.' },
-        foxMessage: { de: 'Vergiss nicht, ein Backup zu machen!', en: 'Don\'t forget to backup!' },
+        text: { de: 'Am Ende des Tages werden erledigte Aufgaben archiviert und offene können verschoben werden. Der Tagesabschluss bietet einen Überblick über die Tagesleistung.', en: 'At the end of the day, completed tasks are archived and open ones can be moved. The end-of-day summary provides an overview of daily performance.' },
+        foxMessage: { de: 'Regelmäßige Backups empfohlen!', en: 'Regular backups recommended!' },
         position: 'bottom-right',
         showGuideCursor: true,
         guideCursorTarget: '[data-end-day-button]',
@@ -237,12 +237,12 @@ const tourSections: TourSection[] = [
       },
       {
         title: { de: 'Tagesabschluss', en: 'End of Day' },
-        text: { de: 'Hier siehst du deine Leistung und kannst ein Backup erstellen. Perfekt für den Tagesabschluss!', en: 'Here you can see your performance and create a backup. Perfect for closing out your day!' },
+        text: { de: 'Die Tagesabschluss-Übersicht zeigt deine Leistung und bietet Backup-Optionen. Ideal für den strukturierten Tagesabschluss.', en: 'The end-of-day overview shows your performance and offers backup options. Ideal for a structured daily close.' },
         position: 'center-right'
       },
       {
         title: { de: 'Weiter geht\'s', en: 'Let\'s continue' },
-        text: { de: 'Entdecke jetzt, wie du deine Aufgaben zeitlich planst.', en: 'Now discover how to plan your tasks by time.' },
+        text: { de: 'Als nächstes schauen wir uns die zeitliche Planung im Wochenplaner an.', en: 'Next, we\'ll look at time planning in the weekly planner.' },
         position: 'center',
         closeEndOfDayModal: true
       }
@@ -255,8 +255,8 @@ const tourSections: TourSection[] = [
     steps: [
       {
         title: { de: 'Dein persönlicher Look', en: 'Your Personal Look' },
-        text: { de: 'TaskFuchs passt sich deinem Geschmack an! Wähle zwischen Light- und Darkmode, verschiedenen Akzentfarben und Hintergrundbildern.', en: 'TaskFuchs adapts to your taste! Choose between light and dark mode, different accent colors, and backgrounds.' },
-        foxMessage: { de: 'Klicke auf Weiter und sieh, wie sich alles verändert!', en: 'Click Next and see how everything changes!' },
+        text: { de: 'TaskFuchs passt sich deinem Geschmack an! Es gibt Light- und Darkmode, verschiedene Akzentfarben und Hintergrundbilder zur Auswahl.', en: 'TaskFuchs adapts to your taste! There are light and dark modes, different accent colors, and backgrounds to choose from.' },
+        foxMessage: { de: 'Gleich siehst du verschiedene Stil-Varianten!', en: 'You\'ll see different style variants soon!' },
         position: 'center',
         stylingDemo: true
       },
@@ -319,25 +319,25 @@ const tourSections: TourSection[] = [
       },
       {
         title: { de: 'Zeitplanung', en: 'Time Planning' },
-        text: { de: 'Gib bei Aufgaben eine geschätzte Zeit an. Die Gesamtzeit wird oben in jeder Spalte angezeigt – so siehst du sofort, ob dein Tag realistisch geplant ist.', en: 'Add estimated time to tasks. Total time is shown at the top of each column – so you can see if your day is realistically planned.' },
-        foxMessage: { de: 'Plane realistisch, schaffe mehr!', en: 'Plan realistically, achieve more!' },
+        text: { de: 'Bei Aufgaben kann eine geschätzte Zeit angegeben werden. Die Gesamtzeit wird oben in jeder Spalte angezeigt – für eine realistische Tagesplanung.', en: 'Estimated time can be added to tasks. Total time is shown at the top of each column – for realistic daily planning.' },
+        foxMessage: { de: 'Realistische Planung bringt mehr Erfolg!', en: 'Realistic planning brings more success!' },
         position: 'top-right',
         highlightElements: ['[data-column-time-today]']
       },
       {
         title: { de: 'Der Timer', en: 'The Timer' },
-        text: { de: 'Starte den Timer bei einer Aufgabe, um fokussiert zu arbeiten. Die Zeit wird getrackt und am Ende des Tages ausgewertet.', en: 'Start the timer on a task to work focused. Time is tracked and evaluated at the end of the day.' },
+        text: { de: 'Der Timer kann bei jeder Aufgabe gestartet werden, um fokussiert zu arbeiten. Die Zeit wird getrackt und am Ende des Tages ausgewertet.', en: 'The timer can be started for any task to work focused. Time is tracked and evaluated at the end of the day.' },
         position: 'center-right',
         startTimer: true
       },
       {
         title: { de: 'Die Sidebar', en: 'The Sidebar' },
-        text: { de: 'Links findest du unverplante Projekt-Aufgaben. Die Sidebar lässt sich ein- und ausklappen.', en: 'On the left you\'ll find unscheduled project tasks. The sidebar can be expanded and collapsed.' },
+        text: { de: 'Links werden unverplante Projekt-Aufgaben angezeigt. Die Sidebar kann ein- und ausgeklappt werden.', en: 'Unscheduled project tasks are shown on the left. The sidebar can be expanded and collapsed.' },
         position: 'top-left'
       },
       {
         title: { de: 'Drag & Drop', en: 'Drag & Drop' },
-        text: { de: 'Ziehe Aufgaben zwischen Tagen hin und her, um umzuplanen. Schau zu!', en: 'Drag tasks between days to reschedule. Watch!' },
+        text: { de: 'Aufgaben können per Drag & Drop zwischen Tagen verschoben werden. Gleich siehst du eine Demonstration.', en: 'Tasks can be moved between days via drag & drop. You\'ll see a demonstration now.' },
         position: 'center-left',
         moveTaskToNextDay: true
       }
@@ -350,14 +350,14 @@ const tourSections: TourSection[] = [
     steps: [
       {
         title: { de: 'Projekte organisieren', en: 'Organize Projects' },
-        text: { de: 'Gruppiere zusammengehörige Aufgaben in Projekten.', en: 'Group related tasks in projects.' },
+        text: { de: 'Zusammengehörige Aufgaben können in Projekten gruppiert werden. Ideal für größere Vorhaben.', en: 'Related tasks can be grouped in projects. Ideal for larger initiatives.' },
         foxMessage: { de: 'Große Ziele, kleine Schritte!', en: 'Big goals, small steps!' },
         position: 'bottom-right',
         createExampleProject: true
       },
       {
         title: { de: 'Kanban-Workflow', en: 'Kanban Workflow' },
-        text: { de: 'Erstelle eigene Spalten wie "To Do", "In Arbeit", "Fertig". Die Projekt-Sidebar ist auf- und zuklappbar.', en: 'Create columns like "To Do", "In Progress", "Done". The project sidebar can be expanded and collapsed.' },
+        text: { de: 'Eigene Spalten wie "To Do", "In Arbeit", "Fertig" können erstellt werden. Die Projekt-Sidebar lässt sich auf- und zuklappen.', en: 'Custom columns like "To Do", "In Progress", "Done" can be created. The project sidebar can be expanded and collapsed.' },
         position: 'center-right'
       }
     ]
@@ -369,13 +369,13 @@ const tourSections: TourSection[] = [
     steps: [
       {
         title: { de: 'Dein Fokus-Board', en: 'Your Focus Board' },
-        text: { de: 'Hefte wichtige Aufgaben hier an – unabhängig von Projekt oder Datum.', en: 'Pin important tasks here – regardless of project or date.' },
+        text: { de: 'Wichtige Aufgaben können hier angepinnt werden – unabhängig von Projekt oder Datum. Perfekt für den täglichen Fokus.', en: 'Important tasks can be pinned here – regardless of project or date. Perfect for daily focus.' },
         foxMessage: { de: 'Was wichtig ist, verdient Aufmerksamkeit!', en: 'What\'s important deserves attention!' },
         position: 'bottom-right'
       },
       {
         title: { de: 'Eigene Pin-Spalten', en: 'Custom Pin Columns' },
-        text: { de: 'Erstelle Spalten wie "Diese Woche" oder "Dringend". Die Aufgaben-Sidebar ist auf- und zuklappbar.', en: 'Create columns like "This Week" or "Urgent". The task sidebar can be expanded and collapsed.' },
+        text: { de: 'Spalten wie "Diese Woche" oder "Dringend" können individuell erstellt werden. Die Aufgaben-Sidebar lässt sich auf- und zuklappen.', en: 'Columns like "This Week" or "Urgent" can be created individually. The task sidebar can be expanded and collapsed.' },
         position: 'center-right'
       }
     ]
@@ -387,8 +387,8 @@ const tourSections: TourSection[] = [
     steps: [
       {
         title: { de: 'Geschafft!', en: 'All Done!' },
-        text: { de: 'Du kennst jetzt alle wichtigen Bereiche von TaskFuchs. Leg los und plane smart!', en: 'You now know all the important areas of TaskFuchs. Get started and plan smart!' },
-        foxMessage: { de: 'Sei schlau wie ein Fuchs – plane smart! 🦊', en: 'Be clever like a fox – plan smart! 🦊' },
+        text: { de: 'Alle wichtigen Bereiche von TaskFuchs sind jetzt bekannt. Die Einführung ist abgeschlossen!', en: 'All important areas of TaskFuchs are now familiar. The introduction is complete!' },
+        foxMessage: { de: 'Viel Erfolg mit deiner smarten Planung! 🦊', en: 'Good luck with your smart planning! 🦊' },
         position: 'center'
       }
     ]
@@ -475,13 +475,13 @@ const pwaSections: TourSection[] = isPWA() ? [
       },
       {
         title: { de: 'App installieren', en: 'Install the App' },
-        text: { de: 'Du kannst TaskFuchs wie eine echte App installieren:\n\n• Chrome/Edge: Klicke auf das Installieren-Symbol in der Adressleiste (⊕) oder Menü → „App installieren"\n• Safari (iOS): Teilen-Button → „Zum Home-Bildschirm"\n• Firefox: Menü → „Seite zum Startbildschirm hinzufügen"', en: 'You can install TaskFuchs like a real app:\n\n• Chrome/Edge: Click the install icon in the address bar (⊕) or Menu → "Install app"\n• Safari (iOS): Share button → "Add to Home Screen"\n• Firefox: Menu → "Add page to Home Screen"' },
-        foxMessage: { de: 'So hast du mich immer griffbereit!', en: 'This way you always have me at hand!' },
+        text: { de: 'TaskFuchs kann wie eine echte App installiert werden:\n\n• Chrome/Edge: Installieren-Symbol in der Adressleiste (⊕) oder Menü → „App installieren"\n• Safari (iOS): Teilen-Button → „Zum Home-Bildschirm"\n• Firefox: Menü → „Seite zum Startbildschirm hinzufügen"', en: 'TaskFuchs can be installed like a real app:\n\n• Chrome/Edge: Install icon in the address bar (⊕) or Menu → "Install app"\n• Safari (iOS): Share button → "Add to Home Screen"\n• Firefox: Menu → "Add page to Home Screen"' },
+        foxMessage: { de: 'So bin ich immer griffbereit!', en: 'This way I\'m always at hand!' },
         position: 'center'
       },
       {
         title: { de: 'Backups sind wichtig!', en: 'Backups are important!' },
-        text: { de: 'Da deine Daten lokal gespeichert werden, solltest du regelmäßig Backups erstellen. Am Ende jedes Arbeitstages ein Klick auf den Backup-Button in der Sidebar reicht!', en: 'Since your data is stored locally, you should create regular backups. At the end of each work day, just click the backup button in the sidebar!' },
+        text: { de: 'Da deine Daten lokal gespeichert werden, empfehlen sich regelmäßige Backups. Der Backup-Button in der Sidebar ermöglicht schnelles Sichern am Ende jedes Arbeitstages.', en: 'Since your data is stored locally, regular backups are recommended. The backup button in the sidebar enables quick saving at the end of each work day.' },
         foxMessage: { de: 'Lieber einmal zu oft sichern!', en: 'Better safe than sorry!' },
         position: 'bottom-left',
         showGuideCursor: true,
@@ -490,7 +490,7 @@ const pwaSections: TourSection[] = isPWA() ? [
       },
       {
         title: { de: 'Backup einrichten', en: 'Setup Backup' },
-        text: { de: 'Beim ersten Klick auf den Backup-Button wählst du einen Speicherort. Danach reicht ein Klick für ein Backup. Wiederherstellung über Einstellungen → Daten.', en: 'On first click, you choose a save location. After that, one click creates a backup. Restore via Settings → Data.' },
+        text: { de: 'Beim ersten Klick wird ein Speicherort ausgewählt. Danach genügt ein Klick für schnelle Backups. Wiederherstellung über Einstellungen → Daten.', en: 'On first click, a save location is selected. After that, one click creates quick backups. Restore via Settings → Data.' },
         position: 'bottom-left'
       }
     ]
@@ -1521,7 +1521,7 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
                 <div className={`flex items-center gap-2 mt-3 p-2.5 rounded-lg ${isDark ? 'bg-gray-800/50' : 'bg-gray-100/50'}`}>
                   <FileText className="w-4 h-4 flex-shrink-0" style={{ color: accentColor }} />
                   <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-                    {language === 'de' ? 'Schau dir die Beispielaufgabe rechts an!' : 'Check out the sample task on the right!'}
+                    {language === 'de' ? 'Die Beispielaufgabe zeigt alle Details.' : 'The sample task shows all details.'}
                         </p>
                       </div>
               )}
