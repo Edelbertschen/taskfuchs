@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
 import { syncManager, SyncLogEntry, SyncStats } from '../../utils/syncUtils';
 import type { Task, SyncStatus } from '../../types';
-import { format, nextMonday } from 'date-fns';
+import { format, nextMonday, addDays, isFriday } from 'date-fns';
 import { de } from 'date-fns/locale';
 
 interface EndOfDayModalProps {
@@ -205,9 +205,20 @@ export function EndOfDayModal({ isOpen, onClose }: EndOfDayModalProps) {
     setShowArchiveConfirm(false);
   };
 
+  // Check if today is Friday
+  const todayIsFriday = isFriday(new Date());
+  
+  // Calculate target date: next Monday on Friday, otherwise tomorrow
+  const getTargetDate = () => {
+    const today = new Date();
+    if (todayIsFriday) {
+      return nextMonday(today);
+    }
+    return addDays(today, 1);
+  };
+
   const handleMoveIncomplete = () => {
-    // Move to the upcoming Monday
-    const target = nextMonday(new Date());
+    const target = getTargetDate();
     const targetStr = format(target, 'yyyy-MM-dd');
 
     // Ensure the date column exists before moving
@@ -529,7 +540,10 @@ export function EndOfDayModal({ isOpen, onClose }: EndOfDayModalProps) {
                   style={getAccentColorStyles().bg}
                 >
                   <ArrowRight className="w-4 h-4 mr-2 inline" />
-                  {i18n.language === 'en' ? 'Move to next Monday' : 'Auf kommenden Montag'}
+                  {todayIsFriday 
+                    ? (i18n.language === 'en' ? 'Move to Monday' : 'Auf Montag')
+                    : (i18n.language === 'en' ? 'Move to tomorrow' : 'Auf morgen')
+                  }
                 </button>
               </div>
             )}
@@ -664,9 +678,14 @@ export function EndOfDayModal({ isOpen, onClose }: EndOfDayModalProps) {
               {i18n.language === 'en' ? 'Move Tasks' : 'Aufgaben verschieben'}
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
-              {i18n.language === 'en' 
-                ? `Do you want to move all ${incompleteTasks.length} open tasks to next Monday?`
-                : `Möchten Sie alle ${incompleteTasks.length} offenen Aufgaben auf den kommenden Montag verschieben?`}
+              {todayIsFriday 
+                ? (i18n.language === 'en' 
+                    ? `Do you want to move all ${incompleteTasks.length} open tasks to next Monday?`
+                    : `Möchten Sie alle ${incompleteTasks.length} offenen Aufgaben auf den kommenden Montag verschieben?`)
+                : (i18n.language === 'en' 
+                    ? `Do you want to move all ${incompleteTasks.length} open tasks to tomorrow?`
+                    : `Möchten Sie alle ${incompleteTasks.length} offenen Aufgaben auf morgen verschieben?`)
+              }
             </p>
             <div className="flex space-x-3">
               <button

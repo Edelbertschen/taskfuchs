@@ -142,37 +142,46 @@ const StandardWidget = ({
   title, 
   accentColor, 
   children, 
-  isMinimalDesign 
+  isMinimalDesign,
+  headerAction
 }: {
   icon: string;
   title: string;
   accentColor: string;
   children: React.ReactNode;
   isMinimalDesign: boolean;
+  headerAction?: React.ReactNode;
 }) => (
   <div className={`${WIDGET_STYLES.container} ${
     isMinimalDesign 
       ? 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg'
       : 'glass-effect'
   }`}>
-    <div className={WIDGET_STYLES.header}>
-      <div 
-        className={`${WIDGET_STYLES.iconContainer} ${
-          isMinimalDesign
-            ? 'bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600'
-            : ''
-        }`}
-        style={!isMinimalDesign ? {
-          background: `${accentColor}20`,
-          border: `1px solid ${accentColor}30`
-        } : undefined}
-      >
-        <MaterialIcon name={icon} size={32} style={{ color: accentColor }} />
+    <div className={`${WIDGET_STYLES.header} flex items-center justify-between`}>
+      <div className="flex items-center">
+        <div 
+          className={`${WIDGET_STYLES.iconContainer} ${
+            isMinimalDesign
+              ? 'bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600'
+              : ''
+          }`}
+          style={!isMinimalDesign ? {
+            background: `${accentColor}20`,
+            border: `1px solid ${accentColor}30`
+          } : undefined}
+        >
+          <MaterialIcon name={icon} size={32} style={{ color: accentColor }} />
+        </div>
+        <h3 className={`${WIDGET_STYLES.title} text-gray-900 dark:text-white`} 
+            style={{ fontFamily: "'Roboto', sans-serif" }}>
+          {title}
+        </h3>
       </div>
-      <h3 className={`${WIDGET_STYLES.title} text-gray-900 dark:text-white`} 
-          style={{ fontFamily: "'Roboto', sans-serif" }}>
-        {title}
-      </h3>
+      {headerAction && (
+        <div className="ml-auto">
+          {headerAction}
+        </div>
+      )}
     </div>
     <div className={WIDGET_STYLES.content}>
       {children}
@@ -1540,27 +1549,6 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
 
             {/* Fixed Top Controls - Only Icons */}
       <div className="fixed top-6 right-6 z-50 flex space-x-3">
-            {/* Settings Button removed per request */}
-            
-            {/* End-of-Day Button */}
-            {state.preferences.enableEndOfDay && (
-              <button
-                onClick={() => setShowEndOfDayModal(true)}
-                data-end-day-button
-                className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 backdrop-blur-lg ${
-                  isMinimalDesign
-                    ? 'bg-white/90 dark:bg-gray-50/90 border border-white/50 dark:border-gray-200/50 hover:bg-white/95 dark:hover:bg-gray-50/95'
-                    : 'bg-white/85 dark:bg-gray-800/85 border border-white/40 dark:border-gray-600/40 hover:bg-white/90 dark:hover:bg-gray-800/90'
-                }`}
-                style={{
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08)',
-                }}
-                title={simpleTodayView.endDay()}
-              >
-                <MaterialIcon name="emoji_events" size={20} style={{ color: state.preferences.accentColor }} />
-              </button>
-            )}
-            
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
@@ -1734,6 +1722,35 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
             title={t('dashboard.todays_tasks')}
             accentColor={state.preferences.accentColor}
             isMinimalDesign={isMinimalDesign}
+            headerAction={state.preferences.enableEndOfDay && (
+              <button
+                onClick={() => setShowEndOfDayModal(true)}
+                data-end-day-button
+                className={`group flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  isMinimalDesign
+                    ? 'bg-gradient-to-r hover:shadow-md'
+                    : 'bg-white/20 hover:bg-white/30 backdrop-blur-sm'
+                }`}
+                style={isMinimalDesign ? {
+                  background: `linear-gradient(135deg, ${state.preferences.accentColor}15, ${state.preferences.accentColor}25)`,
+                  color: state.preferences.accentColor,
+                  border: `1px solid ${state.preferences.accentColor}30`
+                } : {
+                  color: 'white'
+                }}
+                title={simpleTodayView.endDay()}
+              >
+                <span className="text-base">🌙</span>
+                <span className="hidden sm:inline">
+                  {i18n.language === 'en' ? 'End Day' : 'Tagesabschluss'}
+                </span>
+                <MaterialIcon 
+                  name="chevron_right" 
+                  size={16} 
+                  className="opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" 
+                />
+              </button>
+            )}
           >
               {todayTasks.length === 0 ? (
               <EmptyState
