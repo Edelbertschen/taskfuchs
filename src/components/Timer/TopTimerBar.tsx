@@ -252,9 +252,9 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
         >
           <div className="h-full flex items-center justify-center">
             <div className="max-w-4xl w-full flex items-center justify-between px-6">
-            {/* Left: Task Info or Pomodoro */}
+            {/* Left: Task Info */}
             <div className="flex items-center space-x-3 flex-1 min-w-0">
-              {activeTimer ? (
+              {activeTimer && (
                 <>
                   <Target className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
                   <button
