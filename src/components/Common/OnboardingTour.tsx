@@ -100,18 +100,10 @@ const buildTourSections = (): TourSection[] => {
         },
       {
         title: { de: 'Backups sind wichtig!', en: 'Backups are important!' },
-        text: { de: 'Da deine Daten nur lokal gespeichert werden, solltest du regelmäßig Backups erstellen. Klicke am Ende jedes Arbeitstages auf den Backup-Button unten in der Sidebar.', en: 'Since your data is stored locally only, you should create regular backups. Click the backup button at the bottom of the sidebar at the end of each work day.' },
+        text: { de: 'Da deine Daten nur lokal im Browser gespeichert werden, solltest du regelmäßig Backups erstellen. Gehe dazu in die Einstellungen → Daten und exportiere deine Daten als JSON-Datei oder richte Dropbox-Sync ein.', en: 'Since your data is stored locally in the browser, you should create regular backups. Go to Settings → Data and export your data as JSON file or set up Dropbox sync.' },
         foxMessage: { de: 'Lieber einmal zu oft sichern!', en: 'Better safe than sorry!' },
-        position: 'bottom-left',
-        showGuideCursor: true,
-        guideCursorTarget: '[data-backup-button]',
-        guideCursorClickAnimation: false
-      },
-        {
-          title: { de: 'Backup einrichten', en: 'Setup Backup' },
-          text: { de: 'Beim ersten Klick auf den Backup-Button wählst du einen Speicherort. Danach reicht ein Klick, um ein Backup zu erstellen. Wiederherstellung erfolgt über Einstellungen → Daten.', en: 'On first click, you choose a save location. After that, one click creates a backup. Restore via Settings → Data.' },
-          position: 'bottom-left'
-        }
+        position: 'center'
+      }
       ]
     });
   }
@@ -841,7 +833,14 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
   
   // Handle guide cursor for step-specific UI highlights (not for navigation)
   useEffect(() => {
-    if (!isOpen || !language || isNavigationCursor) return;
+    if (!isOpen || !language) return;
+    
+    // Skip if this is a navigation cursor
+    if (isNavigationCursor) {
+      setShowGuideCursor(false);
+      setGuideCursorTarget('');
+      return;
+    }
     
     const currentSection = allTourSections[currentSectionIndex];
     const currentStep = currentSection?.steps[currentStepIndex];
