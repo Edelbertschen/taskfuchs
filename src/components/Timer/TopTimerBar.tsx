@@ -271,7 +271,7 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
             {/* Center: Timer Display */}
             <div className="flex items-center space-x-4">
               {/* Task Timer (if present) */}
-              {activeTimer ? (
+              {activeTimer && (
                 <div className="flex items-center space-x-2">
                   <span className={`text-lg font-mono font-semibold ${isOvertime ? 'text-red-500' : (isDarkMode ? 'text-white' : 'text-gray-900')}`}>
                     {formatTimeWithSecondsExact(activeTimer.elapsedTime || 0)}
