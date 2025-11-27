@@ -327,7 +327,7 @@
     overflow-x: hidden;
     flex: 1;
   }
-
+  
   body {
     overflow-x: hidden;
   }
@@ -1341,13 +1341,13 @@ input, textarea, [contenteditable="true"] {
 
 @keyframes onboarding-border-pulse {
   0%, 100% {
-    opacity: 0.8;
+  opacity: 0.8;
     transform: scale(1);
   }
   50% {
     opacity: 1;
-    transform: scale(1.02);
-  }
+  transform: scale(1.02);
+}
 }
 
 /* Pulsing icons during onboarding */
@@ -1364,47 +1364,4 @@ input, textarea, [contenteditable="true"] {
     transform: scale(1.2);
     opacity: 0.8;
   }
-}
-
-/* Hand-drawn arrow animations for onboarding */
-@keyframes hand-drawn-arrow-draw {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes hand-drawn-arrow-fade-in {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes hand-drawn-arrow-wiggle {
-  0%, 100% {
-    transform: rotate(0deg);
-  }
-  25% {
-    transform: rotate(2deg);
-  }
-  75% {
-    transform: rotate(-2deg);
-  }
-}
-
-.hand-drawn-arrow {
-  animation: hand-drawn-arrow-fade-in 0.4s ease-out forwards;
-}
-
-.hand-drawn-arrow.wiggle {
-  animation: hand-drawn-arrow-fade-in 0.4s ease-out forwards, hand-drawn-arrow-wiggle 2s ease-in-out 0.5s infinite;
-}
-
-.hand-drawn-arrow path {
-  stroke-linecap: round;
-  stroke-linejoin: round;
 }

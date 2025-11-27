@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronRight, ChevronLeft, X, Inbox, CalendarDays, LayoutGrid, FolderKanban, Pin, Check, Sparkles, PanelLeftOpen, FileText, ListChecks, Flag, Smartphone, HardDrive, Clock, Timer, Moon, Palette, Sun } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { HandDrawnArrow } from './HandDrawnArrow';
 import { format } from 'date-fns';
 import type { Task } from '../../types';
 import { GuideCursor } from './GuideCursor';
@@ -50,14 +49,6 @@ interface StylingConfig {
   label: { de: string; en: string };
 }
 
-interface ArrowConfig {
-  direction: 'left' | 'right' | 'up' | 'down' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
-  style?: 'loop' | 'swirl' | 'curved' | 'zigzag';
-  size?: 'sm' | 'md' | 'lg';
-  position?: { top?: string; left?: string; right?: string; bottom?: string };
-  label?: { de: string; en: string };
-}
-
 interface TourSubStep {
   title: { de: string; en: string };
   text: { de: string; en: string };
@@ -80,7 +71,6 @@ interface TourSubStep {
   restoreOriginalStyling?: boolean; // Restore original styling when entering this step
   startTimer?: boolean; // Start timer for sample task
   openSidebar?: 'tasks' | 'projects' | 'pins'; // Open specific sidebar
-  arrow?: ArrowConfig; // Hand-drawn arrow pointing to something
 }
 
 interface TourSection {
@@ -116,13 +106,6 @@ const tourSections: TourSection[] = [
         title: { de: 'Aufgaben organisieren', en: 'Organize Tasks' },
         text: { de: 'Über die Icons können Datum, Projekt oder Pin zugewiesen werden.', en: 'Date, project, or pin can be assigned via the icons.' },
         position: 'center',
-        arrow: {
-          direction: 'up',
-          style: 'swirl',
-          size: 'sm',
-          position: { bottom: '200px', left: '50%' },
-          label: { de: 'Die Icons', en: 'The icons' }
-        },
         highlightElements: ['[data-onboarding-task-icons]']
       }
     ]
@@ -200,14 +183,7 @@ const tourSections: TourSection[] = [
         text: { de: 'TaskFuchs passt sich deinem Geschmack an! Es gibt Light- und Darkmode, verschiedene Akzentfarben und Hintergrundbilder zur Auswahl.', en: 'TaskFuchs adapts to your taste! There are light and dark modes, different accent colors, and backgrounds to choose from.' },
         foxMessage: { de: 'Gleich siehst du verschiedene Stil-Varianten!', en: 'You\'ll see different style variants soon!' },
         position: 'center',
-        stylingDemo: true,
-        arrow: {
-          direction: 'right',
-          style: 'curved',
-          size: 'lg',
-          position: { top: '30%', right: '100px' },
-          label: { de: 'Beobachte!', en: 'Watch!' }
-        }
+        stylingDemo: true
       },
       {
         title: { de: 'Style: Cyan & Dunkel', en: 'Style: Cyan & Dark' },
@@ -278,14 +254,7 @@ const tourSections: TourSection[] = [
         text: { de: 'Der Timer kann bei jeder Aufgabe gestartet werden, um fokussiert zu arbeiten. Die Zeit wird getrackt und am Ende des Tages ausgewertet.', en: 'The timer can be started for any task to work focused. Time is tracked and evaluated at the end of the day.' },
         position: 'center',
         startTimer: true,
-        timerScale: 2,
-        arrow: {
-          direction: 'top-right',
-          style: 'loop',
-          size: 'md',
-          position: { top: '120px', right: '150px' },
-          label: { de: 'Der Timer!', en: 'The Timer!' }
-        }
+        timerScale: 2
       },
       {
         title: { de: 'Die Sidebar', en: 'The Sidebar' },
@@ -296,14 +265,7 @@ const tourSections: TourSection[] = [
         title: { de: 'Drag & Drop', en: 'Drag & Drop' },
         text: { de: 'Aufgaben können per Drag & Drop zwischen Tagen verschoben werden. Gleich siehst du eine Demonstration.', en: 'Tasks can be moved between days via drag & drop. You\'ll see a demonstration now.' },
         position: 'center',
-        moveTaskToNextDay: true,
-        arrow: {
-          direction: 'right',
-          style: 'zigzag',
-          size: 'lg',
-          position: { top: '40%', left: '40%' },
-          label: { de: 'Verschieben!', en: 'Move!' }
-        }
+        moveTaskToNextDay: true
       }
     ]
   },
@@ -448,14 +410,7 @@ const pwaSections: TourSection[] = isPWA() ? [
         text: { de: 'Da deine Daten lokal gespeichert werden, empfehlen sich regelmäßige Backups. Der Backup-Button in der Sidebar ermöglicht schnelles Sichern am Ende jedes Arbeitstages.', en: 'Since your data is stored locally, regular backups are recommended. The backup button in the sidebar enables quick saving at the end of each work day.' },
         foxMessage: { de: 'Lieber einmal zu oft sichern!', en: 'Better safe than sorry!' },
         position: 'center',
-        zoomElement: '[data-backup-button]',
-        arrow: {
-          direction: 'left',
-          style: 'loop',
-          size: 'md',
-          position: { top: '50%', left: '80px' },
-          label: { de: 'Hier!', en: 'Here!' }
-        }
+        zoomElement: '[data-backup-button]'
       },
       {
         title: { de: 'Backup einrichten', en: 'Setup Backup' },
@@ -1809,45 +1764,8 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
           showClick={currentStep?.guideCursorClickAnimation ?? true}
           holdDuration={1500}
         />
-      )}
-      
-      {/* Hand-drawn Arrow */}
-      {currentStep?.arrow && (
-        <div 
-          className="fixed z-[10003] pointer-events-none"
-          style={{
-            top: currentStep.arrow.position?.top,
-            left: currentStep.arrow.position?.left,
-            right: currentStep.arrow.position?.right,
-            bottom: currentStep.arrow.position?.bottom,
-            transform: 'translate(-50%, -50%)',
-          }}
-        >
-          <div className="flex flex-col items-center gap-1">
-            {currentStep.arrow.label && (
-              <span 
-                className="text-sm font-bold whitespace-nowrap px-2 py-0.5 rounded-full"
-                style={{ 
-                  color: accentColor,
-                  backgroundColor: `${accentColor}15`,
-                  textShadow: '0 1px 2px rgba(0,0,0,0.1)'
-                }}
-              >
-                {t(currentStep.arrow.label)}
-              </span>
-            )}
-            <HandDrawnArrow
-              direction={currentStep.arrow.direction}
-              style={currentStep.arrow.style || 'loop'}
-              size={currentStep.arrow.size || 'md'}
-              color={accentColor}
-              animated={true}
-              delay={300}
-            />
-          </div>
-        </div>
-      )}
-    </div>
+                    )}
+                  </div>
   );
   
   return createPortal(content, document.body);
