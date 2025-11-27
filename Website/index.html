@@ -6,18 +6,18 @@
   <title>TaskFuchs – Der Task-Manager, der Spaß macht</title>
   <meta name="description" content="TaskFuchs ist der elegante, minimalistische Task-Manager für alle, die fokussiert arbeiten wollen. Open Source. Kostenlos.">
   
-  <link rel="icon" type="image/svg+xml" href="assets/images/Fuchs.svg">
+  <link rel="icon" type="image/png" href="assets/images/3d_fox.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <style>
     :root {
-      --accent: #0ea5e9;
+      --accent: #e06610;
       --bg: #f8fafc;
       --bg-dark: #0c0c0c;
-      --card: rgba(255, 255, 255, 0.6);
-      --card-dark: rgba(30, 30, 35, 0.6);
+      --card: rgba(255, 255, 255, 0.7);
+      --card-dark: rgba(30, 30, 35, 0.7);
       --text: #1e293b;
       --text-dark: #f1f5f9;
       --muted: #64748b;
@@ -56,55 +56,55 @@
     .bg-orb {
       position: absolute;
       border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.4;
-      animation: float 15s ease-in-out infinite;
+      filter: blur(100px);
+      opacity: 0.35;
+      animation: float 20s ease-in-out infinite;
     }
 
     .bg-orb-1 {
-      width: 600px;
-      height: 600px;
+      width: 500px;
+      height: 500px;
       background: var(--accent);
-      top: -200px;
+      top: -150px;
       right: -100px;
       animation-delay: 0s;
     }
 
     .bg-orb-2 {
-      width: 400px;
-      height: 400px;
+      width: 350px;
+      height: 350px;
       background: var(--accent);
       bottom: 20%;
-      left: -100px;
-      animation-delay: -5s;
+      left: -80px;
+      animation-delay: -7s;
     }
 
     .bg-orb-3 {
-      width: 300px;
-      height: 300px;
+      width: 250px;
+      height: 250px;
       background: var(--accent);
       top: 50%;
-      right: 20%;
-      animation-delay: -10s;
+      right: 25%;
+      animation-delay: -14s;
       opacity: 0.2;
     }
 
     @keyframes float {
       0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(30px, -30px) scale(1.05); }
-      66% { transform: translate(-20px, 20px) scale(0.95); }
+      33% { transform: translate(20px, -20px) scale(1.03); }
+      66% { transform: translate(-15px, 15px) scale(0.97); }
     }
 
     /* Glass Card */
     .glass {
       background: var(--card);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border: 1px solid var(--border);
       box-shadow: 
         0 4px 6px -1px rgba(0, 0, 0, 0.05),
         0 10px 20px -5px rgba(0, 0, 0, 0.05),
-        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        inset 0 1px 0 rgba(255, 255, 255, 0.7);
     }
 
     body.dark .glass {
@@ -132,14 +132,14 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.75rem 1.25rem;
+      padding: 0.5rem 1rem;
       border-radius: 9999px;
     }
 
     .logo {
       display: flex;
       align-items: center;
-      gap: 0.625rem;
+      gap: 0.5rem;
       text-decoration: none;
       color: inherit;
       font-weight: 600;
@@ -147,8 +147,8 @@
     }
 
     .logo img {
-      width: 36px;
-      height: 36px;
+      width: 32px;
+      height: 32px;
       animation: wiggle 3s ease-in-out infinite;
     }
 
@@ -158,44 +158,45 @@
       75% { transform: rotate(5deg); }
     }
 
-    .nav-links {
+    /* Color Palette - Prominent */
+    .color-palette {
       display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .nav-links a {
-      padding: 0.5rem 1rem;
-      border-radius: 9999px;
-      text-decoration: none;
-      color: inherit;
-      font-size: 0.875rem;
-      font-weight: 500;
-      transition: all 0.2s;
-    }
-
-    .nav-links a:hover {
-      background: rgba(0, 0, 0, 0.05);
-    }
-
-    body.dark .nav-links a:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    .nav-links a.github {
-      display: flex;
-      align-items: center;
       gap: 0.375rem;
+    }
+
+    .color-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .color-dot:hover { 
+      transform: scale(1.2); 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+    
+    .color-dot.active { 
+      border-color: var(--text); 
+      transform: scale(1.15); 
+    }
+    
+    body.dark .color-dot.active { 
+      border-color: var(--text-dark); 
     }
 
     .controls {
       display: flex;
-      gap: 0.25rem;
+      gap: 0.375rem;
+      align-items: center;
     }
 
     .control-btn {
-      width: 38px;
-      height: 38px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       border: none;
       background: transparent;
@@ -219,47 +220,9 @@
     }
 
     .control-btn svg {
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
     }
-
-    /* Color Dropdown */
-    .color-picker {
-      position: relative;
-    }
-
-    .color-dropdown {
-      position: absolute;
-      top: calc(100% + 8px);
-      right: 0;
-      padding: 0.75rem;
-      border-radius: 16px;
-      display: none;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      width: 170px;
-      animation: dropIn 0.2s ease-out;
-    }
-
-    .color-dropdown.show { display: flex; }
-
-    @keyframes dropIn {
-      from { opacity: 0; transform: translateY(-8px) scale(0.95); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    .color-swatch {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      border: 3px solid transparent;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .color-swatch:hover { transform: scale(1.15); }
-    .color-swatch.active { border-color: var(--text); transform: scale(1.1); }
-    body.dark .color-swatch.active { border-color: var(--text-dark); }
 
     /* Hero */
     .hero {
@@ -268,7 +231,7 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      padding: 8rem 1.5rem 4rem;
+      padding: 7rem 1.5rem 4rem;
       text-align: center;
     }
 
@@ -278,24 +241,24 @@
     }
 
     .fox-main {
-      width: 140px;
-      height: 140px;
-      animation: bounce 2s ease-in-out infinite;
-      filter: drop-shadow(0 20px 40px rgba(14, 165, 233, 0.3));
+      width: 160px;
+      height: 160px;
+      animation: bounce 2.5s ease-in-out infinite;
+      filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.25));
     }
 
     @keyframes bounce {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-15px); }
+      50% { transform: translateY(-18px); }
     }
 
     .fox-ring {
       position: absolute;
-      inset: -20px;
+      inset: -25px;
       border-radius: 50%;
       border: 2px dashed var(--accent);
-      opacity: 0.3;
-      animation: spin 20s linear infinite;
+      opacity: 0.4;
+      animation: spin 25s linear infinite;
     }
 
     @keyframes spin {
@@ -377,14 +340,14 @@
     /* Try Banner */
     .try-banner {
       padding: 0 1.5rem;
-      margin-bottom: 6rem;
+      margin-bottom: 5rem;
     }
 
     .try-banner-inner {
-      max-width: 900px;
+      max-width: 800px;
       margin: 0 auto;
-      padding: 2rem 2.5rem;
-      border-radius: 24px;
+      padding: 1.75rem 2rem;
+      border-radius: 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -393,31 +356,32 @@
     }
 
     .try-banner h3 {
-      font-size: 1.5rem;
+      font-size: 1.375rem;
       font-weight: 600;
     }
 
     .try-banner p {
       color: var(--muted);
       margin-top: 0.25rem;
+      font-size: 0.95rem;
     }
 
     body.dark .try-banner p { color: var(--muted-dark); }
 
-    /* Screenshots Showcase */
+    /* Screenshots Showcase - Masonry */
     .showcase {
-      padding: 4rem 1.5rem 8rem;
+      padding: 4rem 1.5rem 6rem;
     }
 
     .showcase-header {
       text-align: center;
-      margin-bottom: 4rem;
+      margin-bottom: 3.5rem;
     }
 
     .showcase-header h2 {
       font-size: clamp(2rem, 5vw, 3rem);
       font-weight: 700;
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
     }
 
     .showcase-header p {
@@ -429,53 +393,125 @@
 
     body.dark .showcase-header p { color: var(--muted-dark); }
 
-    .screenshot-grid {
+    .screenshot-masonry {
       max-width: 1200px;
       margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 2rem;
+      column-count: 3;
+      column-gap: 1.5rem;
+    }
+
+    @media (max-width: 1024px) {
+      .screenshot-masonry { column-count: 2; }
+    }
+
+    @media (max-width: 640px) {
+      .screenshot-masonry { column-count: 1; }
     }
 
     .screenshot-card {
-      border-radius: 20px;
+      break-inside: avoid;
+      margin-bottom: 1.5rem;
+      border-radius: 16px;
       overflow: hidden;
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
     }
 
     .screenshot-card:hover {
-      transform: translateY(-8px) scale(1.02);
-      box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.2);
+      transform: translateY(-6px) scale(1.01);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2);
     }
 
     body.dark .screenshot-card:hover {
-      box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     }
 
     .screenshot-card img {
       width: 100%;
       height: auto;
       display: block;
+      transition: transform 0.4s;
+    }
+
+    .screenshot-card:hover img {
+      transform: scale(1.02);
     }
 
     .screenshot-card .label {
-      padding: 1.25rem;
+      padding: 1rem 1.25rem 0.25rem;
       font-weight: 600;
-      font-size: 1.125rem;
+      font-size: 1rem;
     }
 
     .screenshot-card .desc {
-      padding: 0 1.25rem 1.25rem;
+      padding: 0 1.25rem 1rem;
       color: var(--muted);
-      font-size: 0.9rem;
-      margin-top: -0.5rem;
+      font-size: 0.875rem;
     }
 
     body.dark .screenshot-card .desc { color: var(--muted-dark); }
 
+    /* Lightbox */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      cursor: zoom-out;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .lightbox.show { display: flex; }
+
+    .lightbox img {
+      max-width: 95%;
+      max-height: 95%;
+      border-radius: 12px;
+      box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+      animation: scaleIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes scaleIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 2rem;
+      right: 2rem;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .lightbox-close:hover {
+      background: rgba(255,255,255,0.2);
+      transform: scale(1.1);
+    }
+
     /* Features */
     .features {
-      padding: 6rem 1.5rem;
+      padding: 5rem 1.5rem;
       position: relative;
     }
 
@@ -500,7 +536,7 @@
 
     .features-header {
       text-align: center;
-      margin-bottom: 4rem;
+      margin-bottom: 3.5rem;
     }
 
     .features-header h2 {
@@ -512,12 +548,12 @@
     .features-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
+      gap: 1.25rem;
     }
 
     .feature {
-      padding: 2rem;
-      border-radius: 20px;
+      padding: 1.75rem;
+      border-radius: 16px;
       transition: all 0.3s;
     }
 
@@ -526,60 +562,60 @@
     }
 
     .feature-icon {
-      width: 52px;
-      height: 52px;
-      border-radius: 14px;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 1.25rem;
+      margin-bottom: 1rem;
       background: var(--accent);
       color: white;
     }
 
-    .feature-icon svg { width: 26px; height: 26px; }
+    .feature-icon svg { width: 24px; height: 24px; }
 
     .feature h3 {
-      font-size: 1.25rem;
+      font-size: 1.125rem;
       font-weight: 600;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.375rem;
     }
 
     .feature p {
       color: var(--muted);
-      font-size: 0.95rem;
+      font-size: 0.9rem;
     }
 
     body.dark .feature p { color: var(--muted-dark); }
 
     /* CTA */
     .cta {
-      padding: 6rem 1.5rem;
+      padding: 5rem 1.5rem;
       text-align: center;
     }
 
     .cta-inner {
-      max-width: 700px;
+      max-width: 650px;
       margin: 0 auto;
     }
 
     .cta-fox {
-      width: 80px;
-      height: 80px;
-      margin-bottom: 1.5rem;
+      width: 72px;
+      height: 72px;
+      margin-bottom: 1.25rem;
       animation: wiggle 3s ease-in-out infinite;
     }
 
     .cta h2 {
-      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-size: clamp(1.75rem, 4vw, 2.25rem);
       font-weight: 700;
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
     }
 
     .cta p {
       color: var(--muted);
-      font-size: 1.125rem;
-      margin-bottom: 2rem;
+      font-size: 1.05rem;
+      margin-bottom: 1.75rem;
     }
 
     body.dark .cta p { color: var(--muted-dark); }
@@ -593,7 +629,7 @@
 
     /* Downloads */
     .downloads {
-      padding: 4rem 1.5rem 6rem;
+      padding: 4rem 1.5rem 5rem;
     }
 
     .downloads-inner {
@@ -605,7 +641,7 @@
     .downloads h3 {
       font-size: 1.25rem;
       font-weight: 600;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.25rem;
     }
 
     .download-btns {
@@ -618,12 +654,13 @@
     .download-btn {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      padding: 0.875rem 1.5rem;
-      border-radius: 14px;
+      gap: 0.625rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: 12px;
       text-decoration: none;
       color: inherit;
       font-weight: 500;
+      font-size: 0.9rem;
       transition: all 0.2s;
     }
 
@@ -631,11 +668,11 @@
       transform: translateY(-2px);
     }
 
-    .download-btn img { width: 22px; height: 22px; }
+    .download-btn img { width: 20px; height: 20px; }
 
     /* Footer */
     footer {
-      padding: 2rem 1.5rem;
+      padding: 1.75rem 1.5rem;
       border-top: 1px solid var(--border);
     }
 
@@ -653,7 +690,7 @@
 
     .footer-links {
       display: flex;
-      gap: 2rem;
+      gap: 1.5rem;
     }
 
     .footer-links a {
@@ -680,7 +717,8 @@
 
     /* Responsive */
     @media (max-width: 768px) {
-      .nav-links { display: none; }
+      .color-palette { display: none; }
+      .color-palette-mobile { display: flex !important; }
       
       .try-banner-inner {
         flex-direction: column;
@@ -693,17 +731,54 @@
       }
     }
 
-    /* Animations on scroll */
-    .fade-up {
-      opacity: 0;
-      transform: translateY(30px);
-      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    .color-palette-mobile {
+      display: none;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
     }
 
-    .fade-up.visible {
+    /* Slide in animations */
+    .slide-in {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .slide-in.visible {
       opacity: 1;
       transform: translateY(0);
     }
+
+    .slide-in-left {
+      opacity: 0;
+      transform: translateX(-40px);
+      transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .slide-in-left.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .slide-in-right {
+      opacity: 0;
+      transform: translateX(40px);
+      transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .slide-in-right.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* Stagger delay for cards */
+    .screenshot-card:nth-child(1) { transition-delay: 0s; }
+    .screenshot-card:nth-child(2) { transition-delay: 0.1s; }
+    .screenshot-card:nth-child(3) { transition-delay: 0.2s; }
+    .screenshot-card:nth-child(4) { transition-delay: 0.3s; }
+    .screenshot-card:nth-child(5) { transition-delay: 0.4s; }
+    .screenshot-card:nth-child(6) { transition-delay: 0.5s; }
   </style>
 </head>
 <body>
@@ -718,40 +793,19 @@
   <header>
     <div class="header-inner glass">
       <a href="#" class="logo">
-        <img src="assets/images/Fuchs.svg" alt="TaskFuchs">
+        <img src="assets/images/3d_fox.png" alt="TaskFuchs">
         <span>TaskFuchs</span>
       </a>
       
-      <nav class="nav-links">
-        <a href="#showcase" data-i18n="nav.features">Features</a>
-        <a href="#download" data-i18n="nav.download">Download</a>
-        <a href="https://github.com/malteviergutz/taskfuchs" target="_blank" class="github">
-          <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
-            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-          </svg>
-          <span>GitHub</span>
-        </a>
-      </nav>
+      <!-- Color Palette - Prominent -->
+      <div class="color-palette">
+        <button class="color-dot" style="background:#9a244f" data-color="#9a244f" title="Berry"></button>
+        <button class="color-dot active" style="background:#e06610" data-color="#e06610" title="Orange"></button>
+        <button class="color-dot" style="background:#006d8f" data-color="#006d8f" title="Petrol"></button>
+        <button class="color-dot" style="background:#00a78e" data-color="#00a78e" title="Mint"></button>
+      </div>
 
       <div class="controls">
-        <div class="color-picker">
-          <button class="control-btn" id="colorBtn" title="Farbe">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10" stroke-width="2"/>
-              <circle cx="12" cy="12" r="4" fill="currentColor"/>
-            </svg>
-          </button>
-          <div class="color-dropdown glass" id="colorDropdown">
-            <button class="color-swatch active" style="background:#0ea5e9" data-color="#0ea5e9"></button>
-            <button class="color-swatch" style="background:#8b5cf6" data-color="#8b5cf6"></button>
-            <button class="color-swatch" style="background:#ec4899" data-color="#ec4899"></button>
-            <button class="color-swatch" style="background:#f97316" data-color="#f97316"></button>
-            <button class="color-swatch" style="background:#22c55e" data-color="#22c55e"></button>
-            <button class="color-swatch" style="background:#06b6d4" data-color="#06b6d4"></button>
-            <button class="color-swatch" style="background:#f43f5e" data-color="#f43f5e"></button>
-            <button class="color-swatch" style="background:#eab308" data-color="#eab308"></button>
-          </div>
-        </div>
         <button class="control-btn" id="themeBtn" title="Theme">
           <svg class="icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="5" stroke-width="2"/>
@@ -768,44 +822,46 @@
 
   <!-- Hero -->
   <section class="hero">
-    <div class="fox-container">
+    <!-- Mobile Color Palette -->
+    <div class="color-palette-mobile">
+      <button class="color-dot" style="background:#9a244f" data-color="#9a244f"></button>
+      <button class="color-dot active" style="background:#e06610" data-color="#e06610"></button>
+      <button class="color-dot" style="background:#006d8f" data-color="#006d8f"></button>
+      <button class="color-dot" style="background:#00a78e" data-color="#00a78e"></button>
+    </div>
+
+    <div class="fox-container slide-in">
       <div class="fox-ring"></div>
-      <img src="assets/images/Fuchs.svg" alt="TaskFuchs" class="fox-main">
+      <img src="assets/images/3d_fox.png" alt="TaskFuchs" class="fox-main">
     </div>
     
-    <h1>
+    <h1 class="slide-in" style="transition-delay: 0.1s">
       <span data-i18n="hero.line1">Aufgaben erledigen</span><br>
       <span data-i18n="hero.line2">kann auch</span> <span class="accent" data-i18n="hero.line3">Spaß machen</span>
     </h1>
     
-    <p data-i18n="hero.subtitle">
+    <p class="slide-in" style="transition-delay: 0.2s" data-i18n="hero.subtitle">
       TaskFuchs ist dein persönlicher, minimalistischer Task-Manager. Open Source, kostenlos und mit Liebe zum Detail.
     </p>
     
-    <div class="hero-buttons">
-      <a href="https://app.taskfuchs.com" class="btn btn-primary">
+    <div class="hero-buttons slide-in" style="transition-delay: 0.3s">
+      <a href="#download" class="btn btn-primary">
         <span data-i18n="hero.tryNow">Jetzt ausprobieren</span>
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
         </svg>
-      </a>
-      <a href="https://github.com/malteviergutz/taskfuchs" target="_blank" class="btn btn-secondary glass">
-        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-        </svg>
-        <span>GitHub</span>
       </a>
     </div>
   </section>
 
   <!-- Try Banner -->
   <section class="try-banner">
-    <div class="try-banner-inner glass">
+    <div class="try-banner-inner glass slide-in">
       <div>
-        <h3 data-i18n="banner.title">🚀 Probier's direkt im Browser aus!</h3>
+        <h3 data-i18n="banner.title">Probier's direkt im Browser aus</h3>
         <p data-i18n="banner.subtitle">Kein Account nötig. Deine Daten bleiben lokal auf deinem Gerät.</p>
       </div>
-      <a href="https://app.taskfuchs.com" class="btn btn-primary" data-i18n="banner.button">
+      <a href="https://app.taskfuchs.de" class="btn btn-primary" data-i18n="banner.button">
         Los geht's
       </a>
     </div>
@@ -813,59 +869,65 @@
 
   <!-- Screenshots Showcase -->
   <section class="showcase" id="showcase">
-    <div class="showcase-header fade-up">
+    <div class="showcase-header slide-in">
       <h2 data-i18n="showcase.title">So sieht TaskFuchs aus</h2>
       <p data-i18n="showcase.subtitle">Elegant, aufgeräumt und immer im Blick.</p>
     </div>
 
-    <div class="screenshot-grid">
-      <div class="screenshot-card glass fade-up">
+    <div class="screenshot-masonry">
+      <div class="screenshot-card glass slide-in" onclick="openLightbox(this)">
         <img src="assets/screenshots/Planer.png" alt="Wochenplaner" loading="lazy">
-        <div class="label" data-i18n="showcase.planner.title">📅 Wochenplaner</div>
+        <div class="label" data-i18n="showcase.planner.title">Wochenplaner</div>
         <div class="desc" data-i18n="showcase.planner.desc">Deine ganze Woche auf einen Blick. Per Drag & Drop verschieben.</div>
       </div>
 
-      <div class="screenshot-card glass fade-up">
+      <div class="screenshot-card glass slide-in" onclick="openLightbox(this)">
         <img src="assets/screenshots/Heute.png" alt="Heute" loading="lazy">
-        <div class="label" data-i18n="showcase.today.title">☀️ Heute</div>
+        <div class="label" data-i18n="showcase.today.title">Heute</div>
         <div class="desc" data-i18n="showcase.today.desc">Fokus auf das Wesentliche: Was steht heute an?</div>
       </div>
 
-      <div class="screenshot-card glass fade-up">
+      <div class="screenshot-card glass slide-in" onclick="openLightbox(this)">
         <img src="assets/screenshots/Aufgabendetails.png" alt="Aufgabendetails" loading="lazy">
-        <div class="label" data-i18n="showcase.details.title">✏️ Aufgabendetails</div>
+        <div class="label" data-i18n="showcase.details.title">Aufgabendetails</div>
         <div class="desc" data-i18n="showcase.details.desc">Unteraufgaben, Zeitschätzung, Prioritäten und mehr.</div>
       </div>
 
-      <div class="screenshot-card glass fade-up">
+      <div class="screenshot-card glass slide-in" onclick="openLightbox(this)">
         <img src="assets/screenshots/Timer.png" alt="Timer" loading="lazy">
-        <div class="label" data-i18n="showcase.timer.title">⏱️ Timer</div>
+        <div class="label" data-i18n="showcase.timer.title">Timer</div>
         <div class="desc" data-i18n="showcase.timer.desc">Tracke deine Arbeitszeit direkt in der App.</div>
       </div>
 
-      <div class="screenshot-card glass fade-up">
+      <div class="screenshot-card glass slide-in" onclick="openLightbox(this)">
         <img src="assets/screenshots/Tag beenden.png" alt="Tagesabschluss" loading="lazy">
-        <div class="label" data-i18n="showcase.endday.title">🌙 Tagesabschluss</div>
+        <div class="label" data-i18n="showcase.endday.title">Tagesabschluss</div>
         <div class="desc" data-i18n="showcase.endday.desc">Reflektiere deinen Tag und plane den nächsten.</div>
       </div>
 
-      <div class="screenshot-card glass fade-up">
+      <div class="screenshot-card glass slide-in" onclick="openLightbox(this)">
         <img src="assets/screenshots/Theme-Konfiguration.png" alt="Themes" loading="lazy">
-        <div class="label" data-i18n="showcase.themes.title">🎨 Dein Style</div>
+        <div class="label" data-i18n="showcase.themes.title">Dein Style</div>
         <div class="desc" data-i18n="showcase.themes.desc">Farben, Hintergründe und Dark Mode nach deinem Geschmack.</div>
       </div>
     </div>
   </section>
 
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+    <img src="" alt="" id="lightbox-img">
+  </div>
+
   <!-- Features -->
   <section class="features">
     <div class="features-inner">
-      <div class="features-header fade-up">
+      <div class="features-header slide-in">
         <h2 data-i18n="features.title">Was TaskFuchs kann</h2>
       </div>
 
       <div class="features-grid">
-        <div class="feature glass fade-up">
+        <div class="feature glass slide-in-left">
           <div class="feature-icon">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
@@ -875,7 +937,7 @@
           <p data-i18n="features.inbox.desc">Schnell Aufgaben erfassen, später sortieren.</p>
         </div>
 
-        <div class="feature glass fade-up">
+        <div class="feature glass slide-in">
           <div class="feature-icon">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -885,7 +947,7 @@
           <p data-i18n="features.planner.desc">Plane deine Woche visuell mit Drag & Drop.</p>
         </div>
 
-        <div class="feature glass fade-up">
+        <div class="feature glass slide-in-right">
           <div class="feature-icon">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -895,7 +957,7 @@
           <p data-i18n="features.timer.desc">Tracke wie lange du an Aufgaben arbeitest.</p>
         </div>
 
-        <div class="feature glass fade-up">
+        <div class="feature glass slide-in-left">
           <div class="feature-icon">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7"/>
@@ -905,7 +967,7 @@
           <p data-i18n="features.projects.desc">Größere Vorhaben mit Kanban-Boards organisieren.</p>
         </div>
 
-        <div class="feature glass fade-up">
+        <div class="feature glass slide-in">
           <div class="feature-icon">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
@@ -915,7 +977,7 @@
           <p data-i18n="features.pins.desc">Wichtiges dauerhaft im Blick behalten.</p>
         </div>
 
-        <div class="feature glass fade-up">
+        <div class="feature glass slide-in-right">
           <div class="feature-icon">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -930,19 +992,19 @@
 
   <!-- CTA -->
   <section class="cta">
-    <div class="cta-inner fade-up">
-      <img src="assets/images/Fuchs.svg" alt="" class="cta-fox">
+    <div class="cta-inner slide-in">
+      <img src="assets/images/3d_fox.png" alt="" class="cta-fox">
       <h2 data-i18n="cta.title">Bereit, produktiver zu werden?</h2>
       <p data-i18n="cta.subtitle">TaskFuchs ist kostenlos, Open Source und respektiert deine Privatsphäre.</p>
       <div class="cta-buttons">
-        <a href="https://app.taskfuchs.com" class="btn btn-primary" data-i18n="cta.button">
+        <a href="https://app.taskfuchs.de" class="btn btn-primary" data-i18n="cta.button">
           Jetzt starten – kostenlos
         </a>
         <a href="https://github.com/malteviergutz/taskfuchs" target="_blank" class="btn btn-secondary glass">
           <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
             <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
           </svg>
-          <span data-i18n="cta.github">Auf GitHub ansehen</span>
+          <span data-i18n="cta.github">GitHub</span>
         </a>
       </div>
     </div>
@@ -950,8 +1012,8 @@
 
   <!-- Downloads -->
   <section class="downloads" id="download">
-    <div class="downloads-inner fade-up">
-      <h3 data-i18n="downloads.title">📦 Desktop-Apps (Electron)</h3>
+    <div class="downloads-inner slide-in">
+      <h3 data-i18n="downloads.title">Desktop-Apps (Electron)</h3>
       <div class="download-btns">
         <a href="#" class="download-btn glass">
           <img src="assets/images/apple.svg" alt="">
@@ -979,7 +1041,7 @@
       </div>
       <div class="footer-copy">
         <span>© 2025</span>
-        <img src="assets/images/Fuchs.svg" alt="">
+        <img src="assets/images/3d_fox.png" alt="">
         <span>TaskFuchs</span>
       </div>
     </div>
@@ -996,22 +1058,22 @@
         "hero.line3": "Spaß machen",
         "hero.subtitle": "TaskFuchs ist dein persönlicher, minimalistischer Task-Manager. Open Source, kostenlos und mit Liebe zum Detail.",
         "hero.tryNow": "Jetzt ausprobieren",
-        "banner.title": "🚀 Probier's direkt im Browser aus!",
+        "banner.title": "Probier's direkt im Browser aus",
         "banner.subtitle": "Kein Account nötig. Deine Daten bleiben lokal auf deinem Gerät.",
         "banner.button": "Los geht's",
         "showcase.title": "So sieht TaskFuchs aus",
         "showcase.subtitle": "Elegant, aufgeräumt und immer im Blick.",
-        "showcase.planner.title": "📅 Wochenplaner",
+        "showcase.planner.title": "Wochenplaner",
         "showcase.planner.desc": "Deine ganze Woche auf einen Blick. Per Drag & Drop verschieben.",
-        "showcase.today.title": "☀️ Heute",
+        "showcase.today.title": "Heute",
         "showcase.today.desc": "Fokus auf das Wesentliche: Was steht heute an?",
-        "showcase.details.title": "✏️ Aufgabendetails",
+        "showcase.details.title": "Aufgabendetails",
         "showcase.details.desc": "Unteraufgaben, Zeitschätzung, Prioritäten und mehr.",
-        "showcase.timer.title": "⏱️ Timer",
+        "showcase.timer.title": "Timer",
         "showcase.timer.desc": "Tracke deine Arbeitszeit direkt in der App.",
-        "showcase.endday.title": "🌙 Tagesabschluss",
+        "showcase.endday.title": "Tagesabschluss",
         "showcase.endday.desc": "Reflektiere deinen Tag und plane den nächsten.",
-        "showcase.themes.title": "🎨 Dein Style",
+        "showcase.themes.title": "Dein Style",
         "showcase.themes.desc": "Farben, Hintergründe und Dark Mode nach deinem Geschmack.",
         "features.title": "Was TaskFuchs kann",
         "features.inbox.title": "Inbox",
@@ -1029,8 +1091,8 @@
         "cta.title": "Bereit, produktiver zu werden?",
         "cta.subtitle": "TaskFuchs ist kostenlos, Open Source und respektiert deine Privatsphäre.",
         "cta.button": "Jetzt starten – kostenlos",
-        "cta.github": "Auf GitHub ansehen",
-        "downloads.title": "📦 Desktop-Apps (Electron)",
+        "cta.github": "GitHub",
+        "downloads.title": "Desktop-Apps (Electron)",
         "footer.imprint": "Impressum",
         "footer.privacy": "Datenschutz"
       },
@@ -1042,22 +1104,22 @@
         "hero.line3": "be fun",
         "hero.subtitle": "TaskFuchs is your personal, minimalist task manager. Open source, free, and crafted with love.",
         "hero.tryNow": "Try it now",
-        "banner.title": "🚀 Try it right in your browser!",
+        "banner.title": "Try it right in your browser",
         "banner.subtitle": "No account needed. Your data stays local on your device.",
         "banner.button": "Let's go",
         "showcase.title": "This is TaskFuchs",
         "showcase.subtitle": "Elegant, clean, always in sight.",
-        "showcase.planner.title": "📅 Weekly Planner",
+        "showcase.planner.title": "Weekly Planner",
         "showcase.planner.desc": "Your entire week at a glance. Drag & drop to reschedule.",
-        "showcase.today.title": "☀️ Today",
+        "showcase.today.title": "Today",
         "showcase.today.desc": "Focus on what matters: What's on for today?",
-        "showcase.details.title": "✏️ Task Details",
+        "showcase.details.title": "Task Details",
         "showcase.details.desc": "Subtasks, time estimates, priorities and more.",
-        "showcase.timer.title": "⏱️ Timer",
+        "showcase.timer.title": "Timer",
         "showcase.timer.desc": "Track your work time right in the app.",
-        "showcase.endday.title": "🌙 End of Day",
+        "showcase.endday.title": "End of Day",
         "showcase.endday.desc": "Reflect on your day and plan the next.",
-        "showcase.themes.title": "🎨 Your Style",
+        "showcase.themes.title": "Your Style",
         "showcase.themes.desc": "Colors, backgrounds and dark mode to your liking.",
         "features.title": "What TaskFuchs can do",
         "features.inbox.title": "Inbox",
@@ -1075,8 +1137,8 @@
         "cta.title": "Ready to be more productive?",
         "cta.subtitle": "TaskFuchs is free, open source and respects your privacy.",
         "cta.button": "Get started – free",
-        "cta.github": "View on GitHub",
-        "downloads.title": "📦 Desktop Apps (Electron)",
+        "cta.github": "GitHub",
+        "downloads.title": "Desktop Apps (Electron)",
         "footer.imprint": "Imprint",
         "footer.privacy": "Privacy Policy"
       }
@@ -1084,7 +1146,7 @@
 
     let lang = localStorage.getItem('tf-lang') || 'de';
     let theme = localStorage.getItem('tf-theme') || 'light';
-    let color = localStorage.getItem('tf-color') || '#0ea5e9';
+    let color = localStorage.getItem('tf-color') || '#e06610';
 
     // Apply everything on load
     document.addEventListener('DOMContentLoaded', () => {
@@ -1131,14 +1193,12 @@
     langBtn.onclick = () => setLang(lang === 'de' ? 'en' : 'de');
 
     // Colors
-    const colorBtn = document.getElementById('colorBtn');
-    const colorDropdown = document.getElementById('colorDropdown');
-    const swatches = document.querySelectorAll('.color-swatch');
+    const colorDots = document.querySelectorAll('.color-dot');
 
     function setColor(c) {
       color = c;
       document.documentElement.style.setProperty('--accent', c);
-      swatches.forEach(s => s.classList.toggle('active', s.dataset.color === c));
+      colorDots.forEach(s => s.classList.toggle('active', s.dataset.color === c));
       
       // Update button shadows
       document.querySelectorAll('.btn-primary').forEach(btn => {
@@ -1159,20 +1219,29 @@
       localStorage.setItem('tf-color', c);
     }
 
-    colorBtn.onclick = e => {
-      e.stopPropagation();
-      colorDropdown.classList.toggle('show');
-    };
-
-    swatches.forEach(s => {
-      s.onclick = () => {
-        setColor(s.dataset.color);
-        colorDropdown.classList.remove('show');
-      };
+    colorDots.forEach(dot => {
+      dot.onclick = () => setColor(dot.dataset.color);
     });
 
-    document.onclick = () => colorDropdown.classList.remove('show');
-    colorDropdown.onclick = e => e.stopPropagation();
+    // Lightbox
+    function openLightbox(card) {
+      const img = card.querySelector('img');
+      const lightbox = document.getElementById('lightbox');
+      const lightboxImg = document.getElementById('lightbox-img');
+      lightboxImg.src = img.src;
+      lightboxImg.alt = img.alt;
+      lightbox.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeLightbox();
+    });
 
     // Scroll animations
     function initScrollAnimations() {
@@ -1184,7 +1253,7 @@
         });
       }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
-      document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+      document.querySelectorAll('.slide-in, .slide-in-left, .slide-in-right').forEach(el => observer.observe(el));
     }
   </script>
 </body>

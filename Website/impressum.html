@@ -1,344 +1,471 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Impressum - TaskFuchs</title>
-    <meta name="description" content="Impressum der TaskFuchs Produktivitäts-App nach deutschem Recht">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Impressum – TaskFuchs</title>
+  <meta name="description" content="Impressum der TaskFuchs Produktivitäts-App nach deutschem Recht">
+  
+  <link rel="icon" type="image/png" href="assets/images/3d_fox.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --accent: #e06610;
+      --bg: #f8fafc;
+      --bg-dark: #0c0c0c;
+      --card: rgba(255, 255, 255, 0.7);
+      --card-dark: rgba(30, 30, 35, 0.7);
+      --text: #1e293b;
+      --text-dark: #f1f5f9;
+      --muted: #64748b;
+      --muted-dark: #94a3b8;
+      --border: rgba(0, 0, 0, 0.08);
+      --border-dark: rgba(255, 255, 255, 0.1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --primary-color: #e06610;
-            --text-dark: #0f0f23;
-            --text-light: #6b7280;
-            --bg-light: #fafafa;
-        }
+    html {
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      scroll-behavior: smooth;
+    }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-            color: var(--text-dark);
-            background: var(--bg-light);
-            padding-top: 80px; /* Space for fixed navigation */
-        }
+    body.dark {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+    }
 
-        /* Navigation Styles */
-        .nav {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-            padding: 1rem 0;
-            backdrop-filter: blur(20px);
-            background: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
+    /* Animated Background */
+    .bg-animation {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+    }
 
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    .bg-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.25;
+      animation: float 20s ease-in-out infinite;
+    }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 800;
-            font-size: 1.5rem;
-            color: var(--primary-color);
-            text-decoration: none;
-        }
+    .bg-orb-1 {
+      width: 400px;
+      height: 400px;
+      background: var(--accent);
+      top: -100px;
+      right: -50px;
+    }
 
-        .logo img {
-            width: 40px;
-            height: 40px;
-        }
+    .bg-orb-2 {
+      width: 300px;
+      height: 300px;
+      background: var(--accent);
+      bottom: 10%;
+      left: -80px;
+      animation-delay: -7s;
+    }
 
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-        }
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(20px, -20px) scale(1.05); }
+    }
 
-        .nav-links a {
-            text-decoration: none;
-            color: var(--text-dark);
-            font-weight: 500;
-            transition: all 0.3s ease;
-            position: relative;
-        }
+    /* Glass Card */
+    .glass {
+      background: var(--card);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.05),
+        0 10px 20px -5px rgba(0, 0, 0, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    }
 
-        .nav-links a:hover {
-            color: var(--primary-color);
-        }
+    body.dark .glass {
+      background: var(--card-dark);
+      border-color: var(--border-dark);
+      box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.3),
+        0 10px 20px -5px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
 
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: linear-gradient(45deg, var(--primary-color), #ff7a1a);
-            transition: width 0.3s ease;
-        }
+    /* Header */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 1rem;
+    }
 
-        .nav-links a:hover::after {
-            width: 100%;
-        }
+    .header-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+    }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      color: inherit;
+      font-weight: 600;
+      font-size: 1.125rem;
+    }
 
-        .header {
-            text-align: center;
-            margin-bottom: 3rem;
-            padding: 2rem 0;
-            border-bottom: 2px solid var(--primary-color);
-        }
+    .logo img {
+      width: 32px;
+      height: 32px;
+    }
 
-        .header h1 {
-            color: var(--primary-color);
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-        }
+    .controls {
+      display: flex;
+      gap: 0.375rem;
+    }
 
-        .back-link {
-            display: inline-block;
-            color: var(--primary-color);
-            text-decoration: none;
-            margin-bottom: 2rem;
-            font-weight: 500;
-        }
+    .control-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: inherit;
+      transition: all 0.2s;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
 
-        .back-link:hover {
-            text-decoration: underline;
-        }
+    .control-btn:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
 
-        h2 {
-            color: var(--primary-color);
-            font-size: 1.5rem;
-            margin: 2rem 0 1rem 0;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 0.5rem;
-        }
+    body.dark .control-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
 
-        h3 {
-            color: var(--text-dark);
-            font-size: 1.2rem;
-            margin: 1.5rem 0 0.5rem 0;
-        }
+    .control-btn svg {
+      width: 18px;
+      height: 18px;
+    }
 
-        p {
-            margin-bottom: 1rem;
-        }
+    /* Content */
+    .content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 8rem 1.5rem 4rem;
+    }
 
-        .contact-info {
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            border-left: 4px solid var(--primary-color);
-            margin: 2rem 0;
-        }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+      margin-bottom: 2rem;
+      transition: opacity 0.2s;
+    }
 
-        .info-section {
-            background: #fff5f0;
-            padding: 1.5rem;
-            border-radius: 6px;
-            border-left: 3px solid var(--primary-color);
-            margin: 1.5rem 0;
-        }
+    .back-link:hover { opacity: 0.8; }
 
-        .highlight {
-            font-weight: 600;
-            color: var(--primary-color);
-        }
+    .page-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
 
-        .legal-text {
-            font-size: 0.95rem;
-            color: var(--text-light);
-            line-height: 1.5;
-        }
+    .page-header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
 
-        .disclaimer {
-            background: #f8f9fa;
-            padding: 1.5rem;
-            border-radius: 6px;
-            border: 1px solid #e9ecef;
-            margin: 2rem 0;
-        }
+    .page-header p {
+      color: var(--muted);
+    }
 
-        .last-updated {
-            text-align: center;
-            color: var(--text-light);
-            font-style: italic;
-            margin-top: 3rem;
-        }
+    body.dark .page-header p { color: var(--muted-dark); }
 
-        .contact-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
+    .section {
+      margin-bottom: 2.5rem;
+      padding: 1.75rem;
+      border-radius: 16px;
+    }
 
-        .contact-item {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
+    .section h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--accent);
+    }
 
-        .contact-item h4 {
-            color: var(--primary-color);
-            margin-bottom: 0.5rem;
-        }
-    </style>
+    .section h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 1.5rem 0 0.5rem;
+    }
+
+    .section p {
+      margin-bottom: 0.75rem;
+      color: var(--muted);
+    }
+
+    body.dark .section p { color: var(--muted-dark); }
+
+    .section ul {
+      margin-left: 1.5rem;
+      color: var(--muted);
+    }
+
+    body.dark .section ul { color: var(--muted-dark); }
+
+    .section ul li {
+      margin-bottom: 0.375rem;
+    }
+
+    .section a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .section a:hover {
+      text-decoration: underline;
+    }
+
+    .contact-box {
+      padding: 1.25rem;
+      border-radius: 12px;
+      border-left: 3px solid var(--accent);
+      background: rgba(0,0,0,0.02);
+      margin: 1rem 0;
+    }
+
+    body.dark .contact-box {
+      background: rgba(255,255,255,0.02);
+    }
+
+    .contact-box p {
+      margin-bottom: 0.25rem;
+    }
+
+    .last-updated {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.875rem;
+      margin-top: 3rem;
+    }
+
+    body.dark .last-updated { color: var(--muted-dark); }
+
+    /* Footer */
+    footer {
+      padding: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    body.dark footer { border-color: var(--border-dark); }
+
+    .footer-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+    }
+
+    body.dark .footer-links a { color: var(--muted-dark); }
+    .footer-links a:hover { color: var(--accent); }
+
+    .footer-copy {
+      color: var(--muted);
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    body.dark .footer-copy { color: var(--muted-dark); }
+    .footer-copy img { width: 18px; height: 18px; }
+
+    @media (max-width: 640px) {
+      .footer-inner {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+  </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="nav">
-        <div class="nav-container">
-            <a href="index.html" class="logo">
-                <img src="assets/images/3d_fox.png" alt="TaskFuchs Logo">
-                TaskFuchs
-            </a>
-            <ul class="nav-links">
-                <li><a href="index.html#features">Funktionen</a></li>
-                <li><a href="index.html#demo">Demo</a></li>
-                <li><a href="index.html#gallery">Screenshots</a></li>
-                <li><a href="index.html#zielgruppen">Zielgruppen</a></li>
-                <li><a href="datenschutz.html">Datenschutz</a></li>
-            </ul>
-        </div>
-    </nav>
+  <!-- Background -->
+  <div class="bg-animation">
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+  </div>
 
-    <div class="container">
-        <a href="index.html" class="back-link">← Zurück zur Startseite</a>
-        
-        <div class="header">
-            <h1>Impressum</h1>
-            <p>TaskFuchs Produktivitäts-App</p>
-        </div>
-
-        <h2>Angaben gemäß § 5 TMG</h2>
-        
-        <div class="contact-info">
-            <p class="highlight">Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV:</p>
-            <p>
-                <strong>Malte Viergutz</strong><br>
-                Jungnauer Str. 1<br>
-                79211 Denzlingen<br>
-                Deutschland
-            </p>
-        </div>
-
-        <div class="contact-grid">
-            <div class="contact-item">
-                <h4>📞 Kontakt</h4>
-                <p>
-                    E-Mail: info@taskfuchs.de<br>
-                    Website: taskfuchs.de
-                </p>
-            </div>
-        </div>
-
-        <h2>Redaktionell verantwortlich</h2>
-        <div class="info-section">
-            <p>
-                Malte Viergutz<br>
-                Jungnauer Str. 1<br>
-                79211 Denzlingen<br>
-                Deutschland
-            </p>
-        </div>
-
-        <h2>Verbraucher­streit­beilegung/Universal­schlichtungs­stelle</h2>
-        <p class="legal-text">
-            Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.
-        </p>
-
-        <h2>Haftung für Inhalte</h2>
-        <div class="disclaimer">
-            <p class="legal-text">
-                Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht unter der Verpflichtung, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen.
-            </p>
-            <p class="legal-text">
-                Verpflichtungen zur Entfernung oder Sperrung der Nutzung von Informationen nach den allgemeinen Gesetzen bleiben hiervon unberührt. Eine diesbezügliche Haftung ist jedoch erst ab dem Zeitpunkt der Kenntnis einer konkreten Rechtsverletzung möglich. Bei Bekanntwerden von entsprechenden Rechtsverletzungen werden wir diese Inhalte umgehend entfernen.
-            </p>
-        </div>
-
-        <h2>Haftung für Links</h2>
-        <div class="disclaimer">
-            <p class="legal-text">
-                Unser Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich. Die verlinkten Seiten wurden zum Zeitpunkt der Verlinkung auf mögliche Rechtsverstöße überprüft. Rechtswidrige Inhalte waren zum Zeitpunkt der Verlinkung nicht erkennbar.
-            </p>
-            <p class="legal-text">
-                Eine permanente inhaltliche Kontrolle der verlinkten Seiten ist jedoch ohne konkrete Anhaltspunkte einer Rechtsverletzung nicht zumutbar. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Links umgehend entfernen.
-            </p>
-        </div>
-
-        <h2>Urheberrecht</h2>
-        <div class="disclaimer">
-            <p class="legal-text">
-                Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers. Downloads und Kopien dieser Seite sind nur für den privaten, nicht kommerziellen Gebrauch gestattet.
-            </p>
-            <p class="legal-text">
-                Soweit die Inhalte auf dieser Seite nicht vom Betreiber erstellt wurden, werden die Urheberrechte Dritter beachtet. Insbesondere werden Inhalte Dritter als solche gekennzeichnet. Sollten Sie trotzdem auf eine Urheberrechtsverletzung aufmerksam werden, bitten wir um einen entsprechenden Hinweis. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Inhalte umgehend entfernen.
-            </p>
-        </div>
-
-        <h2>TaskFuchs App - Besondere Hinweise</h2>
-        <div class="info-section">
-            <p><strong>Softwareentwicklung und -vertrieb:</strong></p>
-            <p class="legal-text">
-                TaskFuchs ist eine Produktivitäts-App für die Verwaltung von Aufgaben, Projekten und Zielen. Die App wird kontinuierlich weiterentwickelt und verbessert. Änderungen an der Software können jederzeit vorgenommen werden.
-            </p>
-            <p class="legal-text">
-                <strong>Technischer Support:</strong> support@taskfuchs.de<br>
-                <strong>Allgemeine Anfragen:</strong> info@taskfuchs.de
-            </p>
-        </div>
-
-        <h2>EU-Streitschlichtung</h2>
-        <p class="legal-text">
-            Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit: 
-            <a href="https://ec.europa.eu/consumers/odr/" target="_blank" style="color: var(--primary-color);">https://ec.europa.eu/consumers/odr/</a>.
-            Unsere E-Mail-Adresse finden Sie oben im Impressum.
-        </p>
-
-        <h2>Bildnachweise</h2>
-        <div class="info-section">
-            <p>Verwendete Icons und Grafiken:</p>
-            <ul class="legal-text">
-                <li>TaskFuchs Logo: Eigene Erstellung</li>
-                <li>Material Design Icons: Google (Apache License 2.0)</li>
-                <li>Screenshots: Eigene Erstellung der TaskFuchs App</li>
-                <li>Hintergrundgrafiken: Eigene Erstellung/Lizenzfreie Nutzung</li>
-            </ul>
-        </div>
-
-        <div class="last-updated">
-            <p>Stand: Juli 2025</p>
-        </div>
+  <!-- Header -->
+  <header>
+    <div class="header-inner glass">
+      <a href="index.html" class="logo">
+        <img src="assets/images/3d_fox.png" alt="TaskFuchs">
+        <span>TaskFuchs</span>
+      </a>
+      <div class="controls">
+        <button class="control-btn" id="themeBtn" title="Theme">
+          <svg class="icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="5" stroke-width="2"/>
+            <path stroke-width="2" stroke-linecap="round" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+          <svg class="icon-moon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:none">
+            <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+          </svg>
+        </button>
+      </div>
     </div>
+  </header>
+
+  <!-- Content -->
+  <main class="content">
+    <a href="index.html" class="back-link">← Zurück zur Startseite</a>
+    
+    <div class="page-header">
+      <h1>Impressum</h1>
+      <p>TaskFuchs Produktivitäts-App</p>
+    </div>
+
+    <div class="section glass">
+      <h2>Angaben gemäß § 5 TMG</h2>
+      <div class="contact-box">
+        <p><strong>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV:</strong></p>
+        <p><strong>Malte Viergutz</strong></p>
+        <p>Jungnauer Str. 1</p>
+        <p>79211 Denzlingen</p>
+        <p>Deutschland</p>
+      </div>
+
+      <h3>Kontakt</h3>
+      <p>E-Mail: info@taskfuchs.de</p>
+      <p>Website: taskfuchs.de</p>
+    </div>
+
+    <div class="section glass">
+      <h2>Redaktionell verantwortlich</h2>
+      <p>Malte Viergutz</p>
+      <p>Jungnauer Str. 1, 79211 Denzlingen, Deutschland</p>
+    </div>
+
+    <div class="section glass">
+      <h2>Verbraucherstreitbeilegung</h2>
+      <p>Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
+    </div>
+
+    <div class="section glass">
+      <h2>Haftung für Inhalte</h2>
+      <p>Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht unter der Verpflichtung, übermittelte oder gespeicherte fremde Informationen zu überwachen.</p>
+      <p>Verpflichtungen zur Entfernung oder Sperrung der Nutzung von Informationen nach den allgemeinen Gesetzen bleiben hiervon unberührt. Eine diesbezügliche Haftung ist jedoch erst ab dem Zeitpunkt der Kenntnis einer konkreten Rechtsverletzung möglich.</p>
+    </div>
+
+    <div class="section glass">
+      <h2>Haftung für Links</h2>
+      <p>Unser Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Die verlinkten Seiten wurden zum Zeitpunkt der Verlinkung auf mögliche Rechtsverstöße überprüft.</p>
+    </div>
+
+    <div class="section glass">
+      <h2>Urheberrecht</h2>
+      <p>Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung.</p>
+    </div>
+
+    <div class="section glass">
+      <h2>EU-Streitschlichtung</h2>
+      <p>Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit: <a href="https://ec.europa.eu/consumers/odr/" target="_blank">https://ec.europa.eu/consumers/odr/</a></p>
+    </div>
+
+    <div class="section glass">
+      <h2>Bildnachweise</h2>
+      <ul>
+        <li>TaskFuchs Logo: Eigene Erstellung</li>
+        <li>Material Design Icons: Google (Apache License 2.0)</li>
+        <li>Screenshots: Eigene Erstellung der TaskFuchs App</li>
+      </ul>
+    </div>
+
+    <p class="last-updated">Stand: Juli 2025</p>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="impressum.html">Impressum</a>
+        <a href="datenschutz.html">Datenschutz</a>
+        <a href="https://github.com/malteviergutz/taskfuchs" target="_blank">GitHub</a>
+      </div>
+      <div class="footer-copy">
+        <span>© 2025</span>
+        <img src="assets/images/3d_fox.png" alt="">
+        <span>TaskFuchs</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    let theme = localStorage.getItem('tf-theme') || 'light';
+    const themeBtn = document.getElementById('themeBtn');
+    const sunIcon = themeBtn.querySelector('.icon-sun');
+    const moonIcon = themeBtn.querySelector('.icon-moon');
+
+    function setTheme(t) {
+      theme = t;
+      document.body.classList.toggle('dark', t === 'dark');
+      sunIcon.style.display = t === 'dark' ? 'none' : 'block';
+      moonIcon.style.display = t === 'dark' ? 'block' : 'none';
+      localStorage.setItem('tf-theme', t);
+    }
+
+    setTheme(theme);
+    themeBtn.onclick = () => setTheme(theme === 'dark' ? 'light' : 'dark');
+
+    // Apply accent color from storage
+    const color = localStorage.getItem('tf-color') || '#e06610';
+    document.documentElement.style.setProperty('--accent', color);
+    document.querySelectorAll('.bg-orb').forEach(orb => orb.style.background = color);
+  </script>
 </body>
-</html> 
+</html>

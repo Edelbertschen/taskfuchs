@@ -1,319 +1,485 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Privacy Policy - TaskFuchs</title>
-    <meta name="description" content="Privacy Policy of the TaskFuchs productivity app according to GDPR">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy – TaskFuchs</title>
+  <meta name="description" content="Privacy Policy for TaskFuchs productivity app">
+  
+  <link rel="icon" type="image/png" href="assets/images/3d_fox.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --accent: #e06610;
+      --bg: #f8fafc;
+      --bg-dark: #0c0c0c;
+      --card: rgba(255, 255, 255, 0.7);
+      --card-dark: rgba(30, 30, 35, 0.7);
+      --text: #1e293b;
+      --text-dark: #f1f5f9;
+      --muted: #64748b;
+      --muted-dark: #94a3b8;
+      --border: rgba(0, 0, 0, 0.08);
+      --border-dark: rgba(255, 255, 255, 0.1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --primary-color: #e06610;
-            --text-dark: #0f0f23;
-            --text-light: #6b7280;
-            --bg-light: #fafafa;
-        }
+    html {
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      scroll-behavior: smooth;
+    }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-            color: var(--text-dark);
-            background: var(--bg-light);
-            padding-top: 80px; /* Space for fixed navigation */
-        }
+    body.dark {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+    }
 
-        /* Navigation Styles */
-        .nav {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-            padding: 1rem 0;
-            backdrop-filter: blur(20px);
-            background: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
+    .bg-animation {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+    }
 
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    .bg-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.25;
+      animation: float 20s ease-in-out infinite;
+    }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 800;
-            font-size: 1.5rem;
-            color: var(--primary-color);
-            text-decoration: none;
-        }
+    .bg-orb-1 {
+      width: 400px;
+      height: 400px;
+      background: var(--accent);
+      top: -100px;
+      right: -50px;
+    }
 
-        .logo img {
-            width: 40px;
-            height: 40px;
-        }
+    .bg-orb-2 {
+      width: 300px;
+      height: 300px;
+      background: var(--accent);
+      bottom: 10%;
+      left: -80px;
+      animation-delay: -7s;
+    }
 
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-        }
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(20px, -20px) scale(1.05); }
+    }
 
-        .nav-links a {
-            text-decoration: none;
-            color: var(--text-dark);
-            font-weight: 500;
-            transition: all 0.3s ease;
-            position: relative;
-        }
+    .glass {
+      background: var(--card);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.05),
+        0 10px 20px -5px rgba(0, 0, 0, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    }
 
-        .nav-links a:hover {
-            color: var(--primary-color);
-        }
+    body.dark .glass {
+      background: var(--card-dark);
+      border-color: var(--border-dark);
+      box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.3),
+        0 10px 20px -5px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
 
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: linear-gradient(45deg, var(--primary-color), #ff7a1a);
-            transition: width 0.3s ease;
-        }
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 1rem;
+    }
 
-        .nav-links a:hover::after {
-            width: 100%;
-        }
+    .header-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+    }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      color: inherit;
+      font-weight: 600;
+      font-size: 1.125rem;
+    }
 
-        .header {
-            text-align: center;
-            margin-bottom: 3rem;
-            padding: 2rem 0;
-            border-bottom: 2px solid var(--primary-color);
-        }
+    .logo img {
+      width: 32px;
+      height: 32px;
+    }
 
-        .header h1 {
-            color: var(--primary-color);
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-        }
+    .controls {
+      display: flex;
+      gap: 0.375rem;
+    }
 
-        .header p {
-            color: var(--text-light);
-            font-size: 1.1rem;
-        }
+    .control-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: inherit;
+      transition: all 0.2s;
+    }
 
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 500;
-            margin-bottom: 2rem;
-            transition: all 0.3s ease;
-        }
+    .control-btn:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
 
-        .back-link:hover {
-            color: var(--text-dark);
-            transform: translateX(-5px);
-        }
+    body.dark .control-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
 
-        h2 {
-            color: var(--primary-color);
-            margin: 2rem 0 1rem 0;
-            font-size: 1.5rem;
-        }
+    .control-btn svg {
+      width: 18px;
+      height: 18px;
+    }
 
-        h3 {
-            color: var(--text-dark);
-            margin: 1.5rem 0 0.5rem 0;
-            font-size: 1.2rem;
-        }
+    .content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 8rem 1.5rem 4rem;
+    }
 
-        p {
-            margin-bottom: 1rem;
-            text-align: justify;
-        }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+      margin-bottom: 2rem;
+      transition: opacity 0.2s;
+    }
 
-        ul {
-            margin: 1rem 0;
-            padding-left: 2rem;
-        }
+    .back-link:hover { opacity: 0.8; }
 
-        li {
-            margin-bottom: 0.5rem;
-        }
+    .page-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
 
-        .highlight {
-            background: linear-gradient(120deg, transparent 0%, rgba(224, 102, 16, 0.1) 50%, transparent 100%);
-            padding: 0.2rem;
-            border-radius: 3px;
-        }
+    .page-header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
 
-        .footer-nav {
-            margin-top: 3rem;
-            padding-top: 2rem;
-            border-top: 1px solid #e5e5e5;
-            text-align: center;
-        }
+    .page-header p {
+      color: var(--muted);
+    }
 
-        .footer-nav a {
-            color: var(--primary-color);
-            text-decoration: none;
-            margin: 0 1rem;
-            font-weight: 500;
-        }
+    body.dark .page-header p { color: var(--muted-dark); }
 
-        .footer-nav a:hover {
-            text-decoration: underline;
-        }
+    .section {
+      margin-bottom: 2rem;
+      padding: 1.75rem;
+      border-radius: 16px;
+    }
 
-        @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-            
-            .header h1 {
-                font-size: 2rem;
-            }
-        }
-    </style>
+    .section h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--accent);
+    }
+
+    .section p {
+      margin-bottom: 0.75rem;
+      color: var(--muted);
+    }
+
+    body.dark .section p { color: var(--muted-dark); }
+
+    .section ul {
+      margin-left: 1.5rem;
+      color: var(--muted);
+    }
+
+    body.dark .section ul { color: var(--muted-dark); }
+
+    .section ul li {
+      margin-bottom: 0.375rem;
+    }
+
+    .section a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .section a:hover {
+      text-decoration: underline;
+    }
+
+    .highlight-box {
+      padding: 1.25rem;
+      border-radius: 12px;
+      border-left: 3px solid var(--accent);
+      background: rgba(0,0,0,0.02);
+      margin: 1rem 0;
+    }
+
+    body.dark .highlight-box {
+      background: rgba(255,255,255,0.02);
+    }
+
+    .contact-box {
+      padding: 1.25rem;
+      border-radius: 12px;
+      border-left: 3px solid var(--accent);
+      background: rgba(0,0,0,0.02);
+      margin: 1rem 0;
+    }
+
+    body.dark .contact-box {
+      background: rgba(255,255,255,0.02);
+    }
+
+    .last-updated {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.875rem;
+      margin-top: 3rem;
+    }
+
+    body.dark .last-updated { color: var(--muted-dark); }
+
+    footer {
+      padding: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    body.dark footer { border-color: var(--border-dark); }
+
+    .footer-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+    }
+
+    body.dark .footer-links a { color: var(--muted-dark); }
+    .footer-links a:hover { color: var(--accent); }
+
+    .footer-copy {
+      color: var(--muted);
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    body.dark .footer-copy { color: var(--muted-dark); }
+    .footer-copy img { width: 18px; height: 18px; }
+
+    @media (max-width: 640px) {
+      .footer-inner {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+  </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="nav">
-        <div class="nav-container">
-            <a href="index.html" class="logo">
-                <img src="assets/images/3d_fox.png" alt="TaskFuchs Logo">
-                TaskFuchs
-            </a>
-            <ul class="nav-links">
-                <li><a href="index.html#features">Features</a></li>
-                <li><a href="index.html#demo">Demo</a></li>
-                <li><a href="index.html#gallery">Screenshots</a></li>
-                <li><a href="index.html#zielgruppen">Target Groups</a></li>
-                <li><a href="imprint.html">Imprint</a></li>
-            </ul>
-        </div>
-    </nav>
+  <div class="bg-animation">
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+  </div>
 
-    <div class="container">
-        <a href="index.html" class="back-link">
-            ← Back to TaskFuchs
-        </a>
-        
-        <div class="header">
-            <h1>Privacy Policy</h1>
-            <p>TaskFuchs Productivity App</p>
-        </div>
-
-        <h2>1. Privacy at a Glance</h2>
-
-        <h3>General Information</h3>
-        <p>The following notes provide a simple overview of what happens to your personal data when you visit this website. Personal data is any data with which you could be personally identified. Detailed information on the subject of data protection can be found in our privacy policy listed below this text.</p>
-
-        <h3>Data Collection on this Website</h3>
-        <p><strong>Who is responsible for data collection on this website?</strong></p>
-        <p>Data processing on this website is carried out by the website operator. You can find their contact details in the "Information about the responsible party" section in this privacy policy.</p>
-
-        <h3>Data Protection</h3>
-        <p>We take the protection of your personal data very seriously. We treat your personal data confidentially and in accordance with the statutory data protection regulations and this privacy policy.</p>
-
-        <p>When you use this website, various personal data will be collected. Personal data is any data with which you could be personally identified. This privacy policy explains what information we collect and what we use it for. It also explains how and for what purpose this happens.</p>
-
-        <h2>2. Hosting and Content Delivery Networks (CDN)</h2>
-
-        <h3>External Hosting</h3>
-        <p>This website is hosted by an external service provider (host). The personal data collected on this website are stored on the host's servers. This may include IP addresses, contact requests, meta and communication data, contract data, contact details, names, website accesses, and other data generated via a website.</p>
-
-        <p>The external hosting serves the purpose of fulfilling the contract with our potential and existing customers (Art. 6 para. 1 lit. b GDPR) and in the interest of secure, fast, and efficient provision of our online service by a professional provider (Art. 6 para. 1 lit. f GDPR).</p>
-
-        <h2>3. General Information and Mandatory Information</h2>
-
-        <h3>Data Protection</h3>
-        <p>The operators of this website take the protection of your personal data very seriously. We treat your personal data confidentially and in accordance with the statutory data protection regulations and this privacy policy.</p>
-
-        <h3>Information about the Responsible Party</h3>
-        <p>The responsible party for data processing on this website is:</p>
-        <p>
-            Malte Viergutz<br>
-            Jungnauer Str. 1<br>
-            79211 Denzlingen<br>
-            Germany<br>
-            Email: info@taskfuchs.de<br>
-            Website: taskfuchs.de
-        </p>
-
-        <h3>Storage Duration</h3>
-        <p>Unless a more specific storage period has been specified within this privacy policy, your personal data will remain with us until the purpose for the data processing lapses. If you assert a justified request for deletion or revoke your consent to data processing, your data will be deleted, unless we have other legally permissible reasons for storing your personal data.</p>
-
-        <h3>Your Rights</h3>
-        <p>You have the following rights regarding your personal data:</p>
-        <ul>
-            <li><strong>Right to Information:</strong> You can request confirmation about whether personal data concerning you is being processed by us.</li>
-            <li><strong>Right to Correction:</strong> You have the right to have incorrect personal data corrected immediately.</li>
-            <li><strong>Right to Deletion:</strong> You can request the deletion of your personal data stored by us.</li>
-            <li><strong>Right to Restriction:</strong> You can request the restriction of processing of your personal data.</li>
-            <li><strong>Right to Data Portability:</strong> You have the right to receive your personal data in a structured, common, and machine-readable format.</li>
-            <li><strong>Right to Object:</strong> You have the right to object to the processing of your personal data.</li>
-        </ul>
-
-        <h2>4. Data Collection on this Website</h2>
-
-        <h3>Server Log Files</h3>
-        <p>The provider of the pages automatically collects and stores information in so-called server log files, which your browser automatically transmits to us. These are:</p>
-        <ul>
-            <li>Browser type and browser version</li>
-            <li>Operating system used</li>
-            <li>Referrer URL</li>
-            <li>Host name of the accessing computer</li>
-            <li>Time of the server request</li>
-            <li>IP address</li>
-        </ul>
-
-        <p>This data will not be combined with data from other sources. The collection of this data is based on Art. 6 para. 1 lit. f GDPR. The website operator has a legitimate interest in the technically error-free presentation and optimization of his website.</p>
-
-        <h3>SSL or TLS Encryption</h3>
-        <p>This site uses SSL or TLS encryption for security reasons and to protect the transmission of confidential content, such as orders or inquiries you send to us as the site operator. You can recognize an encrypted connection by the fact that the address line of the browser changes from "http://" to "https://" and by the lock symbol in your browser line.</p>
-
-        <h2>5. Social Media</h2>
-        <p>If you access our website via social media links or share our content on social media, the privacy policies of the respective platforms apply.</p>
-
-        <h2>6. Contact</h2>
-        <p>If you have questions about privacy or this privacy policy, you can contact us at any time:</p>
-        <p>
-            Email: info@taskfuchs.de<br>
-            or via the imprint of this website
-        </p>
-
-        <div class="footer-nav">
-            <a href="index.php">Home</a>
-            <a href="imprint.html">Imprint</a>
-        </div>
+  <header>
+    <div class="header-inner glass">
+      <a href="index.html" class="logo">
+        <img src="assets/images/3d_fox.png" alt="TaskFuchs">
+        <span>TaskFuchs</span>
+      </a>
+      <div class="controls">
+        <button class="control-btn" id="themeBtn" title="Theme">
+          <svg class="icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="5" stroke-width="2"/>
+            <path stroke-width="2" stroke-linecap="round" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+          <svg class="icon-moon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:none">
+            <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+          </svg>
+        </button>
+      </div>
     </div>
+  </header>
+
+  <main class="content">
+    <a href="index.html" class="back-link">← Back to Homepage</a>
+    
+    <div class="page-header">
+      <h1>Privacy Policy</h1>
+      <p>TaskFuchs Productivity App</p>
+    </div>
+
+    <div class="section glass">
+      <h2>1. Data Protection at a Glance</h2>
+      <p>The following information provides a simple overview of what happens to your personal data when you visit our website or use our app.</p>
+      
+      <div class="highlight-box">
+        <p><strong>Who is responsible for data collection?</strong></p>
+        <p>Data processing is carried out by the website operator. Contact details can be found in the "Controller" section.</p>
+      </div>
+    </div>
+
+    <div class="section glass">
+      <h2>2. Hosting</h2>
+      <p>This website is hosted by an external service provider. Personal data collected on this website is stored on the host's servers (IP addresses, meta and communication data).</p>
+    </div>
+
+    <div class="section glass">
+      <h2>3. Controller</h2>
+      <div class="contact-box">
+        <p><strong>Malte Viergutz</strong></p>
+        <p>Jungnauer Str. 1</p>
+        <p>79211 Denzlingen, Germany</p>
+        <p>Email: info@taskfuchs.de</p>
+      </div>
+    </div>
+
+    <div class="section glass">
+      <h2>4. Data Collection on This Website</h2>
+      <p>The provider automatically collects information in server log files:</p>
+      <ul>
+        <li>Browser type and version</li>
+        <li>Operating system</li>
+        <li>Referrer URL</li>
+        <li>Hostname of the accessing computer</li>
+        <li>Time of server request</li>
+        <li>IP address</li>
+      </ul>
+      <p>This data is not merged with other data sources.</p>
+    </div>
+
+    <div class="section glass">
+      <h2>5. TaskFuchs App</h2>
+      <p>When using the TaskFuchs app, the following data is stored locally on your device:</p>
+      <ul>
+        <li>Tasks and their status</li>
+        <li>Project data</li>
+        <li>Settings and preferences</li>
+        <li>Time tracking data</li>
+        <li>Productivity statistics</li>
+      </ul>
+      <div class="highlight-box">
+        <p><strong>Important:</strong> TaskFuchs processes your data primarily locally on your device. No personal data is transmitted to servers without your explicit consent.</p>
+      </div>
+    </div>
+
+    <div class="section glass">
+      <h2>6. Your Rights</h2>
+      <p>You have the following rights regarding your personal data:</p>
+      <ul>
+        <li><strong>Access:</strong> You can request information about your stored data.</li>
+        <li><strong>Rectification:</strong> You have the right to have incorrect data corrected.</li>
+        <li><strong>Erasure:</strong> You can request the deletion of your data.</li>
+        <li><strong>Restriction:</strong> You can request restriction of processing.</li>
+        <li><strong>Data portability:</strong> You have the right to receive your data in a portable format.</li>
+        <li><strong>Objection:</strong> You can object to the processing of your data.</li>
+      </ul>
+    </div>
+
+    <div class="section glass">
+      <h2>7. SSL/TLS Encryption</h2>
+      <p>This site uses SSL/TLS encryption. You can recognize an encrypted connection by the lock icon in your browser bar and "https://" in the URL.</p>
+    </div>
+
+    <div class="section glass">
+      <h2>8. Contact</h2>
+      <p>For privacy questions:</p>
+      <div class="contact-box">
+        <p>Email: datenschutz@taskfuchs.de</p>
+      </div>
+    </div>
+
+    <p class="last-updated">Last updated: July 2025</p>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="imprint.html">Imprint</a>
+        <a href="privacy-policy.html">Privacy Policy</a>
+        <a href="https://github.com/malteviergutz/taskfuchs" target="_blank">GitHub</a>
+      </div>
+      <div class="footer-copy">
+        <span>© 2025</span>
+        <img src="assets/images/3d_fox.png" alt="">
+        <span>TaskFuchs</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    let theme = localStorage.getItem('tf-theme') || 'light';
+    const themeBtn = document.getElementById('themeBtn');
+    const sunIcon = themeBtn.querySelector('.icon-sun');
+    const moonIcon = themeBtn.querySelector('.icon-moon');
+
+    function setTheme(t) {
+      theme = t;
+      document.body.classList.toggle('dark', t === 'dark');
+      sunIcon.style.display = t === 'dark' ? 'none' : 'block';
+      moonIcon.style.display = t === 'dark' ? 'block' : 'none';
+      localStorage.setItem('tf-theme', t);
+    }
+
+    setTheme(theme);
+    themeBtn.onclick = () => setTheme(theme === 'dark' ? 'light' : 'dark');
+
+    const color = localStorage.getItem('tf-color') || '#e06610';
+    document.documentElement.style.setProperty('--accent', color);
+    document.querySelectorAll('.bg-orb').forEach(orb => orb.style.background = color);
+  </script>
 </body>
-</html> 
+</html>
