@@ -338,12 +338,15 @@ function MainApp() {
   // Listen for focus prompt events (timer started)
   useEffect(() => {
     const handler = (e: any) => {
+      // Don't show focus prompt during onboarding
+      if (showOnboarding) return;
+      
       setShowFocusPrompt({ visible: true, taskId: e?.detail?.taskId });
       setTimeout(() => setShowFocusPrompt({ visible: false }), 3000);
     };
     window.addEventListener('show-focus-prompt', handler as EventListener);
     return () => window.removeEventListener('show-focus-prompt', handler as EventListener);
-  }, []);
+  }, [showOnboarding]);
 
   // Handle separate timer window (Electron + PWA)
   useEffect(() => {

@@ -1111,6 +1111,11 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
       window.dispatchEvent(new CustomEvent('close-task-modal'));
     }
     
+    // Stop timer if running
+    if (state.activeTimer?.isActive) {
+      dispatch({ type: 'STOP_TIMER' });
+    }
+    
     // Delete sample task
     const sampleTask = state.tasks.find(t => t.id === SAMPLE_TASK_ID);
     if (sampleTask) {
@@ -1124,12 +1129,17 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
     });
     }
     onClose();
-  }, [dispatch, onClose, dontShowAgain, showTaskModal, state.tasks]);
+  }, [dispatch, onClose, dontShowAgain, showTaskModal, state.tasks, state.activeTimer]);
   
   const handleSkip = useCallback(() => {
     // Close task modal if open
     if (showTaskModal) {
       window.dispatchEvent(new CustomEvent('close-task-modal'));
+    }
+    
+    // Stop timer if running
+    if (state.activeTimer?.isActive) {
+      dispatch({ type: 'STOP_TIMER' });
     }
     
     // Delete sample task
@@ -1139,7 +1149,7 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
     }
     
     onClose();
-  }, [onClose, showTaskModal, state.tasks, dispatch]);
+  }, [onClose, showTaskModal, state.tasks, dispatch, state.activeTimer]);
   
   const handleLanguageSelect = useCallback((lang: Language) => {
     setLanguage(lang);
