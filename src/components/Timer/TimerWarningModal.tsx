@@ -9,7 +9,6 @@ interface TimerWarningModalProps {
   taskTitle: string;
   taskId: string;
   timeExceeded: number; // in minutes
-  type: 'estimated' | 'pomodoro';
 }
 
 export function TimerWarningModal({ 
@@ -17,8 +16,7 @@ export function TimerWarningModal({
   onClose, 
   taskTitle, 
   taskId, 
-  timeExceeded,
-  type 
+  timeExceeded
 }: TimerWarningModalProps) {
   const { state, dispatch } = useApp();
   const [additionalTime, setAdditionalTime] = useState<number>(15);
@@ -44,25 +42,12 @@ export function TimerWarningModal({
     onClose();
   };
 
-  const getModalContent = () => {
-    if (type === 'estimated') {
-      return {
-        title: 'Zeit erreicht',
-        icon: <Clock className="w-6 h-6" style={{ color: state.preferences.accentColor }} />,
-        description: `Die geschätzte Zeit für "${taskTitle}" ist erreicht.`,
-        additionalInfo: timeExceeded > 0 ? `Überschreitung: ${Math.round(timeExceeded)} Minuten` : null,
-      };
-    } else {
-      return {
-        title: 'Pomodoro beendet',
-        icon: <Clock className="w-6 h-6" style={{ color: state.preferences.accentColor }} />,
-        description: 'Ihre Pomodoro-Session ist zu Ende.',
-        additionalInfo: 'Zeit für eine wohlverdiente Pause!',
-      };
-    }
+  const content = {
+    title: 'Zeit erreicht',
+    icon: <Clock className="w-6 h-6" style={{ color: state.preferences.accentColor }} />,
+    description: `Die geschätzte Zeit für "${taskTitle}" ist erreicht.`,
+    additionalInfo: timeExceeded > 0 ? `Überschreitung: ${Math.round(timeExceeded)} Minuten` : null,
   };
-
-  const content = getModalContent();
 
   return createPortal(
     <div className="fixed inset-0 z-[9990] flex items-center justify-center" style={{ isolation: 'isolate' }}>
@@ -96,9 +81,8 @@ export function TimerWarningModal({
           )}
         </div>
 
-        {/* Add Time Section - Only for estimated time warnings */}
-        {type === 'estimated' && (
-          <div className="mb-6">
+        {/* Add Time Section */}
+        <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
               Zeit hinzufügen
             </label>
@@ -138,7 +122,6 @@ export function TimerWarningModal({
               </div>
             </div>
           </div>
-        )}
 
         {/* Actions */}
         <div className="flex justify-end space-x-3">
@@ -146,18 +129,16 @@ export function TimerWarningModal({
             onClick={handleContinueWithoutAddingTime}
             className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
           >
-            {type === 'estimated' ? 'Ohne Zeit fortfahren' : 'Verstanden'}
+            Ohne Zeit fortfahren
           </button>
-          {type === 'estimated' && (
-            <button
-              onClick={handleAddTime}
-              className="flex items-center px-4 py-2 text-sm text-white rounded-lg transition-colors hover:opacity-90"
-              style={{ backgroundColor: state.preferences.accentColor }}
-            >
-              <Plus className="w-4 h-4 mr-1" />
-              Zeit hinzufügen
-            </button>
-          )}
+          <button
+            onClick={handleAddTime}
+            className="flex items-center px-4 py-2 text-sm text-white rounded-lg transition-colors hover:opacity-90"
+            style={{ backgroundColor: state.preferences.accentColor }}
+          >
+            <Plus className="w-4 h-4 mr-1" />
+            Zeit hinzufügen
+          </button>
         </div>
       </div>
     </div>,

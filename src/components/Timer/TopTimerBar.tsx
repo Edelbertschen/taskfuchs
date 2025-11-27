@@ -28,10 +28,8 @@ interface TopTimerBarProps {
 export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
   const { t } = useTranslation();
   const { state, dispatch } = useApp();
-  const [pomodoroSession, setPomodoroSession] = useState(timerService.getGlobalPomodoroSession());
   const [showWarningModal, setShowWarningModal] = useState(false);
-  const [warningType, setWarningType] = useState<'estimated' | 'pomodoro'>('estimated');
-  const [lastWarningTime, setLastWarningTime] = useState<{ estimated?: number; pomodoro?: number }>({});
+  const [lastWarningTime, setLastWarningTime] = useState<number | undefined>();
   
   const activeTimer = state.activeTimer;
   const isRunning = activeTimer?.isActive && !activeTimer?.isPaused;
@@ -40,16 +38,6 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
   const [showQuickAdd, setShowQuickAdd] = useState<boolean>(false);
   const [quickAddValue, setQuickAddValue] = useState<string>('');
   const [showSyncDetail, setShowSyncDetail] = useState<boolean>(false);
-
-  // Update Pomodoro session state regularly
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const newSession = timerService.getGlobalPomodoroSession();
-      setPomodoroSession(newSession);
-    }, 1000);
-    
-    return () => clearInterval(interval);
-  }, []);
 
   // Track focus minutes – increments every 60s while a timer is running
   useEffect(() => {
@@ -83,7 +71,7 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
     return () => window.removeEventListener('keydown', onKey, true);
   }, [showQuickAdd]);
 
-  // Monitor timer warnings – mit Sound bei Überlauf (einmalig), Pomodoro-Ende: UI-Modal einmalig
+  // Monitor timer warnings – mit Sound bei Überlauf (einmalig)
   useEffect(() => {
     if (!activeTimer || !isRunning) return;
 
@@ -92,40 +80,21 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
 
     // Estimated time overrun – trigger exactly once when entering overtime
     if (task.estimatedTime) {
-      if (activeTimer.isOvertime && typeof lastWarningTime.estimated === 'undefined') {
+      if (activeTimer.isOvertime && typeof lastWarningTime === 'undefined') {
         // Play warn sound once on entering overtime
         try { playCompletionSound('notice', state.preferences.soundVolume); } catch {}
-        setWarningType('estimated');
         setShowWarningModal(true);
-        setLastWarningTime(prev => ({ ...prev, estimated: activeTimer.elapsedTime }));
+        setLastWarningTime(activeTimer.elapsedTime);
       }
       // Reset guard when back within time (e.g., after adding time or new task)
-      if (!activeTimer.isOvertime && typeof lastWarningTime.estimated !== 'undefined') {
-        setLastWarningTime(prev => ({ ...prev, estimated: undefined }));
+      if (!activeTimer.isOvertime && typeof lastWarningTime !== 'undefined') {
+        setLastWarningTime(undefined);
       }
     }
+  }, [activeTimer, isRunning, state.tasks, lastWarningTime, state.preferences.soundVolume]);
 
-    // Check for Pomodoro session end (only if naturally reached, not when user manually skipped)
-    if (
-      activeTimer?.mode === 'pomodoro' && 
-      pomodoroSession && 
-      pomodoroSession.sessionRemainingTime <= 0
-    ) {
-      // Only once per session end
-      if (typeof lastWarningTime.pomodoro === 'undefined') {
-        setWarningType('pomodoro');
-        setShowWarningModal(true);
-        setLastWarningTime(prev => ({ ...prev, pomodoro: Date.now() }));
-      }
-    } else if (pomodoroSession && pomodoroSession.sessionRemainingTime > 0 && typeof lastWarningTime.pomodoro !== 'undefined') {
-      // Reset guard once a new session or remaining time is positive again
-      setLastWarningTime(prev => ({ ...prev, pomodoro: undefined }));
-    }
-  }, [activeTimer, isRunning, state.tasks, pomodoroSession, lastWarningTime, state.preferences.soundVolume]);
-
-  const hasPomodoro = !!pomodoroSession && pomodoroSession.isActive;
-  // Don't render if neither task timer nor pomodoro is present
-  if (!activeTimer && !hasPomodoro) {
+  // Don't render if no timer is present
+  if (!activeTimer) {
     return null;
   }
 
@@ -183,41 +152,6 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
     return Math.min((elapsedTime / totalTime) * 100, 100);
   };
 
-  // Pomodoro progress percentage (0-100)
-  const getPomodoroProgress = () => {
-    if (!pomodoroSession) return 0;
-    const total = pomodoroSession.sessionRemainingTime + pomodoroSession.sessionElapsedTime;
-    if (total <= 0) return 0;
-    return Math.min(100, (pomodoroSession.sessionElapsedTime / total) * 100);
-  };
-
-  // Get Pomodoro color based on type and progress
-  const getPomodoroColor = () => {
-    if (!pomodoroSession) return state.preferences.accentColor;
-    if (pomodoroSession.type === 'work') {
-      // Work phase: Red for normal, Orange for overtime
-      return pomodoroSession.sessionRemainingTime <= 0 ? '#f97316' : '#ef4444';
-    } else {
-      // Break phase: Green
-      return '#10b981';
-    }
-  };
-
-  // Helpers for tooltips
-  const getPomodoroPhaseLabel = () => {
-    if (!pomodoroSession) return '';
-    switch (pomodoroSession.type) {
-      case 'work': return 'Arbeitsphase';
-      case 'shortBreak': return 'Kurze Pause';
-      case 'longBreak': return 'Lange Pause';
-      default: return 'Pomodoro';
-    }
-  };
-
-  const getPomodoroTooltip = () => {
-    if (!pomodoroSession) return '';
-    return `${getPomodoroPhaseLabel()} ${formatTime(Math.max(0, pomodoroSession.sessionRemainingTime || 0))} übrig`;
-  };
 
   // Quick Add handler
   const handleQuickAddSubmit = () => {
@@ -257,42 +191,20 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
     setShowQuickAdd(false);
   };
 
-  // Unified controls for Task + Pomodoro to avoid duplicate buttons
-  const handleUnifiedPlayPause = () => {
-    // If task timer exists, toggle it
+  // Controls for Task Timer
+  const handlePlayPause = () => {
     if (activeTimer) {
       if (isRunning) {
         dispatch({ type: 'PAUSE_TIMER' });
-        if (pomodoroSession && !pomodoroSession.isPaused) {
-          timerService.pausePomodoroSession();
-        }
       } else {
         dispatch({ type: 'RESUME_TIMER' });
-        if (pomodoroSession && pomodoroSession.isPaused) {
-          timerService.resumePomodoroSession();
-        }
-      }
-      return;
-    }
-    // If no task timer, control Pomodoro only
-    if (pomodoroSession) {
-      if (pomodoroSession.isPaused) {
-        timerService.resumePomodoroSession();
-      } else {
-        timerService.pausePomodoroSession();
       }
     }
   };
 
-  const handleUnifiedStop = () => {
+  const handleStop = () => {
     if (activeTimer) {
-      // Stop only the task timer; keep Pomodoro running
       dispatch({ type: 'STOP_TIMER' });
-      return;
-    }
-    // If no task timer, stop Pomodoro
-    if (pomodoroSession) {
-      timerService.stopPomodoroSession();
     }
   };
 
@@ -302,16 +214,6 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
     }
   };
 
-  const handlePomodoroSkipOrEnd = () => {
-    if (!pomodoroSession) return;
-    if (pomodoroSession.type === 'work') {
-      // Skip work → start break immediately (continues running)
-      timerService.skipPomodoroPhase();
-    } else {
-      // End break → start new work session (continues running)
-      timerService.endPomodoroBreak();
-    }
-  };
 
   const handleEnterFocusMode = () => {
     try {
@@ -363,17 +265,6 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
                     {task?.title || 'Unbekannte Aufgabe'}
                   </button>
                 </>
-              ) : (
-                hasPomodoro && (
-                  <div className="flex items-center space-x-2">
-                    {pomodoroSession?.type === 'work' ? (
-                      <Target className="w-3.5 h-3.5" style={{ color: state.preferences.accentColor }} />
-                    ) : (
-                      <Coffee className="w-3.5 h-3.5 text-red-500" />
-                    )}
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Pomodoro</span>
-                  </div>
-                )
               )}
             </div>
 
@@ -394,113 +285,33 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
                     <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
                   )}
                 </div>
-              ) : (
-                <div />
-              )}
-
-              {/* Pomodoro Timer (always when session exists; visible even without task timer) */}
-              {pomodoroSession && (
-                <>
-                  <div className="w-px h-6 bg-gray-300 dark:bg-gray-600" />
-                  <div className="flex items-center space-x-3" title={getPomodoroTooltip()}>
-                    {/* Elegant Pomodoro Progress Ring */}
-                    <div className="relative w-10 h-10 flex items-center justify-center">
-                      {/* Background ring */}
-                      <svg className="absolute w-full h-full" viewBox="0 0 40 40" style={{ transform: 'rotate(-90deg)' }}>
-                        <circle
-                          cx="20"
-                          cy="20"
-                          r="16"
-                          fill="none"
-                          stroke={isDarkMode ? '#374151' : '#e5e7eb'}
-                          strokeWidth="2"
-                        />
-                        {/* Progress ring */}
-                        <circle
-                          cx="20"
-                          cy="20"
-                          r="16"
-                          fill="none"
-                          stroke={getPomodoroColor()}
-                          strokeWidth="2"
-                          strokeDasharray={`${(getPomodoroProgress() / 100) * 100.53} 100.53`}
-                          style={{
-                            transition: 'stroke-dasharray 1s linear, stroke 0.3s ease',
-                          }}
-                        />
-                      </svg>
-                      {/* Center tomato icon */}
-                      <div className="relative z-10 text-lg" style={{ opacity: 0.9 }}>
-                        {pomodoroSession.type === 'work' ? '🍅' : '☕'}
-                      </div>
-                    </div>
-                    
-                    {/* Time display */}
-                    <div className="flex flex-col">
-                      <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                        {pomodoroSession.type === 'work' ? 'Work' : 'Break'}
-                      </span>
-                      <span className="text-sm font-mono font-semibold" style={{ color: getPomodoroColor() }}>
-                        {formatTimeWithSecondsExact(Math.max(0, pomodoroSession.sessionRemainingTime || 0))}
-                      </span>
-                    </div>
-                    
-                    {/* Session number */}
-                    <span className="text-xs px-2 py-1 rounded-full" style={{ 
-                      backgroundColor: `${getPomodoroColor()}20`,
-                      color: getPomodoroColor()
-                    }}>
-                      #{pomodoroSession.sessionNumber}
-                    </span>
-                    
-                    {/* Skip/End button */}
-                    <button
-                      onClick={handlePomodoroSkipOrEnd}
-                      className="ml-1 px-2 py-0.5 rounded-md text-xs font-medium transition-all duration-200 hover:scale-110 border"
-                      style={{ backgroundColor: 'transparent', color: getPomodoroColor(), borderColor: getPomodoroColor() }}
-                      title={pomodoroSession.type === 'work' ? 'Phase überspringen' : 'Pause beenden'}
-                    >
-                      <SkipForward className="w-3 h-3" />
-                    </button>
-                  </div>
-                </>
               )}
             </div>
 
             {/* Right: Controls */}
             <div className="flex items-center space-x-2 flex-1 justify-end">
-              {/* Unified controls (Task + Pomodoro) */}
-              {(activeTimer || pomodoroSession) && (
+              {/* Task Timer Controls */}
+              {activeTimer && (
                 <>
                   <button
-                    onClick={handleUnifiedPlayPause}
-                    className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-200 text-white shadow-sm ${!activeTimer && state.preferences?.timer?.dimControlsWhenNoTask ? 'opacity-40 pointer-events-none' : 'hover:opacity-80'}`}
+                    onClick={handlePlayPause}
+                    className="w-7 h-7 rounded-full flex items-center justify-center transition-all duration-200 text-white shadow-sm hover:opacity-80"
                     style={{ backgroundColor: state.preferences.accentColor }}
-                    title={(activeTimer ? isRunning : !(pomodoroSession && pomodoroSession.isPaused)) ? 'Pausieren' : 'Fortsetzen'}
+                    title={isRunning ? 'Pausieren' : 'Fortsetzen'}
                   >
-                    {(activeTimer ? isRunning : !(pomodoroSession && pomodoroSession.isPaused)) ? (
+                    {isRunning ? (
                       <Pause className="w-3.5 h-3.5" />
                     ) : (
                       <Play className="w-3.5 h-3.5" />
                     )}
                   </button>
                   <button
-                    onClick={handleUnifiedStop}
-                    className={`w-7 h-7 rounded-full bg-gray-400 text-white flex items-center justify-center transition-all duration-200 shadow-sm hover:opacity-80 hover:bg-gray-500`}
-                    title={activeTimer ? 'Aufgabentimer stoppen' : 'Pomodoro beenden'}
+                    onClick={handleStop}
+                    className="w-7 h-7 rounded-full bg-gray-400 text-white flex items-center justify-center transition-all duration-200 shadow-sm hover:opacity-80 hover:bg-gray-500"
+                    title="Aufgabentimer stoppen"
                   >
                     <Square className="w-3 h-3" />
                   </button>
-                  {/* Dedicated Pomodoro stop when both are present */}
-                  {activeTimer && pomodoroSession && (
-                    <button
-                      onClick={() => timerService.stopPomodoroSession()}
-                      className="w-7 h-7 rounded-full bg-red-500 text-white flex items-center justify-center transition-all duration-200 shadow-sm hover:opacity-90"
-                      title="Pomodoro stoppen"
-                    >
-                      <Square className="w-3 h-3" />
-                    </button>
-                  )}
                 </>
               )}
               {/* Sync badge removed from header; relocated to sidebar */}
@@ -548,7 +359,6 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
           taskTitle={task.title}
           taskId={task.id}
           timeExceeded={Math.max(0, activeTimer!.elapsedTime - (task.estimatedTime || 0))}
-          type={warningType}
         />
       )}
     </>
