@@ -551,18 +551,9 @@ function MainApp() {
     return () => window.removeEventListener('pwa-update-available', onUpdate as EventListener);
   }, []);
 
-  // Reset userExitedFocus when timer stops or new timer starts
-  useEffect(() => {
-    if (!state.activeTimer?.isActive) {
-      // Timer stopped - reset the flag
-      setUserExitedFocus(false);
-    }
-  }, [state.activeTimer?.isActive, state.activeTimer?.taskId]);
-
   // Handle exit from focus mode
   const handleExitFocus = () => {
     console.log('🎯 Exiting focus mode, returning to:', lastViewBeforeFocus);
-    setUserExitedFocus(true); // Mark that user manually exited focus mode
     handleViewChange(lastViewBeforeFocus);
   };
 

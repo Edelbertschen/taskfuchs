@@ -3029,8 +3029,9 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                         {(() => {
                           const trackedTime = getCurrentTrackedTime();
                           if (trackedTime === 0) return '0 min';
-                          const hours = Math.floor(trackedTime / 60);
-                          const mins = trackedTime % 60;
+                          const roundedTime = Math.round(trackedTime);
+                          const hours = Math.floor(roundedTime / 60);
+                          const mins = roundedTime % 60;
                           if (hours > 0) return `${hours}h ${mins}min`;
                           return `${mins} min`;
                         })()}
