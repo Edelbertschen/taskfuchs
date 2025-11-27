@@ -958,6 +958,17 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
   const currentSection = allTourSections[currentSectionIndex];
   const currentStep = currentSection?.steps[currentStepIndex];
   
+  // Debug: Log section and step
+  console.log('[Onboarding] Current state:', {
+    currentSectionIndex,
+    currentStepIndex,
+    totalSections: allTourSections.length,
+    currentSectionId: currentSection?.id,
+    currentStepTitle: currentStep?.title?.de,
+    hasSection: !!currentSection,
+    hasStep: !!currentStep
+  });
+  
   // Map view to sidebar button selector
   const getViewSelector = useCallback((view: string): string | null => {
     switch (view) {
@@ -1039,25 +1050,28 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
       setCurrentStepIndex(currentStepIndex + 1);
       setTimeout(() => setIsAnimating(false), 200);
     } else if (currentSectionIndex < allTourSections.length - 1) {
-      // Move to next section with guide cursor
+      // Move to next section
       const nextSection = allTourSections[currentSectionIndex + 1];
       const currentView = section.view;
       const nextView = nextSection.view;
       
-      if (nextSection && currentView !== nextView) {
-        // Different view - show guide cursor
-        navigateToViewWithCursor(nextView, currentSectionIndex + 1, 0);
-      } else {
-        // Same view - direct navigation
-        setCurrentSectionIndex(currentSectionIndex + 1);
-        setCurrentStepIndex(0);
-        setTimeout(() => setIsAnimating(false), 200);
-      }
+      console.log('[Onboarding] Moving to next section:', {
+        from: section.id,
+        to: nextSection.id,
+        fromView: currentView,
+        toView: nextView
+      });
+      
+      // Always navigate directly (simpler and more reliable)
+      navigateToView(nextView);
+      setCurrentSectionIndex(currentSectionIndex + 1);
+      setCurrentStepIndex(0);
+      setTimeout(() => setIsAnimating(false), 300);
     } else {
       // No more sections
       setTimeout(() => setIsAnimating(false), 200);
     }
-  }, [currentStepIndex, currentSectionIndex, allTourSections, navigateToViewWithCursor, isAnimating]);
+  }, [currentStepIndex, currentSectionIndex, allTourSections, navigateToView, isAnimating]);
   
   // Go to previous step or section - stable version without stale closures
   const handlePrev = useCallback(() => {
