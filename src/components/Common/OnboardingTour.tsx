@@ -781,24 +781,34 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSectionIndex, currentStepIndex]);
   
-  // Create sample task when language is selected (without date for Inbox)
+  // Create sample task when language is selected (without date for Inbox, no pin)
   useEffect(() => {
     if (isOpen && language && !sampleTaskCreated) {
-      // Find an existing pin column or use the first one
-      const pinColumn = state.pinColumns?.[0];
-      const sampleTask = createSampleTask(pinColumn?.id, false); // Create WITHOUT date (for Inbox)
+      // Create WITHOUT pinColumnId so it appears in Inbox
+      const sampleTask = createSampleTask(undefined, false); // No pin, no date (for Inbox)
       
       // Check if sample task already exists
       const existingTask = state.tasks.find(t => t.id === SAMPLE_TASK_ID);
       if (!existingTask) {
         dispatch({ type: 'ADD_TASK', payload: sampleTask });
       } else {
-        // Reset it to inbox state (no date)
+        // Reset it to inbox state (no date, no pin)
         dispatch({ type: 'UPDATE_TASK', payload: sampleTask });
       }
       setSampleTaskCreated(true);
     }
-  }, [isOpen, language, sampleTaskCreated, state.pinColumns, state.tasks, dispatch]);
+  }, [isOpen, language, sampleTaskCreated, state.tasks, dispatch]);
+  
+  // Cleanup: Delete sample task when onboarding closes
+  useEffect(() => {
+    if (!isOpen && sampleTaskCreated) {
+      const sampleTask = state.tasks.find(t => t.id === SAMPLE_TASK_ID);
+      if (sampleTask) {
+        dispatch({ type: 'DELETE_TASK', payload: SAMPLE_TASK_ID });
+        setSampleTaskCreated(false);
+      }
+    }
+  }, [isOpen, sampleTaskCreated, state.tasks, dispatch]);
   
   // Add date to sample task when entering "today" section
   useEffect(() => {
@@ -1133,6 +1143,12 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
       window.dispatchEvent(new CustomEvent('close-task-modal'));
     }
     
+    // Delete sample task
+    const sampleTask = state.tasks.find(t => t.id === SAMPLE_TASK_ID);
+    if (sampleTask) {
+      dispatch({ type: 'DELETE_TASK', payload: SAMPLE_TASK_ID });
+    }
+    
     if (dontShowAgain) {
     dispatch({ 
       type: 'UPDATE_PREFERENCES', 
@@ -1140,15 +1156,22 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
     });
     }
     onClose();
-  }, [dispatch, onClose, dontShowAgain, showTaskModal]);
+  }, [dispatch, onClose, dontShowAgain, showTaskModal, state.tasks]);
   
   const handleSkip = useCallback(() => {
     // Close task modal if open
     if (showTaskModal) {
       window.dispatchEvent(new CustomEvent('close-task-modal'));
     }
+    
+    // Delete sample task
+    const sampleTask = state.tasks.find(t => t.id === SAMPLE_TASK_ID);
+    if (sampleTask) {
+      dispatch({ type: 'DELETE_TASK', payload: SAMPLE_TASK_ID });
+    }
+    
     onClose();
-  }, [onClose, showTaskModal]);
+  }, [onClose, showTaskModal, state.tasks, dispatch]);
   
   const handleLanguageSelect = useCallback((lang: Language) => {
     setLanguage(lang);
