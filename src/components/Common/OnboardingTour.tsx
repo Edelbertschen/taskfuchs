@@ -221,23 +221,15 @@ const tourSections: TourSection[] = [
     steps: [
       {
         title: { de: 'Dein Tagesüberblick', en: 'Your Daily Overview' },
-        text: { de: 'In der Heute-Ansicht werden alle Aufgaben für den aktuellen Tag angezeigt.', en: 'The Today view shows all tasks for the current day.' },
+        text: { de: 'In der Heute-Ansicht werden alle Aufgaben für den aktuellen Tag angezeigt. Am Ende des Tages bietet der Tagesabschluss einen Überblick über die Leistung.', en: 'The Today view shows all tasks for the current day. At the end of the day, the daily summary provides an overview of performance.' },
         foxMessage: { de: 'Ein Schritt nach dem anderen!', en: 'One step at a time!' },
-        position: 'bottom-right'
-      },
-      {
-        title: { de: 'Tag beenden', en: 'End Day' },
-        text: { de: 'Am Ende des Tages werden erledigte Aufgaben archiviert und offene können verschoben werden. Der Tagesabschluss bietet einen Überblick über die Tagesleistung.', en: 'At the end of the day, completed tasks are archived and open ones can be moved. The end-of-day summary provides an overview of daily performance.' },
-        foxMessage: { de: 'Regelmäßige Backups empfohlen!', en: 'Regular backups recommended!' },
         position: 'bottom-right',
-        showGuideCursor: true,
-        guideCursorTarget: '[data-end-day-button]',
-        guideCursorClickAnimation: true,
         openEndOfDayModal: true
       },
       {
         title: { de: 'Tagesabschluss', en: 'End of Day' },
-        text: { de: 'Die Tagesabschluss-Übersicht zeigt deine Leistung und bietet Backup-Optionen. Ideal für den strukturierten Tagesabschluss.', en: 'The end-of-day overview shows your performance and offers backup options. Ideal for a structured daily close.' },
+        text: { de: 'Die Tagesabschluss-Übersicht zeigt erledigte Aufgaben, Zeiterfassung und bietet Backup-Optionen. Erledigte Aufgaben werden archiviert, offene können verschoben werden.', en: 'The end-of-day overview shows completed tasks, time tracking, and offers backup options. Completed tasks are archived, open ones can be moved.' },
+        foxMessage: { de: 'Regelmäßige Backups empfohlen!', en: 'Regular backups recommended!' },
         position: 'center-right'
       },
       {
