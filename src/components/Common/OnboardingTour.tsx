@@ -264,7 +264,7 @@ const tourSections: TourSection[] = [
       {
         title: { de: 'Drag & Drop', en: 'Drag & Drop' },
         text: { de: 'Aufgaben können per Drag & Drop zwischen Tagen verschoben werden. Gleich siehst du eine Demonstration.', en: 'Tasks can be moved between days via drag & drop. You\'ll see a demonstration now.' },
-        position: 'center-left',
+        position: 'center',
         moveTaskToNextDay: true
       }
     ]
