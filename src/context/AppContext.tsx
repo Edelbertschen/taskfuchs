@@ -315,8 +315,6 @@ const initialState: AppState = {
     },
     // End-of-day feature
     enableEndOfDay: true,
-    // Focus mode setting
-    enableFocusMode: true,
     // Timer settings
     timer: {
       showOverlay: true,
@@ -414,14 +412,6 @@ const initialState: AppState = {
       conflictResolution: 'manual',
       rememberPassphrase: false,
       passphraseHint: ''
-    },
-    timer: {
-      showOverlay: true,
-      overlayPosition: { x: 20, y: 20 },
-      overlayMinimized: false,
-      autoOpenTaskOnStart: true,
-      showRemainingTime: true,
-      dimControlsWhenNoTask: true,
     },
     // Background effects
     backgroundEffects: {

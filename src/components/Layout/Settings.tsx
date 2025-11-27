@@ -5463,49 +5463,7 @@ const Settings = React.memo(() => {
               </div>
             </div>
 
-            <div className="settings-card p-6 border">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Fokusmodus</h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <div>
-                    <div className="font-medium text-gray-900 dark:text-white">{settings_timer.focusModeEnable()}</div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">{settings_timer.focusModeDesc()}</div>
-                  </div>
-                  <Toggle 
-                    enabled={state.preferences.enableFocusMode || false} 
-                    onChange={() => dispatch({
-                      type: 'UPDATE_PREFERENCES',
-                      payload: { 
-                        enableFocusMode: !state.preferences.enableFocusMode 
-                      }
-                    })} 
-                  />
-                </div>
-              </div>
-            </div>
-            {/* Toggl Integration (moved from Integrationen) */}
-
-            <div className="settings-card p-6 border">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Fokusmodus</h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <div>
-                    <div className="font-medium text-gray-900 dark:text-white">{settings_timer.focusModeEnable()}</div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">{settings_timer.focusModeDesc()}</div>
-                  </div>
-                  <Toggle 
-                    enabled={state.preferences.enableFocusMode || false} 
-                    onChange={() => dispatch({
-                      type: 'UPDATE_PREFERENCES',
-                      payload: { 
-                        enableFocusMode: !state.preferences.enableFocusMode 
-                      }
-                    })} 
-                  />
-                </div>
-              </div>
-            </div>
-            {/* Toggl Integration (moved from Integrationen) */}
+            {/* Toggl Integration */}
             {renderTogglSection()}
           </div>
         );
