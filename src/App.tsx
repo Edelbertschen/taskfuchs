@@ -343,26 +343,20 @@ function MainApp() {
 
       // Open separate window when mode is set to separateWindow and timer is active
       if (state.preferences.timerDisplayMode === 'separateWindow' && state.activeTimer?.isActive) {
-        // Get Pomodoro session from timerService
-        const pomodoroSession = timerService.getGlobalPomodoroSession();
-        
         // Request to open timer window
         ipcRenderer.send('open-timer-window', {
           timer: state.activeTimer,
           preferences: state.preferences,
-          task: state.tasks?.find(t => t.id === state.activeTimer?.taskId),
-          pomodoro: pomodoroSession
+          task: state.tasks?.find(t => t.id === state.activeTimer?.taskId)
         });
         
         // Setup interval to send updates every second for smooth counting
         if (!(window as any).__electronTimerUpdateInterval) {
           const updateInterval = setInterval(() => {
-            const updatedPomodoro = timerService.getGlobalPomodoroSession();
             ipcRenderer.send('update-timer-window', {
               timer: state.activeTimer,
               preferences: state.preferences,
-              task: state.tasks?.find(t => t.id === state.activeTimer?.taskId),
-              pomodoro: updatedPomodoro
+              task: state.tasks?.find(t => t.id === state.activeTimer?.taskId)
             });
           }, 1000);
           (window as any).__electronTimerUpdateInterval = updateInterval;
@@ -438,14 +432,12 @@ function MainApp() {
           if (timerWindow) {
             timerWindow.addEventListener('load', () => {
               const sendUpdate = () => {
-                const pomodoroSession = timerService.getGlobalPomodoroSession();
                 if (timerWindow && !timerWindow.closed) {
                   timerWindow.postMessage({
                     type: 'timer-update',
                     data: {
                       timer: state.activeTimer,
                       task: state.tasks?.find(t => t.id === state.activeTimer?.taskId),
-                      pomodoro: pomodoroSession,
                       preferences: {
                         theme: state.preferences.theme,
                         accentColor: state.preferences.accentColor
@@ -465,14 +457,12 @@ function MainApp() {
           }
         } else {
           // Update existing window
-          const pomodoroSession = timerService.getGlobalPomodoroSession();
           if ((window as any).__timerWindow && !(window as any).__timerWindow.closed) {
             (window as any).__timerWindow.postMessage({
               type: 'timer-update',
               data: {
                 timer: state.activeTimer,
                 task: state.tasks?.find(t => t.id === state.activeTimer?.taskId),
-                pomodoro: pomodoroSession,
                 preferences: {
                   theme: state.preferences.theme,
                   accentColor: state.preferences.accentColor

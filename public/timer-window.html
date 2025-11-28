@@ -4,7 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TaskFuchs Timer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --accent: #f97316;
+      --bg-light: #ffffff;
+      --bg-dark: #0a0a0b;
+      --text-light: #18181b;
+      --text-dark: #fafafa;
+      --text-muted-light: #71717a;
+      --text-muted-dark: #a1a1aa;
+      --border-light: rgba(0, 0, 0, 0.06);
+      --border-dark: rgba(255, 255, 255, 0.08);
+    }
+
     * {
       margin: 0;
       padding: 0;
@@ -12,96 +27,159 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Roboto', sans-serif;
-      background: rgba(255, 255, 255, 0.95);
-      color: #18181b;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-light);
+      color: var(--text-light);
       height: 100vh;
       overflow: hidden;
       user-select: none;
       -webkit-app-region: drag;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      display: flex;
+      flex-direction: column;
     }
 
     body.dark {
-      background: rgba(24, 24, 27, 0.95);
-      color: #fafafa;
+      background: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    /* Glass effect overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.1) 0%, 
+        rgba(255, 255, 255, 0) 50%,
+        rgba(0, 0, 0, 0.02) 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body.dark::before {
+      background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.03) 0%, 
+        rgba(255, 255, 255, 0) 50%,
+        rgba(0, 0, 0, 0.1) 100%);
     }
 
     /* Progress bar at top */
     .progress-bar {
       height: 3px;
-      background: #f4f4f5;
+      background: rgba(0, 0, 0, 0.05);
       width: 100%;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
     }
 
     body.dark .progress-bar {
-      background: #27272a;
+      background: rgba(255, 255, 255, 0.05);
     }
 
     .progress-fill {
       height: 100%;
+      width: 0%;
       transition: width 0.5s ease, background-color 0.3s ease;
-      background: var(--accent-color, #f97316);
+      background: var(--accent);
+      border-radius: 0 2px 2px 0;
     }
 
     .progress-fill.overtime {
       background: #ef4444;
     }
 
+    /* Main container */
     .container {
-      padding: 16px 20px 20px;
+      flex: 1;
+      padding: 16px 20px 18px;
       -webkit-app-region: no-drag;
       display: flex;
       flex-direction: column;
-      height: calc(100vh - 3px);
+      position: relative;
+      z-index: 1;
     }
 
     /* Task Title */
+    .task-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
     .task-title {
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 12px;
+      letter-spacing: 0.02em;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      color: var(--accent-color, #f97316);
-      cursor: pointer;
+      color: var(--accent);
+      max-width: calc(100% - 60px);
+    }
+
+    .paused-badge {
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted-light);
+      padding: 3px 8px;
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 100px;
+      opacity: 0;
       transition: opacity 0.2s ease;
     }
 
-    .task-title:hover {
-      opacity: 0.7;
+    body.dark .paused-badge {
+      color: var(--text-muted-dark);
+      background: rgba(255, 255, 255, 0.08);
     }
 
-    /* Main Timer Display */
+    .paused-badge.visible {
+      opacity: 1;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* Timer Section */
     .timer-section {
+      flex: 1;
       display: flex;
       align-items: flex-end;
       justify-content: space-between;
-      flex: 1;
+      gap: 16px;
     }
 
     .timer-info {
       display: flex;
       flex-direction: column;
+      min-width: 0;
     }
 
     .timer-display {
-      font-size: 32px;
-      font-weight: 600;
+      font-family: 'JetBrains Mono', 'SF Mono', 'Monaco', monospace;
+      font-size: 36px;
+      font-weight: 500;
       font-variant-numeric: tabular-nums;
-      letter-spacing: -0.03em;
-      color: #18181b;
+      letter-spacing: -0.02em;
+      color: var(--text-light);
       line-height: 1;
+      transition: color 0.3s ease;
     }
 
     body.dark .timer-display {
-      color: #fafafa;
+      color: var(--text-dark);
     }
 
     .timer-display.overtime {
@@ -111,29 +189,26 @@
     .timer-meta {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       margin-top: 6px;
     }
 
-    .estimated-time {
+    .estimated-label {
       font-size: 11px;
-      color: #a1a1aa;
+      color: var(--text-muted-light);
       font-variant-numeric: tabular-nums;
     }
 
-    /* Overtime badge removed - red color indicates overtime */
-    .overtime-badge-unused {
-      display: none;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #ef4444;
+    body.dark .estimated-label {
+      color: var(--text-muted-dark);
     }
 
     /* Controls */
     .controls {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
+      flex-shrink: 0;
     }
 
     button {
@@ -145,41 +220,51 @@
       transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
       -webkit-app-region: no-drag;
       flex-shrink: 0;
+      outline: none;
     }
 
     button:active {
-      transform: scale(0.95);
+      transform: scale(0.92);
     }
 
     .btn-primary {
-      width: 40px;
-      height: 40px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
-      background: var(--accent-color, #f97316);
+      background: var(--accent);
       color: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
     }
 
     .btn-primary:hover {
-      transform: scale(1.1);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transform: scale(1.08);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.16);
     }
 
     .btn-secondary {
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       background: transparent;
-      color: #a1a1aa;
+      color: var(--text-muted-light);
+      border: 1px solid var(--border-light);
+    }
+
+    body.dark .btn-secondary {
+      color: var(--text-muted-dark);
+      border-color: var(--border-dark);
     }
 
     .btn-secondary:hover {
-      color: #71717a;
-      background: #f4f4f5;
+      color: var(--text-light);
+      background: rgba(0, 0, 0, 0.04);
+      border-color: rgba(0, 0, 0, 0.1);
     }
 
     body.dark .btn-secondary:hover {
-      color: #d4d4d8;
-      background: #27272a;
+      color: var(--text-dark);
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.12);
     }
 
     .icon {
@@ -188,38 +273,23 @@
     }
 
     .icon-lg {
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
     }
 
-    /* Paused state indicator */
-    .paused-indicator {
+    /* Fox watermark */
+    .fox-watermark {
       position: absolute;
-      top: 12px;
-      right: 16px;
-      font-size: 9px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #a1a1aa;
-      display: none;
-      animation: pulse 2s ease-in-out infinite;
+      bottom: 8px;
+      right: 12px;
+      width: 24px;
+      height: 24px;
+      opacity: 0.08;
+      pointer-events: none;
     }
 
-    .paused-indicator.visible {
-      display: block;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
-
-    /* Smooth transitions */
-    * {
-      transition-property: color, background-color, border-color, opacity;
-      transition-duration: 0.2s;
-      transition-timing-function: ease;
+    body.dark .fox-watermark {
+      opacity: 0.06;
     }
   </style>
 </head>
@@ -229,38 +299,48 @@
     <div class="progress-fill" id="progressFill"></div>
   </div>
 
-  <!-- Paused Indicator -->
-  <div class="paused-indicator" id="pausedIndicator">Pausiert</div>
-
   <div class="container">
-    <!-- Task Title -->
-    <div class="task-title" id="taskTitle">Timer läuft...</div>
+    <!-- Task Header -->
+    <div class="task-header">
+      <div class="task-title" id="taskTitle">Timer</div>
+      <div class="paused-badge" id="pausedBadge">Pausiert</div>
+    </div>
     
     <!-- Timer Section -->
     <div class="timer-section">
       <div class="timer-info">
         <div class="timer-display" id="timerDisplay">00:00</div>
         <div class="timer-meta">
-          <span class="estimated-time" id="estimatedTime"></span>
+          <span class="estimated-label" id="estimatedLabel"></span>
         </div>
       </div>
 
       <div class="controls">
-        <button id="pauseBtn" class="btn-primary" title="Pause">
+        <button id="pauseBtn" class="btn-primary" title="Pause/Fortsetzen">
           <svg class="icon-lg" viewBox="0 0 24 24" fill="currentColor">
             <path id="pauseIcon" d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
           </svg>
         </button>
-        <button id="stopBtn" class="btn-secondary" title="Stoppen">
+        <button id="stopBtn" class="btn-secondary" title="Timer stoppen">
           <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
-            <rect x="6" y="6" width="12" height="12" rx="1"/>
+            <rect x="6" y="6" width="12" height="12" rx="2"/>
           </svg>
         </button>
       </div>
     </div>
+
+    <!-- Fox Watermark -->
+    <img src="/3d_fox.png" alt="" class="fox-watermark" />
   </div>
 
   <script>
+    // State
+    let timerStart = Date.now();
+    let timerMinutes = 0;
+    let isPaused = false;
+    let estimatedMinutes = 0;
+
+    // Electron vs Browser detection
     const isElectron = typeof require !== 'undefined';
     let ipcRenderer;
     
@@ -271,17 +351,11 @@
       });
     } else {
       window.addEventListener('message', (event) => {
-        if (event.data.type === 'timer-update') {
+        if (event.data && event.data.type === 'timer-update') {
           updateTimerDisplay(event.data.data);
         }
       });
     }
-
-    // Timer state
-    let timerStart = Date.now();
-    let timerMinutes = 0;
-    let isPaused = false;
-    let estimatedMinutes = 0;
 
     function formatTime(minutes, useRealTime = false) {
       let totalSeconds;
@@ -308,14 +382,18 @@
     }
 
     function formatTimeShort(minutes) {
-      if (!minutes || minutes <= 0) return '0m';
+      if (!minutes || minutes <= 0) return '';
       const hours = Math.floor(minutes / 60);
       const mins = Math.floor(minutes % 60);
-      if (hours > 0) return `${hours}h ${mins}m`;
+      if (hours > 0) {
+        return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+      }
       return `${mins}m`;
     }
 
     function updateTimerDisplay(data) {
+      if (!data) return;
+      
       const { timer, task, preferences } = data;
 
       // Update theme
@@ -327,71 +405,71 @@
 
       // Set accent color
       if (preferences?.accentColor) {
-        document.documentElement.style.setProperty('--accent-color', preferences.accentColor);
+        document.documentElement.style.setProperty('--accent', preferences.accentColor);
       }
 
       // Update task title
       const taskTitleEl = document.getElementById('taskTitle');
-      if (task) {
+      if (task && task.title) {
         taskTitleEl.textContent = task.title;
-        taskTitleEl.style.display = 'block';
       } else {
-        taskTitleEl.textContent = 'Timer läuft...';
+        taskTitleEl.textContent = 'Timer';
       }
 
       // Update timer state
-      const elapsedMinutes = timer.elapsedTime || 0;
-      timerStart = Date.now();
-      timerMinutes = elapsedMinutes;
-      isPaused = timer.isPaused || false;
-      estimatedMinutes = timer.estimatedTime || 0;
+      if (timer) {
+        const elapsedMinutes = timer.elapsedTime || 0;
+        timerStart = Date.now();
+        timerMinutes = elapsedMinutes;
+        isPaused = timer.isPaused || false;
+        estimatedMinutes = timer.estimatedTime || 0;
 
-      // Update timer display
-      const timerEl = document.getElementById('timerDisplay');
-      timerEl.textContent = formatTime(elapsedMinutes, true);
+        // Update timer display
+        const timerEl = document.getElementById('timerDisplay');
+        timerEl.textContent = formatTime(elapsedMinutes, true);
 
-      // Overtime handling
-      const isOvertime = estimatedMinutes && elapsedMinutes > estimatedMinutes;
-      timerEl.classList.toggle('overtime', isOvertime);
-      
-      // Progress bar
-      const progressFill = document.getElementById('progressFill');
-      if (estimatedMinutes > 0) {
-        const progress = Math.min(100, (elapsedMinutes / estimatedMinutes) * 100);
-        progressFill.style.width = `${progress}%`;
-        progressFill.classList.toggle('overtime', isOvertime);
-      } else {
-        progressFill.style.width = '0%';
+        // Overtime handling
+        const isOvertime = estimatedMinutes > 0 && elapsedMinutes > estimatedMinutes;
+        timerEl.classList.toggle('overtime', isOvertime);
+        
+        // Progress bar
+        const progressFill = document.getElementById('progressFill');
+        if (estimatedMinutes > 0) {
+          const progress = Math.min(100, (elapsedMinutes / estimatedMinutes) * 100);
+          progressFill.style.width = `${progress}%`;
+          progressFill.classList.toggle('overtime', isOvertime);
+        } else {
+          progressFill.style.width = '0%';
+        }
+
+        // Estimated time display
+        const estimatedEl = document.getElementById('estimatedLabel');
+        if (estimatedMinutes > 0) {
+          estimatedEl.textContent = `von ${formatTimeShort(estimatedMinutes)}`;
+        } else {
+          estimatedEl.textContent = '';
+        }
+
+        // Update pause button icon
+        const pauseIcon = document.getElementById('pauseIcon');
+        const pauseBtn = document.getElementById('pauseBtn');
+        if (isPaused) {
+          pauseIcon.setAttribute('d', 'M8 5v14l11-7z'); // Play icon
+          pauseBtn.title = 'Fortsetzen';
+        } else {
+          pauseIcon.setAttribute('d', 'M6 4h4v16H6V4zm8 0h4v16h-4V4z'); // Pause icon
+          pauseBtn.title = 'Pause';
+        }
+
+        // Paused badge
+        const pausedBadge = document.getElementById('pausedBadge');
+        pausedBadge.classList.toggle('visible', isPaused);
       }
-
-      // Estimated time display (overtime indicated by red color)
-      const estimatedEl = document.getElementById('estimatedTime');
-      
-      if (estimatedMinutes > 0) {
-        estimatedEl.textContent = `von ${formatTimeShort(estimatedMinutes)}`;
-      } else {
-        estimatedEl.textContent = '';
-      }
-
-      // Update pause button icon
-      const pauseIcon = document.getElementById('pauseIcon');
-      const pauseBtn = document.getElementById('pauseBtn');
-      if (isPaused) {
-        pauseIcon.setAttribute('d', 'M8 5v14l11-7z'); // Play icon
-        pauseBtn.title = 'Fortsetzen';
-      } else {
-        pauseIcon.setAttribute('d', 'M6 4h4v16H6V4zm8 0h4v16h-4V4z'); // Pause icon
-        pauseBtn.title = 'Pause';
-      }
-
-      // Paused indicator
-      const pausedIndicator = document.getElementById('pausedIndicator');
-      pausedIndicator.classList.toggle('visible', isPaused);
     }
 
     // Button handlers
     document.getElementById('pauseBtn').addEventListener('click', () => {
-      if (isElectron) {
+      if (isElectron && ipcRenderer) {
         ipcRenderer.send('timer-action', 'pause');
       } else if (window.opener) {
         window.opener.postMessage({ type: 'timer-action', action: 'pause' }, '*');
@@ -399,7 +477,7 @@
     });
 
     document.getElementById('stopBtn').addEventListener('click', () => {
-      if (isElectron) {
+      if (isElectron && ipcRenderer) {
         ipcRenderer.send('timer-action', 'stop-task');
       } else if (window.opener) {
         window.opener.postMessage({ type: 'timer-action', action: 'stop-task' }, '*');
@@ -421,19 +499,26 @@
             const isOvertime = currentMinutes > estimatedMinutes;
             
             timerEl.classList.toggle('overtime', isOvertime);
-            document.getElementById('progressFill').classList.toggle('overtime', isOvertime);
             
-            // Update progress bar
-            const progress = Math.min(100, (currentMinutes / estimatedMinutes) * 100);
-            document.getElementById('progressFill').style.width = `${progress}%`;
+            const progressFill = document.getElementById('progressFill');
+            if (progressFill) {
+              progressFill.classList.toggle('overtime', isOvertime);
+              const progress = Math.min(100, (currentMinutes / estimatedMinutes) * 100);
+              progressFill.style.width = `${progress}%`;
+            }
           }
         }
       }
     }, 1000);
 
-    // Request initial data
-    if (isElectron) {
+    // Request initial data (for Electron)
+    if (isElectron && ipcRenderer) {
       ipcRenderer.send('timer-request-data');
+    }
+
+    // Set initial dark mode based on system preference
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.body.classList.add('dark');
     }
   </script>
 </body>
