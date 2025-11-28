@@ -143,7 +143,8 @@ const StandardWidget = ({
   accentColor, 
   children, 
   isMinimalDesign,
-  footerAction
+  footerAction,
+  headerAction
 }: {
   icon: string;
   title: string;
@@ -151,6 +152,7 @@ const StandardWidget = ({
   children: React.ReactNode;
   isMinimalDesign: boolean;
   footerAction?: React.ReactNode;
+  headerAction?: React.ReactNode;
 }) => (
   <div className={`${WIDGET_STYLES.container} ${
     isMinimalDesign 
@@ -171,10 +173,11 @@ const StandardWidget = ({
       >
         <MaterialIcon name={icon} size={32} style={{ color: accentColor }} />
       </div>
-      <h3 className={`${WIDGET_STYLES.title} text-gray-900 dark:text-white`} 
+      <h3 className={`${WIDGET_STYLES.title} text-gray-900 dark:text-white flex-1`} 
           style={{ fontFamily: "'Roboto', sans-serif" }}>
         {title}
       </h3>
+      {headerAction}
     </div>
     <div className={WIDGET_STYLES.content}>
       {children}
@@ -1720,6 +1723,19 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
             title={t('dashboard.todays_tasks')}
             accentColor={state.preferences.accentColor}
             isMinimalDesign={isMinimalDesign}
+            headerAction={
+              <button
+                onClick={handleCreateNewTask}
+                className="p-2 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95"
+                style={{
+                  background: `${state.preferences.accentColor}15`,
+                  color: state.preferences.accentColor
+                }}
+                title={i18n.language === 'en' ? 'Add task' : 'Aufgabe hinzufügen'}
+              >
+                <Plus className="w-5 h-5" />
+              </button>
+            }
             footerAction={state.preferences.enableEndOfDay && (
               <button
                 onClick={() => setShowEndOfDayModal(true)}

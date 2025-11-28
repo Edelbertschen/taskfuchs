@@ -424,7 +424,7 @@ function MainApp() {
           const timerWindow = window.open(
             '/timer-window.html',
             'TaskFuchs Timer',
-            'width=240,height=200,resizable=no,scrollbars=no,status=no,location=no,toolbar=no,menubar=no'
+            'width=260,height=90,resizable=no,scrollbars=no,status=no,location=no,toolbar=no,menubar=no'
           );
           (window as any).__timerWindow = timerWindow;
 

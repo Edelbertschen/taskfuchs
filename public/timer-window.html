@@ -97,79 +97,51 @@
     /* Main container */
     .container {
       flex: 1;
-      padding: 16px 20px 18px;
+      padding: 10px 14px 12px;
       -webkit-app-region: no-drag;
       display: flex;
       flex-direction: column;
+      justify-content: center;
       position: relative;
       z-index: 1;
     }
 
     /* Task Title */
-    .task-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-    }
-
     .task-title {
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 600;
       letter-spacing: 0.02em;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       color: var(--accent);
-      max-width: calc(100% - 60px);
-    }
-
-    .paused-badge {
-      font-size: 9px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-muted-light);
-      padding: 3px 8px;
-      background: rgba(0, 0, 0, 0.05);
-      border-radius: 100px;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-
-    body.dark .paused-badge {
-      color: var(--text-muted-dark);
-      background: rgba(255, 255, 255, 0.08);
-    }
-
-    .paused-badge.visible {
-      opacity: 1;
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
+      margin-bottom: 8px;
     }
 
     /* Timer Section */
     .timer-section {
-      flex: 1;
       display: flex;
-      align-items: flex-end;
+      align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      gap: 12px;
     }
 
     .timer-info {
       display: flex;
       flex-direction: column;
       min-width: 0;
+      flex: 1;
+    }
+
+    .timer-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
     }
 
     .timer-display {
       font-family: 'JetBrains Mono', 'SF Mono', 'Monaco', monospace;
-      font-size: 36px;
+      font-size: 28px;
       font-weight: 500;
       font-variant-numeric: tabular-nums;
       letter-spacing: -0.02em;
@@ -186,21 +158,40 @@
       color: #ef4444;
     }
 
-    .timer-meta {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 6px;
+    .timer-display.paused {
+      opacity: 0.5;
     }
 
     .estimated-label {
       font-size: 11px;
       color: var(--text-muted-light);
       font-variant-numeric: tabular-nums;
+      white-space: nowrap;
     }
 
     body.dark .estimated-label {
       color: var(--text-muted-dark);
+    }
+
+    .paused-badge {
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--accent);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      margin-left: 4px;
+    }
+
+    .paused-badge.visible {
+      opacity: 1;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
     }
 
     /* Controls */
@@ -228,22 +219,22 @@
     }
 
     .btn-primary {
-      width: 44px;
-      height: 44px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       background: var(--accent);
       color: white;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
     }
 
     .btn-primary:hover {
       transform: scale(1.08);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.16);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.16);
     }
 
     .btn-secondary {
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       background: transparent;
       color: var(--text-muted-light);
@@ -268,28 +259,13 @@
     }
 
     .icon {
-      width: 14px;
-      height: 14px;
+      width: 12px;
+      height: 12px;
     }
 
     .icon-lg {
-      width: 18px;
-      height: 18px;
-    }
-
-    /* Fox watermark */
-    .fox-watermark {
-      position: absolute;
-      bottom: 8px;
-      right: 12px;
-      width: 24px;
-      height: 24px;
-      opacity: 0.08;
-      pointer-events: none;
-    }
-
-    body.dark .fox-watermark {
-      opacity: 0.06;
+      width: 16px;
+      height: 16px;
     }
   </style>
 </head>
@@ -300,18 +276,16 @@
   </div>
 
   <div class="container">
-    <!-- Task Header -->
-    <div class="task-header">
-      <div class="task-title" id="taskTitle">Timer</div>
-      <div class="paused-badge" id="pausedBadge">Pausiert</div>
-    </div>
+    <!-- Task Title -->
+    <div class="task-title" id="taskTitle">Timer</div>
     
     <!-- Timer Section -->
     <div class="timer-section">
       <div class="timer-info">
-        <div class="timer-display" id="timerDisplay">00:00</div>
-        <div class="timer-meta">
+        <div class="timer-row">
+          <div class="timer-display" id="timerDisplay">00:00</div>
           <span class="estimated-label" id="estimatedLabel"></span>
+          <span class="paused-badge" id="pausedBadge">⏸</span>
         </div>
       </div>
 
@@ -328,9 +302,6 @@
         </button>
       </div>
     </div>
-
-    <!-- Fox Watermark -->
-    <img src="/3d_fox.png" alt="" class="fox-watermark" />
   </div>
 
   <script>
@@ -461,9 +432,10 @@
           pauseBtn.title = 'Pause';
         }
 
-        // Paused badge
+        // Paused state
         const pausedBadge = document.getElementById('pausedBadge');
         pausedBadge.classList.toggle('visible', isPaused);
+        timerEl.classList.toggle('paused', isPaused);
       }
     }
 
