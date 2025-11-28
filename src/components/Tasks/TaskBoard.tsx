@@ -1326,11 +1326,12 @@ export function TaskBoard() {
     .slice(startIndex, startIndex + columnsToShow);
 
   // Dispatch scroll state for ColumnSwitcher arrows
+  // For Planner: dates can always go backward and forward (infinite timeline)
   useEffect(() => {
-    const canPrev = startIndex > 0;
-    const canNext = startIndex + columnsToShow < allDateColumns.length;
+    // In Planner, you can ALWAYS navigate to previous/next days
+    // Unlike Pins/Projects which have finite columns
     window.dispatchEvent(new CustomEvent('column-scroll-state', { 
-      detail: { canPrev, canNext } 
+      detail: { canPrev: true, canNext: true } 
     }));
   }, [startIndex, columnsToShow, allDateColumns.length]);
 

@@ -275,10 +275,11 @@ export function PinsView() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [pinOffset, setPinOffset] = useState(0);
 
-  // Helper function to navigate columns
+  // Helper function to navigate columns (includes "Add Column" button as +1)
   const navigateColumns = useCallback((direction: 'prev' | 'next') => {
     const visible = (state.preferences.columns.pinsVisible ?? state.preferences.columns.visible) || 3;
-    const maxOffset = Math.max(0, state.pinColumns.length - visible);
+    const totalColumns = state.pinColumns.length + 1; // +1 for "Add Column" button
+    const maxOffset = Math.max(0, totalColumns - visible);
     const step = direction === 'next' ? 1 : -1;
     setPinOffset((prev) => Math.min(maxOffset, Math.max(0, prev + step)));
   }, [state.pinColumns.length, state.preferences.columns.visible, state.preferences.columns.pinsVisible]);
@@ -337,23 +338,37 @@ export function PinsView() {
   }, [navigateColumns]);
 
   // Get visible pin columns with offset like ProjectKanbanBoard
+  // Includes "Add Column" button as null in the result array
   const displayColumns = useMemo(() => {
     const allColumns = [...state.pinColumns].sort((a, b) => a.order - b.order);
     const visibleColumnCount = state.preferences.columns.pinsVisible ?? state.preferences.columns.visible;
-    const sliced = allColumns.slice(pinOffset, pinOffset + (visibleColumnCount || allColumns.length));
-    const result: (PinColumnType | null | undefined)[] = [...sliced];
-    if ((visibleColumnCount || 0) > 0 && sliced.length < (visibleColumnCount || 0)) {
-      result.push(null);
-      while (result.length < (visibleColumnCount || 0)) result.push(undefined);
+    const totalItems = allColumns.length + 1; // +1 for "Add Column" button
+    const result: (PinColumnType | null | undefined)[] = [];
+    
+    // Fill exactly visibleColumnCount slots
+    for (let i = 0; i < visibleColumnCount; i++) {
+      const itemIndex = pinOffset + i;
+      if (itemIndex < allColumns.length) {
+        // Regular column
+        result.push(allColumns[itemIndex]);
+      } else if (itemIndex === allColumns.length) {
+        // "Add Column" button position
+        result.push(null);
+      } else {
+        // Empty slot (beyond "Add Column")
+        result.push(undefined);
+      }
     }
+    
     return result;
   }, [state.pinColumns, state.preferences.columns.visible, state.preferences.columns.pinsVisible, pinOffset]);
 
   // Dispatch scroll state for ColumnSwitcher arrows
   useEffect(() => {
     const visibleCount = state.preferences.columns.pinsVisible ?? state.preferences.columns.visible;
+    const totalColumns = state.pinColumns.length + 1; // +1 for "Add Column" button
     const canPrev = pinOffset > 0;
-    const canNext = pinOffset + visibleCount < state.pinColumns.length;
+    const canNext = pinOffset + visibleCount < totalColumns;
     window.dispatchEvent(new CustomEvent('column-scroll-state', { 
       detail: { canPrev, canNext } 
     }));

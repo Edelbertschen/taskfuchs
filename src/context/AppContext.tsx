@@ -869,8 +869,10 @@ function appReducer(state: AppState, action: AppAction): AppState {
       const projectColumns = state.viewState.projectKanban.columns.filter(col => 
         col.projectId === state.viewState.projectKanban.selectedProjectId
       );
-      const visibleColumnCount = state.preferences.columns.visible;
-      const maxAllowedOffset = Math.max(0, projectColumns.length - visibleColumnCount + 1); // +1 for "Add Column" button
+      // Use projectsVisible if set, otherwise fall back to visible
+      const projectVisibleColumnCount = state.preferences.columns.projectsVisible ?? state.preferences.columns.visible;
+      const totalProjectColumns = projectColumns.length + 1; // +1 for "Add Column" button
+      const maxAllowedOffset = Math.max(0, totalProjectColumns - projectVisibleColumnCount);
       
       const newOffset = action.payload === 'next' 
         ? Math.min(state.projectColumnOffset + 1, maxAllowedOffset)
