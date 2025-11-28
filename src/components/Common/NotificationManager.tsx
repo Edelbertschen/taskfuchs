@@ -54,7 +54,7 @@ export function NotificationManager() {
           notificationService.showNotification({
             title: 'Benachrichtigungen aktiviert',
             body: 'Sie erhalten jetzt Erinnerungen für Ihre Aufgaben.',
-            icon: '/Fuchs.svg',
+            icon: '/3d_fox.png',
             tag: 'permission-granted',
             silent: true,
             requireInteraction: false
@@ -351,7 +351,7 @@ export function NotificationManager() {
       notificationService.showNotification({
         title: `Erinnerung verschoben`,
         body: `"${currentReminder.title}" wurde um ${minutes} Minuten verschoben.`,
-        icon: '/Fuchs.svg',
+        icon: '/3d_fox.png',
         tag: 'snooze-confirmation',
         silent: true,
         requireInteraction: false

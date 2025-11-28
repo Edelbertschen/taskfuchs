@@ -5117,7 +5117,7 @@ const Settings = React.memo(() => {
                                 await notificationService.showNotification({
                                   title: 'Test-Benachrichtigung',
                                   body: 'Ihre Benachrichtigungen funktionieren einwandfrei.',
-                                  icon: '/Fuchs.svg',
+                                  icon: '/3d_fox.png',
                                   tag: 'test-notification',
                                   silent: false,
                                   requireInteraction: false

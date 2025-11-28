@@ -107,7 +107,7 @@ class NotificationService {
     try {
       const notification = new Notification('TaskFuchs Benachrichtigungen aktiviert! 🦊', {
         body: 'Sie erhalten jetzt Desktop-Benachrichtigungen für Aufgaben und Timer.',
-        icon: '/Fuchs.svg',
+        icon: '/3d_fox.png',
         tag: 'welcome'
       });
 
@@ -418,7 +418,7 @@ Oder:
     this.showNotification({
       title: `📋 Erinnerung: ${task.title}`,
       body: task.description || 'Eine Aufgabe benötigt Ihre Aufmerksamkeit',
-      icon: '/Fuchs.svg',
+      icon: '/3d_fox.png',
       tag: `task-reminder-${task.id}`,
       requireInteraction: true,
       onClick
@@ -433,7 +433,7 @@ Oder:
     this.showNotification({
       title: `Timer beendet`,
       body: `${taskTitle} - ${timeString} gearbeitet`,
-      icon: '/Fuchs.svg',
+      icon: '/3d_fox.png',
       tag: `timer-completion-${Date.now()}`,
       requireInteraction: true,
       onClick
@@ -446,7 +446,7 @@ Oder:
     this.showNotification({
       title: `Überstunden bei ${taskTitle}`,
       body: `Sie arbeiten bereits ${timeText} länger als geplant. Erwägen Sie, die Aufgabe zu beenden oder Zeit hinzuzufügen.`,
-      icon: '/Fuchs.svg',
+      icon: '/3d_fox.png',
       tag: `timer-overtime-${Date.now()}`,
       requireInteraction: true,
       onClick
@@ -459,7 +459,7 @@ Oder:
     this.showNotification({
       title: `${taskTitle} - Zeitwarnung`,
       body: `Noch ${timeText} bis zur geschätzten Zeit.`,
-      icon: '/Fuchs.svg',
+      icon: '/3d_fox.png',
       tag: `timer-warning-${Date.now()}`,
       requireInteraction: true,
       onClick
@@ -471,7 +471,7 @@ Oder:
     this.showNotification({
       title: `Zeit erreicht - ${taskTitle}`,
       body: `Die geschätzte Zeit ist erreicht. Klicken Sie hier um Zeit hinzuzufügen oder die Aufgabe zu beenden.`,
-      icon: '/Fuchs.svg',
+      icon: '/3d_fox.png',
       tag: `timer-deadline-${Date.now()}`,
       requireInteraction: true,
       onClick: () => {
@@ -596,7 +596,7 @@ Oder:
     this.showNotification({
       title: `Aufgabe abgeschlossen`,
       body: `${taskTitle} erfolgreich beendet`,
-      icon: '/Fuchs.svg',
+      icon: '/3d_fox.png',
       tag: `task-completed-${Date.now()}`,
       requireInteraction: false,
       onClick
@@ -612,7 +612,7 @@ Oder:
     this.showNotification({
       title: `Tagesübersicht`,
       body: `${completedTasks} Aufgaben abgeschlossen in ${timeString}`,
-      icon: '/Fuchs.svg',
+      icon: '/3d_fox.png',
       tag: `daily-summary-${Date.now()}`,
       requireInteraction: false
     });

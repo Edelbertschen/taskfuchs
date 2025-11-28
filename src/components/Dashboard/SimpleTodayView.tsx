@@ -427,7 +427,7 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
             notificationService.showNotification({
               title: `Checkliste: ${item.text}`,
               body: simpleTodayView.reminderNotification(),
-              icon: '/Fuchs.svg',
+              icon: '/3d_fox.png',
               tag: `checklist-${item.id}`,
               requireInteraction: true,
               onClick: () => {

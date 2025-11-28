@@ -564,7 +564,7 @@ class NextcloudSyncManager {
         notificationService.showNotification({
           title: '🔄 Nextcloud Synchronisation',
           body: 'Synchronisation wird gestartet...',
-          icon: '/Fuchs.svg',
+          icon: '/3d_fox.png',
           tag: 'nextcloud-sync',
           requireInteraction: false
         });
@@ -595,7 +595,7 @@ class NextcloudSyncManager {
           notificationService.showNotification({
             title: '✅ Nextcloud Synchronisation',
             body: `Erfolgreich synchronisiert! ${stats.tasksUploaded} Aufgaben, ${stats.notesUploaded} Notizen`,
-            icon: '/Fuchs.svg',
+            icon: '/3d_fox.png',
             tag: 'nextcloud-sync-success',
             requireInteraction: false
           });
@@ -616,7 +616,7 @@ class NextcloudSyncManager {
           notificationService.showNotification({
             title: '❌ Nextcloud Synchronisation',
             body: 'Synchronisation fehlgeschlagen. Bitte überprüfen Sie Ihre Verbindung.',
-            icon: '/Fuchs.svg',
+            icon: '/3d_fox.png',
             tag: 'nextcloud-sync-error',
             requireInteraction: true
           });
@@ -638,7 +638,7 @@ class NextcloudSyncManager {
         notificationService.showNotification({
           title: '🚨 Nextcloud Synchronisation',
           body: `Synchronisation fehlgeschlagen: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`,
-          icon: '/Fuchs.svg',
+          icon: '/3d_fox.png',
           tag: 'nextcloud-sync-critical',
           requireInteraction: true
         });
@@ -888,7 +888,7 @@ class NextcloudSyncManager {
         notificationService.showNotification({
           title: '🧪 Nextcloud Test',
           body: 'Teste Synchronisation...',
-          icon: '/Fuchs.svg',
+          icon: '/3d_fox.png',
           tag: 'nextcloud-test',
           requireInteraction: false
         });
@@ -901,7 +901,7 @@ class NextcloudSyncManager {
           notificationService.showNotification({
             title: '❌ Nextcloud Test',
             body: `Verbindungstest fehlgeschlagen: ${connectionTest.message}`,
-            icon: '/Fuchs.svg',
+            icon: '/3d_fox.png',
             tag: 'nextcloud-test-fail',
             requireInteraction: true
           });
@@ -927,7 +927,7 @@ class NextcloudSyncManager {
           notificationService.showNotification({
             title: '❌ Nextcloud Test',
             body: message,
-            icon: '/Fuchs.svg',
+            icon: '/3d_fox.png',
             tag: 'nextcloud-test-fail',
             requireInteraction: true
           });
@@ -942,7 +942,7 @@ class NextcloudSyncManager {
           notificationService.showNotification({
             title: '❌ Nextcloud Test',
             body: message,
-            icon: '/Fuchs.svg',
+            icon: '/3d_fox.png',
             tag: 'nextcloud-test-fail',
             requireInteraction: true
           });
@@ -958,7 +958,7 @@ class NextcloudSyncManager {
           notificationService.showNotification({
             title: '❌ Nextcloud Test',
             body: message,
-            icon: '/Fuchs.svg',
+            icon: '/3d_fox.png',
             tag: 'nextcloud-test-fail',
             requireInteraction: true
           });
@@ -973,7 +973,7 @@ class NextcloudSyncManager {
         notificationService.showNotification({
           title: '✅ Nextcloud Test',
           body: 'Synchronisation funktioniert einwandfrei! Upload, Download und Datenintegrität erfolgreich getestet.',
-          icon: '/Fuchs.svg',
+          icon: '/3d_fox.png',
           tag: 'nextcloud-test-success',
           requireInteraction: false
         });
@@ -997,7 +997,7 @@ class NextcloudSyncManager {
         notificationService.showNotification({
           title: '🚨 Nextcloud Test',
           body: message,
-          icon: '/Fuchs.svg',
+          icon: '/3d_fox.png',
           tag: 'nextcloud-test-error',
           requireInteraction: true
         });

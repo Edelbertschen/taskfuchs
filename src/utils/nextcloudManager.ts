@@ -342,7 +342,7 @@ export class NextcloudManager {
         notificationService.showNotification({
           title: '✅ Nextcloud Sync',
           body: result.message,
-          icon: '/Fuchs.svg',
+          icon: '/3d_fox.png',
           tag: 'nextcloud-success'
         });
       } else {
@@ -352,7 +352,7 @@ export class NextcloudManager {
         notificationService.showNotification({
           title: '❌ Nextcloud Sync',
           body: result.message,
-          icon: '/Fuchs.svg',
+          icon: '/3d_fox.png',
           tag: 'nextcloud-error',
           requireInteraction: true
         });
