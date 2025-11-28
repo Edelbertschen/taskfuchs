@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TaskFuchs</title>
+  <title>TaskFuchs Timer</title>
   <style>
     * {
       margin: 0;
@@ -12,61 +12,92 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
-      background: #ffffff;
-      color: #111827;
-      display: flex;
-      flex-direction: column;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Roboto', sans-serif;
+      background: rgba(255, 255, 255, 0.95);
+      color: #18181b;
       height: 100vh;
       overflow: hidden;
       user-select: none;
       -webkit-app-region: drag;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
     }
 
     body.dark {
-      background: #18181b;
+      background: rgba(24, 24, 27, 0.95);
       color: #fafafa;
     }
 
-    .container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding: 16px;
-      -webkit-app-region: no-drag;
+    /* Progress bar at top */
+    .progress-bar {
+      height: 3px;
+      background: #f4f4f5;
+      width: 100%;
     }
 
+    body.dark .progress-bar {
+      background: #27272a;
+    }
+
+    .progress-fill {
+      height: 100%;
+      transition: width 0.5s ease, background-color 0.3s ease;
+      background: var(--accent-color, #f97316);
+    }
+
+    .progress-fill.overtime {
+      background: #ef4444;
+    }
+
+    .container {
+      padding: 16px 20px 20px;
+      -webkit-app-region: no-drag;
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 3px);
+    }
+
+    /* Task Title */
     .task-title {
-      font-size: 11px;
-      font-weight: 500;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
       margin-bottom: 12px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      color: #71717a;
-      letter-spacing: 0.01em;
+      color: var(--accent-color, #f97316);
+      cursor: pointer;
+      transition: opacity 0.2s ease;
     }
 
-    body.dark .task-title {
-      color: #a1a1aa;
+    .task-title:hover {
+      opacity: 0.7;
     }
 
-    /* Main Timer */
-    .timer-main {
+    /* Main Timer Display */
+    .timer-section {
       display: flex;
-      align-items: center;
+      align-items: flex-end;
       justify-content: space-between;
-      margin-bottom: 12px;
+      flex: 1;
+    }
+
+    .timer-info {
+      display: flex;
+      flex-direction: column;
     }
 
     .timer-display {
-      font-size: 28px;
+      font-size: 32px;
       font-weight: 600;
       font-variant-numeric: tabular-nums;
-      letter-spacing: -0.02em;
-      color: #09090b;
+      letter-spacing: -0.03em;
+      color: #18181b;
+      line-height: 1;
     }
 
     body.dark .timer-display {
@@ -80,303 +111,153 @@
     .timer-meta {
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-size: 10px;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .estimated-time {
+      font-size: 11px;
       color: #a1a1aa;
       font-variant-numeric: tabular-nums;
-      margin-top: 4px;
     }
 
     .overtime-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 3px;
-      padding: 2px 6px;
-      background: #fef2f2;
-      color: #dc2626;
-      border-radius: 4px;
       font-size: 9px;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-    }
-
-    body.dark .overtime-badge {
-      background: #7f1d1d;
-      color: #fca5a5;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #ef4444;
     }
 
     /* Controls */
     .controls {
       display: flex;
-      gap: 6px;
+      align-items: center;
+      gap: 8px;
     }
 
     button {
-      background: #f4f4f5;
       border: none;
-      border-radius: 6px;
-      color: #52525b;
-      width: 28px;
-      height: 28px;
       cursor: pointer;
-      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
       display: flex;
       align-items: center;
       justify-content: center;
-      flex-shrink: 0;
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
       -webkit-app-region: no-drag;
-    }
-
-    body.dark button {
-      background: #27272a;
-      color: #a1a1aa;
-    }
-
-    button:hover {
-      background: #e4e4e7;
-      transform: scale(1.05);
-    }
-
-    body.dark button:hover {
-      background: #3f3f46;
+      flex-shrink: 0;
     }
 
     button:active {
-      transform: scale(0.98);
+      transform: scale(0.95);
     }
 
-    button.primary {
+    .btn-primary {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
       background: var(--accent-color, #f97316);
       color: white;
     }
 
-    button.primary:hover {
-      opacity: 0.9;
-      background: var(--accent-color, #f97316);
+    .btn-primary:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
-    button.success {
-      background: #dcfce7;
-      color: #16a34a;
-    }
-
-    body.dark button.success {
-      background: #14532d;
-      color: #86efac;
-    }
-
-    button.success:hover {
-      background: #bbf7d0;
-    }
-
-    button.warning {
-      background: #fef3c7;
-      color: #d97706;
-    }
-
-    body.dark button.warning {
-      background: #78350f;
-      color: #fcd34d;
-    }
-
-    button.warning:hover {
-      background: #fde68a;
-    }
-
-    button.danger {
-      background: #fef2f2;
-      color: #dc2626;
-    }
-
-    body.dark button.danger {
-      background: #7f1d1d;
-      color: #fca5a5;
-    }
-
-    button.danger:hover {
-      background: #fee2e2;
-    }
-
-    body.dark button.danger:hover {
-      background: #991b1b;
-    }
-
-    /* Pomodoro Section */
-    .pomodoro {
-      padding-top: 12px;
-      margin-top: 12px;
-      border-top: 1px solid #f4f4f5;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    body.dark .pomodoro {
-      border-top-color: #27272a;
-    }
-
-    .pomodoro-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .pomodoro-ring {
-      position: relative;
-      width: 56px;
-      height: 56px;
-      flex-shrink: 0;
-    }
-
-    .pomodoro-icon {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 26px;
-      z-index: 10;
-    }
-
-    .pomodoro-details {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-    }
-
-    .pomodoro-label {
-      font-size: 9px;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
+    .btn-secondary {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: transparent;
       color: #a1a1aa;
     }
 
-    .pomodoro-time {
-      font-size: 15px;
-      font-weight: 600;
-      font-variant-numeric: tabular-nums;
-      letter-spacing: -0.01em;
-      color: #09090b;
+    .btn-secondary:hover {
+      color: #71717a;
+      background: #f4f4f5;
     }
 
-    body.dark .pomodoro-time {
-      color: #fafafa;
-    }
-
-    .pomodoro-time.warning {
-      color: #ef4444;
-    }
-
-    .pomodoro-badge {
-      font-size: 9px;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-weight: 600;
-      opacity: 1;
-    }
-
-    .skip-btn {
-      width: auto;
-      padding: 4px 8px;
-      font-size: 10px;
-      font-weight: 500;
-      border-radius: 4px;
-      background: transparent;
-      border: 1px solid var(--pomodoro-color, #ef4444);
-      color: var(--pomodoro-color, #ef4444);
-    }
-
-    .skip-btn:hover {
-      background: var(--pomodoro-color, #ef4444);
-      color: white;
+    body.dark .btn-secondary:hover {
+      color: #d4d4d8;
+      background: #27272a;
     }
 
     .icon {
-      width: 12px;
-      height: 12px;
+      width: 14px;
+      height: 14px;
     }
 
-    .icon-alert {
-      width: 11px;
-      height: 11px;
-      color: #ef4444;
+    .icon-lg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Paused state indicator */
+    .paused-indicator {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #a1a1aa;
+      display: none;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .paused-indicator.visible {
+      display: block;
     }
 
     @keyframes pulse {
       0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
+      50% { opacity: 0.4; }
     }
 
+    /* Smooth transitions */
     * {
-      transition: color 0.2s ease, background-color 0.2s ease;
+      transition-property: color, background-color, border-color, opacity;
+      transition-duration: 0.2s;
+      transition-timing-function: ease;
     }
   </style>
 </head>
 <body>
+  <!-- Progress Bar -->
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <!-- Paused Indicator -->
+  <div class="paused-indicator" id="pausedIndicator">Pausiert</div>
+
   <div class="container">
     <!-- Task Title -->
     <div class="task-title" id="taskTitle">Timer läuft...</div>
     
-    <!-- Main Timer -->
-    <div class="timer-main">
-      <div>
+    <!-- Timer Section -->
+    <div class="timer-section">
+      <div class="timer-info">
         <div class="timer-display" id="timerDisplay">00:00</div>
         <div class="timer-meta">
-          <span id="estimatedTime"></span>
-          <svg id="overtimeIcon" class="icon-alert" style="display: none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-          </svg>
+          <span class="estimated-time" id="estimatedTime"></span>
+          <span class="overtime-badge" id="overtimeBadge" style="display: none;">Überschritten</span>
         </div>
       </div>
 
       <div class="controls">
-        <button id="completeBtn" class="success" title="Aufgabe abhaken" style="display: none;">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-          </svg>
-        </button>
-        <button id="pauseBtn" class="primary" title="Pause">
-          <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+        <button id="pauseBtn" class="btn-primary" title="Pause">
+          <svg class="icon-lg" viewBox="0 0 24 24" fill="currentColor">
             <path id="pauseIcon" d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
           </svg>
         </button>
-        <button id="stopTaskBtn" class="warning" title="Task-Timer stoppen">
+        <button id="stopBtn" class="btn-secondary" title="Stoppen">
           <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
-            <rect x="6" y="6" width="12" height="12"/>
-          </svg>
-        </button>
-        <button id="stopAllBtn" class="danger" title="Alles stoppen & Pomodoro zurücksetzen">
-          <svg class="icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5">
-            <rect x="6" y="6" width="12" height="12"/>
-            <circle cx="18" cy="6" r="3" fill="#ef4444"/>
+            <rect x="6" y="6" width="12" height="12" rx="1"/>
           </svg>
         </button>
       </div>
-    </div>
-
-    <!-- Pomodoro Section -->
-    <div id="pomodoroSection" class="pomodoro" style="display: none;">
-      <div class="pomodoro-info">
-        <div class="pomodoro-ring">
-          <svg width="56" height="56" viewBox="0 0 56 56" style="transform: rotate(-90deg);">
-            <circle cx="28" cy="28" r="24" fill="none" id="pomodoroRingBg" stroke="#f4f4f5" stroke-width="2"/>
-            <circle id="pomodoroProgress" cx="28" cy="28" r="24" fill="none" stroke="#ef4444" stroke-width="2" 
-                    stroke-dasharray="150.80 150.80" stroke-dashoffset="0" stroke-linecap="round"
-                    style="transition: stroke-dasharray 0.3s ease, stroke 0.2s ease;"/>
-          </svg>
-          <div class="pomodoro-icon" id="pomodoroIcon">🍅</div>
-        </div>
-        <div class="pomodoro-details">
-          <div class="pomodoro-label" id="pomodoroType">POMODORO</div>
-          <div class="pomodoro-time" id="pomodoroTime">25:00</div>
-        </div>
-        <div class="pomodoro-badge" id="pomodoroSession">#1</div>
-      </div>
-      <button id="skipBtn" class="skip-btn" title="Skip">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
-        </svg>
-      </button>
     </div>
   </div>
 
@@ -397,25 +278,20 @@
       });
     }
 
-    // Precise time tracking - separate for main timer and pomodoro
-    let mainTimerStart = Date.now();
-    let mainTimerMinutes = 0;
-    let mainTimerPaused = false;
-    
-    let pomodoroTimerStart = Date.now();
-    let pomodoroRemainingMinutes = 0;
-    let pomodoroTotalMinutes = 0;
-    let pomodoroTimerPaused = false;
+    // Timer state
+    let timerStart = Date.now();
+    let timerMinutes = 0;
+    let isPaused = false;
+    let estimatedMinutes = 0;
 
     function formatTime(minutes, useRealTime = false) {
       let totalSeconds;
       
-      if (useRealTime && !mainTimerPaused) {
-        // Calculate real-time elapsed seconds
+      if (useRealTime && !isPaused) {
         const now = Date.now();
-        const elapsedMs = now - mainTimerStart;
+        const elapsedMs = now - timerStart;
         const elapsedMinutes = elapsedMs / (60 * 1000);
-        totalSeconds = Math.floor((mainTimerMinutes + elapsedMinutes) * 60);
+        totalSeconds = Math.floor((timerMinutes + elapsedMinutes) * 60);
       } else {
         totalSeconds = Math.floor(Math.abs(minutes * 60));
       }
@@ -432,28 +308,16 @@
       return `${pad(mins)}:${pad(secs)}`;
     }
 
-    function formatPomodoroTime(remainingMinutes, useRealTime = false) {
-      let totalSeconds;
-      
-      if (useRealTime && !pomodoroTimerPaused) {
-        // Calculate countdown in real-time
-        const now = Date.now();
-        const elapsedMs = now - pomodoroTimerStart;
-        const elapsedMinutes = elapsedMs / (60 * 1000);
-        const currentRemaining = Math.max(0, pomodoroRemainingMinutes - elapsedMinutes);
-        totalSeconds = Math.floor(currentRemaining * 60);
-      } else {
-        totalSeconds = Math.floor(Math.max(0, remainingMinutes * 60));
-      }
-      
-      const mins = Math.floor(totalSeconds / 60);
-      const secs = totalSeconds % 60;
-      const pad = (n) => String(Math.floor(n)).padStart(2, '0');
-      return `${pad(mins)}:${pad(secs)}`;
+    function formatTimeShort(minutes) {
+      if (!minutes || minutes <= 0) return '0m';
+      const hours = Math.floor(minutes / 60);
+      const mins = Math.floor(minutes % 60);
+      if (hours > 0) return `${hours}h ${mins}m`;
+      return `${mins}m`;
     }
 
     function updateTimerDisplay(data) {
-      const { timer, task, pomodoro, preferences } = data;
+      const { timer, task, preferences } = data;
 
       // Update theme
       if (preferences?.theme === 'dark') {
@@ -467,115 +331,69 @@
         document.documentElement.style.setProperty('--accent-color', preferences.accentColor);
       }
 
-      // Update task title and complete button visibility
+      // Update task title
+      const taskTitleEl = document.getElementById('taskTitle');
       if (task) {
-        document.getElementById('taskTitle').textContent = task.title;
-        // Show complete button only if task is not completed
-        document.getElementById('completeBtn').style.display = task.completed ? 'none' : 'flex';
+        taskTitleEl.textContent = task.title;
+        taskTitleEl.style.display = 'block';
       } else {
-        document.getElementById('completeBtn').style.display = 'none';
+        taskTitleEl.textContent = 'Timer läuft...';
       }
 
-      // Update main timer tracking
+      // Update timer state
       const elapsedMinutes = timer.elapsedTime || 0;
-      mainTimerStart = Date.now();
-      mainTimerMinutes = elapsedMinutes;
-      mainTimerPaused = timer.isPaused || false;
+      timerStart = Date.now();
+      timerMinutes = elapsedMinutes;
+      isPaused = timer.isPaused || false;
+      estimatedMinutes = timer.estimatedTime || 0;
 
-      // Update display
+      // Update timer display
       const timerEl = document.getElementById('timerDisplay');
       timerEl.textContent = formatTime(elapsedMinutes, true);
 
-      // Overtime indicator
-      const isOvertime = timer.estimatedTime && elapsedMinutes > timer.estimatedTime;
+      // Overtime handling
+      const isOvertime = estimatedMinutes && elapsedMinutes > estimatedMinutes;
       timerEl.classList.toggle('overtime', isOvertime);
       
-      const overtimeIcon = document.getElementById('overtimeIcon');
+      // Progress bar
+      const progressFill = document.getElementById('progressFill');
+      if (estimatedMinutes > 0) {
+        const progress = Math.min(100, (elapsedMinutes / estimatedMinutes) * 100);
+        progressFill.style.width = `${progress}%`;
+        progressFill.classList.toggle('overtime', isOvertime);
+      } else {
+        progressFill.style.width = '0%';
+      }
+
+      // Estimated time and overtime badge
       const estimatedEl = document.getElementById('estimatedTime');
+      const overtimeBadge = document.getElementById('overtimeBadge');
       
       if (isOvertime) {
-        overtimeIcon.style.display = 'block';
-        estimatedEl.innerHTML = '<span class="overtime-badge">OVER TIME</span>';
-      } else if (timer.estimatedTime) {
-        overtimeIcon.style.display = 'none';
-        const estHours = Math.floor(timer.estimatedTime / 60);
-        const estMins = Math.floor(timer.estimatedTime % 60);
-        estimatedEl.textContent = `/ ${estHours > 0 ? estHours + 'h ' : ''}${estMins}m`;
+        estimatedEl.textContent = `von ${formatTimeShort(estimatedMinutes)}`;
+        overtimeBadge.style.display = 'inline';
+      } else if (estimatedMinutes > 0) {
+        estimatedEl.textContent = `von ${formatTimeShort(estimatedMinutes)}`;
+        overtimeBadge.style.display = 'none';
       } else {
-        overtimeIcon.style.display = 'none';
         estimatedEl.textContent = '';
+        overtimeBadge.style.display = 'none';
       }
 
-      // Update pause button
+      // Update pause button icon
       const pauseIcon = document.getElementById('pauseIcon');
-      if (timer.isPaused) {
-        pauseIcon.setAttribute('d', 'M8 5v14l11-7z');
-        document.getElementById('pauseBtn').title = 'Resume';
+      const pauseBtn = document.getElementById('pauseBtn');
+      if (isPaused) {
+        pauseIcon.setAttribute('d', 'M8 5v14l11-7z'); // Play icon
+        pauseBtn.title = 'Fortsetzen';
       } else {
-        pauseIcon.setAttribute('d', 'M6 4h4v16H6V4zm8 0h4v16h-4V4z');
-        document.getElementById('pauseBtn').title = 'Pause';
+        pauseIcon.setAttribute('d', 'M6 4h4v16H6V4zm8 0h4v16h-4V4z'); // Pause icon
+        pauseBtn.title = 'Pause';
       }
 
-      // Pomodoro section
-      if (pomodoro && pomodoro.isActive) {
-        const section = document.getElementById('pomodoroSection');
-        section.style.display = 'flex';
-
-        // Update Pomodoro tracking
-        const remaining = pomodoro.sessionRemainingTime || 0;
-        const total = (pomodoro.sessionRemainingTime || 0) + (pomodoro.sessionElapsedTime || 0);
-        
-        pomodoroTimerStart = Date.now();
-        pomodoroRemainingMinutes = remaining;
-        pomodoroTotalMinutes = total;
-        pomodoroTimerPaused = timer.isPaused || false;
-
-        // Update icon and label
-        const isWork = pomodoro.type === 'work';
-        document.getElementById('pomodoroIcon').textContent = isWork ? '🍅' : '☕';
-        document.getElementById('pomodoroType').textContent = isWork ? 'POMODORO' : 'BREAK';
-        
-        // Update time display
-        const pomodoroTimeEl = document.getElementById('pomodoroTime');
-        pomodoroTimeEl.textContent = formatPomodoroTime(remaining, true);
-        
-        // Color: black by default, red only in last minute
-        const isLastMinute = remaining <= 1.0;
-        if (isWork && isLastMinute) {
-          pomodoroTimeEl.classList.add('warning');
-        } else {
-          pomodoroTimeEl.classList.remove('warning');
-        }
-        
-        // Update session badge - more vibrant
-        const sessionBadge = document.getElementById('pomodoroSession');
-        sessionBadge.textContent = '#' + pomodoro.sessionNumber;
-        
-        // Progress ring
-        const elapsed = pomodoro.sessionElapsedTime || 0;
-        const progress = total > 0 ? (1 - (elapsed / total)) : 1;  // Inverted: starts full, empties
-        const circumference = 150.80;  // 2 * PI * 24
-        const dashArray = (progress * circumference).toFixed(2) + ' ' + circumference;
-        document.getElementById('pomodoroProgress').style.strokeDasharray = dashArray;
-        
-        // Ring color
-        const ringColor = isWork 
-          ? (isLastMinute ? '#ef4444' : '#f97316')
-          : '#10b981';
-        
-        document.getElementById('pomodoroProgress').style.stroke = ringColor;
-        sessionBadge.style.background = ringColor;
-        sessionBadge.style.color = 'white';
-        document.getElementById('skipBtn').style.borderColor = ringColor;
-        document.getElementById('skipBtn').style.color = ringColor;
-        document.documentElement.style.setProperty('--pomodoro-color', ringColor);
-        
-        // Ring background
-        const isDark = document.body.classList.contains('dark');
-        document.getElementById('pomodoroRingBg').style.stroke = isDark ? '#27272a' : '#f4f4f5';
-      } else {
-        document.getElementById('pomodoroSection').style.display = 'none';
-      }
+      // Paused indicator
+      const pausedIndicator = document.getElementById('pausedIndicator');
+      pausedIndicator.classList.toggle('visible', isPaused);
     }
 
     // Button handlers
@@ -587,17 +405,7 @@
       }
     });
 
-    // Complete task button
-    document.getElementById('completeBtn').addEventListener('click', () => {
-      if (isElectron) {
-        ipcRenderer.send('timer-action', 'complete-task');
-      } else if (window.opener) {
-        window.opener.postMessage({ type: 'timer-action', action: 'complete-task' }, '*');
-      }
-    });
-
-    // Stop task timer (Pomodoro continues)
-    document.getElementById('stopTaskBtn').addEventListener('click', () => {
+    document.getElementById('stopBtn').addEventListener('click', () => {
       if (isElectron) {
         ipcRenderer.send('timer-action', 'stop-task');
       } else if (window.opener) {
@@ -605,50 +413,27 @@
       }
     });
 
-    // Stop ALL (Task + Pomodoro reset)
-    document.getElementById('stopAllBtn').addEventListener('click', () => {
-      if (isElectron) {
-        ipcRenderer.send('timer-action', 'stop-all');
-      } else if (window.opener) {
-        window.opener.postMessage({ type: 'timer-action', action: 'stop-all' }, '*');
-      }
-    });
-
-    document.getElementById('skipBtn').addEventListener('click', () => {
-      if (isElectron) {
-        ipcRenderer.send('timer-action', 'skip-pomodoro');
-      } else if (window.opener) {
-        window.opener.postMessage({ type: 'timer-action', action: 'skip-pomodoro' }, '*');
-      }
-    });
-
-    // Auto-update every second for smooth, continuous counting
+    // Auto-update every second for smooth counting
     setInterval(() => {
-      // Update main timer
-      if (!mainTimerPaused) {
+      if (!isPaused) {
         const timerEl = document.getElementById('timerDisplay');
         if (timerEl) {
-          timerEl.textContent = formatTime(mainTimerMinutes, true);
-        }
-      }
-      
-      // Update pomodoro timer
-      if (!pomodoroTimerPaused) {
-        const pomodoroTimeEl = document.getElementById('pomodoroTime');
-        if (pomodoroTimeEl && document.getElementById('pomodoroSection').style.display !== 'none') {
-          pomodoroTimeEl.textContent = formatPomodoroTime(pomodoroRemainingMinutes, true);
+          timerEl.textContent = formatTime(timerMinutes, true);
           
-          // Check if last minute for color update
-          const now = Date.now();
-          const elapsedMs = now - pomodoroTimerStart;
-          const elapsedMinutes = elapsedMs / (60 * 1000);
-          const currentRemaining = Math.max(0, pomodoroRemainingMinutes - elapsedMinutes);
-          const isLastMinute = currentRemaining <= 1.0;
-          
-          if (isLastMinute) {
-            pomodoroTimeEl.classList.add('warning');
-          } else {
-            pomodoroTimeEl.classList.remove('warning');
+          // Update overtime status in real-time
+          if (estimatedMinutes > 0) {
+            const now = Date.now();
+            const elapsedMs = now - timerStart;
+            const currentMinutes = timerMinutes + (elapsedMs / (60 * 1000));
+            const isOvertime = currentMinutes > estimatedMinutes;
+            
+            timerEl.classList.toggle('overtime', isOvertime);
+            document.getElementById('progressFill').classList.toggle('overtime', isOvertime);
+            document.getElementById('overtimeBadge').style.display = isOvertime ? 'inline' : 'none';
+            
+            // Update progress bar
+            const progress = Math.min(100, (currentMinutes / estimatedMinutes) * 100);
+            document.getElementById('progressFill').style.width = `${progress}%`;
           }
         }
       }
