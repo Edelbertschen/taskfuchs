@@ -362,13 +362,10 @@ class BackupService {
       }
     };
 
-    // Run first backup after a short delay
-    setTimeout(runBackup, 5000);
-    
-    // Schedule recurring backups
+    // Schedule recurring backups (no immediate backup - wait for first interval)
     this.autoBackupIntervalId = window.setInterval(runBackup, intervalMinutes * 60 * 1000);
     
-    console.log('BackupService: Auto-backup started, interval:', intervalMinutes, 'minutes');
+    console.log('BackupService: Auto-backup started, interval:', intervalMinutes, 'minutes. Next backup in', intervalMinutes, 'minutes.');
   }
 
   /**

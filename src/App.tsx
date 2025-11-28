@@ -1197,6 +1197,12 @@ function MainApp() {
   }, []);
 
   // Automated local JSON backup scheduler using BackupService
+  // Store state ref for backup data getter (to avoid re-triggering useEffect on every state change)
+  const stateRef = React.useRef(state);
+  React.useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
+
   React.useEffect(() => {
     const setupAutoBackup = async () => {
       try {
@@ -1210,23 +1216,27 @@ function MainApp() {
         
         const minutes = Math.max(1, prefs.backup.intervalMinutes || 60);
         
-        const getBackupData = () => ({
-          tasks: state.tasks,
-          archivedTasks: (state as any).archivedTasks || [],
-          columns: state.columns,
-          tags: state.tags,
-          boards: state.boards || [],
-          preferences: state.preferences,
-          viewState: (state as any).viewState || {},
-          projectKanbanColumns: (state as any).viewState?.projectKanban?.columns || [],
-          projectKanbanState: (state as any).viewState?.projectKanban || {},
-          pinColumns: (state as any).pinColumns || [],
-          recurrence: (state as any).recurrence || {},
-          events: (state as any).events || [],
-          calendarSources: (state as any).calendarSources || [],
-          exportDate: new Date().toISOString(),
-          version: '3.0'
-        });
+        // Use stateRef to always get current state without re-triggering useEffect
+        const getBackupData = () => {
+          const currentState = stateRef.current;
+          return {
+            tasks: currentState.tasks,
+            archivedTasks: (currentState as any).archivedTasks || [],
+            columns: currentState.columns,
+            tags: currentState.tags,
+            boards: currentState.boards || [],
+            preferences: currentState.preferences,
+            viewState: (currentState as any).viewState || {},
+            projectKanbanColumns: (currentState as any).viewState?.projectKanban?.columns || [],
+            projectKanbanState: (currentState as any).viewState?.projectKanban || {},
+            pinColumns: (currentState as any).pinColumns || [],
+            recurrence: (currentState as any).recurrence || {},
+            events: (currentState as any).events || [],
+            calendarSources: (currentState as any).calendarSources || [],
+            exportDate: new Date().toISOString(),
+            version: '3.0'
+          };
+        };
         
         backupService.startAutoBackup(
           minutes, 
@@ -1257,7 +1267,8 @@ function MainApp() {
         backupService.stopAutoBackup();
       }).catch(() => {});
     };
-  }, [state.preferences.backup?.enabled, state.preferences.backup?.intervalMinutes, state.tasks, state.columns, state.tags, (state as any).viewState]);
+  // Only re-run when backup config changes, NOT when data changes
+  }, [state.preferences.backup?.enabled, state.preferences.backup?.intervalMinutes]);
 
   // Dropbox auto-sync scheduler
   React.useEffect(() => {
