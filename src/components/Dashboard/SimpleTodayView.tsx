@@ -34,7 +34,8 @@ import {
   Star, AlertCircle, CheckCircle2, Circle, Plus, Check, X, ArrowRight,
   Clock, FileText, Edit3, Bold, Italic, Code, List, ListOrdered, 
   Link as LinkIcon, Minus, HelpCircle, Heading1, Heading2, Heading3, ExternalLink,
-  Zap, CheckSquare, Bell, Calendar, Edit, Settings, Trash2, MoreVertical
+  Zap, CheckSquare, Bell, Calendar, Edit, Settings, Trash2, MoreVertical,
+  Sun, Moon
 } from 'lucide-react';
 import { TaskModal } from '../Tasks/TaskModal';
 import { SmartTaskModal } from '../Tasks/SmartTaskModal';
@@ -363,6 +364,37 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
   
   // Customization panel state
   const [showCustomizePanel, setShowCustomizePanel] = useState(false);
+  const customizePanelRef = React.useRef<HTMLDivElement>(null);
+  
+  // Close customize panel on ESC or click outside
+  useEffect(() => {
+    if (!showCustomizePanel) return;
+    
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowCustomizePanel(false);
+      }
+    };
+    
+    const handleClickOutside = (e: MouseEvent) => {
+      if (customizePanelRef.current && !customizePanelRef.current.contains(e.target as Node)) {
+        // Also check if the click was on the customize button itself
+        const customizeButton = document.querySelector('[data-customize-button]');
+        if (customizeButton && customizeButton.contains(e.target as Node)) {
+          return; // Let the button's onClick handle it
+        }
+        setShowCustomizePanel(false);
+      }
+    };
+    
+    document.addEventListener('keydown', handleEsc);
+    document.addEventListener('mousedown', handleClickOutside);
+    
+    return () => {
+      document.removeEventListener('keydown', handleEsc);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showCustomizePanel]);
 
   // Checklist reminder modal state
   const [showChecklistReminderModal, setShowChecklistReminderModal] = useState(false);
@@ -1555,6 +1587,7 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
       <div className="fixed top-6 right-6 z-50 flex space-x-3">
             {/* Customize Button */}
             <button
+              data-customize-button
               onClick={() => setShowCustomizePanel(!showCustomizePanel)}
               className={`px-3 h-10 rounded-full flex items-center justify-center gap-2 transition-all duration-200 backdrop-blur-lg ${
                 showCustomizePanel
@@ -1593,42 +1626,67 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
 
           </div>
           
-          {/* Customization Panel - Slides down from top */}
-          <div className={`fixed top-20 right-6 z-40 transition-all duration-300 ease-out ${
-            showCustomizePanel 
-              ? 'opacity-100 translate-y-0' 
-              : 'opacity-0 -translate-y-4 pointer-events-none'
-          }`}>
-            <div className={`rounded-2xl p-4 backdrop-blur-xl border shadow-2xl w-80 ${
+          {/* Customization Panel - Full Settings Layout */}
+          <div 
+            ref={customizePanelRef}
+            className={`fixed top-20 right-6 z-40 transition-all duration-300 ease-out max-h-[calc(100vh-120px)] overflow-y-auto ${
+              showCustomizePanel 
+                ? 'opacity-100 translate-y-0' 
+                : 'opacity-0 -translate-y-4 pointer-events-none'
+            }`}
+          >
+            <div className={`rounded-2xl p-6 backdrop-blur-xl border shadow-2xl w-[420px] ${
               isMinimalDesign
-                ? 'bg-white/95 dark:bg-gray-800/95 border-gray-200/50 dark:border-gray-700/50'
-                : 'bg-white/90 dark:bg-gray-900/90 border-white/30 dark:border-gray-600/30'
-            }`} style={{ boxShadow: '0 20px 50px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.1)' }}>
+                ? 'bg-white/98 dark:bg-gray-800/98 border-gray-200/50 dark:border-gray-700/50'
+                : 'bg-white/95 dark:bg-gray-900/95 border-white/30 dark:border-gray-600/30'
+            }`} style={{ boxShadow: '0 25px 60px rgba(0, 0, 0, 0.2), 0 8px 20px rgba(0, 0, 0, 0.12)' }}>
               
-              {/* Theme Presets */}
-              <div className="mb-4">
-                <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">
-                  {t('settings.theme_presets', { defaultValue: 'Theme Presets' })}
-                </div>
-                <div className="grid grid-cols-3 gap-2">
-                  {/* Light Mode Preset */}
+              {/* Header */}
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {t('settings.customize', { defaultValue: 'Anpassen' })}
+                </h3>
+                <button
+                  onClick={() => setShowCustomizePanel(false)}
+                  className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              {/* Theme Presets - Like Settings */}
+              <div className="mb-6">
+                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Theme Presets</h4>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                  {state.preferences.language === 'de' 
+                    ? 'Wähle ein vordefiniertes Theme'
+                    : 'Choose a predefined theme'}
+                </p>
+                <div className="grid grid-cols-4 gap-3">
+                  {/* Standard Theme */}
                   <button
                     onClick={() => {
                       dispatch({ type: 'UPDATE_PREFERENCES', payload: { 
                         theme: 'light', 
-                        accentColor: '#e06610',
+                        accentColor: '#f97316',
                         backgroundImage: '/backgrounds/bg12.png',
                         backgroundType: 'image'
                       }});
                       document.documentElement.classList.remove('dark');
                     }}
-                    className="p-2 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-orange-400 transition-all"
+                    className="group relative p-2 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-orange-400 transition-all bg-white dark:bg-gray-800"
                   >
-                    <div className="aspect-square rounded bg-gradient-to-br from-orange-100 to-orange-200 mb-1" />
-                    <span className="text-xs text-gray-600 dark:text-gray-400">Light</span>
+                    <div className="aspect-[4/3] rounded-lg overflow-hidden mb-2 relative">
+                      <img src="/backgrounds/bg12.png" alt="Standard" className="w-full h-full object-cover" />
+                      <div className="absolute top-1 right-1 w-3 h-3 rounded-full border border-white shadow-sm" style={{ backgroundColor: '#f97316' }} />
+                      <div className="absolute bottom-1 left-1 bg-white/90 rounded px-1 py-0.5">
+                        <Sun className="w-2.5 h-2.5 text-amber-500" />
+                      </div>
+                    </div>
+                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Standard</span>
                   </button>
-                  
-                  {/* Cyan Dark Preset */}
+
+                  {/* Cyan & Dark Theme */}
                   <button
                     onClick={() => {
                       dispatch({ type: 'UPDATE_PREFERENCES', payload: { 
@@ -1639,87 +1697,204 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
                       }});
                       document.documentElement.classList.add('dark');
                     }}
-                    className="p-2 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-cyan-400 transition-all"
+                    className="group relative p-2 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-cyan-400 transition-all bg-white dark:bg-gray-800"
                   >
-                    <div className="aspect-square rounded bg-gradient-to-br from-gray-800 to-cyan-900 mb-1" />
-                    <span className="text-xs text-gray-600 dark:text-gray-400">Cyan</span>
+                    <div className="aspect-[4/3] rounded-lg overflow-hidden mb-2 relative">
+                      <img src="/backgrounds/bg2.jpg" alt="Cyan & Dark" className="w-full h-full object-cover" />
+                      <div className="absolute top-1 right-1 w-3 h-3 rounded-full border border-white shadow-sm" style={{ backgroundColor: '#22d3ee' }} />
+                      <div className="absolute bottom-1 left-1 bg-gray-900/90 rounded px-1 py-0.5">
+                        <Moon className="w-2.5 h-2.5 text-blue-400" />
+                      </div>
+                    </div>
+                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Cyan</span>
                   </button>
-                  
-                  {/* Minimal Preset */}
+
+                  {/* Purple & Dark Theme */}
                   <button
                     onClick={() => {
                       dispatch({ type: 'UPDATE_PREFERENCES', payload: { 
                         theme: 'dark', 
-                        accentColor: '#a78bfa',
-                        backgroundImage: '/backgrounds/bg4.jpg',
+                        accentColor: '#7b2ff2',
+                        backgroundImage: '/backgrounds/bg8.jpg',
                         backgroundType: 'image'
                       }});
                       document.documentElement.classList.add('dark');
                     }}
-                    className="p-2 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-purple-400 transition-all"
+                    className="group relative p-2 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-purple-500 transition-all bg-white dark:bg-gray-800"
                   >
-                    <div className="aspect-square rounded bg-gradient-to-br from-purple-900 to-gray-900 mb-1" />
-                    <span className="text-xs text-gray-600 dark:text-gray-400">Purple</span>
+                    <div className="aspect-[4/3] rounded-lg overflow-hidden mb-2 relative">
+                      <img src="/backgrounds/bg8.jpg" alt="Lila & Dunkel" className="w-full h-full object-cover" />
+                      <div className="absolute top-1 right-1 w-3 h-3 rounded-full border border-white shadow-sm" style={{ backgroundColor: '#7b2ff2' }} />
+                      <div className="absolute bottom-1 left-1 bg-gray-900/90 rounded px-1 py-0.5">
+                        <Moon className="w-2.5 h-2.5 text-blue-400" />
+                      </div>
+                    </div>
+                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Lila</span>
+                  </button>
+
+                  {/* Teal & Light Theme */}
+                  <button
+                    onClick={() => {
+                      dispatch({ type: 'UPDATE_PREFERENCES', payload: { 
+                        theme: 'light', 
+                        accentColor: '#006d8f',
+                        backgroundImage: '/backgrounds/bg11.jpg',
+                        backgroundType: 'image'
+                      }});
+                      document.documentElement.classList.remove('dark');
+                    }}
+                    className="group relative p-2 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-teal-500 transition-all bg-white dark:bg-gray-800"
+                  >
+                    <div className="aspect-[4/3] rounded-lg overflow-hidden mb-2 relative">
+                      <img src="/backgrounds/bg11.jpg" alt="Petrol & Hell" className="w-full h-full object-cover" />
+                      <div className="absolute top-1 right-1 w-3 h-3 rounded-full border border-white shadow-sm" style={{ backgroundColor: '#006d8f' }} />
+                      <div className="absolute bottom-1 left-1 bg-white/90 rounded px-1 py-0.5">
+                        <Sun className="w-2.5 h-2.5 text-amber-500" />
+                      </div>
+                    </div>
+                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Petrol</span>
                   </button>
                 </div>
               </div>
               
-              {/* Accent Colors */}
-              <div className="mb-4">
-                <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">
-                  {t('settings.accent_color', { defaultValue: 'Akzentfarbe' })}
+              {/* Accent Colors - Full Palette */}
+              <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
+                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
+                  {state.preferences.language === 'de' ? 'Akzentfarbe' : 'Accent Color'}
+                </h4>
+                
+                {/* Light Mode Colors */}
+                <div className="mb-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sun className="w-4 h-4 text-amber-500" />
+                    <span className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">Light Mode</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {['#e06610', '#9a244f', '#7b2ff2', '#006d8f', '#00a78e', '#00b92a', '#2f4f4f', '#7c2a00', '#c600ff'].map(color => (
+                      <button
+                        key={`light-${color}`}
+                        onClick={() => dispatch({ type: 'UPDATE_PREFERENCES', payload: { accentColor: color }})}
+                        className={`relative w-8 h-8 rounded-lg transition-all duration-200 hover:scale-110 ${
+                          state.preferences.accentColor === color
+                            ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800'
+                            : 'hover:ring-1 hover:ring-gray-300'
+                        }`}
+                        style={{
+                          backgroundColor: color,
+                          boxShadow: state.preferences.accentColor === color ? `0 0 0 2px ${color}` : '0 1px 3px rgba(0,0,0,0.1)'
+                        }}
+                        title={color}
+                      >
+                        {state.preferences.accentColor === color && (
+                          <Check className="w-4 h-4 text-white absolute inset-0 m-auto drop-shadow-md" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {(isDarkMode 
-                    ? ['#ff8a3d', '#ff6b9d', '#a78bfa', '#22d3ee', '#34d399', '#4ade80', '#60a5fa', '#fbbf24', '#f472b6']
-                    : ['#e06610', '#9a244f', '#7b2ff2', '#006d8f', '#00a78e', '#00b92a', '#2f4f4f', '#7c2a00', '#c600ff']
-                  ).map(color => (
-                    <button
-                      key={color}
-                      onClick={() => dispatch({ type: 'UPDATE_PREFERENCES', payload: { accentColor: color }})}
-                      className={`w-7 h-7 rounded-full transition-all duration-200 ${
-                        state.preferences.accentColor === color 
-                          ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800 scale-110' 
-                          : 'hover:scale-110'
-                      }`}
-                      style={{ 
-                        backgroundColor: color,
-                        ringColor: color
-                      }}
-                    />
-                  ))}
+                
+                {/* Dark Mode Colors */}
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Moon className="w-4 h-4 text-indigo-400" />
+                    <span className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">Dark Mode</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {['#ff8a3d', '#ff6b9d', '#a78bfa', '#22d3ee', '#34d399', '#4ade80', '#60a5fa', '#fbbf24', '#f472b6'].map(color => (
+                      <button
+                        key={`dark-${color}`}
+                        onClick={() => dispatch({ type: 'UPDATE_PREFERENCES', payload: { accentColor: color }})}
+                        className={`relative w-8 h-8 rounded-lg transition-all duration-200 hover:scale-110 ${
+                          state.preferences.accentColor === color
+                            ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800'
+                            : 'hover:ring-1 hover:ring-gray-300'
+                        }`}
+                        style={{
+                          backgroundColor: color,
+                          boxShadow: state.preferences.accentColor === color ? `0 0 0 2px ${color}` : '0 1px 3px rgba(0,0,0,0.1)'
+                        }}
+                        title={color}
+                      >
+                        {state.preferences.accentColor === color && (
+                          <Check className="w-4 h-4 text-white absolute inset-0 m-auto drop-shadow-md" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
               
-              {/* Background Images */}
+              {/* Background Images - Full Gallery */}
               <div>
-                <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">
-                  {t('settings.background', { defaultValue: 'Hintergrund' })}
-                </div>
-                <div className="grid grid-cols-4 gap-2">
-                  {['bg12.png', 'bg2.jpg', 'bg4.jpg', 'bg6.jpg', 'bg7.jpg', 'bg8.jpg', 'bg9.jpg', 'bg11.jpg'].map((bg) => (
-                    <button
-                      key={bg}
-                      onClick={() => dispatch({ type: 'UPDATE_PREFERENCES', payload: { 
-                        backgroundImage: `/backgrounds/${bg}`,
-                        backgroundType: 'image'
-                      }})}
-                      className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${
-                        state.preferences.backgroundImage?.includes(bg)
-                          ? 'ring-2 scale-105'
-                          : 'border-gray-200 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-400'
+                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  {state.preferences.language === 'de' ? 'Hintergrundbilder' : 'Background Images'}
+                </h4>
+                <div className="grid grid-cols-3 gap-3">
+                  {/* Light/Dark Mode Pair - bg12 & bg13 */}
+                  <div 
+                    className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all col-span-2 ${
+                      state.preferences.backgroundImage?.includes('bg12.png') || state.preferences.backgroundImage?.includes('bg13.png')
+                        ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800'
+                        : 'border-gray-200 dark:border-gray-600 hover:border-gray-300'
+                    }`}
+                    style={(state.preferences.backgroundImage?.includes('bg12.png') || state.preferences.backgroundImage?.includes('bg13.png')) ? {
+                      borderColor: state.preferences.accentColor,
+                      boxShadow: `0 0 0 2px ${state.preferences.accentColor}20, 0 0 0 4px ${state.preferences.accentColor}`
+                    } : {}}
+                    onClick={() => dispatch({ type: 'UPDATE_PREFERENCES', payload: { backgroundImage: '/backgrounds/bg12.png', backgroundType: 'image' }})}
+                  >
+                    <div className="flex h-16">
+                      <div className="relative flex-1 overflow-hidden">
+                        <img src="/backgrounds/bg12.png" alt="Light" className="w-full h-full object-cover" />
+                        <div className="absolute bottom-1 left-1 bg-white/90 rounded px-1 py-0.5 flex items-center gap-0.5">
+                          <Sun className="w-2 h-2 text-amber-500" />
+                          <span className="text-[9px] font-medium text-gray-700">Light</span>
+                        </div>
+                      </div>
+                      <div className="w-0.5 bg-gradient-to-b from-white/50 via-gray-400 to-white/50" />
+                      <div className="relative flex-1 overflow-hidden">
+                        <img src="/backgrounds/bg13.png" alt="Dark" className="w-full h-full object-cover" />
+                        <div className="absolute bottom-1 right-1 bg-gray-900/90 rounded px-1 py-0.5 flex items-center gap-0.5">
+                          <Moon className="w-2 h-2 text-blue-400" />
+                          <span className="text-[9px] font-medium text-white">Dark</span>
+                        </div>
+                      </div>
+                    </div>
+                    {(state.preferences.backgroundImage?.includes('bg12.png') || state.preferences.backgroundImage?.includes('bg13.png')) && (
+                      <div className="absolute bottom-1 left-1/2 -translate-x-1/2">
+                        <div className="text-white text-[9px] px-1.5 py-0.5 rounded font-medium flex items-center gap-0.5" 
+                             style={{ backgroundColor: state.preferences.accentColor }}>
+                          <Check className="w-2 h-2" />
+                          Aktiv
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Regular Gallery Images */}
+                  {['/backgrounds/bg1.jpg', '/backgrounds/bg2.jpg', '/backgrounds/bg3.jpg', '/backgrounds/bg4.jpg', '/backgrounds/bg5.jpg', '/backgrounds/bg6.jpg', '/backgrounds/bg7.jpg', '/backgrounds/bg8.jpg', '/backgrounds/bg9.jpg', '/backgrounds/bg10.jpg', '/backgrounds/bg11.jpg'].map((imageUrl) => (
+                    <div 
+                      key={imageUrl}
+                      className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
+                        state.preferences.backgroundImage === imageUrl
+                          ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800'
+                          : 'border-gray-200 dark:border-gray-600 hover:border-gray-300'
                       }`}
-                      style={{ 
-                        borderColor: state.preferences.backgroundImage?.includes(bg) ? state.preferences.accentColor : undefined,
-                        ringColor: state.preferences.backgroundImage?.includes(bg) ? state.preferences.accentColor : undefined
-                      }}
+                      style={state.preferences.backgroundImage === imageUrl ? {
+                        borderColor: state.preferences.accentColor,
+                        boxShadow: `0 0 0 2px ${state.preferences.accentColor}20, 0 0 0 4px ${state.preferences.accentColor}`
+                      } : {}}
+                      onClick={() => dispatch({ type: 'UPDATE_PREFERENCES', payload: { backgroundImage: imageUrl, backgroundType: 'image' }})}
                     >
-                      <img 
-                        src={`/backgrounds/${bg}`} 
-                        alt={bg} 
-                        className="w-full h-full object-cover"
-                      />
-                    </button>
+                      <img src={imageUrl} alt="Background" className="w-full h-16 object-cover" />
+                      {state.preferences.backgroundImage === imageUrl && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                          <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: state.preferences.accentColor }}>
+                            <Check className="w-3 h-3 text-white" />
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </div>
               </div>
