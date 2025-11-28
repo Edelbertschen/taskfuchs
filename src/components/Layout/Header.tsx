@@ -1634,7 +1634,6 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
                     document.body
                   )}
                 </div>
-                )}
                 
                 {/* Guest mode badge removed */}
               </>
