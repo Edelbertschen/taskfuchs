@@ -826,51 +826,8 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
           </div>
         </nav>
 
-        {/* Bottom section (Backup & Dropbox sync) */}
+        {/* Bottom section (Backup) */}
         <div className="sidebar-content px-2 pb-4">
-          {/* Dropbox Sync Button */}
-          {dropboxConnected && (
-            <div className="mt-2 flex items-center justify-center px-1">
-              <button 
-                onClick={handleDropboxSync}
-                disabled={dropboxSyncStatus === 'syncing'}
-                className={`
-                  relative w-10 h-10 rounded-full flex items-center justify-center 
-                  transition-all duration-200
-                  ${dropboxSyncStatus === 'syncing' ? 'animate-pulse' : ''}
-                  ${state.preferences.design?.mode === 'minimal'
-                    ? dropboxSyncStatus === 'error' 
-                      ? 'bg-red-500 hover:bg-red-600 text-white'
-                      : dropboxSyncStatus === 'success'
-                        ? 'bg-green-500 hover:bg-green-600 text-white'
-                        : 'bg-blue-500 hover:bg-blue-600 text-white'
-                    : isDarkMode
-                      ? dropboxSyncStatus === 'error'
-                        ? 'bg-red-500/20 hover:bg-red-500/30 text-red-400'
-                        : dropboxSyncStatus === 'success'
-                          ? 'bg-green-500/20 hover:bg-green-500/30 text-green-400'
-                          : 'bg-blue-500/20 hover:bg-blue-500/30 text-blue-400'
-                      : dropboxSyncStatus === 'error'
-                        ? 'bg-red-500/10 hover:bg-red-500/20 text-red-600'
-                        : dropboxSyncStatus === 'success'
-                          ? 'bg-green-500/10 hover:bg-green-500/20 text-green-600'
-                          : 'bg-blue-500/10 hover:bg-blue-500/20 text-blue-600'
-                  }
-                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-                  dark:focus:ring-offset-gray-900
-                  disabled:opacity-50
-                `}
-                title={dropboxSyncStatus === 'syncing' ? 'Synchronisiere...' : dropboxSyncMessage || 'Mit Dropbox synchronisieren'} 
-                aria-label="Dropbox Sync"
-              >
-                {dropboxSyncStatus === 'error' ? (
-                  <CloudOff className="w-5 h-5" />
-                ) : (
-                  <Cloud className={`w-5 h-5 ${dropboxSyncStatus === 'syncing' ? 'animate-bounce' : ''}`} />
-                )}
-              </button>
-            </div>
-          )}
           {canLocalBackup && (
             <div className="mt-2 flex flex-col items-center px-1">
               <button 

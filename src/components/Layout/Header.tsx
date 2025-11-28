@@ -168,9 +168,9 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
     };
   }, []);
 
-  // Close filter panel when leaving tasks or notes view
+  // Close filter panel when leaving tasks, notes, or pins view
   useEffect(() => {
-    if (currentView !== 'tasks' && currentView !== 'notes' && isFilterOpen) {
+    if (currentView !== 'tasks' && currentView !== 'notes' && currentView !== 'pins' && isFilterOpen) {
       setIsFilterOpen(false);
     }
   }, [currentView, isFilterOpen]);
@@ -999,14 +999,17 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
               )}
             </div>
 
-            {/* Filter Button - Show in Tasks, Notes and Kanban view */}
-            {(currentView === 'tasks' || currentView === 'notes' || currentView === 'kanban') && (
+            {/* Filter Button - Show in Tasks, Notes, Kanban and Pins view */}
+            {(currentView === 'tasks' || currentView === 'notes' || currentView === 'kanban' || currentView === 'pins') && (
               <div ref={filterContainerRef} className="relative">
                 <button
                   onClick={() => {
                     if (currentView === 'kanban') {
                       // For kanban view, dispatch custom event
                       window.dispatchEvent(new CustomEvent('toggle-kanban-filter'));
+                    } else if (currentView === 'pins') {
+                      // For pins view, dispatch custom event
+                      window.dispatchEvent(new CustomEvent('toggle-pins-filter'));
                     } else {
                       setIsFilterOpen(!isFilterOpen);
                     }
@@ -1014,14 +1017,16 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
                   className={`group p-2.5 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 h-[44px] w-[44px] flex items-center justify-center ${
                     (currentView === 'tasks' && (activeFiltersCount > 0 || isFilterOpen)) ||
                     (currentView === 'notes' && (state.notes.selectedTags.length > 0 || isFilterOpen)) ||
-                    (currentView === 'kanban' && ((state.viewState.projectKanban.priorityFilters.length > 0 || state.viewState.projectKanban.tagFilters.length > 0) || isFilterOpen))
+                    (currentView === 'kanban' && ((state.viewState.projectKanban.priorityFilters.length > 0 || state.viewState.projectKanban.tagFilters.length > 0) || isFilterOpen)) ||
+                    (currentView === 'pins' && isFilterOpen)
                       ? 'text-white'
                       : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800'
                   }`}
                   style={
                     (currentView === 'tasks' && (activeFiltersCount > 0 || isFilterOpen)) ||
                     (currentView === 'notes' && (state.notes.selectedTags.length > 0 || isFilterOpen)) ||
-                    (currentView === 'kanban' && ((state.viewState.projectKanban.priorityFilters.length > 0 || state.viewState.projectKanban.tagFilters.length > 0) || isFilterOpen))
+                    (currentView === 'kanban' && ((state.viewState.projectKanban.priorityFilters.length > 0 || state.viewState.projectKanban.tagFilters.length > 0) || isFilterOpen)) ||
+                    (currentView === 'pins' && isFilterOpen)
                       ? { backgroundColor: state.preferences.accentColor }
                       : {}
                   }
@@ -1206,7 +1211,8 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
                 
                 {/* Profile Button (removed for planner - moved to sidebar header) */}
                 
-                {/* Dreipunkt-Menu */}
+                {/* Dreipunkt-Menu - Hide in views without menu items (e.g., inbox) */}
+                {currentView !== 'inbox' && (
                 <div ref={moreMenuRef} className="relative">
                   <button
                     onClick={() => setShowMoreMenu(!showMoreMenu)}
@@ -1627,6 +1633,7 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
                     document.body
                   )}
                 </div>
+                )}
                 
                 {/* Guest mode badge removed */}
               </>

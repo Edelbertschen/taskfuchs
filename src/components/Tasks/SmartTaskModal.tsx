@@ -18,9 +18,10 @@ interface SmartTaskModalProps {
   placeholder?: string;
   projectId?: string; // For project kanban context
   kanbanColumnId?: string; // For project kanban column
+  defaultDate?: string; // ISO date string to pre-assign task to specific date
 }
 
-export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, projectId, kanbanColumnId }: SmartTaskModalProps) {
+export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, projectId, kanbanColumnId, defaultDate }: SmartTaskModalProps) {
   // Simplified close handling
   const protectedOnClose = useCallback((source?: string) => {
     onClose();
@@ -156,8 +157,8 @@ export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, pro
     let finalColumnId = undefined;
     let finalReminderDate = undefined;
     
-    // PRIORITY: If task has a parsed date and is not for a project, ALWAYS place it in the date column
-    // This overrides any targetColumn that might be set
+    // PRIORITY 1: If task has a parsed date and is not for a project, ALWAYS place it in the date column
+    // This overrides any targetColumn or defaultDate
     if (task.dueDate && !projectId && !kanbanColumnId) {
       const dueDate = new Date(task.dueDate);
       const dateStr = dueDate.toISOString().split('T')[0]; // Format: YYYY-MM-DD
@@ -167,9 +168,17 @@ export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, pro
       // Ensure the date column exists
       dispatch({ type: 'ENSURE_DATE_COLUMN', payload: dateStr });
     }
+    // PRIORITY 2: If defaultDate is provided (e.g., from "Heute" view), use it
+    else if (defaultDate && !projectId && !kanbanColumnId) {
+      finalColumnId = `date-${defaultDate}`;
+      finalReminderDate = defaultDate;
+      
+      // Ensure the date column exists
+      dispatch({ type: 'ENSURE_DATE_COLUMN', payload: defaultDate });
+    }
     
     // For project kanban tasks, don't set columnId - only use projectId and kanbanColumnId
-    if (!projectId && !kanbanColumnId) {
+    if (!projectId && !kanbanColumnId && !finalColumnId) {
       finalColumnId = targetColumn?.id || 'inbox';
     }
 

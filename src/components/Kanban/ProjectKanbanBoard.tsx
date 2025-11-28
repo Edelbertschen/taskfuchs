@@ -690,10 +690,11 @@ export function ProjectKanbanBoard() {
     const allProjectColumns = state.viewState.projectKanban.columns
       .filter(col => col.projectId === project.id);
       
+    // Count only tasks that are actually IN the project's kanban columns (not archived, not completed)
     const projectTaskCount = state.tasks.filter(t => 
-      !t.completed && (
-        allProjectColumns.some(col => col.id === t.kanbanColumnId) || t.projectId === project.id
-      )
+      !t.completed && 
+      !t.archived &&
+      allProjectColumns.some(col => col.id === t.kanbanColumnId)
     ).length;
 
     const isEditing = editingProjectId === project.id;
@@ -2088,10 +2089,14 @@ export function ProjectKanbanBoard() {
                   overflow: 'hidden'
                 }}
               >
-                {/* Filter Slider - Below Controls */}
+                {/* Filter Slider - Below Controls - Matching TaskBoard styling */}
                 {selectedProject && showFilterDropdown && (
-                    <div className="backdrop-blur-md border-b border-gray-200/60 dark:border-gray-700/60 shadow-sm animate-in slide-in-from-top-2 duration-300" style={{ backgroundColor: '#e5e7eb' }}>
-                    <div className="px-4 py-3">
+                    <div className={`overflow-hidden transition-all duration-300 max-h-96 opacity-100 mt-3 mx-4 rounded-lg backdrop-blur-sm border ${
+                      isMinimalDesign
+                        ? 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+                        : (isDarkMode ? 'bg-black/20 border-gray-600/30' : 'bg-white/30 border-gray-300/30')
+                    }`}>
+                    <div className="p-4">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center space-x-3">
                           <div className="p-1.5 rounded-lg" style={{ backgroundColor: state.preferences.accentColor + '20' }}>
@@ -2123,13 +2128,16 @@ export function ProjectKanbanBoard() {
                         </div>
                       </div>
 
-                      <div className="space-y-2">
-                        {/* Priority Filters */}
-                        <div className="flex items-center space-x-4">
-                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-0 flex-shrink-0">
-                            Prioritäten:
-                          </span>
-                          <div className="flex flex-wrap gap-2">
+                      <div className="space-y-4">
+                        {/* Priority Filters - Grid layout like TaskBoard */}
+                        <div>
+                          <label className={`block text-xs font-medium mb-2 flex items-center space-x-2 ${
+                            isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? 'text-gray-300' : 'text-gray-900')
+                          }`}>
+                            <AlertCircle className="w-3 h-3" />
+                            <span>Prioritäten</span>
+                          </label>
+                          <div className="grid grid-cols-5 gap-1">
                             {priorities.map((priority) => {
                               const isActive = state.viewState.projectKanban.priorityFilters.includes(priority.value as any);
                               const taskCount = getTaskCountForProjectPriority(priority.value);

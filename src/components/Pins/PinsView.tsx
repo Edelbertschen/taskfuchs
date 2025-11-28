@@ -41,7 +41,10 @@ import {
   ChevronLeft,
   ChevronRight,
   Calendar,
-  Folder
+  Folder,
+  Filter,
+  AlertCircle,
+  Tag
 } from 'lucide-react';
 import { TaskCard } from '../Tasks/TaskCard';
 import { TaskColumn } from '../Tasks/TaskColumn';
@@ -149,8 +152,23 @@ export function PinsView() {
   const [showTodayTasks, setShowTodayTasks] = useState(true);
   const [mounted, setMounted] = useState(false);
   
+  // Filter state
+  const [showFilterPanel, setShowFilterPanel] = useState(false);
+  const [priorityFilter, setPriorityFilter] = useState<string>('all');
+  const [tagFilters, setTagFilters] = useState<string[]>([]);
+  
   useEffect(() => {
     setMounted(true);
+  }, []);
+  
+  // Listen for filter toggle event from Header
+  useEffect(() => {
+    const handleToggleFilter = () => {
+      setShowFilterPanel(prev => !prev);
+    };
+    
+    window.addEventListener('toggle-pins-filter', handleToggleFilter);
+    return () => window.removeEventListener('toggle-pins-filter', handleToggleFilter);
   }, []);
   
   // Dispatch sidebar state to header
@@ -1016,6 +1034,114 @@ export function PinsView() {
           }`}>
             <Header currentView="pins" />
           </div>
+
+          {/* Filter Panel - Like TaskBoard */}
+          {showFilterPanel && (
+            <div className={`overflow-hidden transition-all duration-300 max-h-96 opacity-100 mx-4 mt-3 rounded-lg backdrop-blur-sm border ${
+              isMinimalDesign
+                ? 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+                : (isDarkMode ? 'bg-black/20 border-gray-600/30' : 'bg-white/30 border-gray-300/30')
+            }`}>
+              <div className="p-4 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-1.5 rounded-lg" style={{ backgroundColor: state.preferences.accentColor + '20' }}>
+                      <Filter className="w-4 h-4" style={{ color: state.preferences.accentColor }} />
+                    </div>
+                    <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter</h3>
+                  </div>
+                  <button
+                    onClick={() => setShowFilterPanel(false)}
+                    className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                
+                {/* Priority Filters */}
+                <div>
+                  <label className={`block text-xs font-medium mb-2 flex items-center space-x-2 ${
+                    isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? 'text-gray-300' : 'text-gray-900')
+                  }`}>
+                    <AlertCircle className="w-3 h-3" />
+                    <span>Prioritäten</span>
+                  </label>
+                  <div className="grid grid-cols-5 gap-1">
+                    <button
+                      onClick={() => setPriorityFilter('all')}
+                      className={`h-8 rounded-md text-xs font-bold transition-all duration-200 ${
+                        priorityFilter === 'all'
+                          ? 'bg-white text-gray-800 shadow-lg scale-105'
+                          : 'bg-gray-700/60 text-gray-300 hover:bg-gray-600/60 hover:scale-105'
+                      }`}
+                    >
+                      ALL
+                    </button>
+                    {[
+                      { key: 'high', label: 'H', color: '#ef4444' },
+                      { key: 'medium', label: 'M', color: '#f59e0b' },
+                      { key: 'low', label: 'L', color: '#10b981' },
+                      { key: 'none', label: '–', color: '#9ca3af' }
+                    ].map(({ key, label, color }) => (
+                      <button
+                        key={key}
+                        onClick={() => setPriorityFilter(key)}
+                        className={`h-8 rounded-md text-xs font-bold transition-all duration-200 ${
+                          priorityFilter === key
+                            ? 'text-white shadow-lg scale-105'
+                            : 'text-white/80 hover:text-white hover:scale-105'
+                        }`}
+                        style={{
+                          backgroundColor: priorityFilter === key ? color : `${color}60`,
+                          boxShadow: priorityFilter === key ? `0 0 12px ${color}40` : 'none'
+                        }}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Tag Filters */}
+                <div>
+                  <label className={`block text-xs font-medium mb-2 flex items-center space-x-2 ${
+                    isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? 'text-gray-300' : 'text-gray-900')
+                  }`}>
+                    <Tag className="w-3 h-3" />
+                    <span>Tags</span>
+                  </label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {state.tags.filter(tag => tag.count > 0).slice(0, 8).map(tag => {
+                      const isActive = tagFilters.includes(tag.name);
+                      return (
+                        <button
+                          key={tag.id}
+                          onClick={() => {
+                            if (isActive) {
+                              setTagFilters(prev => prev.filter(t => t !== tag.name));
+                            } else {
+                              setTagFilters(prev => [...prev, tag.name]);
+                            }
+                          }}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all duration-200 ${
+                            isActive
+                              ? 'text-white shadow-sm scale-105'
+                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                          }`}
+                          style={isActive ? { backgroundColor: tag.color || state.preferences.accentColor } : {}}
+                        >
+                          {tag.name}
+                        </button>
+                      );
+                    })}
+                    {state.tags.filter(tag => tag.count > 0).length === 0 && (
+                      <span className="text-xs text-gray-500 dark:text-gray-400">Keine Tags vorhanden</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Board Content */}
           <div className="flex-1 overflow-hidden">

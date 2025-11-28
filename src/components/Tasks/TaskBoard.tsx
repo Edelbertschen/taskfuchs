@@ -599,14 +599,14 @@ export function TaskBoard() {
         // Scroll direction: negative deltaY = scroll up = go left, positive deltaY = scroll down = go right
         const direction = e.deltaY > 0 ? 'next' : 'prev';
         
-        // Use the same navigation as the arrow buttons
-        handleDateNavigation(direction);
+        // Dispatch navigation directly instead of using handleDateNavigation
+        dispatch({ type: 'NAVIGATE_DATE', payload: direction });
       }
     };
 
     // Listen for column navigation from ColumnSwitcher arrows
     const handleColumnNavigate = (e: CustomEvent<{ direction: 'prev' | 'next' }>) => {
-      handleDateNavigation(e.detail.direction);
+      dispatch({ type: 'NAVIGATE_DATE', payload: e.detail.direction });
     };
 
     // Event-Listener direkt am Container, nicht am Document
@@ -621,8 +621,6 @@ export function TaskBoard() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!scrollContainerRef.current) return;
       
-      const container = scrollContainerRef.current;
-      
       // Check if we're focused on the board area (not input fields)
       const activeElement = document.activeElement;
       const isInputFocused = activeElement && (
@@ -636,8 +634,8 @@ export function TaskBoard() {
         
         const direction = e.key === 'ArrowLeft' ? 'prev' : 'next';
         
-        // Use the same navigation as the arrow buttons
-        handleDateNavigation(direction);
+        // Dispatch navigation directly
+        dispatch({ type: 'NAVIGATE_DATE', payload: direction });
       }
     };
     
@@ -651,7 +649,7 @@ export function TaskBoard() {
       window.removeEventListener('column-navigate', handleColumnNavigate as EventListener);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [dispatch]);
 
   // ESC key listener for focus mode
   useEffect(() => {

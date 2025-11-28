@@ -360,6 +360,9 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
   
   // End-of-day modal state
   const [showEndOfDayModal, setShowEndOfDayModal] = useState(false);
+  
+  // Customization panel state
+  const [showCustomizePanel, setShowCustomizePanel] = useState(false);
 
   // Checklist reminder modal state
   const [showChecklistReminderModal, setShowChecklistReminderModal] = useState(false);
@@ -1550,6 +1553,25 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
 
             {/* Fixed Top Controls - Only Icons */}
       <div className="fixed top-6 right-6 z-50 flex space-x-3">
+            {/* Customize Button */}
+            <button
+              onClick={() => setShowCustomizePanel(!showCustomizePanel)}
+              className={`px-3 h-10 rounded-full flex items-center justify-center gap-2 transition-all duration-200 backdrop-blur-lg ${
+                showCustomizePanel
+                  ? 'text-white'
+                  : isMinimalDesign
+                    ? 'bg-white/90 dark:bg-gray-50/90 border border-white/50 dark:border-gray-200/50 hover:bg-white/95 dark:hover:bg-gray-50/95 text-gray-700 dark:text-gray-800'
+                    : 'bg-white/85 dark:bg-gray-800/85 border border-white/40 dark:border-gray-600/40 hover:bg-white/90 dark:hover:bg-gray-800/90 text-gray-700 dark:text-gray-300'
+              }`}
+              style={{
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08)',
+                backgroundColor: showCustomizePanel ? state.preferences.accentColor : undefined
+              }}
+            >
+              <MaterialIcon name="palette" size={18} style={{ color: showCustomizePanel ? 'white' : state.preferences.accentColor }} />
+              <span className="text-sm font-medium">{t('common.customize', { defaultValue: 'Anpassen' })}</span>
+            </button>
+            
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
@@ -1569,6 +1591,139 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
               )}
             </button>
 
+          </div>
+          
+          {/* Customization Panel - Slides down from top */}
+          <div className={`fixed top-20 right-6 z-40 transition-all duration-300 ease-out ${
+            showCustomizePanel 
+              ? 'opacity-100 translate-y-0' 
+              : 'opacity-0 -translate-y-4 pointer-events-none'
+          }`}>
+            <div className={`rounded-2xl p-4 backdrop-blur-xl border shadow-2xl w-80 ${
+              isMinimalDesign
+                ? 'bg-white/95 dark:bg-gray-800/95 border-gray-200/50 dark:border-gray-700/50'
+                : 'bg-white/90 dark:bg-gray-900/90 border-white/30 dark:border-gray-600/30'
+            }`} style={{ boxShadow: '0 20px 50px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.1)' }}>
+              
+              {/* Theme Presets */}
+              <div className="mb-4">
+                <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">
+                  {t('settings.theme_presets', { defaultValue: 'Theme Presets' })}
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  {/* Light Mode Preset */}
+                  <button
+                    onClick={() => {
+                      dispatch({ type: 'UPDATE_PREFERENCES', payload: { 
+                        theme: 'light', 
+                        accentColor: '#e06610',
+                        backgroundImage: '/backgrounds/bg12.png',
+                        backgroundType: 'image'
+                      }});
+                      document.documentElement.classList.remove('dark');
+                    }}
+                    className="p-2 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-orange-400 transition-all"
+                  >
+                    <div className="aspect-square rounded bg-gradient-to-br from-orange-100 to-orange-200 mb-1" />
+                    <span className="text-xs text-gray-600 dark:text-gray-400">Light</span>
+                  </button>
+                  
+                  {/* Cyan Dark Preset */}
+                  <button
+                    onClick={() => {
+                      dispatch({ type: 'UPDATE_PREFERENCES', payload: { 
+                        theme: 'dark', 
+                        accentColor: '#22d3ee',
+                        backgroundImage: '/backgrounds/bg2.jpg',
+                        backgroundType: 'image'
+                      }});
+                      document.documentElement.classList.add('dark');
+                    }}
+                    className="p-2 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-cyan-400 transition-all"
+                  >
+                    <div className="aspect-square rounded bg-gradient-to-br from-gray-800 to-cyan-900 mb-1" />
+                    <span className="text-xs text-gray-600 dark:text-gray-400">Cyan</span>
+                  </button>
+                  
+                  {/* Minimal Preset */}
+                  <button
+                    onClick={() => {
+                      dispatch({ type: 'UPDATE_PREFERENCES', payload: { 
+                        theme: 'dark', 
+                        accentColor: '#a78bfa',
+                        backgroundImage: '/backgrounds/bg4.jpg',
+                        backgroundType: 'image'
+                      }});
+                      document.documentElement.classList.add('dark');
+                    }}
+                    className="p-2 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-purple-400 transition-all"
+                  >
+                    <div className="aspect-square rounded bg-gradient-to-br from-purple-900 to-gray-900 mb-1" />
+                    <span className="text-xs text-gray-600 dark:text-gray-400">Purple</span>
+                  </button>
+                </div>
+              </div>
+              
+              {/* Accent Colors */}
+              <div className="mb-4">
+                <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">
+                  {t('settings.accent_color', { defaultValue: 'Akzentfarbe' })}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {(isDarkMode 
+                    ? ['#ff8a3d', '#ff6b9d', '#a78bfa', '#22d3ee', '#34d399', '#4ade80', '#60a5fa', '#fbbf24', '#f472b6']
+                    : ['#e06610', '#9a244f', '#7b2ff2', '#006d8f', '#00a78e', '#00b92a', '#2f4f4f', '#7c2a00', '#c600ff']
+                  ).map(color => (
+                    <button
+                      key={color}
+                      onClick={() => dispatch({ type: 'UPDATE_PREFERENCES', payload: { accentColor: color }})}
+                      className={`w-7 h-7 rounded-full transition-all duration-200 ${
+                        state.preferences.accentColor === color 
+                          ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800 scale-110' 
+                          : 'hover:scale-110'
+                      }`}
+                      style={{ 
+                        backgroundColor: color,
+                        ringColor: color
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+              
+              {/* Background Images */}
+              <div>
+                <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">
+                  {t('settings.background', { defaultValue: 'Hintergrund' })}
+                </div>
+                <div className="grid grid-cols-4 gap-2">
+                  {['bg12.png', 'bg2.jpg', 'bg4.jpg', 'bg6.jpg', 'bg7.jpg', 'bg8.jpg', 'bg9.jpg', 'bg11.jpg'].map((bg) => (
+                    <button
+                      key={bg}
+                      onClick={() => dispatch({ type: 'UPDATE_PREFERENCES', payload: { 
+                        backgroundImage: `/backgrounds/${bg}`,
+                        backgroundType: 'image'
+                      }})}
+                      className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${
+                        state.preferences.backgroundImage?.includes(bg)
+                          ? 'ring-2 scale-105'
+                          : 'border-gray-200 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-400'
+                      }`}
+                      style={{ 
+                        borderColor: state.preferences.backgroundImage?.includes(bg) ? state.preferences.accentColor : undefined,
+                        ringColor: state.preferences.backgroundImage?.includes(bg) ? state.preferences.accentColor : undefined
+                      }}
+                    >
+                      <img 
+                        src={`/backgrounds/${bg}`} 
+                        alt={bg} 
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
 
       
@@ -1832,12 +1987,13 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
         ) : null;
       })()}
 
-      {/* Smart Task Modal */}
+      {/* Smart Task Modal - Tasks added here are dated for today */}
       {showSmartTaskModal && createPortal(
         <SmartTaskModal 
           isOpen={showSmartTaskModal}
           onClose={handleCloseSmartTaskModal}
-          placeholder={forms.placeholderSmartTask()} 
+          placeholder={forms.placeholderSmartTask()}
+          defaultDate={format(new Date(), 'yyyy-MM-dd')}
         />,
         document.body
       )}
@@ -2220,11 +2376,12 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
         />
       )}
 
-      {/* Smart Task Modal */}
+      {/* Smart Task Modal - Tasks added here are dated for today */}
       <SmartTaskModal
         isOpen={showSmartTaskModal}
         onClose={handleCloseSmartTaskModal}
         placeholder={forms.placeholderSmartTask()}
+        defaultDate={format(new Date(), 'yyyy-MM-dd')}
       />
 
       {/* Undo snackbar */}

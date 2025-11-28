@@ -174,20 +174,20 @@ function ColumnSwitcher({
   const sidebarWidth = getSidebarWidth();
   const sidebarOffset = sidebarWidth / 2; // Half of sidebar width for centering
 
-  // Arrow button component
+  // Separate arrow button component - larger, standalone style
   const ArrowButton = ({ direction, disabled }: { direction: 'prev' | 'next'; disabled: boolean }) => (
     <button
       onClick={() => !disabled && onNavigate(direction)}
       disabled={disabled}
-      className={`p-1.5 rounded-full transition-all duration-200 focus:outline-none ${
+      className={`w-9 h-9 flex items-center justify-center rounded-full transition-all duration-200 focus:outline-none shadow-lg border ${
         disabled 
-          ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed' 
-          : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-90'
+          ? 'bg-gray-100 dark:bg-gray-800 text-gray-300 dark:text-gray-600 border-gray-200 dark:border-gray-700 cursor-not-allowed opacity-50' 
+          : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 hover:scale-110 active:scale-95'
       }`}
       title={direction === 'prev' ? 'Nach links scrollen' : 'Nach rechts scrollen'}
     >
       <svg 
-        className="w-3.5 h-3.5" 
+        className="w-4 h-4" 
         fill="none" 
         stroke="currentColor" 
         viewBox="0 0 24 24"
@@ -203,23 +203,23 @@ function ColumnSwitcher({
   
   return (
     <div 
-      className="fixed bottom-4 z-30 transition-all duration-500 ease-in-out"
+      className="fixed bottom-4 z-30 transition-all duration-500 ease-in-out pointer-events-none"
       style={{
         left: `calc(50% + ${sidebarOffset}px)`,
         transform: 'translateX(-50%)'
       }}
     >
-      <div className="flex items-center gap-1 bg-white dark:bg-gray-800 rounded-full px-1.5 py-1 shadow-lg border border-gray-200 dark:border-gray-700">
-        {/* Left arrow */}
+      <div className="flex items-center gap-6 pointer-events-auto">
+        {/* Left arrow - separate from column selector */}
         <ArrowButton direction="prev" disabled={!canNavigatePrev} />
         
-        {/* Column count buttons */}
-        <div className="flex items-center px-1">
+        {/* Column count buttons - centered */}
+        <div className="flex items-center bg-white dark:bg-gray-800 rounded-full px-2 py-1 shadow-lg border border-gray-200 dark:border-gray-700">
           {columnOptions.map((count) => (
             <button
               key={count}
               onClick={() => onColumnCountChange(count)}
-              className={`px-2 py-1 text-xs font-medium rounded-full transition-all duration-200 focus:outline-none ${
+              className={`px-2.5 py-1 text-xs font-medium rounded-full transition-all duration-200 focus:outline-none ${
                 visibleColumns === count
                   ? 'text-white shadow-sm'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
@@ -233,7 +233,7 @@ function ColumnSwitcher({
           ))}
         </div>
         
-        {/* Right arrow */}
+        {/* Right arrow - separate from column selector */}
         <ArrowButton direction="next" disabled={!canNavigateNext} />
       </div>
     </div>
