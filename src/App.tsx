@@ -89,13 +89,16 @@ const hslToHex = (h: number, s: number, l: number) => {
 
 type ViewType = 'today' | 'tasks' | 'kanban' | 'focus' | 'pins' | 'archive' | 'inbox' | 'statistics' | 'series';
 
-// Column Switcher Component
+// Column Switcher Component with scroll arrows
 interface ColumnSwitcherProps {
   currentView: string;
   isNoteEditorFullScreen: boolean;
   visibleColumns: number;
   columnOptions: number[];
   onColumnCountChange: (count: number) => void;
+  onNavigate: (direction: 'prev' | 'next') => void;
+  canNavigatePrev: boolean;
+  canNavigateNext: boolean;
   colors: any;
 }
 
@@ -104,7 +107,10 @@ function ColumnSwitcher({
   isNoteEditorFullScreen, 
   visibleColumns, 
   columnOptions, 
-  onColumnCountChange, 
+  onColumnCountChange,
+  onNavigate,
+  canNavigatePrev,
+  canNavigateNext,
   colors 
 }: ColumnSwitcherProps) {
   const [projectSidebarMinimized, setProjectSidebarMinimized] = React.useState(false);
@@ -136,8 +142,8 @@ function ColumnSwitcher({
     };
   }, []);
 
-  // Only show for tasks and kanban views
-  if (currentView !== 'tasks' && currentView !== 'kanban') {
+  // Show for tasks, kanban, and pins views
+  if (currentView !== 'tasks' && currentView !== 'kanban' && currentView !== 'pins') {
     return null;
   }
 
@@ -158,11 +164,42 @@ function ColumnSwitcher({
       return projectSidebarMinimized ? 80 : 320;
     }
     
+    if (currentView === 'pins') {
+      return 80; // Only main sidebar
+    }
+    
     return 80; // Default sidebar width
   };
   
   const sidebarWidth = getSidebarWidth();
   const sidebarOffset = sidebarWidth / 2; // Half of sidebar width for centering
+
+  // Arrow button component
+  const ArrowButton = ({ direction, disabled }: { direction: 'prev' | 'next'; disabled: boolean }) => (
+    <button
+      onClick={() => !disabled && onNavigate(direction)}
+      disabled={disabled}
+      className={`p-1.5 rounded-full transition-all duration-200 focus:outline-none ${
+        disabled 
+          ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed' 
+          : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-90'
+      }`}
+      title={direction === 'prev' ? 'Nach links scrollen' : 'Nach rechts scrollen'}
+    >
+      <svg 
+        className="w-3.5 h-3.5" 
+        fill="none" 
+        stroke="currentColor" 
+        viewBox="0 0 24 24"
+      >
+        {direction === 'prev' ? (
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+        ) : (
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+        )}
+      </svg>
+    </button>
+  );
   
   return (
     <div 
@@ -172,23 +209,32 @@ function ColumnSwitcher({
         transform: 'translateX(-50%)'
       }}
     >
-      <div className="flex items-center bg-white dark:bg-gray-800 rounded-full px-2 py-1 shadow-lg border border-gray-200 dark:border-gray-700">
-        {columnOptions.map((count) => (
-          <button
-            key={count}
-            onClick={() => onColumnCountChange(count)}
-            className={`px-2 py-1 text-xs font-medium rounded-full transition-all duration-200 focus:outline-none ${
-              visibleColumns === count
-                ? 'text-white shadow-sm'
-                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
-            }`}
-            style={visibleColumns === count ? {
-              backgroundColor: colors.primary
-            } : {}}
-          >
-            {count}
-          </button>
-        ))}
+      <div className="flex items-center gap-1 bg-white dark:bg-gray-800 rounded-full px-1.5 py-1 shadow-lg border border-gray-200 dark:border-gray-700">
+        {/* Left arrow */}
+        <ArrowButton direction="prev" disabled={!canNavigatePrev} />
+        
+        {/* Column count buttons */}
+        <div className="flex items-center px-1">
+          {columnOptions.map((count) => (
+            <button
+              key={count}
+              onClick={() => onColumnCountChange(count)}
+              className={`px-2 py-1 text-xs font-medium rounded-full transition-all duration-200 focus:outline-none ${
+                visibleColumns === count
+                  ? 'text-white shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
+              style={visibleColumns === count ? {
+                backgroundColor: colors.primary
+              } : {}}
+            >
+              {count}
+            </button>
+          ))}
+        </div>
+        
+        {/* Right arrow */}
+        <ArrowButton direction="next" disabled={!canNavigateNext} />
       </div>
     </div>
   );
@@ -210,6 +256,10 @@ function MainApp() {
   const [showBackupSetup, setShowBackupSetup] = React.useState(false);
   const [showUserGuide, setShowUserGuide] = React.useState(false);
   
+  // Column navigation state (for scroll arrows)
+  const [canNavigatePrev, setCanNavigatePrev] = React.useState(false);
+  const [canNavigateNext, setCanNavigateNext] = React.useState(true);
+  
   const { state, dispatch } = useApp();
   const { t, i18n } = useTranslation();
 
@@ -223,6 +273,24 @@ function MainApp() {
 
   // Backup setup is now triggered via sidebar warning icon instead of auto-popup
   // The 'open-backup-setup' event handler (below) will open the modal when clicked
+
+  // Listen for scroll state updates from child views (TaskBoard, ProjectKanbanBoard, PinsView)
+  React.useEffect(() => {
+    const handleScrollStateUpdate = (e: CustomEvent<{ canPrev: boolean; canNext: boolean }>) => {
+      setCanNavigatePrev(e.detail.canPrev);
+      setCanNavigateNext(e.detail.canNext);
+    };
+
+    window.addEventListener('column-scroll-state', handleScrollStateUpdate as EventListener);
+    return () => {
+      window.removeEventListener('column-scroll-state', handleScrollStateUpdate as EventListener);
+    };
+  }, []);
+
+  // Handle navigation requests from the ColumnSwitcher
+  const handleColumnNavigate = React.useCallback((direction: 'prev' | 'next') => {
+    window.dispatchEvent(new CustomEvent('column-navigate', { detail: { direction } }));
+  }, []);
 
   // Mobile PWA: Show minimalistic mobile shell
   if (isMobilePWAEnvironment()) {
@@ -1085,6 +1153,9 @@ function MainApp() {
             handleColumnCountChange(count);
           }
         }}
+        onNavigate={handleColumnNavigate}
+        canNavigatePrev={canNavigatePrev}
+        canNavigateNext={canNavigateNext}
         colors={colors}
       />
 

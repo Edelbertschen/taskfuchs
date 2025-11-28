@@ -257,22 +257,34 @@ export function PinsView() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [pinOffset, setPinOffset] = useState(0);
 
+  // Helper function to navigate columns
+  const navigateColumns = useCallback((direction: 'prev' | 'next') => {
+    const visible = (state.preferences.columns.pinsVisible ?? state.preferences.columns.visible) || 3;
+    const maxOffset = Math.max(0, state.pinColumns.length - visible);
+    const step = direction === 'next' ? 1 : -1;
+    setPinOffset((prev) => Math.min(maxOffset, Math.max(0, prev + step)));
+  }, [state.pinColumns.length, state.preferences.columns.visible, state.preferences.columns.pinsVisible]);
+
   useEffect(() => {
     const container = scrollContainerRef.current;
 
     const handleWheel = (e: WheelEvent) => {
-      // Support both vertical and horizontal trackpad gestures
-      // Choose the dominant axis to determine direction
-      const absX = Math.abs(e.deltaX || 0);
-      const absY = Math.abs(e.deltaY || 0);
-      const raw = absX > absY ? e.deltaX : e.deltaY;
-      if (raw === 0) return;
-      e.preventDefault();
-      e.stopPropagation();
-      const visible = (state.preferences.columns.pinsVisible ?? state.preferences.columns.visible) || 3;
-      const step = Math.sign(raw);
-      const maxOffset = Math.max(0, state.pinColumns.length - visible);
-      setPinOffset((prev) => Math.min(maxOffset, Math.max(0, prev + step)));
+      // Use SHIFT + Mouse wheel for column navigation (like Planner)
+      if (e.shiftKey) {
+        const absX = Math.abs(e.deltaX || 0);
+        const absY = Math.abs(e.deltaY || 0);
+        const raw = absX > absY ? e.deltaX : e.deltaY;
+        if (raw === 0) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const direction = raw > 0 ? 'next' : 'prev';
+        navigateColumns(direction);
+      }
+    };
+
+    // Listen for column navigation from ColumnSwitcher arrows
+    const handleColumnNavigate = (e: CustomEvent<{ direction: 'prev' | 'next' }>) => {
+      navigateColumns(e.detail.direction);
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -286,25 +298,25 @@ export function PinsView() {
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
         if (!scrollContainerRef.current) return;
         e.preventDefault();
-        const visible = (state.preferences.columns.pinsVisible ?? state.preferences.columns.visible) || 3;
-        const maxOffset = Math.max(0, state.pinColumns.length - visible);
-        const step = e.key === 'ArrowRight' ? 1 : -1;
-        setPinOffset((prev) => Math.min(maxOffset, Math.max(0, prev + step)));
+        const direction = e.key === 'ArrowRight' ? 'next' : 'prev';
+        navigateColumns(direction);
       }
     };
 
     if (container) {
       container.addEventListener('wheel', handleWheel, { passive: false });
     }
+    window.addEventListener('column-navigate', handleColumnNavigate as EventListener);
     document.addEventListener('keydown', handleKeyDown);
 
     return () => {
       if (container) {
         container.removeEventListener('wheel', handleWheel as EventListener);
       }
+      window.removeEventListener('column-navigate', handleColumnNavigate as EventListener);
       document.removeEventListener('keydown', handleKeyDown as EventListener);
     };
-  }, [state.pinColumns.length, state.preferences.columns.visible, state.preferences.columns.pinsVisible]);
+  }, [navigateColumns]);
 
   // Get visible pin columns with offset like ProjectKanbanBoard
   const displayColumns = useMemo(() => {
@@ -318,6 +330,16 @@ export function PinsView() {
     }
     return result;
   }, [state.pinColumns, state.preferences.columns.visible, state.preferences.columns.pinsVisible, pinOffset]);
+
+  // Dispatch scroll state for ColumnSwitcher arrows
+  useEffect(() => {
+    const visibleCount = state.preferences.columns.pinsVisible ?? state.preferences.columns.visible;
+    const canPrev = pinOffset > 0;
+    const canNext = pinOffset + visibleCount < state.pinColumns.length;
+    window.dispatchEvent(new CustomEvent('column-scroll-state', { 
+      detail: { canPrev, canNext } 
+    }));
+  }, [pinOffset, state.pinColumns.length, state.preferences.columns.pinsVisible, state.preferences.columns.visible]);
 
   // Tasks grouped by pin column
   const tasksByPinColumn = useMemo(() => {

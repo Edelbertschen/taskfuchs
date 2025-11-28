@@ -303,38 +303,35 @@ export function ProjectKanbanBoard() {
   }, [selectedProject]);
 
   // Horizontal scrolling & navigation:
-  // - Mouse/trackpad wheel scrolls horizontally across columns
-  // - SHIFT + wheel navigates projects (prev/next)
-  // - Arrow keys scroll horizontally across columns
+  // - SHIFT + wheel navigates columns (like Planner)
+  // - Arrow keys navigate columns
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
-      const container = scrollContainerRef.current;
-      if (!container) return;
-
-      // Determine dominant axis (support both classic mice and trackpads)
-      const absX = Math.abs(e.deltaX || 0);
-      const absY = Math.abs(e.deltaY || 0);
-      const raw = absX > absY ? (e.deltaX || 0) : (e.deltaY || 0);
-
+      // Only handle SHIFT + wheel for column navigation (like Planner)
       if (e.shiftKey) {
-        // Keep legacy behavior: SHIFT + wheel navigates projects
+        const absX = Math.abs(e.deltaX || 0);
+        const absY = Math.abs(e.deltaY || 0);
+        const raw = absX > absY ? (e.deltaX || 0) : (e.deltaY || 0);
+        if (raw === 0) return;
+        
         e.preventDefault();
         e.stopPropagation();
         const direction = raw > 0 ? 'next' : 'prev';
         dispatch({ type: 'NAVIGATE_PROJECTS', payload: direction });
-        return;
       }
+    };
 
-      // Default: scroll horizontally by the dominant delta
-      e.preventDefault();
-      e.stopPropagation();
-      container.scrollLeft += raw;
+    // Listen for column navigation from ColumnSwitcher arrows
+    const handleColumnNavigate = (e: CustomEvent<{ direction: 'prev' | 'next' }>) => {
+      dispatch({ type: 'NAVIGATE_PROJECTS', payload: e.detail.direction });
     };
 
     const container = scrollContainerRef.current;
     if (container) {
       container.addEventListener('wheel', handleWheel, { passive: false });
     }
+    
+    window.addEventListener('column-navigate', handleColumnNavigate as EventListener);
 
     const handleKeyDown = (e: KeyboardEvent) => {
       // Check if we're focused on inputs or modals
@@ -348,11 +345,9 @@ export function ProjectKanbanBoard() {
       );
 
       if (!isInputFocused && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
-        const container = scrollContainerRef.current;
-        if (!container) return;
         e.preventDefault();
-        const step = 120; // pixels per key press
-        container.scrollLeft += (e.key === 'ArrowLeft' ? -step : step);
+        const direction = e.key === 'ArrowLeft' ? 'prev' : 'next';
+        dispatch({ type: 'NAVIGATE_PROJECTS', payload: direction });
       }
     };
 
@@ -362,6 +357,7 @@ export function ProjectKanbanBoard() {
       if (container) {
         container.removeEventListener('wheel', handleWheel as EventListener);
       }
+      window.removeEventListener('column-navigate', handleColumnNavigate as EventListener);
       document.removeEventListener('keydown', handleKeyDown as EventListener);
     };
   }, [dispatch]);
@@ -535,6 +531,17 @@ export function ProjectKanbanBoard() {
 
     return result;
   }, [selectedProject, projectColumns, state.preferences.columns.projectsVisible, state.preferences.columns.visible, state.projectColumnOffset]);
+
+  // Dispatch scroll state for ColumnSwitcher arrows
+  useEffect(() => {
+    const visibleCount = state.preferences.columns.projectsVisible ?? state.preferences.columns.visible;
+    const totalColumns = projectColumns.length + 1; // +1 for "Add Column" button
+    const canPrev = state.projectColumnOffset > 0;
+    const canNext = state.projectColumnOffset + visibleCount < totalColumns;
+    window.dispatchEvent(new CustomEvent('column-scroll-state', { 
+      detail: { canPrev, canNext } 
+    }));
+  }, [state.projectColumnOffset, projectColumns.length, state.preferences.columns.projectsVisible, state.preferences.columns.visible]);
 
   // Auto-edit newly created columns
   useEffect(() => {
@@ -1315,8 +1322,7 @@ export function ProjectKanbanBoard() {
   };
 
   const handleTaskPlay = (task: Task) => {
-    const timerMode = state.preferences?.pomodoro?.enabled ? 'pomodoro' : 'normal';
-    dispatch({ type: 'START_TIMER', payload: { taskId: task.id, mode: timerMode } });
+    dispatch({ type: 'START_TIMER', payload: { taskId: task.id } });
   };
 
   const handleSmartTaskAdd = (column: Column) => {

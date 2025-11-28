@@ -604,13 +604,20 @@ export function TaskBoard() {
       }
     };
 
+    // Listen for column navigation from ColumnSwitcher arrows
+    const handleColumnNavigate = (e: CustomEvent<{ direction: 'prev' | 'next' }>) => {
+      handleDateNavigation(e.detail.direction);
+    };
+
     // Event-Listener direkt am Container, nicht am Document
     const container = scrollContainerRef.current;
     if (container) {
       container.addEventListener('wheel', handleWheel, { passive: false });
     }
     
-        // Arrow key navigation
+    window.addEventListener('column-navigate', handleColumnNavigate as EventListener);
+    
+    // Arrow key navigation
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!scrollContainerRef.current) return;
       
@@ -641,6 +648,7 @@ export function TaskBoard() {
       if (container) {
         container.removeEventListener('wheel', handleWheel);
       }
+      window.removeEventListener('column-navigate', handleColumnNavigate as EventListener);
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
@@ -1318,6 +1326,15 @@ export function TaskBoard() {
   const columnsToShow = state.preferences.columns.plannerVisible ?? state.preferences.columns.visible;
   const dateColumns = allDateColumns
     .slice(startIndex, startIndex + columnsToShow);
+
+  // Dispatch scroll state for ColumnSwitcher arrows
+  useEffect(() => {
+    const canPrev = startIndex > 0;
+    const canNext = startIndex + columnsToShow < allDateColumns.length;
+    window.dispatchEvent(new CustomEvent('column-scroll-state', { 
+      detail: { canPrev, canNext } 
+    }));
+  }, [startIndex, columnsToShow, allDateColumns.length]);
 
 
   
