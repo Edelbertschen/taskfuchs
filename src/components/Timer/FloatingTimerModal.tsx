@@ -154,11 +154,6 @@ export function FloatingTimerModal({ isVisible, onOpenTask }: FloatingTimerModal
                 <span className="text-[10px] text-zinc-400">
                   von {formatTimeShort(activeTimer.estimatedTime)}
                 </span>
-                {isOvertime && (
-                  <span className="text-[9px] font-bold text-red-500 uppercase tracking-wider">
-                    Überschritten
-                  </span>
-                )}
               </div>
             )}
           </div>

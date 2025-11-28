@@ -121,9 +121,9 @@
       font-variant-numeric: tabular-nums;
     }
 
-    .overtime-badge {
-      font-size: 9px;
-      font-weight: 700;
+    /* Overtime badge removed - red color indicates overtime */
+    .overtime-badge-unused {
+      display: none;
       text-transform: uppercase;
       letter-spacing: 0.05em;
       color: #ef4444;
@@ -242,7 +242,6 @@
         <div class="timer-display" id="timerDisplay">00:00</div>
         <div class="timer-meta">
           <span class="estimated-time" id="estimatedTime"></span>
-          <span class="overtime-badge" id="overtimeBadge" style="display: none;">Überschritten</span>
         </div>
       </div>
 
@@ -365,19 +364,13 @@
         progressFill.style.width = '0%';
       }
 
-      // Estimated time and overtime badge
+      // Estimated time display (overtime indicated by red color)
       const estimatedEl = document.getElementById('estimatedTime');
-      const overtimeBadge = document.getElementById('overtimeBadge');
       
-      if (isOvertime) {
+      if (estimatedMinutes > 0) {
         estimatedEl.textContent = `von ${formatTimeShort(estimatedMinutes)}`;
-        overtimeBadge.style.display = 'inline';
-      } else if (estimatedMinutes > 0) {
-        estimatedEl.textContent = `von ${formatTimeShort(estimatedMinutes)}`;
-        overtimeBadge.style.display = 'none';
       } else {
         estimatedEl.textContent = '';
-        overtimeBadge.style.display = 'none';
       }
 
       // Update pause button icon
@@ -429,7 +422,6 @@
             
             timerEl.classList.toggle('overtime', isOvertime);
             document.getElementById('progressFill').classList.toggle('overtime', isOvertime);
-            document.getElementById('overtimeBadge').style.display = isOvertime ? 'inline' : 'none';
             
             // Update progress bar
             const progress = Math.min(100, (currentMinutes / estimatedMinutes) * 100);
