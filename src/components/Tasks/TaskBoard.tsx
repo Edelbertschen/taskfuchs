@@ -591,17 +591,25 @@ export function TaskBoard() {
   // Horizontal scroll functionality with Shift + Mouse wheel
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
-      // Use SHIFT + Mouse wheel for column navigation (like the arrow buttons)
-      if (e.shiftKey) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        // Scroll direction: negative deltaY = scroll up = go left, positive deltaY = scroll down = go right
-        const direction = e.deltaY > 0 ? 'next' : 'prev';
-        
-        // Dispatch navigation directly instead of using handleDateNavigation
-        dispatch({ type: 'NAVIGATE_DATE', payload: direction });
-      }
+      // Only handle if SHIFT is pressed
+      if (!e.shiftKey) return;
+      
+      // Check if we're over the scroll container
+      const container = scrollContainerRef.current;
+      if (!container) return;
+      
+      // Check if the event target is within our container
+      const target = e.target as Node;
+      if (!container.contains(target)) return;
+      
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Scroll direction: negative deltaY = scroll up = go left, positive deltaY = scroll down = go right
+      const direction = e.deltaY > 0 ? 'next' : 'prev';
+      
+      // Dispatch navigation directly
+      dispatch({ type: 'NAVIGATE_DATE', payload: direction });
     };
 
     // Listen for column navigation from ColumnSwitcher arrows
@@ -609,12 +617,8 @@ export function TaskBoard() {
       dispatch({ type: 'NAVIGATE_DATE', payload: e.detail.direction });
     };
 
-    // Event-Listener direkt am Container, nicht am Document
-    const container = scrollContainerRef.current;
-    if (container) {
-      container.addEventListener('wheel', handleWheel, { passive: false });
-    }
-    
+    // Attach to document with passive: false to allow preventDefault
+    document.addEventListener('wheel', handleWheel, { passive: false });
     window.addEventListener('column-navigate', handleColumnNavigate as EventListener);
     
     // Arrow key navigation
@@ -630,11 +634,8 @@ export function TaskBoard() {
       );
 
       if (!isInputFocused && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
-          e.preventDefault();
-        
+        e.preventDefault();
         const direction = e.key === 'ArrowLeft' ? 'prev' : 'next';
-        
-        // Dispatch navigation directly
         dispatch({ type: 'NAVIGATE_DATE', payload: direction });
       }
     };
@@ -642,10 +643,7 @@ export function TaskBoard() {
     document.addEventListener('keydown', handleKeyDown);
     
     return () => {
-      const container = scrollContainerRef.current;
-      if (container) {
-        container.removeEventListener('wheel', handleWheel);
-      }
+      document.removeEventListener('wheel', handleWheel);
       window.removeEventListener('column-navigate', handleColumnNavigate as EventListener);
       document.removeEventListener('keydown', handleKeyDown);
     };

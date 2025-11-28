@@ -307,18 +307,26 @@ export function ProjectKanbanBoard() {
   // - Arrow keys navigate columns
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
-      // Only handle SHIFT + wheel for column navigation (like Planner)
-      if (e.shiftKey) {
-        const absX = Math.abs(e.deltaX || 0);
-        const absY = Math.abs(e.deltaY || 0);
-        const raw = absX > absY ? (e.deltaX || 0) : (e.deltaY || 0);
-        if (raw === 0) return;
-        
-        e.preventDefault();
-        e.stopPropagation();
-        const direction = raw > 0 ? 'next' : 'prev';
-        dispatch({ type: 'NAVIGATE_PROJECTS', payload: direction });
-      }
+      // Only handle if SHIFT is pressed
+      if (!e.shiftKey) return;
+      
+      // Check if we're over the scroll container
+      const container = scrollContainerRef.current;
+      if (!container) return;
+      
+      // Check if the event target is within our container
+      const target = e.target as Node;
+      if (!container.contains(target)) return;
+      
+      const absX = Math.abs(e.deltaX || 0);
+      const absY = Math.abs(e.deltaY || 0);
+      const raw = absX > absY ? (e.deltaX || 0) : (e.deltaY || 0);
+      if (raw === 0) return;
+      
+      e.preventDefault();
+      e.stopPropagation();
+      const direction = raw > 0 ? 'next' : 'prev';
+      dispatch({ type: 'NAVIGATE_PROJECTS', payload: direction });
     };
 
     // Listen for column navigation from ColumnSwitcher arrows
@@ -326,11 +334,8 @@ export function ProjectKanbanBoard() {
       dispatch({ type: 'NAVIGATE_PROJECTS', payload: e.detail.direction });
     };
 
-    const container = scrollContainerRef.current;
-    if (container) {
-      container.addEventListener('wheel', handleWheel, { passive: false });
-    }
-    
+    // Attach to document with passive: false to allow preventDefault
+    document.addEventListener('wheel', handleWheel, { passive: false });
     window.addEventListener('column-navigate', handleColumnNavigate as EventListener);
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -354,11 +359,9 @@ export function ProjectKanbanBoard() {
     document.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      if (container) {
-        container.removeEventListener('wheel', handleWheel as EventListener);
-      }
+      document.removeEventListener('wheel', handleWheel);
       window.removeEventListener('column-navigate', handleColumnNavigate as EventListener);
-      document.removeEventListener('keydown', handleKeyDown as EventListener);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, [dispatch]);
 

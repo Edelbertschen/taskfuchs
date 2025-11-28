@@ -285,20 +285,27 @@ export function PinsView() {
   }, [state.pinColumns.length, state.preferences.columns.visible, state.preferences.columns.pinsVisible]);
 
   useEffect(() => {
-    const container = scrollContainerRef.current;
-
     const handleWheel = (e: WheelEvent) => {
-      // Use SHIFT + Mouse wheel for column navigation (like Planner)
-      if (e.shiftKey) {
-        const absX = Math.abs(e.deltaX || 0);
-        const absY = Math.abs(e.deltaY || 0);
-        const raw = absX > absY ? e.deltaX : e.deltaY;
-        if (raw === 0) return;
-        e.preventDefault();
-        e.stopPropagation();
-        const direction = raw > 0 ? 'next' : 'prev';
-        navigateColumns(direction);
-      }
+      // Only handle if SHIFT is pressed
+      if (!e.shiftKey) return;
+      
+      // Check if we're over the scroll container
+      const container = scrollContainerRef.current;
+      if (!container) return;
+      
+      // Check if the event target is within our container
+      const target = e.target as Node;
+      if (!container.contains(target)) return;
+      
+      const absX = Math.abs(e.deltaX || 0);
+      const absY = Math.abs(e.deltaY || 0);
+      const raw = absX > absY ? e.deltaX : e.deltaY;
+      if (raw === 0) return;
+      
+      e.preventDefault();
+      e.stopPropagation();
+      const direction = raw > 0 ? 'next' : 'prev';
+      navigateColumns(direction);
     };
 
     // Listen for column navigation from ColumnSwitcher arrows
@@ -322,18 +329,15 @@ export function PinsView() {
       }
     };
 
-    if (container) {
-      container.addEventListener('wheel', handleWheel, { passive: false });
-    }
+    // Attach to document with passive: false to allow preventDefault
+    document.addEventListener('wheel', handleWheel, { passive: false });
     window.addEventListener('column-navigate', handleColumnNavigate as EventListener);
     document.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      if (container) {
-        container.removeEventListener('wheel', handleWheel as EventListener);
-      }
+      document.removeEventListener('wheel', handleWheel);
       window.removeEventListener('column-navigate', handleColumnNavigate as EventListener);
-      document.removeEventListener('keydown', handleKeyDown as EventListener);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, [navigateColumns]);
 
