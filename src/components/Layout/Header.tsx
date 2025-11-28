@@ -1426,6 +1426,7 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
                     document.body
                   )}
                 </div>
+                )}
                 
                 {/* Logout Button */}
                 <button
