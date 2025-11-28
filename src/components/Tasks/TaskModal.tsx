@@ -3023,7 +3023,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <Timer className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm text-gray-600 dark:text-gray-400">{t('tasks.time_tracked')}</span>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">{t('tasks.modal.time_tracked')}</span>
                       </div>
                       {isEditingTime ? (
                         <div className="flex items-center space-x-1">
@@ -3066,7 +3066,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                           onClick={startTimeEditing}
                           className="text-sm font-medium text-gray-900 dark:text-white hover:underline cursor-pointer transition-colors"
                           style={{ color: state.preferences.accentColor }}
-                          title={t('tasks.time_tracked_edit')}
+                          title={t('tasks.modal.time_tracked_edit')}
                         >
                           {(() => {
                             const trackedTime = getCurrentTrackedTime();
