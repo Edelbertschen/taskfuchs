@@ -790,11 +790,9 @@ const Settings = React.memo(() => {
     const defaultItems = [
       { id: 'today', label: t('navigation.today'), icon: Home, visible: true },
       { id: 'inbox', label: 'Inbox', icon: Inbox, visible: true },
-      { id: 'review', label: 'Review', icon: ClipboardList, visible: true },
       { id: 'tasks', label: t('navigation.planner'), icon: CheckSquare, visible: true },
       { id: 'kanban', label: t('navigation.projects'), icon: Columns, visible: true },
       { id: 'pins', label: t('navigation.pins'), icon: Pin, visible: true },
-      { id: 'notes', label: t('navigation.notes'), icon: FileText, visible: true },
       { id: 'series', label: t('navigation.series'), icon: RefreshCw, visible: true },
       { id: 'tags', label: 'Tags', icon: TagIcon, visible: true },
       { id: 'statistics', label: t('navigation.reports'), icon: BarChart3, visible: true },
@@ -4970,7 +4968,7 @@ const Settings = React.memo(() => {
                         {/* Toggle whether item is in "Mehr" menu */}
                         <button
                           onClick={() => {
-                            const current = state.preferences.sidebar?.moreItems || ['series', 'review', 'archive', 'tags', 'statistics'];
+                            const current = state.preferences.sidebar?.moreItems || ['series', 'archive', 'tags', 'statistics'];
                             const isInMore = current.includes(item.id);
                             const updated = isInMore ? current.filter(id => id !== item.id) : [...current, item.id];
                             dispatch({
@@ -4984,7 +4982,7 @@ const Settings = React.memo(() => {
                             });
                           }}
                           className={`px-2 py-1 text-xs rounded border inline-flex items-center space-x-1 ${
-                            (state.preferences.sidebar?.moreItems || ['series','review','archive','tags','statistics']).includes(item.id)
+                            (state.preferences.sidebar?.moreItems || ['series','archive','tags','statistics']).includes(item.id)
                               ? 'text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
                               : 'text-gray-400 border-gray-300 dark:border-gray-700'
                           }`}
