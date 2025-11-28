@@ -129,34 +129,40 @@ const BackupDirectoryStatus = () => {
   }, []);
 
   return (
-    <div className={`mb-4 p-3 rounded-lg border ${
+    <div className={`mb-4 p-4 rounded-lg border ${
       isConfigured 
         ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' 
         : 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800'
     }`}>
-      <div className="flex items-center gap-2">
-        {isConfigured ? (
-          <>
+      {isConfigured ? (
+        <div>
+          <div className="flex items-center gap-2 mb-2">
             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            <div className="flex-1">
-              <div className="text-sm font-medium text-green-800 dark:text-green-200">
-                {t('settings_data.backupConfigured') || 'Backup konfiguriert'}
-              </div>
-              <div className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1 mt-0.5">
-                <FolderOpen className="w-3 h-3" />
-                <span className="font-mono">{dirName}</span>
-              </div>
+            <div className="text-sm font-medium text-green-800 dark:text-green-200">
+              {t('settings_data.backupConfigured') || 'Backup konfiguriert'}
             </div>
-          </>
-        ) : (
-          <>
-            <div className="w-2 h-2 rounded-full bg-amber-500" />
-            <div className="text-sm text-amber-800 dark:text-amber-200">
-              {t('settings_data.noBackupConfigured') || 'Kein Backup-Verzeichnis gewählt'}
+          </div>
+          <div className="bg-white/60 dark:bg-gray-800/60 rounded-lg p-3 mt-2">
+            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-1">
+              <FolderOpen className="w-3.5 h-3.5" />
+              <span>{t('settings_data.selectedFolder') || 'Ausgewählter Ordner:'}</span>
             </div>
-          </>
-        )}
-      </div>
+            <div className="font-mono text-sm font-semibold text-gray-900 dark:text-white break-all">
+              {dirName}
+            </div>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 italic">
+              ⚠️ {t('settings_data.browserPathLimitation') || 'Der Browser zeigt aus Sicherheitsgründen nur den Ordnernamen an, nicht den vollständigen Pfad.'}
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-amber-500" />
+          <div className="text-sm text-amber-800 dark:text-amber-200">
+            {t('settings_data.noBackupConfigured') || 'Kein Backup-Verzeichnis gewählt'}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

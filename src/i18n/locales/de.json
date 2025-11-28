@@ -2190,6 +2190,8 @@
     "lastBackup": "Letztes Backup",
     "backupConfigured": "Backup konfiguriert",
     "noBackupConfigured": "Kein Backup-Verzeichnis gewählt",
+    "selectedFolder": "Ausgewählter Ordner:",
+    "browserPathLimitation": "Der Browser zeigt aus Sicherheitsgründen nur den Ordnernamen an, nicht den vollständigen Pfad.",
     "invalidBackupFile": "Ungültige Backup-Datei.",
     "restore": "Wiederherstellen",
     "restoreDesc": "Standard: letztes Backup im gewählten Ordner. Ohne Ordner erscheint ein Dateiauswahldialog.",

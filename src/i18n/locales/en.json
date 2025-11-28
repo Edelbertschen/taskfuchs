@@ -1625,6 +1625,8 @@
     "lastBackup": "Last Backup",
     "backupConfigured": "Backup configured",
     "noBackupConfigured": "No backup directory selected",
+    "selectedFolder": "Selected folder:",
+    "browserPathLimitation": "For security reasons, the browser only shows the folder name, not the full path.",
     "invalidBackupFile": "Invalid backup file.",
     "restore": "Restore",
     "restoreDesc": "Default: last backup in the selected folder. Without a folder, a file selection dialog appears.",

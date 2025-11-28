@@ -282,9 +282,20 @@ export function BackupSetupModal({ isOpen, onClose }: BackupSetupModalProps) {
                   </h4>
                   
                   {status.isConfigured && status.directoryName && (
-                    <div className="flex items-center gap-2 mt-2 text-sm text-gray-600 dark:text-gray-400">
-                      <FolderOpen className="w-4 h-4" />
-                      <span className="truncate">{status.directoryName}</span>
+                    <div className="mt-3 p-3 bg-gray-100 dark:bg-gray-700/50 rounded-lg">
+                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-1">
+                        <FolderOpen className="w-4 h-4" />
+                        <span>{i18n.language === 'de' ? 'Ausgewählter Ordner:' : 'Selected folder:'}</span>
+                      </div>
+                      <div className="font-mono text-sm font-medium text-gray-900 dark:text-white break-all">
+                        {status.directoryName}
+                      </div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1.5 italic">
+                        {i18n.language === 'de' 
+                          ? '⚠️ Der Browser zeigt aus Sicherheitsgründen nur den Ordnernamen an, nicht den vollständigen Pfad.'
+                          : '⚠️ For security reasons, the browser only shows the folder name, not the full path.'
+                        }
+                      </p>
                     </div>
                   )}
                   
