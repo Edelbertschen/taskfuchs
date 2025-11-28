@@ -284,18 +284,14 @@ export function PinsView() {
     setPinOffset((prev) => Math.min(maxOffset, Math.max(0, prev + step)));
   }, [state.pinColumns.length, state.preferences.columns.visible, state.preferences.columns.pinsVisible]);
 
+  // Using a ref callback approach to ensure the listener is attached when the container mounts
+  const wheelListenerRef = useRef<((e: WheelEvent) => void) | null>(null);
+  
+  // Create the wheel handler once
   useEffect(() => {
-    const handleWheel = (e: WheelEvent) => {
+    wheelListenerRef.current = (e: WheelEvent) => {
       // Only handle if SHIFT is pressed
       if (!e.shiftKey) return;
-      
-      // Check if we're over the scroll container
-      const container = scrollContainerRef.current;
-      if (!container) return;
-      
-      // Check if the event target is within our container
-      const target = e.target as Node;
-      if (!container.contains(target)) return;
       
       const absX = Math.abs(e.deltaX || 0);
       const absY = Math.abs(e.deltaY || 0);
@@ -307,8 +303,23 @@ export function PinsView() {
       const direction = raw > 0 ? 'next' : 'prev';
       navigateColumns(direction);
     };
+  }, [navigateColumns]);
+  
+  // Attach wheel listener to container when it mounts
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container || !wheelListenerRef.current) return;
+    
+    const handler = wheelListenerRef.current;
+    container.addEventListener('wheel', handler, { passive: false });
+    
+    return () => {
+      container.removeEventListener('wheel', handler);
+    };
+  });
 
-    // Listen for column navigation from ColumnSwitcher arrows
+  // Listen for column navigation from ColumnSwitcher arrows
+  useEffect(() => {
     const handleColumnNavigate = (e: CustomEvent<{ direction: 'prev' | 'next' }>) => {
       navigateColumns(e.detail.direction);
     };
@@ -329,13 +340,10 @@ export function PinsView() {
       }
     };
 
-    // Attach to document with passive: false to allow preventDefault
-    document.addEventListener('wheel', handleWheel, { passive: false });
     window.addEventListener('column-navigate', handleColumnNavigate as EventListener);
     document.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      document.removeEventListener('wheel', handleWheel);
       window.removeEventListener('column-navigate', handleColumnNavigate as EventListener);
       document.removeEventListener('keydown', handleKeyDown);
     };

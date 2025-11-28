@@ -589,18 +589,14 @@ export function TaskBoard() {
   };
 
   // Horizontal scroll functionality with Shift + Mouse wheel
+  // Using a ref callback approach to ensure the listener is attached when the container mounts
+  const wheelListenerRef = useRef<((e: WheelEvent) => void) | null>(null);
+  
+  // Create the wheel handler once
   useEffect(() => {
-    const handleWheel = (e: WheelEvent) => {
+    wheelListenerRef.current = (e: WheelEvent) => {
       // Only handle if SHIFT is pressed
       if (!e.shiftKey) return;
-      
-      // Check if we're over the scroll container
-      const container = scrollContainerRef.current;
-      if (!container) return;
-      
-      // Check if the event target is within our container
-      const target = e.target as Node;
-      if (!container.contains(target)) return;
       
       e.preventDefault();
       e.stopPropagation();
@@ -611,15 +607,26 @@ export function TaskBoard() {
       // Dispatch navigation directly
       dispatch({ type: 'NAVIGATE_DATE', payload: direction });
     };
+  }, [dispatch]);
+  
+  // Attach wheel listener to container when it mounts
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container || !wheelListenerRef.current) return;
+    
+    const handler = wheelListenerRef.current;
+    container.addEventListener('wheel', handler, { passive: false });
+    
+    return () => {
+      container.removeEventListener('wheel', handler);
+    };
+  });
 
-    // Listen for column navigation from ColumnSwitcher arrows
+  // Listen for column navigation from ColumnSwitcher arrows
+  useEffect(() => {
     const handleColumnNavigate = (e: CustomEvent<{ direction: 'prev' | 'next' }>) => {
       dispatch({ type: 'NAVIGATE_DATE', payload: e.detail.direction });
     };
-
-    // Attach to document with passive: false to allow preventDefault
-    document.addEventListener('wheel', handleWheel, { passive: false });
-    window.addEventListener('column-navigate', handleColumnNavigate as EventListener);
     
     // Arrow key navigation
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -640,10 +647,10 @@ export function TaskBoard() {
       }
     };
     
+    window.addEventListener('column-navigate', handleColumnNavigate as EventListener);
     document.addEventListener('keydown', handleKeyDown);
     
     return () => {
-      document.removeEventListener('wheel', handleWheel);
       window.removeEventListener('column-navigate', handleColumnNavigate as EventListener);
       document.removeEventListener('keydown', handleKeyDown);
     };

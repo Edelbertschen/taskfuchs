@@ -305,18 +305,15 @@ export function ProjectKanbanBoard() {
   // Horizontal scrolling & navigation:
   // - SHIFT + wheel navigates columns (like Planner)
   // - Arrow keys navigate columns
+  
+  // Using a ref callback approach to ensure the listener is attached when the container mounts
+  const wheelListenerRef = useRef<((e: WheelEvent) => void) | null>(null);
+  
+  // Create the wheel handler once
   useEffect(() => {
-    const handleWheel = (e: WheelEvent) => {
+    wheelListenerRef.current = (e: WheelEvent) => {
       // Only handle if SHIFT is pressed
       if (!e.shiftKey) return;
-      
-      // Check if we're over the scroll container
-      const container = scrollContainerRef.current;
-      if (!container) return;
-      
-      // Check if the event target is within our container
-      const target = e.target as Node;
-      if (!container.contains(target)) return;
       
       const absX = Math.abs(e.deltaX || 0);
       const absY = Math.abs(e.deltaY || 0);
@@ -328,15 +325,26 @@ export function ProjectKanbanBoard() {
       const direction = raw > 0 ? 'next' : 'prev';
       dispatch({ type: 'NAVIGATE_PROJECTS', payload: direction });
     };
+  }, [dispatch]);
+  
+  // Attach wheel listener to container when it mounts
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container || !wheelListenerRef.current) return;
+    
+    const handler = wheelListenerRef.current;
+    container.addEventListener('wheel', handler, { passive: false });
+    
+    return () => {
+      container.removeEventListener('wheel', handler);
+    };
+  });
 
-    // Listen for column navigation from ColumnSwitcher arrows
+  // Listen for column navigation from ColumnSwitcher arrows
+  useEffect(() => {
     const handleColumnNavigate = (e: CustomEvent<{ direction: 'prev' | 'next' }>) => {
       dispatch({ type: 'NAVIGATE_PROJECTS', payload: e.detail.direction });
     };
-
-    // Attach to document with passive: false to allow preventDefault
-    document.addEventListener('wheel', handleWheel, { passive: false });
-    window.addEventListener('column-navigate', handleColumnNavigate as EventListener);
 
     const handleKeyDown = (e: KeyboardEvent) => {
       // Check if we're focused on inputs or modals
@@ -356,10 +364,10 @@ export function ProjectKanbanBoard() {
       }
     };
 
+    window.addEventListener('column-navigate', handleColumnNavigate as EventListener);
     document.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      document.removeEventListener('wheel', handleWheel);
       window.removeEventListener('column-navigate', handleColumnNavigate as EventListener);
       document.removeEventListener('keydown', handleKeyDown);
     };
