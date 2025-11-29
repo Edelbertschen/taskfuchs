@@ -34,6 +34,7 @@ export const GuideCursor: React.FC<GuideCursorProps> = ({
       const targetElement = document.querySelector(targetSelector);
       if (!targetElement) {
         console.warn(`GuideCursor: Target element not found: ${targetSelector}`);
+        // Still call onAnimationComplete so navigation can proceed without visual cursor
         onAnimationComplete?.();
         return;
       }

@@ -1102,9 +1102,23 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
     
     if (!selector) {
       // No cursor needed, navigate directly
+      console.log('[Onboarding] Direct navigation (no selector):', { view, sectionIndex, stepIndex });
       navigateToView(view);
       setCurrentSectionIndex(sectionIndex);
       setCurrentStepIndex(stepIndex);
+      setTimeout(() => setIsAnimating(false), 200);
+      return;
+    }
+    
+    // Check if target element exists before showing cursor
+    const targetElement = document.querySelector(selector);
+    if (!targetElement) {
+      // Element not found, navigate directly without cursor
+      console.log('[Onboarding] Target not found, direct navigation:', { view, sectionIndex, stepIndex, selector });
+      navigateToView(view);
+      setCurrentSectionIndex(sectionIndex);
+      setCurrentStepIndex(stepIndex);
+      setTimeout(() => setIsAnimating(false), 200);
       return;
     }
     
@@ -1115,6 +1129,21 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
     setIsNavigationCursor(true);
     setGuideCursorTarget(selector);
     setShowGuideCursor(true);
+    
+    // Fallback: If cursor doesn't complete within 5 seconds, navigate anyway
+    setTimeout(() => {
+      if (pendingNavigationRef.current) {
+        console.log('[Onboarding] Fallback navigation (timeout):', pendingNavigationRef.current);
+        const { view: v, sectionIndex: s, stepIndex: st } = pendingNavigationRef.current;
+        navigateToView(v);
+        setCurrentSectionIndex(s);
+        setCurrentStepIndex(st);
+        pendingNavigationRef.current = null;
+        setIsNavigationCursor(false);
+        setShowGuideCursor(false);
+        setIsAnimating(false);
+      }
+    }, 5000);
   }, [getViewSelector, navigateToView]);
   
   // Handle guide cursor animation complete
@@ -1122,8 +1151,10 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
     setShowGuideCursor(false);
     
     // Execute pending navigation (for view transitions)
-    if (isNavigationCursor && pendingNavigationRef.current) {
+    // Always check pendingNavigationRef - don't rely on isNavigationCursor state
+    if (pendingNavigationRef.current) {
       const { view, sectionIndex, stepIndex } = pendingNavigationRef.current;
+      console.log('[Onboarding] GuideCursor complete, navigating to:', { view, sectionIndex, stepIndex });
       navigateToView(view);
       setCurrentSectionIndex(sectionIndex);
       setCurrentStepIndex(stepIndex);
@@ -1132,9 +1163,12 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
       
       // Reset animation state after navigation
       setTimeout(() => setIsAnimating(false), 200);
+    } else {
+      // For non-navigation cursors (UI highlights), just reset states
+      setIsNavigationCursor(false);
+      setTimeout(() => setIsAnimating(false), 200);
     }
-    // For non-navigation cursors (UI highlights), cursor just disappears
-  }, [navigateToView, isNavigationCursor]);
+  }, [navigateToView]);
   
   // Go to next step or section - stable version without stale closures
   const handleNext = useCallback(() => {
