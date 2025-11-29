@@ -202,14 +202,6 @@ export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, pro
       position: Date.now()
     };
 
-    console.log('🚀 Task creation debug:', {
-      taskId: newTask.id,
-      title: newTask.title,
-      projectId: newTask.projectId,
-      kanbanColumnId: newTask.kanbanColumnId,
-      columnId: newTask.columnId,
-      context: projectId ? 'project-kanban' : kanbanColumnId ? 'standalone-kanban' : 'planner-or-inbox'
-    });
 
     // Automatic assignment based on target column type (only for non-project contexts)
     if (targetColumn && !projectId && !kanbanColumnId) {

@@ -87,7 +87,18 @@ export function parseTaskInput(input: string): ParseResult {
     }
 
     // Extract date - ONLY set dueDate, match against current title
-    const dateMatches = [...title.matchAll(/(?:^|\s)(heute|morgen|übermorgen|today|tomorrow|(\d{1,2})\.(\d{1,2})\.(?:(\d{4})|(\d{2}))?)(?=\s|$)/g)];
+    // Pattern: "heute", "morgen", "übermorgen", "today", "tomorrow", or dd.mm.yyyy / dd.mm.
+    const DATE_PATTERN = /(?:^|\s)(heute|morgen|übermorgen|today|tomorrow|(\d{1,2})\.(\d{1,2})\.(?:(\d{4})|(\d{2}))?)(?=\s|$)/gi;
+    const dateMatches = [...title.matchAll(DATE_PATTERN)];
+    
+    // Helper function to format date as YYYY-MM-DD without timezone issues
+    const formatDate = (date: Date): string => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+    
     if (dateMatches.length > 0) {
       const dateMatch = dateMatches[0];
       const dateStr = dateMatch[1].toLowerCase();
@@ -99,14 +110,11 @@ export function parseTaskInput(input: string): ParseResult {
       dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
       
       if (dateStr === 'heute' || dateStr === 'today') {
-        dueDate = today.toISOString().split('T')[0];
-        // NO automatic columnId assignment - task stays in target column
+        dueDate = formatDate(today);
       } else if (dateStr === 'morgen' || dateStr === 'tomorrow') {
-        dueDate = tomorrow.toISOString().split('T')[0];
-        // NO automatic columnId assignment - task stays in target column
+        dueDate = formatDate(tomorrow);
       } else if (dateStr === 'übermorgen') {
-        dueDate = dayAfterTomorrow.toISOString().split('T')[0];
-        // NO automatic columnId assignment - task stays in target column
+        dueDate = formatDate(dayAfterTomorrow);
       } else if (dateMatch[2] && dateMatch[3]) {
         // Parse dd.mm.yyyy or dd.mm. format
         const day = parseInt(dateMatch[2]);
@@ -120,13 +128,11 @@ export function parseTaskInput(input: string): ParseResult {
         }
         
         const parsedDate = new Date(year, month, day);
-        dueDate = parsedDate.toISOString().split('T')[0];
-        
-        // NO automatic columnId assignment - task stays in target column
+        dueDate = formatDate(parsedDate);
       }
       
-      // Remove date from title using current match
-      title = title.replace(/(?:^|\s)(heute|morgen|übermorgen|today|tomorrow|(\d{1,2})\.(\d{1,2})\.(?:(\d{4})|(\d{2}))?)(?=\s|$)/g, ' ').trim();
+      // Remove date from title - create new regex to avoid lastIndex issues
+      title = title.replace(/(?:^|\s)(heute|morgen|übermorgen|today|tomorrow|(\d{1,2})\.(\d{1,2})\.(?:(\d{4})|(\d{2}))?)(?=\s|$)/gi, ' ').trim();
     }
 
     // Extract column - ONLY explicit @column assignments set columnId (match against current title)

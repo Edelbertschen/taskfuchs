@@ -861,6 +861,13 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
     // Always parse input for smart suggestions - no restrictions
     if (value.trim()) {
       const result = parseTaskInput(value);
+      console.log('📝 TaskModal parse result:', {
+        input: value,
+        success: result.success,
+        title: result.task?.title,
+        dueDate: result.task?.dueDate,
+        priority: result.task?.priority
+      });
       setParseResult(result);
     } else {
       setParseResult(null);
