@@ -15,9 +15,9 @@ export const GuideCursor: React.FC<GuideCursorProps> = ({
   targetSelector, 
   onAnimationComplete,
   accentColor,
-  delay = 400,
+  delay = 150,        // Reduced from 400ms
   showClick = true,
-  holdDuration = 1000
+  holdDuration = 400  // Reduced from 1000ms
 }) => {
   const [position, setPosition] = useState({ x: -100, y: -100 });
   const [targetPosition, setTargetPosition] = useState({ x: 0, y: 0 });
@@ -45,11 +45,11 @@ export const GuideCursor: React.FC<GuideCursorProps> = ({
 
       // Start position (slightly offset from target)
       setPosition({ 
-        x: targetX - 200, 
-        y: targetY - 100 
+        x: targetX - 120, 
+        y: targetY - 60 
       });
 
-      // Trigger movement animation
+      // Trigger movement animation immediately
       setTimeout(() => {
         setTargetPosition({ x: targetX, y: targetY });
         setIsAnimating(true);
@@ -58,24 +58,24 @@ export const GuideCursor: React.FC<GuideCursorProps> = ({
         setTimeout(() => {
           if (showClick) {
             setIsClicking(true);
-            // After click, fade out and complete
+            // After click, fade out and complete quickly
             setTimeout(() => {
               setIsVisible(false);
               setTimeout(() => {
                 onAnimationComplete?.();
-              }, 300);
-            }, 600);
+              }, 150);  // Reduced from 300ms
+            }, 350);   // Reduced from 600ms
           } else {
             // Just hold at position, then fade out
             setTimeout(() => {
               setIsVisible(false);
               setTimeout(() => {
                 onAnimationComplete?.();
-              }, 300);
+              }, 150);  // Reduced from 300ms
             }, holdDuration);
           }
-        }, 800);
-      }, 100);
+        }, 450);  // Reduced from 800ms
+      }, 50);    // Reduced from 100ms
     }, delay);
 
     return () => clearTimeout(showTimeout);
@@ -96,7 +96,7 @@ export const GuideCursor: React.FC<GuideCursorProps> = ({
 
       {/* Guide Cursor */}
       <div
-        className="fixed pointer-events-none transition-all duration-700 ease-out"
+        className="fixed pointer-events-none transition-all duration-400 ease-out"
         style={{
           left: isAnimating ? targetPosition.x : position.x,
           top: isAnimating ? targetPosition.y : position.y,

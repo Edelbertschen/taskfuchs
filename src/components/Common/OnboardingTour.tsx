@@ -796,7 +796,7 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
       const timer = setTimeout(() => {
         setShowGuideCursor(true);
         setGuideCursorTarget(currentStep.guideCursorTarget || '');
-      }, 300);
+      }, 100);
       
       return () => clearTimeout(timer);
     } else {
@@ -1130,7 +1130,7 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
     setGuideCursorTarget(selector);
     setShowGuideCursor(true);
     
-    // Fallback: If cursor doesn't complete within 5 seconds, navigate anyway
+    // Fallback: If cursor doesn't complete within 2 seconds, navigate anyway
     setTimeout(() => {
       if (pendingNavigationRef.current) {
         console.log('[Onboarding] Fallback navigation (timeout):', pendingNavigationRef.current);
@@ -1143,7 +1143,7 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
         setShowGuideCursor(false);
         setIsAnimating(false);
       }
-    }, 5000);
+    }, 2000);
   }, [getViewSelector, navigateToView]);
   
   // Handle guide cursor animation complete
@@ -1184,7 +1184,7 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
     if (currentStepIndex < stepsCount - 1) {
       // More steps in current section - no navigation needed
       setCurrentStepIndex(currentStepIndex + 1);
-      setTimeout(() => setIsAnimating(false), 200);
+      setTimeout(() => setIsAnimating(false), 100);
     } else if (currentSectionIndex < allTourSections.length - 1) {
       // Move to next section
       const nextSection = allTourSections[currentSectionIndex + 1];
@@ -1206,7 +1206,7 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
         navigateToView(nextView);
         setCurrentSectionIndex(currentSectionIndex + 1);
         setCurrentStepIndex(0);
-        setTimeout(() => setIsAnimating(false), 300);
+        setTimeout(() => setIsAnimating(false), 150);
       }
     } else {
       // No more sections
@@ -1223,7 +1223,7 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
     if (currentStepIndex > 0) {
       // Previous step in current section - no navigation needed
       setCurrentStepIndex(currentStepIndex - 1);
-      setTimeout(() => setIsAnimating(false), 200);
+      setTimeout(() => setIsAnimating(false), 100);
     } else if (currentSectionIndex > 0) {
       // Move to previous section, last step with guide cursor
       const prevSection = allTourSections[currentSectionIndex - 1];
@@ -1794,9 +1794,9 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
           targetSelector={guideCursorTarget}
           accentColor={accentColor}
           onAnimationComplete={handleGuideCursorComplete}
-          delay={300}
+          delay={100}
           showClick={currentStep?.guideCursorClickAnimation ?? true}
-          holdDuration={1500}
+          holdDuration={300}
         />
                     )}
                   </div>
