@@ -386,7 +386,7 @@ export function PinsView() {
     }));
   }, [pinOffset, state.pinColumns.length, state.preferences.columns.pinsVisible, state.preferences.columns.visible]);
 
-  // Tasks grouped by pin column
+  // Tasks grouped by pin column with filtering
   const tasksByPinColumn = useMemo(() => {
     const tasksByColumn: Record<string, Task[]> = {};
     
@@ -395,7 +395,30 @@ export function PinsView() {
     });
 
     state.tasks
-      .filter(task => task.pinColumnId && !task.completed && !task.archived)
+      .filter(task => {
+        // Basic filters
+        if (!task.pinColumnId || task.completed || task.archived) return false;
+        
+        // Priority filter
+        if (priorityFilter !== 'all') {
+          const taskPriority = task.priority || 'none';
+          if (priorityFilter === 'none') {
+            if (taskPriority !== 'none' && task.priority) return false;
+          } else {
+            if (taskPriority !== priorityFilter) return false;
+          }
+        }
+        
+        // Tag filters
+        if (tagFilters.length > 0) {
+          const hasMatchingTag = tagFilters.some(filterTag => 
+            task.tags.includes(filterTag)
+          );
+          if (!hasMatchingTag) return false;
+        }
+        
+        return true;
+      })
       .forEach(task => {
         if (tasksByColumn[task.pinColumnId!]) {
           tasksByColumn[task.pinColumnId!].push(task);
@@ -407,7 +430,7 @@ export function PinsView() {
     });
 
     return tasksByColumn;
-  }, [state.tasks, state.pinColumns]);
+  }, [state.tasks, state.pinColumns, priorityFilter, tagFilters]);
 
   // Drag handlers
   const handleDragStart = (event: DragStartEvent) => {
@@ -1076,13 +1099,34 @@ export function PinsView() {
                       <Filter className="w-4 h-4" style={{ color: state.preferences.accentColor }} />
                     </div>
                     <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter</h3>
+                    {(priorityFilter !== 'all' || tagFilters.length > 0) && (
+                      <span 
+                        className="px-2 py-0.5 rounded-full text-xs font-bold text-white"
+                        style={{ backgroundColor: state.preferences.accentColor }}
+                      >
+                        {(priorityFilter !== 'all' ? 1 : 0) + tagFilters.length}
+                      </span>
+                    )}
                   </div>
-                  <button
-                    onClick={() => setShowFilterPanel(false)}
-                    className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
+                  <div className="flex items-center space-x-2">
+                    {(priorityFilter !== 'all' || tagFilters.length > 0) && (
+                      <button
+                        onClick={() => {
+                          setPriorityFilter('all');
+                          setTagFilters([]);
+                        }}
+                        className="px-2 py-1 text-xs font-medium text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-all duration-200"
+                      >
+                        Zurücksetzen
+                      </button>
+                    )}
+                    <button
+                      onClick={() => setShowFilterPanel(false)}
+                      className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
                 
                 {/* Priority Filters */}

@@ -933,12 +933,21 @@ export function ProjectKanbanBoard() {
       }
     }
 
-    // Apply tag filters
-    if (state.activeTagFilters.length > 0) {
-      const hasAllActiveTags = state.activeTagFilters.every(filterTag =>
+    // Apply tag filters (using project-specific filters)
+    if (state.viewState.projectKanban.tagFilters.length > 0) {
+      const hasAllActiveTags = state.viewState.projectKanban.tagFilters.every(filterTag =>
         task.tags.includes(filterTag)
       );
       if (!hasAllActiveTags) {
+        return false;
+      }
+    }
+    
+    // Apply priority filters (using project-specific filters)
+    if (state.viewState.projectKanban.priorityFilters.length > 0) {
+      const taskPriority = task.priority || 'none';
+      const hasActivePriority = state.viewState.projectKanban.priorityFilters.includes(taskPriority);
+      if (!hasActivePriority) {
         return false;
       }
     }
