@@ -862,7 +862,7 @@ export function UserGuide({ isOpen, onClose }: UserGuideProps) {
   if (!isOpen) return null;
 
   const getBackgroundImagePath = () => {
-    return '/backgrounds/bg12.png';
+    return '/backgrounds/bg12.webp';
   };
 
   return createPortal(
