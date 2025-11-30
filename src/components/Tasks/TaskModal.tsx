@@ -24,6 +24,7 @@ import { format, addDays, startOfDay, isSameDay, addMonths, subMonths, startOfMo
 import { de } from 'date-fns/locale';
 import { playCompletionSound } from '../../utils/soundUtils';
 import { RecurringTaskSection } from './RecurringTaskSection';
+import { Celebration } from '../Common/Celebration';
 
 
 interface TaskModalProps {
@@ -106,6 +107,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
     kanbanColumnId: task?.kanbanColumnId,
   });
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
   const [showNotesOverlay, setShowNotesOverlay] = useState(false);
   const [showMarkdownHelp, setShowMarkdownHelp] = useState(false);
   const [notesSearchQuery, setNotesSearchQuery] = useState('');
@@ -1179,6 +1181,11 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
       // Mark task as completed
       const newCompletedState = true;
       
+      // Show celebration if enabled
+      if (state.preferences.enableCelebration) {
+        setShowCelebration(true);
+      }
+      
       // Play completion sound
       if (state.preferences.sounds) {
         playCompletionSound(state.preferences.completionSound, state.preferences.soundVolume).catch(console.warn);
@@ -1193,8 +1200,14 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
         }
       });
 
-      // Close modal
-      onClose();
+      // Close modal after a short delay if celebration is shown, otherwise immediately
+      if (state.preferences.enableCelebration) {
+        setTimeout(() => {
+          onClose();
+        }, 500);
+      } else {
+        onClose();
+      }
     }
   }, [task, dispatch, state.preferences, onClose]);
 
@@ -4222,6 +4235,13 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
   return (
     <>
       {createPortal(modalContent, document.body)}
+      {/* Celebration effect for task completion */}
+      {showCelebration && (
+        <Celebration 
+          isVisible={showCelebration} 
+          onComplete={() => setShowCelebration(false)} 
+        />
+      )}
     </>
   );
 } 

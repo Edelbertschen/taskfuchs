@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useApp } from '../../context/AppContext';
-import { getFuchsImagePath } from '../../utils/imageUtils';
 
 interface CelebrationProps {
   isVisible: boolean;
@@ -137,9 +136,9 @@ export function Celebration({ isVisible, onComplete }: CelebrationProps) {
             }}
           >
             <img 
-              src={getFuchsImagePath()} 
-              alt="Celebration Fox" 
-              className="w-full h-full"
+              src="/salto.png" 
+              alt="Celebration" 
+              className="w-full h-full object-contain"
               style={{
                 animation: 'fox-wiggle-enhanced 0.8s ease-in-out infinite',
               }}
