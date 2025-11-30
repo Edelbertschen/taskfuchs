@@ -1611,7 +1611,7 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
                   <img 
                     src={getFoxImagePath()}
                     alt="" 
-                    className="w-7 h-7 object-contain flex-shrink-0"
+                    className="w-12 h-12 object-contain flex-shrink-0"
                     onError={(e) => {
                       const img = e.target as HTMLImageElement;
                       if (img.src.includes('/3d_fox.png')) img.src = './3d_fox.png';
@@ -1620,7 +1620,7 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
                   <p className="text-sm font-medium" style={{ color: accentColor }}>
                     {t(currentStep.foxMessage)}
                   </p>
-                      </div>
+                </div>
               )}
               
               {/* Task Modal hint */}
