@@ -409,6 +409,8 @@ const Settings = React.memo(() => {
       '/backgrounds/bg13.png',
       '/backgrounds/bg14.png',
       '/backgrounds/bg15.png',
+      '/backgrounds/bg16.png',
+      '/backgrounds/bg17.png',
       ...Array.from({ length: 11 }, (_, i) => `/backgrounds/bg${i + 1}.jpg`),
     ];
     const savedGallery = localStorage.getItem('backgroundImageGallery');
@@ -4392,9 +4394,66 @@ const Settings = React.memo(() => {
                         </div>
                       )}
                       
+                      {/* Light/Dark Mode Background Pair - bg16.png & bg17.png */}
+                      {backgroundImageGallery.some(url => url.includes('bg16.png') || url.includes('bg17.png')) && (
+                        <div 
+                          className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all col-span-2 ${
+                            state.preferences.backgroundImage?.includes('bg16.png') || state.preferences.backgroundImage?.includes('bg17.png')
+                              ? 'border-2 ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800'
+                              : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+                          }`}
+                          style={(state.preferences.backgroundImage?.includes('bg16.png') || state.preferences.backgroundImage?.includes('bg17.png')) ? {
+                            borderColor: getAccentColorStyles().border.borderColor,
+                            boxShadow: `0 0 0 2px ${getAccentColorStyles().bg.backgroundColor}20, 0 0 0 4px ${getAccentColorStyles().bg.backgroundColor}`
+                          } : {}}
+                          onClick={() => handleSelectImageFromGallery('/backgrounds/bg16.png')}
+                        >
+                          <div className="flex h-20">
+                            {/* Light Mode Half */}
+                            <div className="relative flex-1 overflow-hidden">
+                              <img 
+                                src="/backgrounds/bg16.png" 
+                                alt="Light Mode Hintergrund 3"
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute bottom-1 left-1 bg-white/90 dark:bg-white/80 rounded px-1.5 py-0.5 flex items-center gap-1">
+                                <Sun className="w-3 h-3 text-amber-500" />
+                                <span className="text-[10px] font-medium text-gray-700">Light</span>
+                              </div>
+                            </div>
+                            {/* Divider */}
+                            <div className="w-px bg-gray-300 dark:bg-gray-600" />
+                            {/* Dark Mode Half */}
+                            <div className="relative flex-1 overflow-hidden">
+                              <img 
+                                src="/backgrounds/bg17.png" 
+                                alt="Dark Mode Hintergrund 3"
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute bottom-1 right-1 bg-gray-900/90 dark:bg-gray-900/80 rounded px-1.5 py-0.5 flex items-center gap-1">
+                                <Moon className="w-3 h-3 text-blue-400" />
+                                <span className="text-[10px] font-medium text-gray-200">Dark</span>
+                              </div>
+                            </div>
+                          </div>
+                          {/* Hover overlay */}
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-opacity" />
+                          {/* Selected indicator */}
+                          {(state.preferences.backgroundImage?.includes('bg16.png') || state.preferences.backgroundImage?.includes('bg17.png')) && (
+                            <div className="absolute bottom-1 left-1/2 -translate-x-1/2">
+                              <div className="text-white text-xs px-2 py-0.5 rounded text-center font-medium flex items-center gap-1" 
+                                   style={{ backgroundColor: getAccentColorStyles().bg.backgroundColor }}>
+                                <Check className="w-3 h-3" />
+                                {settings_appearance.current()}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      
                       {/* Regular Gallery Images (excluding paired backgrounds) */}
                       {backgroundImageGallery
-                        .filter(url => !url.includes('bg12.png') && !url.includes('bg13.png') && !url.includes('bg14.png') && !url.includes('bg15.png'))
+                        .filter(url => !url.includes('bg12.png') && !url.includes('bg13.png') && !url.includes('bg14.png') && !url.includes('bg15.png') && !url.includes('bg16.png') && !url.includes('bg17.png'))
                         .map((imageUrl, index) => (
                         <div 
                           key={index}
@@ -4488,6 +4547,8 @@ const Settings = React.memo(() => {
                             '/backgrounds/bg13.png',
                             '/backgrounds/bg14.png',
                             '/backgrounds/bg15.png',
+                            '/backgrounds/bg16.png',
+                            '/backgrounds/bg17.png',
                             ...Array.from({ length: 11 }, (_, i) => `/backgrounds/bg${i + 1}.jpg`),
                           ];
                           setBackgroundImageGallery(defaults);
@@ -7341,7 +7402,7 @@ const Settings = React.memo(() => {
                       const { backupService } = await import('../../utils/backupService');
                       const success = await backupService.pickDirectory();
                       if (success) {
-                        dispatch({ type: 'UPDATE_PREFERENCES', payload: { backup: { ...(state.preferences.backup||{ intervalMinutes: 60, notify: true }), enabled: true } } });
+                            dispatch({ type: 'UPDATE_PREFERENCES', payload: { backup: { ...(state.preferences.backup||{ intervalMinutes: 60, notify: true }), enabled: true } } });
                       } else if (!backupService.supportsFileSystemAPI()) {
                         alert(t('settings_data.browserNoSupport'));
                       }
@@ -7375,7 +7436,7 @@ const Settings = React.memo(() => {
                       };
                       const result = await backupService.createBackup(data);
                       if (result.success) {
-                        const prev = state.preferences.backup || { enabled: true, intervalMinutes: 60, notify: true };
+                      const prev = state.preferences.backup || { enabled: true, intervalMinutes: 60, notify: true };
                         dispatch({ type: 'UPDATE_PREFERENCES', payload: { backup: { enabled: prev.enabled, intervalMinutes: prev.intervalMinutes, notify: prev.notify, lastSuccess: result.timestamp } } });
                       } else {
                         alert(result.error || 'Backup failed');
