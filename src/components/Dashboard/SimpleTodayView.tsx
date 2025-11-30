@@ -1953,8 +1953,49 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
                     )}
                   </div>
                   
-                  {/* Regular Gallery Images */}
-                  {['/backgrounds/bg1.jpg', '/backgrounds/bg2.jpg', '/backgrounds/bg3.jpg', '/backgrounds/bg4.jpg', '/backgrounds/bg5.jpg', '/backgrounds/bg6.jpg', '/backgrounds/bg7.jpg', '/backgrounds/bg8.jpg', '/backgrounds/bg9.jpg', '/backgrounds/bg10.jpg', '/backgrounds/bg11.jpg'].map((imageUrl) => (
+                  {/* Light/Dark Mode Pair - bg18 & bg19 */}
+                  <div 
+                    className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all col-span-2 ${
+                      state.preferences.backgroundImage?.includes('bg18.png') || state.preferences.backgroundImage?.includes('bg19.png')
+                        ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800'
+                        : 'border-gray-200 dark:border-gray-600 hover:border-gray-300'
+                    }`}
+                    style={(state.preferences.backgroundImage?.includes('bg18.png') || state.preferences.backgroundImage?.includes('bg19.png')) ? {
+                      borderColor: state.preferences.accentColor,
+                      boxShadow: `0 0 0 2px ${state.preferences.accentColor}20, 0 0 0 4px ${state.preferences.accentColor}`
+                    } : {}}
+                    onClick={() => dispatch({ type: 'UPDATE_PREFERENCES', payload: { backgroundImage: '/backgrounds/bg18.png', backgroundType: 'image' }})}
+                  >
+                    <div className="flex h-16">
+                      <div className="relative flex-1 overflow-hidden">
+                        <img src="/backgrounds/bg18.png" alt="Light 4" className="w-full h-full object-cover" />
+                        <div className="absolute bottom-1 left-1 bg-white/90 rounded px-1 py-0.5 flex items-center gap-0.5">
+                          <Sun className="w-2 h-2 text-amber-500" />
+                          <span className="text-[8px] font-medium text-gray-700">Light</span>
+                        </div>
+                      </div>
+                      <div className="w-px bg-gray-300 dark:bg-gray-600" />
+                      <div className="relative flex-1 overflow-hidden">
+                        <img src="/backgrounds/bg19.png" alt="Dark 4" className="w-full h-full object-cover" />
+                        <div className="absolute bottom-1 right-1 bg-gray-900/90 rounded px-1 py-0.5 flex items-center gap-0.5">
+                          <Moon className="w-2 h-2 text-blue-400" />
+                          <span className="text-[8px] font-medium text-gray-200">Dark</span>
+                        </div>
+                      </div>
+                    </div>
+                    {(state.preferences.backgroundImage?.includes('bg18.png') || state.preferences.backgroundImage?.includes('bg19.png')) && (
+                      <div className="absolute bottom-1 left-1/2 -translate-x-1/2">
+                        <div className="text-white text-[9px] px-1.5 py-0.5 rounded font-medium flex items-center gap-0.5" 
+                             style={{ backgroundColor: state.preferences.accentColor }}>
+                          <Check className="w-2 h-2" />
+                          Aktiv
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Regular Gallery Images (including bg20) */}
+                  {['/backgrounds/bg20.png', '/backgrounds/bg1.jpg', '/backgrounds/bg2.jpg', '/backgrounds/bg3.jpg', '/backgrounds/bg4.jpg', '/backgrounds/bg5.jpg', '/backgrounds/bg6.jpg', '/backgrounds/bg7.jpg', '/backgrounds/bg8.jpg', '/backgrounds/bg9.jpg', '/backgrounds/bg10.jpg', '/backgrounds/bg11.jpg'].map((imageUrl) => (
                     <div 
                       key={imageUrl}
                       className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
