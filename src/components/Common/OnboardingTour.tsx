@@ -419,7 +419,7 @@ const pwaSections: TourSection[] = isPWA() ? [
         title: { de: 'Backups sind wichtig!', en: 'Backups are important!' },
         text: { de: 'Da deine Daten lokal gespeichert werden, empfehlen sich regelmäßige Backups. Der Backup-Button in der Sidebar ermöglicht schnelles Sichern am Ende jedes Arbeitstages.', en: 'Since your data is stored locally, regular backups are recommended. The backup button in the sidebar enables quick saving at the end of each work day.' },
         foxMessage: { de: 'Lieber einmal zu oft sichern!', en: 'Better safe than sorry!' },
-        position: 'center',
+        position: 'center-right',
         zoomElement: '[data-backup-button]'
       },
       {
@@ -465,7 +465,7 @@ function LanguageSelectionModal({ isDark, accentColor, onSelect, onSkip }: Langu
           <img 
             src={getFoxImagePath()}
             alt="TaskFuchs" 
-            className="w-[120px] h-[120px] object-contain"
+            className="w-[136px] h-[136px] object-contain"
             onError={(e) => {
               const img = e.target as HTMLImageElement;
               if (img.src.includes('/3d_fox.png')) img.src = './3d_fox.png';
@@ -960,7 +960,7 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
     // No cleanup here - timer stays running until onboarding ends
   }, [currentSectionIndex, currentStepIndex, state.tasks, state.activeTimer?.isActive, state.preferences.timerDisplayMode, dispatch, allTourSections]);
   
-  // Zoom effect for elements (Asterix-style magnifying glass effect)
+  // Highlight effect for elements (subtle glow on the element itself)
   useEffect(() => {
     const currentSection = allTourSections[currentSectionIndex];
     const currentStep = currentSection?.steps[currentStepIndex];
@@ -969,63 +969,34 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
       const timer = setTimeout(() => {
         const el = document.querySelector(currentStep.zoomElement!) as HTMLElement;
         if (el) {
-          // Create zoom overlay
-          const overlay = document.createElement('div');
-          overlay.id = 'onboarding-zoom-overlay';
-          overlay.style.cssText = `
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 9998;
-            pointer-events: none;
-            transition: opacity 0.5s ease;
-          `;
+          // Add highlight class directly to the element
+          el.classList.add('onboarding-element-highlight');
+          el.style.setProperty('--highlight-color', accentColor);
           
-          // Create zoom container
-          const zoomContainer = document.createElement('div');
-          zoomContainer.id = 'onboarding-zoom-container';
-          
-          // Get element position
-          const rect = el.getBoundingClientRect();
-          const centerX = window.innerWidth / 2;
-          const centerY = window.innerHeight / 2;
-          
-          zoomContainer.style.cssText = `
-            position: fixed;
-            left: ${centerX}px;
-            top: ${centerY}px;
-            transform: translate(-50%, -50%) scale(3);
-            z-index: 9999;
-            border-radius: 50%;
-            box-shadow: 0 0 0 4px var(--accent-color, #22d3ee), 0 0 60px rgba(0,0,0,0.5);
-            overflow: hidden;
-            width: 120px;
-            height: 120px;
-            transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-            animation: zoom-pulse 2s ease-in-out infinite;
-          `;
-          
-          // Clone the element
-          const clone = el.cloneNode(true) as HTMLElement;
-          clone.style.cssText = `
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-          `;
-          
-          zoomContainer.appendChild(clone);
-          document.body.appendChild(overlay);
-          document.body.appendChild(zoomContainer);
-          
-          // Add animation keyframes if not exists
-          if (!document.getElementById('zoom-keyframes')) {
+          // Add keyframes if not exists
+          if (!document.getElementById('element-highlight-keyframes')) {
             const style = document.createElement('style');
-            style.id = 'zoom-keyframes';
+            style.id = 'element-highlight-keyframes';
             style.textContent = `
-              @keyframes zoom-pulse {
-                0%, 100% { box-shadow: 0 0 0 4px var(--accent-color, #22d3ee), 0 0 60px rgba(0,0,0,0.5); }
-                50% { box-shadow: 0 0 0 6px var(--accent-color, #22d3ee), 0 0 80px rgba(0,0,0,0.6); }
+              .onboarding-element-highlight {
+                position: relative;
+                z-index: 10000 !important;
+                animation: element-glow 1.5s ease-in-out infinite !important;
+                border-radius: 12px;
+              }
+              @keyframes element-glow {
+                0%, 100% { 
+                  box-shadow: 0 0 0 3px var(--highlight-color, #f97316), 
+                              0 0 20px var(--highlight-color, #f97316),
+                              0 0 40px rgba(249, 115, 22, 0.4) !important;
+                  transform: scale(1.05);
+                }
+                50% { 
+                  box-shadow: 0 0 0 5px var(--highlight-color, #f97316), 
+                              0 0 30px var(--highlight-color, #f97316),
+                              0 0 60px rgba(249, 115, 22, 0.5) !important;
+                  transform: scale(1.1);
+                }
               }
             `;
             document.head.appendChild(style);
@@ -1035,8 +1006,12 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
       
       return () => {
         clearTimeout(timer);
-        document.getElementById('onboarding-zoom-overlay')?.remove();
-        document.getElementById('onboarding-zoom-container')?.remove();
+        // Remove highlight from element
+        const el = document.querySelector(currentStep.zoomElement!) as HTMLElement;
+        if (el) {
+          el.classList.remove('onboarding-element-highlight');
+          el.style.removeProperty('--highlight-color');
+        }
       };
     }
   }, [currentSectionIndex, currentStepIndex, allTourSections]);
@@ -1474,7 +1449,7 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
                 <img 
                   src={getFoxImagePath()}
                 alt="TaskFuchs" 
-                  className="w-[144px] h-[144px] object-contain"
+                  className="w-[164px] h-[164px] object-contain"
                   onError={(e) => {
                     const img = e.target as HTMLImageElement;
                     if (img.src.includes('/3d_fox.png')) img.src = './3d_fox.png';
@@ -1878,7 +1853,7 @@ export function SplashModal({ isOpen, onClose, onStartOnboarding, showOnboarding
           <img 
             src={getFoxImagePath()}
             alt="TaskFuchs" 
-            className="w-[120px] h-[120px] object-contain"
+            className="w-[136px] h-[136px] object-contain"
             onError={(e) => {
               const img = e.target as HTMLImageElement;
               if (img.src.includes('/3d_fox.png')) img.src = './3d_fox.png';

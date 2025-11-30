@@ -1992,7 +1992,7 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
               <img 
                 src={getFuchsImagePath()} 
                 alt="Fuchs Logo" 
-                className="w-[72px] h-[72px] object-contain"
+                className="w-[86px] h-[86px] object-contain"
                 onError={(e) => { (e.currentTarget as HTMLImageElement).src = getImagePath('Fuchs.svg'); }}
               />
               <p className={`text-4xl font-medium tracking-wide ${
