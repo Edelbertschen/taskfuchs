@@ -129,7 +129,7 @@ export function Celebration({ isVisible, onComplete }: CelebrationProps) {
         {/* Tanzender Fuchs mit verbesserter Animation */}
         <div className="relative z-10 mb-8">
           <div 
-            className="w-40 h-40 relative"
+            className="w-64 h-64 relative"
             style={{
               animation: 'fox-dance-enhanced 1.5s ease-in-out infinite',
               filter: `drop-shadow(0 0 20px ${state.preferences.accentColor}50)`,

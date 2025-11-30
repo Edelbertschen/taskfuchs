@@ -2231,17 +2231,6 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
         ) : null;
       })()}
 
-      {/* Smart Task Modal - Tasks added here are dated for today */}
-      {showSmartTaskModal && createPortal(
-        <SmartTaskModal 
-          isOpen={showSmartTaskModal}
-          onClose={handleCloseSmartTaskModal}
-          placeholder={forms.placeholderSmartTask()}
-          defaultDate={format(new Date(), 'yyyy-MM-dd')}
-        />,
-        document.body
-      )}
-
       {/* Note Modal */}
       {showNoteModal && selectedNote && (
         <div 
