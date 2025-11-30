@@ -626,7 +626,7 @@ const TaskColumn = React.memo(({
         onContextMenu={handleContextMenu}
         className={`group flex-1 min-w-0 h-auto flex flex-col relative ${
           isMinimalDesign
-            ? 'px-4'
+                ? 'px-4'
             : 'glass-effect rounded-lg'
         } overflow-hidden ${
           isFocusMode

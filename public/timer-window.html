@@ -283,7 +283,7 @@
     <div class="timer-section">
       <div class="timer-info">
         <div class="timer-row">
-          <div class="timer-display" id="timerDisplay">00:00</div>
+        <div class="timer-display" id="timerDisplay">00:00</div>
           <span class="estimated-label" id="estimatedLabel"></span>
           <span class="paused-badge" id="pausedBadge">⏸</span>
         </div>
@@ -389,20 +389,20 @@
 
       // Update timer state
       if (timer) {
-        const elapsedMinutes = timer.elapsedTime || 0;
+      const elapsedMinutes = timer.elapsedTime || 0;
         timerStart = Date.now();
         timerMinutes = elapsedMinutes;
         isPaused = timer.isPaused || false;
         estimatedMinutes = timer.estimatedTime || 0;
 
         // Update timer display
-        const timerEl = document.getElementById('timerDisplay');
-        timerEl.textContent = formatTime(elapsedMinutes, true);
+      const timerEl = document.getElementById('timerDisplay');
+      timerEl.textContent = formatTime(elapsedMinutes, true);
 
         // Overtime handling
         const isOvertime = estimatedMinutes > 0 && elapsedMinutes > estimatedMinutes;
-        timerEl.classList.toggle('overtime', isOvertime);
-        
+      timerEl.classList.toggle('overtime', isOvertime);
+      
         // Progress bar
         const progressFill = document.getElementById('progressFill');
         if (estimatedMinutes > 0) {
@@ -417,12 +417,12 @@
         const estimatedEl = document.getElementById('estimatedLabel');
         if (estimatedMinutes > 0) {
           estimatedEl.textContent = `von ${formatTimeShort(estimatedMinutes)}`;
-        } else {
-          estimatedEl.textContent = '';
-        }
+      } else {
+        estimatedEl.textContent = '';
+      }
 
         // Update pause button icon
-        const pauseIcon = document.getElementById('pauseIcon');
+      const pauseIcon = document.getElementById('pauseIcon');
         const pauseBtn = document.getElementById('pauseBtn');
         if (isPaused) {
           pauseIcon.setAttribute('d', 'M8 5v14l11-7z'); // Play icon
@@ -465,7 +465,7 @@
           
           // Update overtime status in real-time
           if (estimatedMinutes > 0) {
-            const now = Date.now();
+          const now = Date.now();
             const elapsedMs = now - timerStart;
             const currentMinutes = timerMinutes + (elapsedMs / (60 * 1000));
             const isOvertime = currentMinutes > estimatedMinutes;

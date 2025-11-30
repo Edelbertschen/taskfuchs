@@ -247,14 +247,14 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
               
               {/* Task Title - left aligned */}
               {activeTimer && task && (
-                <button
-                  onClick={handleOpenTask}
+                  <button
+                    onClick={handleOpenTask}
                   className="text-xs font-medium truncate max-w-[200px] hover:opacity-80 transition-opacity"
-                  style={{ color: state.preferences.accentColor }}
+                    style={{ color: state.preferences.accentColor }}
                   title={task.title}
-                >
+                  >
                   {task.title}
-                </button>
+                  </button>
               )}
 
               {/* Timer Display - elegant center */}
@@ -306,7 +306,7 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
                     <Square className="w-2.5 h-2.5" fill="currentColor" />
                   </button>
                 </div>
-              )}
+                  )}
             </div>
           </div>
         </div>

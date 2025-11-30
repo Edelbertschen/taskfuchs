@@ -149,12 +149,12 @@ export function FloatingTimerModal({ isVisible, onOpenTask }: FloatingTimerModal
             >
               {formatTimeWithSecondsExact(activeTimer.elapsedTime || 0)}
             </div>
-            {activeTimer.estimatedTime && (
+              {activeTimer.estimatedTime && (
               <div className="flex items-center gap-1.5 mt-0.5">
                 <span className="text-[10px] text-zinc-400">
                   von {formatTimeShort(activeTimer.estimatedTime)}
                 </span>
-              </div>
+            </div>
             )}
           </div>
 

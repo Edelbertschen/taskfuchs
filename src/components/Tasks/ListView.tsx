@@ -1730,13 +1730,13 @@ export function ListView({ onTaskEdit, onTaskView, onTaskPlay }: ListViewProps) 
     {/* Project Timebudget Modal */}
     {showProjectTimebudgetModal && (
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                <ProjectTimebudgetDetailModal 
-          project={showProjectTimebudgetModal}
-          isOpen={true}
-          onClose={() => setShowProjectTimebudgetModal(null)}
-        />
-     </div>
-   )}
+                 <ProjectTimebudgetDetailModal 
+           project={showProjectTimebudgetModal}
+           isOpen={true}
+           onClose={() => setShowProjectTimebudgetModal(null)}
+         />
+      </div>
+    )}
     </>
   );
-}
+} 

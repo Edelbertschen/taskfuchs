@@ -43,11 +43,11 @@ export function TimerWarningModal({
   };
 
   const content = {
-    title: 'Zeit erreicht',
-    icon: <Clock className="w-6 h-6" style={{ color: state.preferences.accentColor }} />,
-    description: `Die geschätzte Zeit für "${taskTitle}" ist erreicht.`,
-    additionalInfo: timeExceeded > 0 ? `Überschreitung: ${Math.round(timeExceeded)} Minuten` : null,
-  };
+        title: 'Zeit erreicht',
+        icon: <Clock className="w-6 h-6" style={{ color: state.preferences.accentColor }} />,
+        description: `Die geschätzte Zeit für "${taskTitle}" ist erreicht.`,
+        additionalInfo: timeExceeded > 0 ? `Überschreitung: ${Math.round(timeExceeded)} Minuten` : null,
+      };
 
   return createPortal(
     <div className="fixed inset-0 z-[9990] flex items-center justify-center" style={{ isolation: 'isolate' }}>
@@ -82,7 +82,7 @@ export function TimerWarningModal({
         </div>
 
         {/* Add Time Section */}
-        <div className="mb-6">
+          <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
               Zeit hinzufügen
             </label>
@@ -131,14 +131,14 @@ export function TimerWarningModal({
           >
             Ohne Zeit fortfahren
           </button>
-          <button
-            onClick={handleAddTime}
-            className="flex items-center px-4 py-2 text-sm text-white rounded-lg transition-colors hover:opacity-90"
-            style={{ backgroundColor: state.preferences.accentColor }}
-          >
-            <Plus className="w-4 h-4 mr-1" />
-            Zeit hinzufügen
-          </button>
+            <button
+              onClick={handleAddTime}
+              className="flex items-center px-4 py-2 text-sm text-white rounded-lg transition-colors hover:opacity-90"
+              style={{ backgroundColor: state.preferences.accentColor }}
+            >
+              <Plus className="w-4 h-4 mr-1" />
+              Zeit hinzufügen
+            </button>
         </div>
       </div>
     </div>,

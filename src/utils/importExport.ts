@@ -200,7 +200,7 @@ export function validateImportData(data: ExportData): {
       legacyNotesCount = data.notes.length;
     } else if (typeof data.notes === 'object' && Array.isArray((data.notes as any).notes)) {
       legacyNotesCount = (data.notes as any).notes.length;
-    }
+  }
   }
   if (data.noteLinks && Array.isArray(data.noteLinks)) {
     legacyNoteLinksCount = data.noteLinks.length;

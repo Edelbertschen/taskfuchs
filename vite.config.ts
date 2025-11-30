@@ -142,14 +142,14 @@ export default defineConfig({
     // Better chunk splitting for faster loading
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Core React libraries
-          vendor: ['react', 'react-dom'],
-          // UI utilities
-          ui: ['lucide-react'],
-          // Date/time utilities  
-          utils: ['date-fns'],
-        },
+                  manualChunks: {
+            // Core React libraries
+            vendor: ['react', 'react-dom'],
+            // UI utilities
+            ui: ['lucide-react'],
+            // Date/time utilities  
+            utils: ['date-fns'],
+          },
         // Optimize chunk names
         chunkFileNames: 'js/[name]-[hash].js',
         entryFileNames: 'js/[name]-[hash].js',

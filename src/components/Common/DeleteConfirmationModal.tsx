@@ -62,17 +62,17 @@ export function DeleteConfirmationModal({
   const modalContent = (
     <div 
       className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
-      style={{ zIndex: 1500 }}
+              style={{ zIndex: 1500 }}
       onClick={() => {
         onClose();
       }}
     >
-      <div 
+             <div 
         className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-200 dark:border-gray-700"
-        onClick={(e) => {
-          e.stopPropagation();
-        }}
-      >
+         onClick={(e) => {
+           e.stopPropagation();
+         }}
+       >
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center space-x-3">
@@ -94,67 +94,67 @@ export function DeleteConfirmationModal({
         {/* Content */}
         <div className="p-5">
           <p className="text-gray-600 dark:text-gray-300 mb-4">
-            {message}
-          </p>
-          
-          {itemName && (
+              {message}
+            </p>
+            
+            {itemName && (
             <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg mb-4 border border-gray-100 dark:border-gray-700">
               <p className="text-sm text-gray-700 dark:text-gray-300">
                 <span className="font-medium text-gray-500 dark:text-gray-400">Element:</span> {itemName}
-              </p>
-            </div>
-          )}
+                </p>
+              </div>
+            )}
 
-          {warningText && (
+            {warningText && (
             <div className="p-3 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-lg mb-4">
               <p className="text-sm text-red-700 dark:text-red-300">
                 <span className="font-medium">Warnung:</span> {warningText}
-              </p>
-            </div>
-          )}
-
-          {!simple && (
-            <>
-              <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 rounded-lg p-4 mb-4">
-                <p className="text-sm text-amber-800 dark:text-amber-300 font-medium mb-1">
-                  {messages.actionCannotBeUndone()}
-                </p>
-                <p className="text-sm text-amber-700 dark:text-amber-400">
-                  {forms.enterDeleteToConfirm()}
                 </p>
               </div>
+            )}
 
-              <input
-                type="text"
-                value={confirmationText}
-                onChange={(e) => setConfirmationText(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder={forms.placeholderDeleteConfirmation()}
+            {!simple && (
+              <>
+              <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 rounded-lg p-4 mb-4">
+                <p className="text-sm text-amber-800 dark:text-amber-300 font-medium mb-1">
+                    {messages.actionCannotBeUndone()}
+                  </p>
+                <p className="text-sm text-amber-700 dark:text-amber-400">
+                    {forms.enterDeleteToConfirm()}
+                  </p>
+                </div>
+
+                <input
+                  type="text"
+                  value={confirmationText}
+                  onChange={(e) => setConfirmationText(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder={forms.placeholderDeleteConfirmation()}
                 className={`w-full px-4 py-2.5 border-2 rounded-lg focus:outline-none focus:ring-0 text-center font-mono text-lg transition-colors ${
-                  confirmationText === 'LÖSCHEN' 
+                    confirmationText === 'LÖSCHEN' 
                     ? 'border-green-400 dark:border-green-500 bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-300' 
-                    : confirmationText === '' 
+                      : confirmationText === '' 
                     ? 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500'
                     : 'border-red-400 dark:border-red-500 bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-300'
-                }`}
-                autoFocus
-              />
-              
-              {confirmationText && confirmationText !== 'LÖSCHEN' && (
+                  }`}
+                  autoFocus
+                />
+                
+                {confirmationText && confirmationText !== 'LÖSCHEN' && (
                 <p className="text-sm text-red-600 dark:text-red-400 mt-2 text-center">
-                  {forms.enterDeleteExactly()}
-                </p>
-              )}
-            </>
-          )}
+                    {forms.enterDeleteExactly()}
+                  </p>
+                )}
+              </>
+            )}
 
-          {simple && (
+            {simple && (
             <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 rounded-lg p-4">
               <p className="text-sm text-amber-800 dark:text-amber-300 font-medium">
-                {messages.actionCannotBeUndone()}
-              </p>
-            </div>
-          )}
+                  {messages.actionCannotBeUndone()}
+                </p>
+              </div>
+            )}
         </div>
 
         {/* Footer */}

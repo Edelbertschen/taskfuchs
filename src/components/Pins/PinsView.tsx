@@ -292,7 +292,7 @@ export function PinsView() {
     wheelListenerRef.current = (e: WheelEvent) => {
       // Only handle if SHIFT is pressed
       if (!e.shiftKey) return;
-      
+
       const absX = Math.abs(e.deltaX || 0);
       const absY = Math.abs(e.deltaY || 0);
       const raw = absX > absY ? e.deltaX : e.deltaY;
@@ -365,11 +365,11 @@ export function PinsView() {
         result.push(allColumns[itemIndex]);
       } else if (itemIndex === allColumns.length) {
         // "Add Column" button position
-        result.push(null);
+      result.push(null);
       } else {
         // Empty slot (beyond "Add Column")
         result.push(undefined);
-      }
+    }
     }
     
     return result;
@@ -520,46 +520,46 @@ export function PinsView() {
 
     const activeId = active.id as string;
     const overId = over.id as string;
-
+    
     // Task drag & drop (both sidebar and regular tasks)
     if (isSidebarTask || activeData?.type === 'task') {
       
       // Dropping on pin column (empty area or column itself)
-      const targetPinColumn = state.pinColumns.find(col => col.id === overId);
-      if (targetPinColumn) {
-        const columnTasks = state.tasks
-          .filter(task => task.pinColumnId === targetPinColumn.id && task.id !== activeId)
-          .sort((a, b) => (a.position || 0) - (b.position || 0));
-        
-        const newPosition = columnTasks.length > 0 ? Math.max(...columnTasks.map(t => t.position || 0)) + 1 : 0;
-        
-        dispatch({
-          type: 'UPDATE_TASK',
-          payload: {
+    const targetPinColumn = state.pinColumns.find(col => col.id === overId);
+    if (targetPinColumn) {
+      const columnTasks = state.tasks
+        .filter(task => task.pinColumnId === targetPinColumn.id && task.id !== activeId)
+        .sort((a, b) => (a.position || 0) - (b.position || 0));
+      
+      const newPosition = columnTasks.length > 0 ? Math.max(...columnTasks.map(t => t.position || 0)) + 1 : 0;
+      
+      dispatch({
+        type: 'UPDATE_TASK',
+        payload: {
             ...draggedTask,
-            pinColumnId: targetPinColumn.id,
-            pinned: true,
-            position: newPosition,
-            updatedAt: new Date().toISOString()
-          }
-        });
+          pinColumnId: targetPinColumn.id,
+          pinned: true,
+          position: newPosition,
+          updatedAt: new Date().toISOString()
+        }
+      });
         
         console.log('📌 Task pinned to column:', {
           taskId: draggedTask.id,
           taskTitle: draggedTask.title,
           pinColumn: targetPinColumn.title
         });
-        return;
-      }
+      return;
+    }
 
       // Dropping on another task in a pin column
-      const overTask = state.tasks.find(t => t.id === overId);
-      if (overTask && overTask.pinColumnId) {
-        const targetColumnId = overTask.pinColumnId;
+    const overTask = state.tasks.find(t => t.id === overId);
+    if (overTask && overTask.pinColumnId) {
+      const targetColumnId = overTask.pinColumnId;
         const isSameColumn = draggedTask.pinColumnId === targetColumnId;
         const activeTaskPosition = draggedTask.position || 0;
-        const targetPosition = overTask.position || 0;
-        
+      const targetPosition = overTask.position || 0;
+      
         // Calculate new position
         let newPosition = targetPosition;
         
@@ -575,17 +575,17 @@ export function PinsView() {
         }
 
         // Update all tasks with proper position management
-        const updatedTasks = state.tasks.map(task => {
-          if (task.id === activeId) {
+      const updatedTasks = state.tasks.map(task => {
+        if (task.id === activeId) {
             // Update the active task
-            return {
-              ...task,
-              pinColumnId: targetColumnId,
-              pinned: true,
+          return {
+            ...task,
+            pinColumnId: targetColumnId,
+            pinned: true,
               position: newPosition,
-              updatedAt: new Date().toISOString()
-            };
-          } else if (task.pinColumnId === targetColumnId && task.id !== activeId) {
+            updatedAt: new Date().toISOString()
+          };
+        } else if (task.pinColumnId === targetColumnId && task.id !== activeId) {
             // Handle position shifts in target column
             if (isSameColumn) {
               // Same column movement
@@ -598,9 +598,9 @@ export function PinsView() {
                 };
               } else if (activeTaskPosition > targetPosition && (task.position || 0) >= targetPosition && (task.position || 0) < activeTaskPosition) {
                 // Moving up: shift tasks between new and old position down
-                return {
-                  ...task,
-                  position: (task.position || 0) + 1,
+            return {
+              ...task,
+              position: (task.position || 0) + 1,
                   updatedAt: new Date().toISOString()
                 };
               }
@@ -620,12 +620,12 @@ export function PinsView() {
               return {
                 ...task,
                 position: (task.position || 0) - 1,
-                updatedAt: new Date().toISOString()
-              };
-            }
+              updatedAt: new Date().toISOString()
+            };
           }
-          return task;
-        });
+        }
+        return task;
+      });
 
         // Normalize positions to ensure no gaps
         const columnsToNormalize = isSameColumn 
@@ -633,10 +633,10 @@ export function PinsView() {
           : [targetColumnId, draggedTask.pinColumnId].filter(Boolean) as string[];
         const normalizedTasks = normalizeTaskPositions(updatedTasks, columnsToNormalize);
 
-        dispatch({
-          type: 'SET_TASKS',
+      dispatch({
+        type: 'SET_TASKS',
           payload: normalizedTasks
-        });
+      });
         
         console.log('📌 Task repositioned in pin column:', {
           taskId: draggedTask.id,
@@ -1091,13 +1091,13 @@ export function PinsView() {
               isMinimalDesign
                 ? 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
                 : (isDarkMode ? 'bg-black/20 border-gray-600/30' : 'bg-white/30 border-gray-300/30')
-            }`}>
+          }`}>
               <div className="p-4 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
                     <div className="p-1.5 rounded-lg" style={{ backgroundColor: state.preferences.accentColor + '20' }}>
                       <Filter className="w-4 h-4" style={{ color: state.preferences.accentColor }} />
-                    </div>
+                </div>
                     <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter</h3>
                     {(priorityFilter !== 'all' || tagFilters.length > 0) && (
                       <span 
@@ -1208,9 +1208,9 @@ export function PinsView() {
                     {state.tags.filter(tag => tag.count > 0).length === 0 && (
                       <span className="text-xs text-gray-500 dark:text-gray-400">Keine Tags vorhanden</span>
                     )}
-                  </div>
-                </div>
               </div>
+            </div>
+          </div>
             </div>
           )}
 
@@ -1295,11 +1295,11 @@ export function PinsView() {
         {/* Drag Overlay - Minimalist style like Planer */}
         <DragOverlay
           dropAnimation={null}
-          style={{
+              style={{ 
             zIndex: 9999,
             pointerEvents: 'none',
-          }}
-        >
+              }}
+            >
           {activeTask && (
             <div style={{
               filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',

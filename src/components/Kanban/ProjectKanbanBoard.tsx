@@ -314,16 +314,16 @@ export function ProjectKanbanBoard() {
     wheelListenerRef.current = (e: WheelEvent) => {
       // Only handle if SHIFT is pressed
       if (!e.shiftKey) return;
-      
+
       const absX = Math.abs(e.deltaX || 0);
       const absY = Math.abs(e.deltaY || 0);
       const raw = absX > absY ? (e.deltaX || 0) : (e.deltaY || 0);
       if (raw === 0) return;
-      
-      e.preventDefault();
-      e.stopPropagation();
-      const direction = raw > 0 ? 'next' : 'prev';
-      dispatch({ type: 'NAVIGATE_PROJECTS', payload: direction });
+
+        e.preventDefault();
+        e.stopPropagation();
+        const direction = raw > 0 ? 'next' : 'prev';
+        dispatch({ type: 'NAVIGATE_PROJECTS', payload: direction });
     };
   }, [dispatch]);
   
@@ -807,12 +807,12 @@ export function ProjectKanbanBoard() {
             
             {/* Task count indicator - plain text like Inbox */}
             <span className={`text-sm font-medium ${
-              isMinimalDesign 
+              isMinimalDesign
                 ? 'text-gray-500 dark:text-gray-400' 
                 : (isDarkMode ? 'text-white/60' : 'text-gray-600')
-            }`}>
-              {projectTaskCount}
-            </span>
+              }`}>
+                {projectTaskCount}
+              </span>
 
             {/* Three-dots menu */}
             <div className="relative">
@@ -1806,30 +1806,30 @@ export function ProjectKanbanBoard() {
         {/* Projects Sidebar - Now using flexbox instead of absolute positioning */}
         <div 
           className={`flex-shrink-0 flex flex-col overflow-hidden transition-all duration-300 border-r ${
-            isMinimalDesign
+          isMinimalDesign
               ? 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800'
               : 'bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border-white/20 dark:border-gray-700/30'
-          }`}
-          style={{ 
+        }`}
+        style={{ 
             boxShadow: isMinimalDesign ? '0 1px 3px 0 rgba(0, 0, 0, 0.1)' : '0 8px 32px rgba(0, 0, 0, 0.1)',
             width: sidebarMinimized ? '0px' : '320px',
             marginLeft: sidebarMinimized ? '-320px' : '0px',
-          }}
-        >
-          {/* Header */}
-          <div 
-            className="relative flex items-center px-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#111827]"
-            style={{ 
-              height: '68px',
-              minHeight: '68px',
-              maxHeight: '68px',
-              boxSizing: 'border-box'
             }}
           >
-            {/* Main header content - centered */}
-            <div className="flex items-center justify-between w-full">
-              {projects.length > 0 ? (
-                <>
+                {/* Header */}
+                <div 
+            className="relative flex items-center px-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#111827]"
+                  style={{ 
+                    height: '68px',
+                    minHeight: '68px',
+                    maxHeight: '68px',
+                    boxSizing: 'border-box'
+                  }}
+                >
+                  {/* Main header content - centered */}
+                  <div className="flex items-center justify-between w-full">
+                    {projects.length > 0 ? (
+                      <>
                   <h1 className="text-lg font-semibold flex items-center space-x-2 text-gray-900 dark:text-white">
                           <Columns className="w-5 h-5" style={getAccentColorStyles().text} />
                           <span>{t('projects.title')}</span>

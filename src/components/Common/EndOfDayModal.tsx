@@ -101,7 +101,7 @@ export function EndOfDayModal({ isOpen, onClose }: EndOfDayModalProps) {
     window.addEventListener('close-end-of-day-modal', handleCloseEndOfDayModal);
     return () => window.removeEventListener('close-end-of-day-modal', handleCloseEndOfDayModal);
   }, [onClose]);
-  
+
   // Initialize sync status monitoring
   useEffect(() => {
     if (!isOpen) return;
@@ -680,7 +680,7 @@ export function EndOfDayModal({ isOpen, onClose }: EndOfDayModalProps) {
             <p className="text-gray-600 dark:text-gray-400 mb-6">
               {todayIsFriday 
                 ? (i18n.language === 'en' 
-                    ? `Do you want to move all ${incompleteTasks.length} open tasks to next Monday?`
+                ? `Do you want to move all ${incompleteTasks.length} open tasks to next Monday?`
                     : `Möchten Sie alle ${incompleteTasks.length} offenen Aufgaben auf den kommenden Montag verschieben?`)
                 : (i18n.language === 'en' 
                     ? `Do you want to move all ${incompleteTasks.length} open tasks to tomorrow?`

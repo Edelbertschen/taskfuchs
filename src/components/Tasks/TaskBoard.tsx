@@ -598,17 +598,17 @@ export function TaskBoard() {
       // Only handle if SHIFT is pressed
       if (!e.shiftKey) return;
       
-      e.preventDefault();
-      e.stopPropagation();
-      
-      // Scroll direction: negative deltaY = scroll up = go left, positive deltaY = scroll down = go right
-      const direction = e.deltaY > 0 ? 'next' : 'prev';
-      
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Scroll direction: negative deltaY = scroll up = go left, positive deltaY = scroll down = go right
+        const direction = e.deltaY > 0 ? 'next' : 'prev';
+        
       // Dispatch navigation directly
       dispatch({ type: 'NAVIGATE_DATE', payload: direction });
     };
   }, [dispatch]);
-  
+
   // Attach wheel listener to container when it mounts
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -628,7 +628,7 @@ export function TaskBoard() {
       dispatch({ type: 'NAVIGATE_DATE', payload: e.detail.direction });
     };
     
-    // Arrow key navigation
+        // Arrow key navigation
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!scrollContainerRef.current) return;
       
@@ -641,7 +641,7 @@ export function TaskBoard() {
       );
 
       if (!isInputFocused && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
-        e.preventDefault();
+          e.preventDefault();
         const direction = e.key === 'ArrowLeft' ? 'prev' : 'next';
         dispatch({ type: 'NAVIGATE_DATE', payload: direction });
       }
@@ -1407,7 +1407,7 @@ export function TaskBoard() {
       if (priorityFilter === 'none') {
         // Filter for tasks without priority
         if (taskPriority !== 'none' && task.priority) {
-          return false;
+        return false;
         }
       } else {
         // Filter for specific priority

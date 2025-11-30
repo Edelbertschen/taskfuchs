@@ -1769,7 +1769,7 @@ function InboxTaskCard({
 
   // Check if this is the onboarding sample task
   const isOnboardingSampleTask = task.id === 'onboarding-sample-task';
-  
+
   return (
     <>
     <div 
@@ -1957,7 +1957,7 @@ function InboxTaskCard({
               onPointerDown={(e) => e.stopPropagation()}
               className={`p-2 rounded-lg backdrop-blur-xl border border-white/20 transition-all duration-200 hover:scale-110 opacity-0 group-hover:opacity-100 ${isDarkMode ? 'text-white/70 hover:text-red-400' : 'text-gray-900 hover:text-red-600'}`}
               style={{ background: 'rgba(255, 255, 255, 0.1)' }}
-              title={actions.delete()}
+                              title={actions.delete()}
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -1970,7 +1970,7 @@ function InboxTaskCard({
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleConfirmDelete}
-        title={inboxView.tooltips.deleteTask()}
+                    title={inboxView.tooltips.deleteTask()}
         message={`Möchten Sie die Aufgabe "${task.title}" wirklich löschen?`}
         simple={true}
       />

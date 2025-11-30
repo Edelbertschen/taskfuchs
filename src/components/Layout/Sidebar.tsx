@@ -174,7 +174,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
       } else if (result.status === 'pushed' || result.status === 'pulled') {
         setDropboxSyncStatus('success');
         setTimeout(() => setDropboxSyncStatus('idle'), 2000);
-      }
+    }
     };
     
     window.addEventListener('dropbox-sync-complete', handleSyncComplete as any);
@@ -233,9 +233,9 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
             } 
           } 
         });
-        
+      
         // Show success (green) for 10 seconds
-        setShowBackupSuccess(true);
+      setShowBackupSuccess(true);
         setTimeout(() => setShowBackupSuccess(false), 10000);
       } else {
         alert((t('backup.failed') || 'Backup fehlgeschlagen: ') + result.error);
@@ -624,7 +624,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
             title={t('header.settings')}
           >
             <div className="flex flex-col items-center gap-0.5">
-              <User className="w-6 h-6 text-gray-700 dark:text-white" />
+            <User className="w-6 h-6 text-gray-700 dark:text-white" />
               {/* Elegant dropdown indicator */}
               <ChevronDown 
                 className={`w-3.5 h-3.5 transition-all duration-200 ${
@@ -924,7 +924,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
         </div>,
         document.body
       )}
-
+      
       {/* End-of-Day Modal */}
       <EndOfDayModal 
         isOpen={showEndOfDayModal}
