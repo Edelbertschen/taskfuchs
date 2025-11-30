@@ -999,6 +999,11 @@ function MainApp() {
         if (isBg18or19) {
           return isDarkMode ? '/backgrounds/bg19.png' : '/backgrounds/bg18.png';
         }
+        // Check for bg22/bg23 pair
+        const isBg22or23 = /\/backgrounds\/bg2(2|3)\.(png|jpg)$/.test(img);
+        if (isBg22or23) {
+          return isDarkMode ? '/backgrounds/bg23.png' : '/backgrounds/bg22.png';
+        }
         return img;
       }
       // Fallback when no image is chosen: always use bg12.png

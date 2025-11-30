@@ -415,6 +415,8 @@ const Settings = React.memo(() => {
       '/backgrounds/bg19.png',
       '/backgrounds/bg20.png',
       '/backgrounds/bg21.png',
+      '/backgrounds/bg22.png',
+      '/backgrounds/bg23.png',
       ...Array.from({ length: 11 }, (_, i) => `/backgrounds/bg${i + 1}.jpg`),
     ];
     const savedGallery = localStorage.getItem('backgroundImageGallery');
@@ -446,6 +448,7 @@ const Settings = React.memo(() => {
   const [tempImageUrl, setTempImageUrl] = useState('');
   const [tempColorValue, setTempColorValue] = useState('#f3f4f6');
   const [showPhotoCreditsModal, setShowPhotoCreditsModal] = useState(false);
+  const [showFoxBackgrounds, setShowFoxBackgrounds] = useState(false);
   
   // Stock Photos modal state
   const [showStockPhotosModal, setShowStockPhotosModal] = useState(false);
@@ -4277,244 +4280,114 @@ const Settings = React.memo(() => {
                         {settings_appearance.credentials()}
                       </button>
                     </div>
+                    {/* 🦊 Fuchsbilder - Collapsible Section */}
+                    <div className="mb-4">
+                      <button
+                        onClick={() => setShowFoxBackgrounds(!showFoxBackgrounds)}
+                        className={`w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all duration-300 ${
+                          showFoxBackgrounds 
+                            ? 'border-orange-300 dark:border-orange-600 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20' 
+                            : 'border-gray-200 dark:border-gray-700 hover:border-orange-200 dark:hover:border-orange-700 bg-white dark:bg-gray-800'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="relative">
+                            <img 
+                              src="/3d_fox.png" 
+                              alt="Fox" 
+                              className="w-10 h-10 object-contain"
+                              onError={(e) => { e.currentTarget.src = '/Fuchs.svg'; }}
+                            />
+                            <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
+                              <span className="text-[8px] text-white font-bold">6</span>
+                            </div>
+                          </div>
+                          <div className="text-left">
+                            <div className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                              Fuchsbilder
+                              <span className="text-xs px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/40 dark:to-orange-900/40 text-orange-700 dark:text-orange-300 font-medium">
+                                Light/Dark Auto
+                              </span>
+                            </div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">
+                              Wechselt automatisch mit dem Theme
+                            </div>
+                          </div>
+                        </div>
+                        <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-300 ${showFoxBackgrounds ? 'rotate-180' : ''}`} />
+                      </button>
+                      
+                      {/* Expandable Fox Backgrounds Grid */}
+                      <div className={`overflow-hidden transition-all duration-500 ease-out ${showFoxBackgrounds ? 'max-h-[600px] opacity-100 mt-3' : 'max-h-0 opacity-0'}`}>
+                        <div className="grid grid-cols-3 gap-3 p-3 rounded-xl bg-gradient-to-br from-orange-50/50 to-amber-50/50 dark:from-orange-900/10 dark:to-amber-900/10 border border-orange-100 dark:border-orange-900/30">
+                          {/* Fox Background Pairs */}
+                          {[
+                            { light: 'bg12.png', dark: 'bg13.png' },
+                            { light: 'bg14.png', dark: 'bg15.png' },
+                            { light: 'bg16.png', dark: 'bg17.png' },
+                            { light: 'bg18.png', dark: 'bg19.png' },
+                            { light: 'bg22.png', dark: 'bg23.png' },
+                          ].map((pair, idx) => {
+                            const isSelected = state.preferences.backgroundImage?.includes(pair.light) || state.preferences.backgroundImage?.includes(pair.dark);
+                            return (
+                              <div 
+                                key={idx}
+                                className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all duration-200 hover:scale-[1.02] ${
+                                  isSelected
+                                    ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800'
+                                    : 'border-gray-200 dark:border-gray-600 hover:border-orange-300 dark:hover:border-orange-600'
+                                }`}
+                                style={isSelected ? {
+                                  borderColor: getAccentColorStyles().border.borderColor,
+                                  boxShadow: `0 0 0 2px ${getAccentColorStyles().bg.backgroundColor}20, 0 0 0 4px ${getAccentColorStyles().bg.backgroundColor}`
+                                } : {}}
+                                onClick={() => handleSelectImageFromGallery(`/backgrounds/${pair.light}`)}
+                              >
+                                <div className="flex h-16">
+                                  <div className="relative flex-1 overflow-hidden">
+                                    <img 
+                                      src={`/backgrounds/${pair.light}`}
+                                      alt="Light"
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </div>
+                                  <div className="w-px bg-gray-300 dark:bg-gray-600" />
+                                  <div className="relative flex-1 overflow-hidden">
+                                    <img 
+                                      src={`/backgrounds/${pair.dark}`}
+                                      alt="Dark"
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </div>
+                                </div>
+                                {/* Mode indicator */}
+                                <div className="absolute top-1 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-sm rounded-full px-1.5 py-0.5 flex items-center gap-1">
+                                  <Sun className="w-2.5 h-2.5 text-amber-400" />
+                                  <span className="text-[8px] text-white/80">/</span>
+                                  <Moon className="w-2.5 h-2.5 text-blue-400" />
+                                </div>
+                                {/* Hover overlay */}
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-opacity" />
+                                {/* Selected indicator */}
+                                {isSelected && (
+                                  <div className="absolute bottom-1 left-1/2 -translate-x-1/2">
+                                    <div className="text-white text-[10px] px-1.5 py-0.5 rounded font-medium flex items-center gap-0.5" 
+                                         style={{ backgroundColor: getAccentColorStyles().bg.backgroundColor }}>
+                                      <Check className="w-2.5 h-2.5" />
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Regular Gallery Images */}
                     <div className="grid grid-cols-3 gap-4">
-                      {/* Light/Dark Mode Background Pair - bg12.png & bg13.png */}
-                      {backgroundImageGallery.some(url => url.includes('bg12.png') || url.includes('bg13.png')) && (
-                        <div 
-                          className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all col-span-2 ${
-                            state.preferences.backgroundImage?.includes('bg12.png') || state.preferences.backgroundImage?.includes('bg13.png')
-                              ? 'border-2 ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800'
-                              : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
-                          }`}
-                          style={(state.preferences.backgroundImage?.includes('bg12.png') || state.preferences.backgroundImage?.includes('bg13.png')) ? {
-                            borderColor: getAccentColorStyles().border.borderColor,
-                            boxShadow: `0 0 0 2px ${getAccentColorStyles().bg.backgroundColor}20, 0 0 0 4px ${getAccentColorStyles().bg.backgroundColor}`
-                          } : {}}
-                          onClick={() => handleSelectImageFromGallery('/backgrounds/bg12.png')}
-                        >
-                          <div className="flex h-20">
-                            {/* Light Mode Half */}
-                            <div className="relative flex-1 overflow-hidden">
-                              <img 
-                                src="/backgrounds/bg12.png" 
-                                alt="Light Mode Hintergrund"
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute bottom-1 left-1 bg-white/90 dark:bg-white/80 rounded px-1.5 py-0.5 flex items-center gap-1">
-                                <Sun className="w-3 h-3 text-amber-500" />
-                                <span className="text-[10px] font-medium text-gray-700">Light</span>
-                              </div>
-                            </div>
-                            {/* Divider */}
-                            <div className="w-0.5 bg-gradient-to-b from-white/50 via-gray-400 to-white/50 dark:from-gray-600/50 dark:via-gray-500 dark:to-gray-600/50" />
-                            {/* Dark Mode Half */}
-                            <div className="relative flex-1 overflow-hidden">
-                              <img 
-                                src="/backgrounds/bg13.png" 
-                                alt="Dark Mode Hintergrund"
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute bottom-1 right-1 bg-gray-900/90 dark:bg-gray-900/80 rounded px-1.5 py-0.5 flex items-center gap-1">
-                                <Moon className="w-3 h-3 text-blue-400" />
-                                <span className="text-[10px] font-medium text-white">Dark</span>
-                              </div>
-                            </div>
-                          </div>
-                          {/* Pair indicator overlay */}
-                          <div className="absolute top-1 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-sm rounded-full px-2 py-0.5 flex items-center gap-1.5">
-                            <Sun className="w-3 h-3 text-amber-400" />
-                            <span className="text-[10px] font-semibold text-white">/</span>
-                            <Moon className="w-3 h-3 text-blue-400" />
-                          </div>
-                          {/* Hover overlay */}
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-opacity" />
-                          {/* Selected indicator */}
-                          {(state.preferences.backgroundImage?.includes('bg12.png') || state.preferences.backgroundImage?.includes('bg13.png')) && (
-                            <div className="absolute bottom-1 left-1/2 -translate-x-1/2">
-                              <div className="text-white text-xs px-2 py-0.5 rounded text-center font-medium flex items-center gap-1" 
-                                   style={{ backgroundColor: getAccentColorStyles().bg.backgroundColor }}>
-                                <Check className="w-3 h-3" />
-                                {settings_appearance.current()}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      
-                      {/* Light/Dark Mode Background Pair - bg14.png & bg15.png */}
-                      {backgroundImageGallery.some(url => url.includes('bg14.png') || url.includes('bg15.png')) && (
-                        <div 
-                          className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all col-span-2 ${
-                            state.preferences.backgroundImage?.includes('bg14.png') || state.preferences.backgroundImage?.includes('bg15.png')
-                              ? 'border-2 ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800'
-                              : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
-                          }`}
-                          style={(state.preferences.backgroundImage?.includes('bg14.png') || state.preferences.backgroundImage?.includes('bg15.png')) ? {
-                            borderColor: getAccentColorStyles().border.borderColor,
-                            boxShadow: `0 0 0 2px ${getAccentColorStyles().bg.backgroundColor}20, 0 0 0 4px ${getAccentColorStyles().bg.backgroundColor}`
-                          } : {}}
-                          onClick={() => handleSelectImageFromGallery('/backgrounds/bg14.png')}
-                        >
-                          <div className="flex h-20">
-                            {/* Light Mode Half */}
-                            <div className="relative flex-1 overflow-hidden">
-                              <img 
-                                src="/backgrounds/bg14.png" 
-                                alt="Light Mode Hintergrund 2"
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute bottom-1 left-1 bg-white/90 dark:bg-white/80 rounded px-1.5 py-0.5 flex items-center gap-1">
-                                <Sun className="w-3 h-3 text-amber-500" />
-                                <span className="text-[10px] font-medium text-gray-700">Light</span>
-                              </div>
-                            </div>
-                            {/* Divider */}
-                            <div className="w-px bg-gray-300 dark:bg-gray-600" />
-                            {/* Dark Mode Half */}
-                            <div className="relative flex-1 overflow-hidden">
-                              <img 
-                                src="/backgrounds/bg15.png" 
-                                alt="Dark Mode Hintergrund 2"
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute bottom-1 right-1 bg-gray-900/90 dark:bg-gray-900/80 rounded px-1.5 py-0.5 flex items-center gap-1">
-                                <Moon className="w-3 h-3 text-blue-400" />
-                                <span className="text-[10px] font-medium text-gray-200">Dark</span>
-                              </div>
-                            </div>
-                          </div>
-                          {/* Hover overlay */}
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-opacity" />
-                          {/* Selected indicator */}
-                          {(state.preferences.backgroundImage?.includes('bg14.png') || state.preferences.backgroundImage?.includes('bg15.png')) && (
-                            <div className="absolute bottom-1 left-1/2 -translate-x-1/2">
-                              <div className="text-white text-xs px-2 py-0.5 rounded text-center font-medium flex items-center gap-1" 
-                                   style={{ backgroundColor: getAccentColorStyles().bg.backgroundColor }}>
-                                <Check className="w-3 h-3" />
-                                {settings_appearance.current()}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      
-                      {/* Light/Dark Mode Background Pair - bg16.png & bg17.png */}
-                      {backgroundImageGallery.some(url => url.includes('bg16.png') || url.includes('bg17.png')) && (
-                        <div 
-                          className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all col-span-2 ${
-                            state.preferences.backgroundImage?.includes('bg16.png') || state.preferences.backgroundImage?.includes('bg17.png')
-                              ? 'border-2 ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800'
-                              : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
-                          }`}
-                          style={(state.preferences.backgroundImage?.includes('bg16.png') || state.preferences.backgroundImage?.includes('bg17.png')) ? {
-                            borderColor: getAccentColorStyles().border.borderColor,
-                            boxShadow: `0 0 0 2px ${getAccentColorStyles().bg.backgroundColor}20, 0 0 0 4px ${getAccentColorStyles().bg.backgroundColor}`
-                          } : {}}
-                          onClick={() => handleSelectImageFromGallery('/backgrounds/bg16.png')}
-                        >
-                          <div className="flex h-20">
-                            {/* Light Mode Half */}
-                            <div className="relative flex-1 overflow-hidden">
-                              <img 
-                                src="/backgrounds/bg16.png" 
-                                alt="Light Mode Hintergrund 3"
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute bottom-1 left-1 bg-white/90 dark:bg-white/80 rounded px-1.5 py-0.5 flex items-center gap-1">
-                                <Sun className="w-3 h-3 text-amber-500" />
-                                <span className="text-[10px] font-medium text-gray-700">Light</span>
-                              </div>
-                            </div>
-                            {/* Divider */}
-                            <div className="w-px bg-gray-300 dark:bg-gray-600" />
-                            {/* Dark Mode Half */}
-                            <div className="relative flex-1 overflow-hidden">
-                              <img 
-                                src="/backgrounds/bg17.png" 
-                                alt="Dark Mode Hintergrund 3"
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute bottom-1 right-1 bg-gray-900/90 dark:bg-gray-900/80 rounded px-1.5 py-0.5 flex items-center gap-1">
-                                <Moon className="w-3 h-3 text-blue-400" />
-                                <span className="text-[10px] font-medium text-gray-200">Dark</span>
-                              </div>
-                            </div>
-                          </div>
-                          {/* Hover overlay */}
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-opacity" />
-                          {/* Selected indicator */}
-                          {(state.preferences.backgroundImage?.includes('bg16.png') || state.preferences.backgroundImage?.includes('bg17.png')) && (
-                            <div className="absolute bottom-1 left-1/2 -translate-x-1/2">
-                              <div className="text-white text-xs px-2 py-0.5 rounded text-center font-medium flex items-center gap-1" 
-                                   style={{ backgroundColor: getAccentColorStyles().bg.backgroundColor }}>
-                                <Check className="w-3 h-3" />
-                                {settings_appearance.current()}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      
-                      {/* Light/Dark Mode Background Pair - bg18.png & bg19.png */}
-                      {backgroundImageGallery.some(url => url.includes('bg18.png') || url.includes('bg19.png')) && (
-                        <div 
-                          className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all col-span-2 ${
-                            state.preferences.backgroundImage?.includes('bg18.png') || state.preferences.backgroundImage?.includes('bg19.png')
-                              ? 'border-2 ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800'
-                              : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
-                          }`}
-                          style={(state.preferences.backgroundImage?.includes('bg18.png') || state.preferences.backgroundImage?.includes('bg19.png')) ? {
-                            borderColor: getAccentColorStyles().border.borderColor,
-                            boxShadow: `0 0 0 2px ${getAccentColorStyles().bg.backgroundColor}20, 0 0 0 4px ${getAccentColorStyles().bg.backgroundColor}`
-                          } : {}}
-                          onClick={() => handleSelectImageFromGallery('/backgrounds/bg18.png')}
-                        >
-                          <div className="flex h-20">
-                            {/* Light Mode Half */}
-                            <div className="relative flex-1 overflow-hidden">
-                              <img 
-                                src="/backgrounds/bg18.png" 
-                                alt="Light Mode Hintergrund 4"
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute bottom-1 left-1 bg-white/90 dark:bg-white/80 rounded px-1.5 py-0.5 flex items-center gap-1">
-                                <Sun className="w-3 h-3 text-amber-500" />
-                                <span className="text-[10px] font-medium text-gray-700">Light</span>
-                              </div>
-                            </div>
-                            {/* Divider */}
-                            <div className="w-px bg-gray-300 dark:bg-gray-600" />
-                            {/* Dark Mode Half */}
-                            <div className="relative flex-1 overflow-hidden">
-                              <img 
-                                src="/backgrounds/bg19.png" 
-                                alt="Dark Mode Hintergrund 4"
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute bottom-1 right-1 bg-gray-900/90 dark:bg-gray-900/80 rounded px-1.5 py-0.5 flex items-center gap-1">
-                                <Moon className="w-3 h-3 text-blue-400" />
-                                <span className="text-[10px] font-medium text-gray-200">Dark</span>
-                              </div>
-                            </div>
-                          </div>
-                          {/* Hover overlay */}
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-opacity" />
-                          {/* Selected indicator */}
-                          {(state.preferences.backgroundImage?.includes('bg18.png') || state.preferences.backgroundImage?.includes('bg19.png')) && (
-                            <div className="absolute bottom-1 left-1/2 -translate-x-1/2">
-                              <div className="text-white text-xs px-2 py-0.5 rounded text-center font-medium flex items-center gap-1" 
-                                   style={{ backgroundColor: getAccentColorStyles().bg.backgroundColor }}>
-                                <Check className="w-3 h-3" />
-                                {settings_appearance.current()}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      
-                      {/* Regular Gallery Images (excluding paired backgrounds) */}
                       {backgroundImageGallery
-                        .filter(url => !url.includes('bg12.png') && !url.includes('bg13.png') && !url.includes('bg14.png') && !url.includes('bg15.png') && !url.includes('bg16.png') && !url.includes('bg17.png') && !url.includes('bg18.png') && !url.includes('bg19.png'))
+                        .filter(url => !url.includes('bg12.png') && !url.includes('bg13.png') && !url.includes('bg14.png') && !url.includes('bg15.png') && !url.includes('bg16.png') && !url.includes('bg17.png') && !url.includes('bg18.png') && !url.includes('bg19.png') && !url.includes('bg22.png') && !url.includes('bg23.png'))
                         .map((imageUrl, index) => (
                         <div 
                           key={index}
@@ -4614,6 +4487,8 @@ const Settings = React.memo(() => {
                             '/backgrounds/bg19.png',
                             '/backgrounds/bg20.png',
                             '/backgrounds/bg21.png',
+                            '/backgrounds/bg22.png',
+                            '/backgrounds/bg23.png',
                             ...Array.from({ length: 11 }, (_, i) => `/backgrounds/bg${i + 1}.jpg`),
                           ];
                           setBackgroundImageGallery(defaults);
