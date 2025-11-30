@@ -66,7 +66,9 @@ import {
   Target,
   Zap,
   MoreHorizontal,
-  FolderOpen
+  FolderOpen,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { DeleteConfirmationModal } from '../Common/DeleteConfirmationModal';
@@ -4283,19 +4285,14 @@ const Settings = React.memo(() => {
                     <div className="grid grid-cols-3 gap-4">
                       {/* Light/Dark Theme Pairs - Collapsible Stack */}
                       <div className="col-span-3 mb-2">
-                        <button
-                          onClick={() => setShowThemePairs(!showThemePairs)}
-                          className={`w-full relative group cursor-pointer rounded-xl overflow-hidden border-2 transition-all duration-300 ${
-                            showThemePairs 
-                              ? 'border-transparent' 
-                              : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
-                          }`}
-                          style={showThemePairs ? {
-                            borderColor: getAccentColorStyles().border.borderColor,
-                          } : {}}
-                        >
-                          {/* Stacked Preview (collapsed state) */}
-                          <div className={`relative h-16 transition-all duration-300 ${showThemePairs ? 'opacity-0 h-0' : 'opacity-100'}`}>
+                        {/* Collapsed state button */}
+                        {!showThemePairs && (
+                          <button
+                            onClick={() => setShowThemePairs(true)}
+                            className="w-full relative group cursor-pointer rounded-xl overflow-hidden border-2 border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 transition-all duration-300"
+                          >
+                            {/* Stacked Preview */}
+                            <div className="relative h-16">
                             {/* Stack of images */}
                             <div className="absolute inset-0 flex">
                               <div className="flex-1 relative overflow-hidden">
@@ -4327,14 +4324,13 @@ const Settings = React.memo(() => {
                             )}
                           </div>
                         </button>
+                        )}
                         
                         {/* Expanded pairs */}
-                        <div 
-                          className={`grid grid-cols-2 gap-3 overflow-hidden transition-all duration-500 ease-out ${
-                            showThemePairs ? 'max-h-[600px] opacity-100 mt-3' : 'max-h-0 opacity-0'
-                          }`}
-                        >
+                        {showThemePairs && (
+                        <div className="space-y-3">
                           {/* Theme Pair Cards */}
+                          <div className="grid grid-cols-2 gap-3">
                           {[
                             { light: 'bg12.png', dark: 'bg13.png', num: 1 },
                             { light: 'bg14.png', dark: 'bg15.png', num: 2 },
@@ -4382,7 +4378,17 @@ const Settings = React.memo(() => {
                               </div>
                             );
                           })}
+                          </div>
+                          {/* Collapse button */}
+                          <button
+                            onClick={() => setShowThemePairs(false)}
+                            className="w-full py-2 flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50"
+                          >
+                            <ChevronUp className="w-4 h-4" />
+                            <span>{state.preferences.language === 'de' ? 'Einklappen' : 'Collapse'}</span>
+                          </button>
                         </div>
+                        )}
                       </div>
                       
                       {/* Regular Gallery Images (excluding paired backgrounds) */}

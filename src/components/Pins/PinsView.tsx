@@ -548,7 +548,7 @@ export function PinsView() {
           taskId: draggedTask.id,
           taskTitle: draggedTask.title,
           pinColumn: targetPinColumn.title
-        });
+      });
       return;
     }
 
