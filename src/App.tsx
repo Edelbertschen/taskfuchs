@@ -974,15 +974,20 @@ function MainApp() {
             : getBackgroundStyles(state.preferences))
         : {};
   
-  // Resolve actual image to render: enforce bg12 (light) and bg13 (dark) pairing
+  // Resolve actual image to render: enforce light/dark pairing for bg12/13 and bg14/15
   const resolvedBackgroundImage = (() => {
     const img = state.preferences.backgroundImage;
     if (backgroundType === 'image') {
       if (img) {
+        // Check for bg12/bg13 pair
         const isBg12or13 = /\/backgrounds\/bg1(2|3)\.(png|jpg)$/.test(img);
         if (isBg12or13) {
-          // Keep bg12/bg13 pairing when one of them is explicitly chosen
           return isDarkMode ? '/backgrounds/bg13.png' : '/backgrounds/bg12.png';
+        }
+        // Check for bg14/bg15 pair
+        const isBg14or15 = /\/backgrounds\/bg1(4|5)\.(png|jpg)$/.test(img);
+        if (isBg14or15) {
+          return isDarkMode ? '/backgrounds/bg15.png' : '/backgrounds/bg14.png';
         }
         return img;
       }

@@ -14,13 +14,15 @@ const preloadImages = (urls: string[]) => {
   });
 };
 
-// Demo background images to preload (note: most are jpg, bg12/bg13 are png)
+// Demo background images to preload (note: most are jpg, bg12-15 are png)
 const DEMO_BACKGROUND_IMAGES = [
   '/backgrounds/bg2.jpg',
   '/backgrounds/bg8.jpg',
   '/backgrounds/bg11.jpg',
   '/backgrounds/bg12.png',
-  '/backgrounds/bg13.png'
+  '/backgrounds/bg13.png',
+  '/backgrounds/bg14.png',
+  '/backgrounds/bg15.png'
 ];
 
 // Check if we're in a PWA/Web context (not Electron)
