@@ -4317,7 +4317,7 @@ const Settings = React.memo(() => {
                               </div>
                             </div>
                             {/* Active pair indicator */}
-                            {(state.preferences.backgroundImage?.match(/bg1[2-9]\.png|bg2[0-3]\.png/)) && (
+                            {(state.preferences.backgroundImage?.match(/bg1[2-9]\.png|bg2[2-5]\.png/)) && (
                               <div className="absolute top-2 right-2">
                                 <div className="w-3 h-3 rounded-full animate-pulse" style={{ backgroundColor: getAccentColorStyles().bg.backgroundColor }} />
                               </div>
@@ -4332,12 +4332,13 @@ const Settings = React.memo(() => {
                           {/* Theme Pair Cards */}
                           <div className="grid grid-cols-2 gap-3">
                           {[
-                            { light: 'bg12.png', dark: 'bg13.png', num: 1 },
-                            { light: 'bg14.png', dark: 'bg15.png', num: 2 },
-                            { light: 'bg16.png', dark: 'bg17.png', num: 3 },
-                            { light: 'bg18.png', dark: 'bg19.png', num: 4 },
-                            { light: 'bg22.png', dark: 'bg23.png', num: 5 },
-                          ].map((pair, idx) => {
+                            { light: 'bg12.png', dark: 'bg13.png' },
+                            { light: 'bg14.png', dark: 'bg15.png' },
+                            { light: 'bg16.png', dark: 'bg17.png' },
+                            { light: 'bg18.png', dark: 'bg19.png' },
+                            { light: 'bg22.png', dark: 'bg23.png' },
+                            { light: 'bg24.png', dark: 'bg25.png' },
+                          ].map((pair) => {
                             const isSelected = state.preferences.backgroundImage?.includes(pair.light) || state.preferences.backgroundImage?.includes(pair.dark);
                             return (
                               <div
@@ -4393,7 +4394,7 @@ const Settings = React.memo(() => {
                       
                       {/* Regular Gallery Images (excluding paired backgrounds) */}
                       {backgroundImageGallery
-                        .filter(url => !url.includes('bg12.png') && !url.includes('bg13.png') && !url.includes('bg14.png') && !url.includes('bg15.png') && !url.includes('bg16.png') && !url.includes('bg17.png') && !url.includes('bg18.png') && !url.includes('bg19.png') && !url.includes('bg22.png') && !url.includes('bg23.png'))
+                        .filter(url => !url.includes('bg12.png') && !url.includes('bg13.png') && !url.includes('bg14.png') && !url.includes('bg15.png') && !url.includes('bg16.png') && !url.includes('bg17.png') && !url.includes('bg18.png') && !url.includes('bg19.png') && !url.includes('bg22.png') && !url.includes('bg23.png') && !url.includes('bg24.png') && !url.includes('bg25.png'))
                         .map((imageUrl, index) => (
                         <div 
                           key={index}

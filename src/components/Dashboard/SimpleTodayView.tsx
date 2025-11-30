@@ -35,7 +35,7 @@ import {
   Clock, FileText, Edit3, Bold, Italic, Code, List, ListOrdered, 
   Link as LinkIcon, Minus, HelpCircle, Heading1, Heading2, Heading3, ExternalLink,
   Zap, CheckSquare, Bell, Calendar, Edit, Settings, Trash2, MoreVertical,
-  Sun, Moon, ChevronDown
+  Sun, Moon, ChevronDown, ChevronUp
 } from 'lucide-react';
 import { TaskModal } from '../Tasks/TaskModal';
 import { SmartTaskModal } from '../Tasks/SmartTaskModal';
@@ -1833,65 +1833,60 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
                 <div className="grid grid-cols-3 gap-3">
                   {/* Light/Dark Theme Pairs - Collapsible Stack */}
                   <div className="col-span-3 mb-2">
-                    <button
-                      onClick={() => setShowThemePairs(!showThemePairs)}
-                      className={`w-full relative group cursor-pointer rounded-xl overflow-hidden border-2 transition-all duration-300 ${
-                        showThemePairs 
-                          ? 'border-transparent' 
-                          : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
-                      }`}
-                      style={showThemePairs ? {
-                        borderColor: state.preferences.accentColor,
-                      } : {}}
-                    >
-                      {/* Stacked Preview (collapsed state) */}
-                      <div className={`relative h-14 transition-all duration-300 ${showThemePairs ? 'opacity-0 h-0' : 'opacity-100'}`}>
-                        {/* Stack of images */}
-                        <div className="absolute inset-0 flex">
-                          <div className="flex-1 relative overflow-hidden">
-                            <img src="/backgrounds/bg12.png" alt="" className="w-full h-full object-cover" />
+                    {/* Collapsed state button */}
+                    {!showThemePairs && (
+                      <button
+                        onClick={() => setShowThemePairs(true)}
+                        className="w-full relative group cursor-pointer rounded-xl overflow-hidden border-2 border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 transition-all duration-300"
+                      >
+                        {/* Stacked Preview */}
+                        <div className="relative h-14">
+                          {/* Stack of images */}
+                          <div className="absolute inset-0 flex">
+                            <div className="flex-1 relative overflow-hidden">
+                              <img src="/backgrounds/bg12.png" alt="" className="w-full h-full object-cover" />
+                            </div>
+                            <div className="w-px bg-gray-300 dark:bg-gray-600" />
+                            <div className="flex-1 relative overflow-hidden">
+                              <img src="/backgrounds/bg13.png" alt="" className="w-full h-full object-cover" />
+                            </div>
                           </div>
-                          <div className="w-px bg-gray-300 dark:bg-gray-600" />
-                          <div className="flex-1 relative overflow-hidden">
-                            <img src="/backgrounds/bg13.png" alt="" className="w-full h-full object-cover" />
+                          {/* Stacked cards effect */}
+                          <div className="absolute inset-x-1 -bottom-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-b-lg opacity-60" />
+                          <div className="absolute inset-x-2 -bottom-2 h-2 bg-gray-300 dark:bg-gray-600 rounded-b-lg opacity-40" />
+                          {/* Overlay with label */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent flex items-end justify-center pb-2">
+                            <div className="flex items-center gap-2 text-white">
+                              <Sun className="w-3 h-3 text-amber-400" />
+                              <span className="text-xs font-medium">/</span>
+                              <Moon className="w-3 h-3 text-blue-400" />
+                              <span className="text-xs font-medium ml-1">Theme-Paare</span>
+                              <ChevronDown className="w-3 h-3 ml-1" />
+                            </div>
                           </div>
+                          {/* Active pair indicator */}
+                          {(state.preferences.backgroundImage?.match(/bg1[2-9]\.png|bg2[2-5]\.png/)) && (
+                            <div className="absolute top-2 right-2">
+                              <div className="w-2.5 h-2.5 rounded-full animate-pulse" style={{ backgroundColor: state.preferences.accentColor }} />
+                            </div>
+                          )}
                         </div>
-                        {/* Stacked cards effect */}
-                        <div className="absolute inset-x-1 -bottom-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-b-lg opacity-60" />
-                        <div className="absolute inset-x-2 -bottom-2 h-2 bg-gray-300 dark:bg-gray-600 rounded-b-lg opacity-40" />
-                        {/* Overlay with label */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent flex items-end justify-center pb-2">
-                          <div className="flex items-center gap-2 text-white">
-                            <Sun className="w-3 h-3 text-amber-400" />
-                            <span className="text-xs font-medium">/</span>
-                            <Moon className="w-3 h-3 text-blue-400" />
-                            <span className="text-xs font-medium ml-1">Theme-Paare</span>
-                            <ChevronDown className={`w-3 h-3 ml-1 transition-transform duration-300 ${showThemePairs ? 'rotate-180' : ''}`} />
-                          </div>
-                        </div>
-                        {/* Active pair indicator */}
-                        {(state.preferences.backgroundImage?.match(/bg1[2-9]\.png|bg2[0-3]\.png/)) && (
-                          <div className="absolute top-2 right-2">
-                            <div className="w-2.5 h-2.5 rounded-full animate-pulse" style={{ backgroundColor: state.preferences.accentColor }} />
-                          </div>
-                        )}
-                      </div>
-                    </button>
+                      </button>
+                    )}
                     
                     {/* Expanded pairs */}
-                    <div 
-                      className={`grid grid-cols-2 gap-2 overflow-hidden transition-all duration-500 ease-out ${
-                        showThemePairs ? 'max-h-[400px] opacity-100 mt-2' : 'max-h-0 opacity-0'
-                      }`}
-                    >
-                      {/* Theme Pair Cards */}
-                      {[
-                        { light: 'bg12.png', dark: 'bg13.png' },
-                        { light: 'bg14.png', dark: 'bg15.png' },
-                        { light: 'bg16.png', dark: 'bg17.png' },
-                        { light: 'bg18.png', dark: 'bg19.png' },
-                        { light: 'bg22.png', dark: 'bg23.png' },
-                      ].map((pair) => {
+                    {showThemePairs && (
+                      <div className="space-y-2">
+                        <div className="grid grid-cols-2 gap-2">
+                        {/* Theme Pair Cards */}
+                        {[
+                          { light: 'bg12.png', dark: 'bg13.png' },
+                          { light: 'bg14.png', dark: 'bg15.png' },
+                          { light: 'bg16.png', dark: 'bg17.png' },
+                          { light: 'bg18.png', dark: 'bg19.png' },
+                          { light: 'bg22.png', dark: 'bg23.png' },
+                          { light: 'bg24.png', dark: 'bg25.png' },
+                        ].map((pair) => {
                         const isSelected = state.preferences.backgroundImage?.includes(pair.light) || state.preferences.backgroundImage?.includes(pair.dark);
                         return (
                           <div
@@ -1932,7 +1927,17 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
                           </div>
                         );
                       })}
-                    </div>
+                        </div>
+                        {/* Collapse button */}
+                        <button
+                          onClick={() => setShowThemePairs(false)}
+                          className="w-full py-1.5 flex items-center justify-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50"
+                        >
+                          <ChevronUp className="w-3 h-3" />
+                          <span>{state.preferences.language === 'de' ? 'Einklappen' : 'Collapse'}</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
                   
                   {/* Regular Gallery Images (including bg20, bg21) */}
