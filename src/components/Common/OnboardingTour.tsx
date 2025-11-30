@@ -419,7 +419,7 @@ const pwaSections: TourSection[] = isPWA() ? [
         title: { de: 'Backups sind wichtig!', en: 'Backups are important!' },
         text: { de: 'Da deine Daten lokal gespeichert werden, empfehlen sich regelmäßige Backups. Der Backup-Button in der Sidebar ermöglicht schnelles Sichern am Ende jedes Arbeitstages.', en: 'Since your data is stored locally, regular backups are recommended. The backup button in the sidebar enables quick saving at the end of each work day.' },
         foxMessage: { de: 'Lieber einmal zu oft sichern!', en: 'Better safe than sorry!' },
-        position: 'center-right',
+        position: 'center',
         zoomElement: '[data-backup-button]'
       },
       {
@@ -1620,7 +1620,7 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
                   <p className="text-sm font-medium" style={{ color: accentColor }}>
                     {t(currentStep.foxMessage)}
                   </p>
-                </div>
+                      </div>
               )}
               
               {/* Task Modal hint */}
@@ -1860,7 +1860,7 @@ export function SplashModal({ isOpen, onClose, onStartOnboarding, showOnboarding
             }}
             style={{ animation: 'bounce-gentle 2s ease-in-out infinite' }}
           />
-        </div>
+                </div>
         
         {/* Title */}
         <div className="text-center px-6 pb-4">
