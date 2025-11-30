@@ -47,7 +47,7 @@
 
     /* Animated Background */
     .bg-animation {
-      position: fixed;
+            position: fixed;
       inset: 0;
       z-index: -1;
             overflow: hidden;
@@ -152,7 +152,7 @@
     header {
       position: fixed;
       top: 0;
-      left: 0;
+            left: 0;
       right: 0;
       z-index: 1000;
       padding: 1rem;
@@ -172,7 +172,7 @@
             display: flex;
             align-items: center;
       gap: 0.5rem;
-      text-decoration: none;
+            text-decoration: none;
       color: inherit;
             font-weight: 600;
       font-size: 1.125rem;
@@ -192,7 +192,7 @@
 
     /* Color Palette */
     .color-palette {
-      display: flex;
+            display: flex;
       gap: 0.375rem;
     }
 
@@ -261,7 +261,7 @@
     }
 
     .theme-toggle .toggle-icon {
-      position: absolute;
+            position: absolute;
       top: 50%;
       transform: translateY(-50%);
       width: 14px;
@@ -294,9 +294,9 @@
     .lang-btn {
       padding: 0.375rem 0.75rem;
       border-radius: 8px;
-      border: none;
+            border: none;
       background: rgba(0, 0, 0, 0.05);
-      cursor: pointer;
+            cursor: pointer;
       color: inherit;
       font-size: 0.75rem;
       font-weight: 600;
@@ -323,15 +323,15 @@
       justify-content: center;
       align-items: center;
       padding: 7rem 1.5rem 4rem;
-      text-align: center;
+            text-align: center;
     }
 
     .fox-container {
             position: relative;
       margin-bottom: 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
     }
 
     .fox-main {
@@ -393,13 +393,13 @@
     .hero-buttons {
             display: flex;
             gap: 1rem;
-      flex-wrap: wrap;
+            flex-wrap: wrap;
             justify-content: center;
-    }
+        }
 
     .btn {
       display: inline-flex;
-      align-items: center;
+            align-items: center;
       gap: 0.5rem;
       padding: 1rem 2rem;
       border-radius: 9999px;
@@ -415,7 +415,7 @@
 
     .btn-primary {
       background: var(--accent);
-      color: white;
+            color: white;
       box-shadow: 0 8px 30px -5px var(--accent);
     }
 
@@ -447,7 +447,7 @@
 
     .try-banner-inner {
       max-width: 800px;
-      margin: 0 auto;
+                margin: 0 auto;
       padding: 1.75rem 2rem;
       border-radius: 20px;
             display: flex;
@@ -465,7 +465,7 @@
     .try-banner p {
       color: var(--muted);
       margin-top: 0.25rem;
-      font-size: 0.95rem;
+                font-size: 0.95rem;
     }
 
     body.dark .try-banner p { color: var(--muted-dark); }
@@ -519,9 +519,9 @@
             overflow: hidden;
       cursor: pointer;
       display: inline-block;
-      width: 100%;
+            width: 100%;
       vertical-align: top;
-      opacity: 0;
+            opacity: 0;
       transform: translateY(16px);
       transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1), 
                   transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), 
@@ -541,7 +541,7 @@
 
     /* Visible state - triggered by JS */
     .screenshot-card.card-visible {
-      opacity: 1;
+            opacity: 1;
       transform: translateY(0);
     }
 
@@ -650,16 +650,16 @@
         }
 
     /* Features */
-    .features {
+        .features {
       padding: 5rem 1.5rem;
             position: relative;
         }
 
-    .features::before {
+        .features::before {
             content: '';
             position: absolute;
             top: 0;
-      left: 10%;
+            left: 10%;
       right: 10%;
       height: 1px;
       background: linear-gradient(90deg, transparent, var(--border), transparent);
@@ -686,27 +686,27 @@
 
     .features-grid {
             display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 1.25rem;
     }
 
     .feature {
       padding: 1.75rem;
-      border-radius: 16px;
+            border-radius: 16px;
       transition: all 0.3s;
     }
 
     .feature:hover {
-      transform: translateY(-4px);
-    }
+            transform: translateY(-4px);
+        }
 
-    .feature-icon {
+        .feature-icon {
       width: 48px;
       height: 48px;
       border-radius: 12px;
             display: flex;
             align-items: center;
-      justify-content: center;
+            justify-content: center;
       margin-bottom: 1rem;
       background: var(--accent);
       color: white;
@@ -722,7 +722,7 @@
 
     .feature p {
       color: var(--muted);
-      font-size: 0.9rem;
+            font-size: 0.9rem;
     }
 
     body.dark .feature p { color: var(--muted-dark); }
@@ -749,18 +749,18 @@
 
     .privacy-inner {
       max-width: 900px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-    }
-
-    @media (max-width: 768px) {
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+                gap: 2rem;
+            }
+            
+        @media (max-width: 768px) {
       .privacy-inner { grid-template-columns: 1fr; }
     }
 
     .privacy-card {
-      padding: 2rem;
+            padding: 2rem;
       border-radius: 20px;
       display: flex;
       gap: 1.5rem;
@@ -776,15 +776,15 @@
     .privacy-card h3 {
       font-size: 1.25rem;
       font-weight: 700;
-      margin-bottom: 0.75rem;
-      display: flex;
-      align-items: center;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
       gap: 0.5rem;
     }
 
     .privacy-card p {
       color: var(--muted);
-      font-size: 0.95rem;
+            font-size: 0.95rem;
       line-height: 1.7;
     }
 
@@ -792,7 +792,7 @@
 
     .privacy-badge {
       display: inline-flex;
-      align-items: center;
+            align-items: center;
       gap: 0.375rem;
       padding: 0.25rem 0.75rem;
       border-radius: 9999px;
@@ -829,7 +829,7 @@
 
     .wallpapers-inner {
       max-width: 1100px;
-      margin: 0 auto;
+            margin: 0 auto;
     }
 
     .wallpapers-header {
@@ -846,7 +846,7 @@
     .wallpapers-header p {
       color: var(--muted);
       font-size: 1.05rem;
-      max-width: 500px;
+            max-width: 500px;
       margin: 0 auto;
     }
 
@@ -859,11 +859,11 @@
     }
 
     .wallpaper-card {
-      position: relative;
+            position: relative;
       border-radius: 16px;
       overflow: hidden;
       aspect-ratio: 16/10;
-      cursor: pointer;
+            cursor: pointer;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
@@ -879,10 +879,10 @@
     }
 
     .wallpaper-overlay {
-      position: absolute;
+            position: absolute;
       inset: 0;
       background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
-      opacity: 0;
+            opacity: 0;
       transition: opacity 0.3s;
       display: flex;
       align-items: flex-end;
@@ -891,8 +891,8 @@
     }
 
     .wallpaper-card:hover .wallpaper-overlay {
-      opacity: 1;
-    }
+            opacity: 1;
+        }
 
     .wallpaper-download {
       display: inline-flex;
@@ -911,7 +911,7 @@
     .wallpaper-download:hover {
       transform: scale(1.05);
       background: var(--accent);
-      color: white;
+            color: white;
     }
 
     .wallpaper-download svg {
@@ -927,7 +927,7 @@
 
     .cta-inner {
       max-width: 650px;
-      margin: 0 auto;
+            margin: 0 auto;
     }
 
     .cta-fox {
@@ -939,7 +939,7 @@
 
     .cta h2 {
       font-size: clamp(1.75rem, 4vw, 2.25rem);
-      font-weight: 700;
+            font-weight: 700;
       margin-bottom: 0.75rem;
     }
 
@@ -954,7 +954,7 @@
     .cta-buttons {
             display: flex;
       gap: 1rem;
-      justify-content: center;
+            justify-content: center;
       flex-wrap: wrap;
     }
 
@@ -966,37 +966,37 @@
       backdrop-filter: blur(8px);
       z-index: 10001;
       display: none;
-      align-items: center;
-      justify-content: center;
+            align-items: center;
+            justify-content: center;
       padding: 1.5rem;
     }
 
     .modal-overlay.show {
-      display: flex;
+            display: flex;
       animation: fadeIn 0.2s ease;
     }
 
     .modal-content {
       max-width: 560px;
-      width: 100%;
+            width: 100%;
       border-radius: 24px;
       padding: 2.5rem;
-      position: relative;
+            position: relative;
       animation: scaleIn 0.25s ease;
     }
 
     .modal-close {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
       width: 36px;
       height: 36px;
-      border: none;
+            border: none;
       background: rgba(0,0,0,0.05);
       border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
       justify-content: center;
       font-size: 1.25rem;
       color: var(--muted);
@@ -1046,25 +1046,25 @@
       font-size: 1rem;
       font-weight: 600;
       margin: 1.5rem 0 0.75rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
     }
 
     .browser-instructions {
       display: flex;
-      flex-direction: column;
+                flex-direction: column;
       gap: 0.75rem;
     }
 
     .browser-item {
-      display: flex;
+                display: flex;
       align-items: center;
       gap: 0.75rem;
       padding: 0.75rem 1rem;
       border-radius: 12px;
       background: rgba(0,0,0,0.03);
-      font-size: 0.9rem;
+                font-size: 0.9rem;
     }
 
     body.dark .browser-item {
@@ -1077,7 +1077,7 @@
 
     .modal-cta {
       margin-top: 2rem;
-      text-align: center;
+                text-align: center;
     }
 
     .modal-cta .btn-primary {
@@ -1200,6 +1200,38 @@
     .feature:nth-child(4) { transition-delay: 0.24s; }
     .feature:nth-child(5) { transition-delay: 0.32s; }
     .feature:nth-child(6) { transition-delay: 0.4s; }
+
+    /* Startfox images */
+    .startfox-hero {
+      width: 120px;
+      height: auto;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      margin-left: 0.5rem;
+    }
+
+    .startfox-hero:hover {
+      transform: scale(1.08);
+    }
+
+    .startfox-cta {
+      width: 100px;
+      height: auto;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      margin-left: 0.5rem;
+    }
+
+    .startfox-cta:hover {
+      transform: scale(1.08);
+    }
+
+    @media (max-width: 640px) {
+      .startfox-hero,
+      .startfox-cta {
+        width: 80px;
+      }
+    }
     </style>
 </head>
 <body>
@@ -1214,7 +1246,7 @@
   <header>
     <div class="header-inner glass">
       <a href="#" class="logo">
-        <img src="assets/images/3d_fox.png" alt="TaskFuchs">
+        <img src="assets/images/3d_fox_light.png" alt="TaskFuchs" data-fox>
         <span>TaskFuchs</span>
       </a>
       
@@ -1254,7 +1286,7 @@
             
     <div class="fox-container slide-in">
       <div class="fox-ring"></div>
-      <img src="assets/images/3d_fox.png" alt="TaskFuchs" class="fox-main">
+      <img src="assets/images/3d_fox_light.png" alt="TaskFuchs" class="fox-main" data-fox>
         </div>
     
     <h1 class="slide-in" style="transition-delay: 0.1s">
@@ -1269,39 +1301,25 @@
     <div class="hero-buttons slide-in" style="transition-delay: 0.3s">
       <button class="btn btn-primary" onclick="openPWAModal()">
         <span data-i18n="hero.tryNow">Jetzt ausprobieren</span>
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                                </svg>
       </button>
+      <img src="assets/images/startfox_light.png" alt="" class="startfox-hero" onclick="openPWAModal()" data-startfox>
         </div>
     </section>
 
-  <!-- Try Banner -->
-  <section class="try-banner">
-    <div class="try-banner-inner glass slide-in">
-      <div>
-        <h3 data-i18n="banner.title">Probier's direkt im Browser aus</h3>
-        <p data-i18n="banner.subtitle">Kein Account nötig. Deine Daten bleiben lokal auf deinem Gerät.</p>
-            </div>
-      <button class="btn btn-primary" onclick="openPWAModal()" data-i18n="banner.button">
-        Los geht's
-      </button>
-                    </div>
-  </section>
 
   <!-- Screenshots Showcase -->
   <section class="showcase" id="showcase">
     <div class="showcase-header slide-in">
       <h2 data-i18n="showcase.title">So sieht TaskFuchs aus</h2>
       <p data-i18n="showcase.subtitle">Elegant, aufgeräumt und immer im Blick.</p>
-                </div>
-
+            </div>
+            
     <div class="screenshot-masonry">
       <div class="screenshot-card glass-premium" onclick="openLightbox(this)">
         <img src="assets/screenshots/Planer.png" alt="Wochenplaner" data-screenshot="Planer">
         <div class="label" data-i18n="showcase.planner.title">Wochenplaner</div>
         <div class="desc" data-i18n="showcase.planner.desc">Deine ganze Woche auf einen Blick. Per Drag & Drop verschieben.</div>
-                </div>
+                    </div>
 
       <div class="screenshot-card glass-premium" onclick="openLightbox(this)">
         <img src="assets/screenshots/Heute.png" alt="Heute" data-screenshot="Heute">
@@ -1331,41 +1349,41 @@
         <img src="assets/screenshots/Theme-Konfiguration_l.png" alt="Themes" data-screenshot="Theme-Konfiguration">
         <div class="label" data-i18n="showcase.themes.title">Dein Style</div>
         <div class="desc" data-i18n="showcase.themes.desc">Farben, Hintergründe und Dark Mode nach deinem Geschmack.</div>
-                    </div>
+                </div>
 
       <div class="screenshot-card glass-premium" onclick="openLightbox(this)">
         <img src="assets/screenshots/settings_l.png" alt="Einstellungen" data-screenshot="settings">
         <div class="label" data-i18n="showcase.settings.title">Einstellungen</div>
         <div class="desc" data-i18n="showcase.settings.desc">Passe TaskFuchs ganz nach deinen Wünschen an.</div>
-        </div>
-        
+                </div>
+
       <div class="screenshot-card glass-premium" onclick="openLightbox(this)">
         <img src="assets/screenshots/smart aufgabe erstellen_l.png" alt="Smart Aufgabe" data-screenshot="smart aufgabe erstellen">
         <div class="label" data-i18n="showcase.smart.title">Schnelle Eingabe</div>
         <div class="desc" data-i18n="showcase.smart.desc">Aufgaben blitzschnell mit natürlicher Sprache erstellen.</div>
-            </div>
-            
+                </div>
+
       <div class="screenshot-card glass-premium" onclick="openLightbox(this)">
         <img src="assets/screenshots/Reports.png" alt="Reports" data-screenshot="Reports">
         <div class="label" data-i18n="showcase.reports.title">Statistiken</div>
         <div class="desc" data-i18n="showcase.reports.desc">Behalte den Überblick über deine Produktivität.</div>
-                    </div>
-                </div>
-  </section>
+            </div>
+        </div>
+    </section>
 
   <!-- Lightbox -->
   <div class="lightbox" id="lightbox" onclick="closeLightbox()">
     <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
     <img src="" alt="" id="lightbox-img">
-                </div>
-
+        </div>
+        
   <!-- Features -->
   <section class="features">
     <div class="features-inner">
       <div class="features-header slide-in">
         <h2 data-i18n="features.title">Was TaskFuchs kann</h2>
-                </div>
-
+            </div>
+            
       <div class="features-grid">
         <div class="feature glass slide-in">
                     <div class="feature-icon">
@@ -1434,32 +1452,32 @@
   <section class="privacy-section">
     <div class="privacy-inner">
       <div class="privacy-card glass slide-in">
-        <img src="assets/images/3d_fox.png" alt="Privacy">
+        <img src="assets/images/3d_fox_light.png" alt="Privacy" data-fox>
         <div>
           <h3>
             <span data-i18n="privacy.data.title">Deine Daten gehören Dir</span>
             <span class="privacy-badge">
               <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-              </svg>
+                        </svg>
               100%
             </span>
           </h3>
           <p data-i18n="privacy.data.desc">
             TaskFuchs sammelt keine Nutzerdaten, keine Analytics, kein Tracking. Deine Aufgaben bleiben auf deinem Gerät – immer. Du behältst die volle Kontrolle.
           </p>
-        </div>
-      </div>
+                    </div>
+                </div>
 
       <div class="privacy-card glass slide-in">
-        <img src="assets/images/3d_fox.png" alt="No AI">
+        <img src="assets/images/3d_fox_light.png" alt="No AI" data-fox>
         <div>
           <h3 data-i18n="privacy.noai.title">Bewusst ohne KI</h3>
           <p data-i18n="privacy.noai.desc">
             Wir verzichten bewusst auf KI-Funktionen. Warum? Du bist Herr über deine Zeit – nicht ein Algorithmus. Keine automatischen Vorschläge, keine Ablenkung. Nur du und deine Aufgaben.
           </p>
-        </div>
-      </div>
+                    </div>
+                </div>
     </div>
   </section>
 
@@ -1478,11 +1496,11 @@
             <a href="assets/wallpapers/bg12.png" download class="wallpaper-download">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-              </svg>
+                        </svg>
               Download
             </a>
-          </div>
-        </div>
+                    </div>
+                </div>
 
         <div class="wallpaper-card slide-in">
           <img src="assets/wallpapers/bg13.png" alt="Wallpaper">
@@ -1490,11 +1508,11 @@
             <a href="assets/wallpapers/bg13.png" download class="wallpaper-download">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-              </svg>
+                        </svg>
               Download
             </a>
-          </div>
-        </div>
+                    </div>
+                </div>
 
         <div class="wallpaper-card slide-in">
           <img src="assets/wallpapers/bg14.png" alt="Wallpaper">
@@ -1502,11 +1520,11 @@
             <a href="assets/wallpapers/bg14.png" download class="wallpaper-download">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-              </svg>
+                        </svg>
               Download
             </a>
-          </div>
-        </div>
+                    </div>
+                </div>
 
         <div class="wallpaper-card slide-in">
           <img src="assets/wallpapers/bg15.png" alt="Wallpaper">
@@ -1514,11 +1532,11 @@
             <a href="assets/wallpapers/bg15.png" download class="wallpaper-download">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-              </svg>
+                        </svg>
               Download
             </a>
-          </div>
-        </div>
+                    </div>
+                </div>
 
         <div class="wallpaper-card slide-in">
           <img src="assets/wallpapers/bg16.png" alt="Wallpaper">
@@ -1529,7 +1547,7 @@
               </svg>
               Download
             </a>
-          </div>
+            </div>
         </div>
 
         <div class="wallpaper-card slide-in">
@@ -1543,7 +1561,7 @@
             </a>
           </div>
         </div>
-
+        
         <div class="wallpaper-card slide-in">
           <img src="assets/wallpapers/bg18.png" alt="Wallpaper">
           <div class="wallpaper-overlay">
@@ -1553,20 +1571,20 @@
               </svg>
               Download
             </a>
-          </div>
+            </div>
         </div>
-
+        
         <div class="wallpaper-card slide-in">
           <img src="assets/wallpapers/bg19.png" alt="Wallpaper">
           <div class="wallpaper-overlay">
             <a href="assets/wallpapers/bg19.png" download class="wallpaper-download">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-              </svg>
+                        </svg>
               Download
             </a>
-          </div>
-        </div>
+                    </div>
+                </div>
 
         <div class="wallpaper-card slide-in">
           <img src="assets/wallpapers/bg20.png" alt="Wallpaper">
@@ -1574,11 +1592,11 @@
             <a href="assets/wallpapers/bg20.png" download class="wallpaper-download">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-              </svg>
+                        </svg>
               Download
             </a>
-          </div>
-        </div>
+                    </div>
+                </div>
 
         <div class="wallpaper-card slide-in">
           <img src="assets/wallpapers/bg22.png" alt="Wallpaper">
@@ -1586,11 +1604,11 @@
             <a href="assets/wallpapers/bg22.png" download class="wallpaper-download">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-              </svg>
+                        </svg>
               Download
             </a>
-          </div>
-        </div>
+                    </div>
+                </div>
 
         <div class="wallpaper-card slide-in">
           <img src="assets/wallpapers/bg23.png" alt="Wallpaper">
@@ -1598,11 +1616,11 @@
             <a href="assets/wallpapers/bg23.png" download class="wallpaper-download">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-              </svg>
+                        </svg>
               Download
             </a>
-          </div>
-        </div>
+                    </div>
+                </div>
 
         <div class="wallpaper-card slide-in">
           <img src="assets/wallpapers/bg24.png" alt="Wallpaper">
@@ -1610,11 +1628,11 @@
             <a href="assets/wallpapers/bg24.png" download class="wallpaper-download">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-              </svg>
+                        </svg>
               Download
             </a>
-          </div>
-        </div>
+                    </div>
+                </div>
 
         <div class="wallpaper-card slide-in">
           <img src="assets/wallpapers/bg25.png" alt="Wallpaper">
@@ -1622,25 +1640,25 @@
             <a href="assets/wallpapers/bg25.png" download class="wallpaper-download">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-              </svg>
+                        </svg>
               Download
             </a>
-          </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </section>
+    </section>
 
   <!-- CTA -->
   <section class="cta">
     <div class="cta-inner slide-in">
-      <img src="assets/images/3d_fox.png" alt="" class="cta-fox">
       <h2 data-i18n="cta.title">Bereit, produktiver zu werden?</h2>
       <p data-i18n="cta.subtitle">TaskFuchs ist kostenlos, Open Source und respektiert deine Privatsphäre.</p>
       <div class="cta-buttons">
         <button class="btn btn-primary" onclick="openPWAModal()" data-i18n="cta.button">
           Jetzt starten – kostenlos
         </button>
+        <img src="assets/images/startfox_light.png" alt="" class="startfox-cta" onclick="openPWAModal()" data-startfox>
         </div>
             </div>
     </section>
@@ -1651,7 +1669,7 @@
       <button class="modal-close" onclick="closePWAModal()">&times;</button>
       
       <div class="modal-header">
-        <img src="assets/images/3d_fox.png" alt="TaskFuchs">
+        <img src="assets/images/3d_fox_light.png" alt="TaskFuchs" data-fox>
         <h3 data-i18n="modal.title">TaskFuchs starten</h3>
       </div>
 
@@ -1671,11 +1689,11 @@
           <div class="browser-item">
             <strong>Chrome</strong>
             <span data-i18n="modal.chrome">Adresszeile → Installationssymbol → "Installieren"</span>
-          </div>
+                </div>
           <div class="browser-item">
             <strong>Safari</strong>
             <span data-i18n="modal.safari">Teilen-Button → "Zum Home-Bildschirm"</span>
-          </div>
+                </div>
           <div class="browser-item">
             <strong>Edge</strong>
             <span data-i18n="modal.edge">Menü (···) → "App installieren"</span>
@@ -1683,17 +1701,17 @@
           <div class="browser-item">
             <strong>Firefox</strong>
             <span data-i18n="modal.firefox">Adresszeile → "Als App installieren"</span>
-          </div>
+            </div>
         </div>
-      </div>
+    </div>
 
       <div class="modal-cta">
         <a href="https://app.taskfuchs.de" class="btn btn-primary" data-i18n="modal.start">
           TaskFuchs öffnen
         </a>
       </div>
+        </div>
     </div>
-  </div>
 
     <!-- Footer -->
   <footer>
@@ -1705,7 +1723,7 @@
                 </div>
       <div class="footer-copy">
         <span>© 2025</span>
-        <img src="assets/images/3d_fox.png" alt="">
+        <img src="assets/images/3d_fox_light.png" alt="" data-fox>
         <span>TaskFuchs</span>
             </div>
         </div>
@@ -1869,11 +1887,21 @@
         const baseName = img.dataset.screenshot;
         if (knownThemedScreenshots.includes(baseName)) {
           const newSrc = `assets/screenshots/${baseName}${suffix}.png`;
-          // Only update if src is different to avoid flicker
           if (img.src !== newSrc && !img.src.endsWith(newSrc)) {
             img.src = newSrc;
           }
         }
+      });
+
+      // Update fox images based on theme
+      const foxSuffix = t === 'dark' ? 'dark' : 'light';
+      document.querySelectorAll('img[data-fox]').forEach(img => {
+        img.src = `assets/images/3d_fox_${foxSuffix}.png`;
+      });
+      
+      // Update startfox images
+      document.querySelectorAll('img[data-startfox]').forEach(img => {
+        img.src = `assets/images/startfox_${foxSuffix}.png`;
       });
     }
 
@@ -1891,7 +1919,7 @@
           // Check if the value contains HTML
           if (t[key].includes('<')) {
             el.innerHTML = t[key];
-          } else {
+                } else {
             el.textContent = t[key];
           }
         }
@@ -2029,4 +2057,4 @@
             }
     </script>
 </body>
-</html>
+</html> 
