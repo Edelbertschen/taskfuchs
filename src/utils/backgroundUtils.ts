@@ -115,7 +115,7 @@ function darkenColor(color: string): string {
 export function getBackgroundOverlayStyles(preferences: UserPreferences, isDarkMode: boolean): React.CSSProperties {
   const backgroundType = preferences.backgroundType || 'image';
   
-  if (backgroundType === 'image' && preferences.backgroundImage && preferences.backgroundEffects?.overlay !== false) {
+  if (backgroundType === 'image' && preferences.backgroundImage && preferences.backgroundEffects?.overlay === true) {
     const overlayOpacity = preferences.backgroundEffects?.overlayOpacity || 0.4;
     
     return {

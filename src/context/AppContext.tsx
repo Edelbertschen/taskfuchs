@@ -416,7 +416,7 @@ const initialState: AppState = {
     // Background effects
     backgroundEffects: {
       blur: false,
-      overlay: true,
+      overlay: false,
       overlayOpacity: 0.4,
     },
   },
@@ -833,7 +833,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
           // Ensure background effects structure is maintained
           backgroundEffects: {
             blur: false,
-            overlay: true,
+            overlay: false,
             overlayOpacity: 0.4,
             ...state.preferences?.backgroundEffects,
             ...action.payload.backgroundEffects

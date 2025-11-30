@@ -4144,7 +4144,7 @@ const Settings = React.memo(() => {
                           payload: { 
                             backgroundEffects: {
                               blur: !(state.preferences.backgroundEffects?.blur === true),
-                              overlay: state.preferences.backgroundEffects?.overlay !== false,
+                              overlay: state.preferences.backgroundEffects?.overlay === true,
                               overlayOpacity: state.preferences.backgroundEffects?.overlayOpacity || 0.4
                             }
                           }
@@ -4160,13 +4160,13 @@ const Settings = React.memo(() => {
                       <div className="text-sm text-gray-500 dark:text-gray-400">Transparente Verdunklung für bessere Lesbarkeit</div>
                     </div>
                     <Toggle 
-                      enabled={state.preferences.backgroundEffects?.overlay !== false}
+                      enabled={state.preferences.backgroundEffects?.overlay === true}
                       onChange={state.preferences.minimalDesign ? undefined : () => {
                         dispatch({ 
                           type: 'UPDATE_PREFERENCES', 
                           payload: { 
                             backgroundEffects: {
-                              blur: state.preferences.backgroundEffects?.blur !== false,
+                              blur: state.preferences.backgroundEffects?.blur === true,
                               overlay: !state.preferences.backgroundEffects?.overlay,
                               overlayOpacity: state.preferences.backgroundEffects?.overlayOpacity || 0.4
                             }
@@ -4177,7 +4177,7 @@ const Settings = React.memo(() => {
                     />
                   </div>
                   
-                  {state.preferences.backgroundEffects?.overlay !== false && (
+                  {state.preferences.backgroundEffects?.overlay === true && (
                     <div className="pt-4 border-t border-gray-200 dark:border-gray-600">
                       <div className="flex items-center justify-between">
                         <div>
@@ -4197,8 +4197,8 @@ const Settings = React.memo(() => {
                               type: 'UPDATE_PREFERENCES', 
                               payload: { 
                                 backgroundEffects: {
-                                  blur: state.preferences.backgroundEffects?.blur !== false,
-                                  overlay: state.preferences.backgroundEffects?.overlay !== false,
+                                  blur: state.preferences.backgroundEffects?.blur === true,
+                                  overlay: state.preferences.backgroundEffects?.overlay === true,
                                   overlayOpacity: parseFloat(e.target.value)
                                 }
                               }
