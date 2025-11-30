@@ -151,7 +151,7 @@
     /* Header */
     header {
       position: fixed;
-      top: 0;
+            top: 0;
             left: 0;
       right: 0;
       z-index: 1000;
@@ -171,7 +171,7 @@
     .logo {
             display: flex;
             align-items: center;
-      gap: 0.5rem;
+            gap: 0.5rem;
             text-decoration: none;
       color: inherit;
             font-weight: 600;
@@ -227,7 +227,7 @@
 
     /* Toggle Switch */
     .theme-toggle {
-      position: relative;
+            position: relative;
       width: 56px;
       height: 28px;
       background: rgba(0, 0, 0, 0.1);
@@ -272,7 +272,7 @@
     .theme-toggle .icon-sun {
       left: 7px;
       color: #f59e0b;
-            opacity: 1;
+                opacity: 1;
         }
 
     .theme-toggle .icon-moon {
@@ -319,9 +319,9 @@
     .hero {
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
+                flex-direction: column;
       justify-content: center;
-      align-items: center;
+                align-items: center;
       padding: 7rem 1.5rem 4rem;
             text-align: center;
     }
@@ -357,7 +357,7 @@
             left: 50%;
       margin-top: -210px;
       margin-left: -210px;
-      border-radius: 50%;
+            border-radius: 50%;
       border: 2px dashed var(--accent);
                 opacity: 0.4;
       animation: spin 25s linear infinite;
@@ -597,14 +597,14 @@
     }
 
     .privacy-card img {
-      width: 80px;
-      height: 80px;
+                width: 80px;
+                height: 80px;
       flex-shrink: 0;
     }
 
     .privacy-icon {
-      width: 150px;
-      height: 150px;
+      width: 180px;
+      height: 180px;
       object-fit: contain;
     }
 
@@ -645,7 +645,7 @@
     /* Wallpapers Section */
     .wallpapers-section {
       padding: 5rem 1.5rem;
-      position: relative;
+            position: relative;
     }
 
     .wallpapers-section::before {
@@ -665,12 +665,12 @@
     .wallpapers-inner {
       max-width: 1100px;
             margin: 0 auto;
-    }
+        }
 
     .wallpapers-header {
-      text-align: center;
-      margin-bottom: 3rem;
-    }
+            text-align: center;
+            margin-bottom: 3rem;
+        }
 
     .wallpapers-header h2 {
       font-size: clamp(1.75rem, 4vw, 2.5rem);
@@ -682,8 +682,8 @@
       color: var(--muted);
       font-size: 1.05rem;
             max-width: 500px;
-      margin: 0 auto;
-    }
+            margin: 0 auto;
+        }
 
     body.dark .wallpapers-header p { color: var(--muted-dark); }
 
@@ -788,7 +788,7 @@
 
     .cta-buttons {
             display: flex;
-      gap: 1rem;
+            gap: 1rem;
             justify-content: center;
       flex-wrap: wrap;
     }
@@ -841,17 +841,17 @@
       font-size: 1.25rem;
       color: var(--muted);
       transition: all 0.2s;
-    }
+        }
 
     body.dark .modal-close {
       background: rgba(255,255,255,0.1);
       color: var(--muted-dark);
-    }
+        }
 
     .modal-close:hover {
       background: rgba(0,0,0,0.1);
-      transform: scale(1.1);
-    }
+            transform: scale(1.1);
+        }
 
     body.dark .modal-close:hover {
       background: rgba(255,255,255,0.15);
@@ -871,7 +871,7 @@
 
     .modal-header h3 {
       font-size: 1.5rem;
-      font-weight: 700;
+            font-weight: 700;
     }
 
     .modal-body p {
@@ -884,7 +884,7 @@
 
     .modal-body h4 {
       font-size: 1rem;
-      font-weight: 600;
+            font-weight: 600;
       margin: 1.5rem 0 0.75rem;
             display: flex;
             align-items: center;
@@ -894,18 +894,18 @@
     .browser-instructions {
       display: flex;
                 flex-direction: column;
-      gap: 0.75rem;
+            gap: 0.75rem;
     }
 
     .browser-item {
-                display: flex;
-      align-items: center;
+            display: flex;
+            align-items: center;
       gap: 0.75rem;
       padding: 0.75rem 1rem;
       border-radius: 12px;
       background: rgba(0,0,0,0.03);
-                font-size: 0.9rem;
-    }
+            font-size: 0.9rem;
+        }
 
     body.dark .browser-item {
       background: rgba(255,255,255,0.05);
@@ -921,7 +921,7 @@
     }
 
     .modal-cta .btn-primary {
-      width: 100%;
+            width: 100%;
       justify-content: center;
     }
 
@@ -986,14 +986,14 @@
       }
 
       .privacy-card {
-        flex-direction: column;
-        text-align: center;
+                flex-direction: column;
+                text-align: center;
         align-items: center;
       }
     }
 
     .color-palette-mobile {
-            display: none;
+                display: none;
       justify-content: center;
       gap: 0.5rem;
       margin-bottom: 1rem;
@@ -1012,13 +1012,13 @@
     }
 
     .slide-in-left {
-      opacity: 0;
+            opacity: 0;
       transform: translateX(-20px);
       transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-    }
+        }
 
     .slide-in-left.visible {
-      opacity: 1;
+            opacity: 1;
       transform: translateX(0);
     }
 
@@ -1129,12 +1129,12 @@
 
     /* Rotating border effect */
     .rotating-border {
-      position: relative;
-    }
+            position: relative;
+        }
 
     .rotating-border::before {
       content: '';
-      position: absolute;
+            position: absolute;
       inset: -3px;
       border-radius: inherit;
       background: conic-gradient(from 0deg, var(--accent), transparent, var(--accent));
@@ -1154,13 +1154,13 @@
 
     /* Shine effect on hover */
     .shine-effect {
-      position: relative;
-      overflow: hidden;
-    }
+            position: relative;
+            overflow: hidden;
+        }
 
     .shine-effect::after {
-      content: '';
-      position: absolute;
+            content: '';
+            position: absolute;
       top: -50%;
       left: -50%;
       width: 200%;
@@ -1218,7 +1218,7 @@
 
     /* Morphing blob background */
     .morphing-blob {
-      position: absolute;
+            position: absolute;
       width: 400px;
       height: 400px;
       background: var(--accent);
@@ -1244,20 +1244,20 @@
       bottom: 2rem;
       left: 50%;
       transform: translateX(-50%);
-      display: flex;
+            display: flex;
       flex-direction: column;
-      align-items: center;
+            align-items: center;
       gap: 0.5rem;
       color: var(--muted);
       font-size: 0.75rem;
       animation: bounce 2s ease-in-out infinite;
-    }
+        }
 
     body.dark .scroll-indicator { color: var(--muted-dark); }
 
     .scroll-indicator svg {
-      width: 24px;
-      height: 24px;
+            width: 24px;
+            height: 24px;
       animation: scrollArrow 1.5s ease-in-out infinite;
     }
 
@@ -1283,7 +1283,7 @@
 
     /* Stagger children animation */
     .stagger-children > * {
-      opacity: 0;
+            opacity: 0;
       transform: translateY(20px);
     }
 
@@ -1296,7 +1296,7 @@
 
     @keyframes staggerIn {
       to {
-        opacity: 1;
+            opacity: 1;
         transform: translateY(0);
       }
     }
@@ -1306,7 +1306,7 @@
       display: inline-flex;
       align-items: center;
       cursor: pointer;
-      position: relative;
+            position: relative;
       transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
@@ -1328,8 +1328,8 @@
       width: 140px;
       height: auto;
       margin-left: -50px;
-      position: relative;
-      z-index: 1;
+            position: relative;
+            z-index: 1;
       filter: drop-shadow(0 8px 20px rgba(0,0,0,0.2));
       transition: transform 0.3s ease;
     }
@@ -1341,7 +1341,7 @@
     /* Startfox CTA */
     .cta-button-wrapper {
       display: inline-flex;
-      align-items: center;
+            align-items: center;
       cursor: pointer;
       position: relative;
       transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1353,11 +1353,11 @@
 
     .cta-button-inner {
       background: var(--accent);
-      color: white;
+            color: white;
       padding: 1rem 3rem 1rem 2rem;
       border-radius: 9999px;
       font-size: 1rem;
-      font-weight: 600;
+            font-weight: 600;
       transition: all 0.3s;
     }
 
@@ -1441,7 +1441,7 @@
 
     .discover-content > p {
       color: var(--muted);
-      font-size: 1.1rem;
+                font-size: 1.1rem;
       line-height: 1.8;
       margin-bottom: 2rem;
     }
@@ -1489,7 +1489,7 @@
 
     .highlight-item:hover .highlight-icon {
       background: var(--accent);
-      color: white;
+                color: white;
       transform: scale(1.1) rotate(5deg);
     }
 
@@ -1499,7 +1499,7 @@
       border-radius: 10px;
       background: rgba(0,0,0,0.05);
       display: flex;
-      align-items: center;
+                align-items: center;
       justify-content: center;
       flex-shrink: 0;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1528,7 +1528,7 @@
     }
 
     .url-link-large {
-      display: inline-block;
+            display: inline-block;
       font-size: 1.5rem;
       font-weight: 700;
       color: var(--accent);
@@ -1541,12 +1541,12 @@
 
     .url-link-large:hover {
       background: var(--accent);
-      color: white;
+            color: white;
     }
 
     /* Modal URL */
     .modal-url {
-      text-align: center;
+            text-align: center;
       margin: 1.5rem 0;
       padding: 1rem;
       background: rgba(0,0,0,0.03);
@@ -1558,7 +1558,7 @@
     }
 
     .modal-url span {
-      display: block;
+            display: block;
       font-size: 0.875rem;
       color: var(--muted);
       margin-bottom: 0.5rem;
@@ -1633,7 +1633,7 @@
       <div class="fox-ring"></div>
       <img src="assets/images/3d_fox_light.png" alt="TaskFuchs" class="fox-main" data-fox>
         </div>
-    
+        
     <h1 class="slide-in" style="transition-delay: 0.1s">
       <span data-i18n="hero.line1">Aufgaben erledigen</span><br>
       <span data-i18n="hero.line2">kann auch</span> <span class="accent parallax-text" data-i18n="hero.line3">Spaß machen</span>
@@ -1646,16 +1646,16 @@
     <div class="hero-cta-wrapper slide-in shine-effect" style="transition-delay: 0.3s" onclick="openPWAModal()">
       <div class="hero-cta-button">
         <span data-i18n="hero.tryNow">Jetzt ausprobieren</span>
-      </div>
+            </div>
       <img src="assets/images/startfox_light.png" alt="" class="startfox-hero" data-startfox>
-    </div>
-
+            </div>
+            
     <div class="scroll-indicator">
       <span data-i18n="hero.scroll">Scroll</span>
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
       </svg>
-    </div>
+        </div>
     </section>
 
 
@@ -1675,32 +1675,32 @@
             <div class="highlight-icon">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
-              </svg>
-            </div>
+                                </svg>
+                            </div>
             <span data-i18n="discover.highlight1">Themes & Farben nach deinem Geschmack</span>
-          </div>
+                        </div>
           <div class="highlight-item">
             <div class="highlight-icon">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-              </svg>
-            </div>
+                                </svg>
+                            </div>
             <span data-i18n="discover.highlight2">Individuelle Hintergründe</span>
-          </div>
+                        </div>
           <div class="highlight-item">
             <div class="highlight-icon">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
-              </svg>
-            </div>
+                                </svg>
+                            </div>
             <span data-i18n="discover.highlight3">Light & Dark Mode</span>
-          </div>
+                        </div>
           <div class="highlight-item">
             <div class="highlight-icon">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/>
               </svg>
-            </div>
+                    </div>
             <span data-i18n="discover.highlight4">Interaktives Onboarding</span>
           </div>
         </div>
@@ -1709,11 +1709,11 @@
         </p>
         <div class="discover-url">
           <a href="https://app.taskfuchs.de" target="_blank" rel="noopener" class="url-link-large">app.taskfuchs.de</a>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </section>
-        
+    </section>
+
   <!-- Features -->
   <section class="features">
     <div class="features-inner">
@@ -1780,8 +1780,8 @@
                     </div>
           <h3 data-i18n="features.themes.title">Custom Themes</h3>
           <p data-i18n="features.themes.desc">Hintergründe, Farben, Dark Mode – alles anpassbar.</p>
+                    </div>
                 </div>
-            </div>
         </div>
     </section>
 
@@ -1813,10 +1813,10 @@
           <p data-i18n="privacy.noai.desc">
             Wir verzichten bewusst auf KI-Funktionen. Warum? Du bist Herr über deine Zeit – nicht ein Algorithmus. Keine automatischen Vorschläge, keine Ablenkung. Nur du und deine Aufgaben.
           </p>
-                    </div>
                 </div>
-    </div>
-  </section>
+            </div>
+        </div>
+    </section>
 
   <!-- Wallpapers Section -->
   <section class="wallpapers-section">
@@ -1824,8 +1824,8 @@
       <div class="wallpapers-header slide-in">
         <h2 data-i18n="wallpapers.title">Hintergründe als Wallpaper</h2>
         <p data-i18n="wallpapers.subtitle">Die schönen Hintergründe aus TaskFuchs jetzt auch für deinen Desktop.</p>
-      </div>
-
+        </div>
+        
       <div class="wallpapers-grid">
         <div class="wallpaper-card slide-in">
           <img src="assets/wallpapers/bg12.png" alt="Wallpaper">
@@ -1881,11 +1881,11 @@
             <a href="assets/wallpapers/bg16.png" download class="wallpaper-download">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-              </svg>
+                        </svg>
               Download
             </a>
-            </div>
-        </div>
+                    </div>
+                </div>
 
         <div class="wallpaper-card slide-in">
           <img src="assets/wallpapers/bg17.png" alt="Wallpaper">
@@ -1893,24 +1893,24 @@
             <a href="assets/wallpapers/bg17.png" download class="wallpaper-download">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-              </svg>
+                        </svg>
               Download
             </a>
-          </div>
-        </div>
-        
+                    </div>
+                </div>
+
         <div class="wallpaper-card slide-in">
           <img src="assets/wallpapers/bg18.png" alt="Wallpaper">
           <div class="wallpaper-overlay">
             <a href="assets/wallpapers/bg18.png" download class="wallpaper-download">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-              </svg>
+                        </svg>
               Download
             </a>
-            </div>
-        </div>
-        
+                    </div>
+                </div>
+
         <div class="wallpaper-card slide-in">
           <img src="assets/wallpapers/bg19.png" alt="Wallpaper">
           <div class="wallpaper-overlay">
@@ -1995,11 +1995,11 @@
         <div class="cta-button-wrapper" onclick="openPWAModal()">
           <div class="cta-button-inner" data-i18n="cta.button">
             Jetzt starten – kostenlos
-          </div>
-          <img src="assets/images/startfox_light.png" alt="" class="startfox-cta" data-startfox>
-        </div>
-        </div>
             </div>
+          <img src="assets/images/startfox_light.png" alt="" class="startfox-cta" data-startfox>
+                    </div>
+            </div>
+        </div>
     </section>
 
   <!-- PWA Modal -->
@@ -2007,10 +2007,10 @@
     <div class="modal-content glass">
       <button class="modal-close" onclick="closePWAModal()">&times;</button>
       
-      <div class="modal-header">
+                <div class="modal-header">
         <img src="assets/images/3d_fox_light.png" alt="TaskFuchs" data-fox>
         <h3 data-i18n="modal.title">TaskFuchs starten</h3>
-      </div>
+                </div>
 
       <div class="modal-body">
         <p data-i18n="modal.intro">
@@ -2028,34 +2028,34 @@
           <div class="browser-item">
             <strong>Chrome</strong>
             <span data-i18n="modal.chrome">Adresszeile → Installationssymbol → "Installieren"</span>
-                </div>
+            </div>
           <div class="browser-item">
             <strong>Safari</strong>
             <span data-i18n="modal.safari">Teilen-Button → "Zum Home-Bildschirm"</span>
-                </div>
+        </div>
           <div class="browser-item">
             <strong>Edge</strong>
             <span data-i18n="modal.edge">Menü (···) → "App installieren"</span>
-          </div>
+    </div>
           <div class="browser-item">
             <strong>Firefox</strong>
             <span data-i18n="modal.firefox">Adresszeile → "Als App installieren"</span>
+                </div>
+                </div>
             </div>
-        </div>
-    </div>
 
       <div class="modal-url">
         <span data-i18n="modal.url_label">Die App findest du unter:</span>
         <a href="https://app.taskfuchs.de" target="_blank" rel="noopener" class="url-link">app.taskfuchs.de</a>
-      </div>
+    </div>
 
       <div class="modal-cta">
         <a href="https://app.taskfuchs.de" target="_blank" rel="noopener" class="btn btn-primary" data-i18n="modal.start">
           TaskFuchs öffnen
         </a>
       </div>
+        </div>
     </div>
-  </div>
 
     <!-- Footer -->
   <footer>
@@ -2353,9 +2353,9 @@
       });
       
       // Observer for slide-in elements
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
             entry.target.classList.add('visible');
           }
         });
@@ -2363,7 +2363,7 @@
 
       elements.forEach(el => {
         if (!el.classList.contains('visible')) {
-          observer.observe(el);
+            observer.observe(el);
         }
       });
 
@@ -2380,7 +2380,7 @@
       revealElements.forEach(el => {
         if (isInViewport(el)) {
           el.classList.add('revealed');
-        } else {
+                } else {
           revealObserver.observe(el);
         }
       });
