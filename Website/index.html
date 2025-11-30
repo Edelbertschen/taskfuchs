@@ -415,13 +415,11 @@
 
     .btn-primary {
       background: var(--accent);
-            color: white;
-      box-shadow: 0 8px 30px -5px var(--accent);
+      color: white;
     }
 
     .btn-primary:hover {
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 15px 40px -5px var(--accent);
+      transform: translateY(-3px);
     }
 
     .btn-secondary {
@@ -470,152 +468,6 @@
 
     body.dark .try-banner p { color: var(--muted-dark); }
 
-    /* Screenshots - Grid Layout (stable 3 columns) */
-    .showcase {
-      padding: 4rem 1.5rem 6rem;
-    }
-
-    .showcase-header {
-            text-align: center;
-      margin-bottom: 3.5rem;
-    }
-
-    .showcase-header h2 {
-      font-size: clamp(2rem, 5vw, 3rem);
-            font-weight: 700;
-      margin-bottom: 0.75rem;
-    }
-
-    .showcase-header p {
-      color: var(--muted);
-      font-size: 1.125rem;
-      max-width: 500px;
-      margin: 0 auto;
-    }
-
-    body.dark .showcase-header p { color: var(--muted-dark); }
-
-    /* Masonry Layout with Columns */
-    .screenshot-masonry {
-      max-width: 1200px;
-      margin: 0 auto;
-      column-count: 3;
-      column-gap: 1.5rem;
-      column-fill: balance;
-    }
-
-    @media (max-width: 1024px) {
-      .screenshot-masonry { column-count: 2; }
-    }
-
-    @media (max-width: 640px) {
-      .screenshot-masonry { column-count: 1; }
-    }
-
-    .screenshot-card {
-      break-inside: avoid;
-      margin-bottom: 1.5rem;
-      border-radius: 16px;
-            overflow: hidden;
-      cursor: pointer;
-      display: inline-block;
-            width: 100%;
-      vertical-align: top;
-            opacity: 0;
-      transform: translateY(16px);
-      transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1), 
-                  transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), 
-                  box-shadow 0.4s ease;
-    }
-
-    /* Staggered animation delays - subtle cascade */
-    .screenshot-card:nth-child(1) { transition-delay: 0s; }
-    .screenshot-card:nth-child(2) { transition-delay: 0.06s; }
-    .screenshot-card:nth-child(3) { transition-delay: 0.12s; }
-    .screenshot-card:nth-child(4) { transition-delay: 0.18s; }
-    .screenshot-card:nth-child(5) { transition-delay: 0.24s; }
-    .screenshot-card:nth-child(6) { transition-delay: 0.3s; }
-    .screenshot-card:nth-child(7) { transition-delay: 0.36s; }
-    .screenshot-card:nth-child(8) { transition-delay: 0.42s; }
-    .screenshot-card:nth-child(9) { transition-delay: 0.48s; }
-
-    /* Visible state - triggered by JS */
-    .screenshot-card.card-visible {
-            opacity: 1;
-      transform: translateY(0);
-    }
-
-    .screenshot-card:first-child,
-    .screenshot-card:nth-child(4),
-    .screenshot-card:nth-child(7) {
-      margin-top: 0;
-    }
-
-    .screenshot-card:hover {
-      transform: translateY(-4px) !important;
-      box-shadow: 
-        0 20px 40px -15px rgba(0, 0, 0, 0.12),
-        0 8px 16px -8px rgba(0, 0, 0, 0.08);
-    }
-
-    body.dark .screenshot-card:hover {
-      box-shadow: 
-        0 20px 40px -15px rgba(0, 0, 0, 0.4),
-        0 8px 16px -8px rgba(0, 0, 0, 0.3);
-    }
-
-    .screenshot-card img {
-            width: 100%;
-            height: auto;
-      display: block;
-      transition: transform 0.4s;
-    }
-
-    .screenshot-card:hover img {
-      transform: scale(1.015);
-    }
-
-    .screenshot-card .label {
-      padding: 1rem 1.25rem 0.25rem;
-      font-weight: 600;
-      font-size: 1rem;
-    }
-
-    .screenshot-card .desc {
-      padding: 0 1.25rem 1rem;
-      color: var(--muted);
-      font-size: 0.875rem;
-    }
-
-    body.dark .screenshot-card .desc { color: var(--muted-dark); }
-
-    /* Lightbox */
-        .lightbox {
-            position: fixed;
-      inset: 0;
-      z-index: 10000;
-      background: rgba(0, 0, 0, 0.92);
-      backdrop-filter: blur(20px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-      cursor: zoom-out;
-    }
-
-    .lightbox.show { 
-      display: flex; 
-      animation: fadeIn 0.25s ease;
-    }
-
-    .lightbox img {
-      max-width: 95%;
-      max-height: 95%;
-      border-radius: 12px;
-      box-shadow: 0 25px 80px rgba(0,0,0,0.5);
-      animation: scaleIn 0.25s ease;
-    }
-
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -624,29 +476,6 @@
     @keyframes scaleIn {
       from { transform: scale(0.9); opacity: 0; }
       to { transform: scale(1); opacity: 1; }
-        }
-
-        .lightbox-close {
-            position: absolute;
-      top: 2rem;
-      right: 2rem;
-      width: 48px;
-      height: 48px;
-            border-radius: 50%;
-      border: none;
-      background: rgba(255,255,255,0.1);
-            color: white;
-            font-size: 1.5rem;
-      cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-      transition: all 0.2s;
-    }
-
-    .lightbox-close:hover {
-      background: rgba(255,255,255,0.2);
-            transform: scale(1.1);
         }
 
     /* Features */
@@ -978,11 +807,16 @@
 
     .modal-content {
       max-width: 560px;
-            width: 100%;
+      width: 100%;
       border-radius: 24px;
       padding: 2.5rem;
-            position: relative;
+      position: relative;
       animation: scaleIn 0.25s ease;
+      background: white;
+    }
+
+    body.dark .modal-content {
+      background: var(--card-dark);
     }
 
     .modal-close {
@@ -1201,36 +1035,256 @@
     .feature:nth-child(5) { transition-delay: 0.32s; }
     .feature:nth-child(6) { transition-delay: 0.4s; }
 
-    /* Startfox images */
-    .startfox-hero {
-      width: 120px;
-      height: auto;
+    /* Hero CTA Wrapper - Button + Startfox combined elegantly */
+    .hero-cta-wrapper {
+      display: inline-flex;
+      align-items: center;
       cursor: pointer;
-      transition: transform 0.3s ease;
-      margin-left: 0.5rem;
+      position: relative;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .startfox-hero:hover {
-      transform: scale(1.08);
+    .hero-cta-wrapper:hover {
+      transform: translateY(-3px);
+    }
+
+    .hero-cta-button {
+      background: var(--accent);
+      color: white;
+      padding: 1.25rem 3.5rem 1.25rem 2.5rem;
+      border-radius: 9999px;
+      font-size: 1.125rem;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .startfox-hero {
+      width: 140px;
+      height: auto;
+      margin-left: -50px;
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 8px 20px rgba(0,0,0,0.2));
+      transition: transform 0.3s ease;
+    }
+
+    .hero-cta-wrapper:hover .startfox-hero {
+      transform: scale(1.08) rotate(5deg);
+    }
+
+    /* Startfox CTA */
+    .cta-button-wrapper {
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .cta-button-wrapper:hover {
+      transform: translateY(-3px);
+    }
+
+    .cta-button-inner {
+      background: var(--accent);
+      color: white;
+      padding: 1rem 3rem 1rem 2rem;
+      border-radius: 9999px;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.3s;
     }
 
     .startfox-cta {
-      width: 100px;
+      width: 110px;
       height: auto;
-      cursor: pointer;
+      margin-left: -40px;
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 6px 15px rgba(0,0,0,0.2));
       transition: transform 0.3s ease;
-      margin-left: 0.5rem;
     }
 
-    .startfox-cta:hover {
-      transform: scale(1.08);
+    .cta-button-wrapper:hover .startfox-cta {
+      transform: scale(1.08) rotate(5deg);
     }
 
     @media (max-width: 640px) {
-      .startfox-hero,
+      .startfox-hero {
+        width: 100px;
+        margin-left: -35px;
+      }
+      .hero-cta-button {
+        padding: 1rem 2.5rem 1rem 1.5rem;
+        font-size: 1rem;
+      }
       .startfox-cta {
         width: 80px;
+        margin-left: -30px;
       }
+      .cta-button-inner {
+        padding: 0.875rem 2rem 0.875rem 1.5rem;
+      }
+    }
+
+    /* Discover Section */
+    .discover-section {
+      padding: 5rem 1.5rem;
+      position: relative;
+    }
+
+    .discover-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 10%;
+      right: 10%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+    }
+
+    body.dark .discover-section::before {
+      background: linear-gradient(90deg, transparent, var(--border-dark), transparent);
+    }
+
+    .discover-inner {
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .discover-content h2 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .discover-lead {
+      font-size: clamp(1.25rem, 3vw, 1.75rem);
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+
+    .discover-lead em {
+      font-style: normal;
+      text-decoration: underline;
+      text-decoration-thickness: 3px;
+      text-underline-offset: 4px;
+    }
+
+    .discover-content > p {
+      color: var(--muted);
+      font-size: 1.1rem;
+      line-height: 1.8;
+      margin-bottom: 2rem;
+    }
+
+    body.dark .discover-content > p { color: var(--muted-dark); }
+
+    .discover-highlights {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    @media (max-width: 500px) {
+      .discover-highlights { grid-template-columns: 1fr; }
+    }
+
+    .highlight-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      background: var(--card);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-weight: 500;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    body.dark .highlight-item {
+      background: var(--card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .highlight-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+
+    body.dark .highlight-item:hover {
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    }
+
+    .highlight-emoji {
+      font-size: 1.5rem;
+    }
+
+    .discover-cta-text {
+      font-size: 1.05rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    body.dark .discover-cta-text { color: var(--muted-dark); }
+
+    .discover-url {
+      margin-top: 1.5rem;
+    }
+
+    .url-link-large {
+      display: inline-block;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-decoration: none;
+      padding: 0.75rem 1.5rem;
+      border: 2px solid var(--accent);
+      border-radius: 12px;
+      transition: all 0.3s;
+    }
+
+    .url-link-large:hover {
+      background: var(--accent);
+      color: white;
+    }
+
+    /* Modal URL */
+    .modal-url {
+      text-align: center;
+      margin: 1.5rem 0;
+      padding: 1rem;
+      background: rgba(0,0,0,0.03);
+      border-radius: 12px;
+    }
+
+    body.dark .modal-url {
+      background: rgba(255,255,255,0.05);
+    }
+
+    .modal-url span {
+      display: block;
+      font-size: 0.875rem;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    body.dark .modal-url span { color: var(--muted-dark); }
+
+    .url-link {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    .url-link:hover {
+      opacity: 0.8;
     }
     </style>
 </head>
@@ -1298,84 +1352,53 @@
       TaskFuchs ist dein persönlicher, minimalistischer Task-Manager. Open Source, kostenlos und mit Liebe zum Detail.
     </p>
     
-    <div class="hero-buttons slide-in" style="transition-delay: 0.3s">
-      <button class="btn btn-primary" onclick="openPWAModal()">
+    <div class="hero-cta-wrapper slide-in" style="transition-delay: 0.3s" onclick="openPWAModal()">
+      <div class="hero-cta-button">
         <span data-i18n="hero.tryNow">Jetzt ausprobieren</span>
-      </button>
-      <img src="assets/images/startfox_light.png" alt="" class="startfox-hero" onclick="openPWAModal()" data-startfox>
-        </div>
+      </div>
+      <img src="assets/images/startfox_light.png" alt="" class="startfox-hero" data-startfox>
+    </div>
     </section>
 
 
-  <!-- Screenshots Showcase -->
-  <section class="showcase" id="showcase">
-    <div class="showcase-header slide-in">
-      <h2 data-i18n="showcase.title">So sieht TaskFuchs aus</h2>
-      <p data-i18n="showcase.subtitle">Elegant, aufgeräumt und immer im Blick.</p>
-            </div>
-            
-    <div class="screenshot-masonry">
-      <div class="screenshot-card glass-premium" onclick="openLightbox(this)">
-        <img src="assets/screenshots/Planer.png" alt="Wochenplaner" data-screenshot="Planer">
-        <div class="label" data-i18n="showcase.planner.title">Wochenplaner</div>
-        <div class="desc" data-i18n="showcase.planner.desc">Deine ganze Woche auf einen Blick. Per Drag & Drop verschieben.</div>
-                    </div>
-
-      <div class="screenshot-card glass-premium" onclick="openLightbox(this)">
-        <img src="assets/screenshots/Heute.png" alt="Heute" data-screenshot="Heute">
-        <div class="label" data-i18n="showcase.today.title">Heute</div>
-        <div class="desc" data-i18n="showcase.today.desc">Fokus auf das Wesentliche: Was steht heute an?</div>
-                </div>
-
-      <div class="screenshot-card glass-premium" onclick="openLightbox(this)">
-        <img src="assets/screenshots/Aufgabendetails.png" alt="Aufgabendetails" data-screenshot="Aufgabendetails">
-        <div class="label" data-i18n="showcase.details.title">Aufgabendetails</div>
-        <div class="desc" data-i18n="showcase.details.desc">Unteraufgaben, Zeitschätzung, Prioritäten und mehr.</div>
-                </div>
-
-      <div class="screenshot-card glass-premium" onclick="openLightbox(this)">
-        <img src="assets/screenshots/Timer.png" alt="Timer" data-screenshot="Timer">
-        <div class="label" data-i18n="showcase.timer.title">Timer</div>
-        <div class="desc" data-i18n="showcase.timer.desc">Tracke deine Arbeitszeit direkt in der App.</div>
-                </div>
-
-      <div class="screenshot-card glass-premium" onclick="openLightbox(this)">
-        <img src="assets/screenshots/Tag beenden.png" alt="Tagesabschluss" data-screenshot="Tag beenden">
-        <div class="label" data-i18n="showcase.endday.title">Tagesabschluss</div>
-        <div class="desc" data-i18n="showcase.endday.desc">Reflektiere deinen Tag und plane den nächsten.</div>
-                </div>
-
-      <div class="screenshot-card glass-premium" onclick="openLightbox(this)">
-        <img src="assets/screenshots/Theme-Konfiguration_l.png" alt="Themes" data-screenshot="Theme-Konfiguration">
-        <div class="label" data-i18n="showcase.themes.title">Dein Style</div>
-        <div class="desc" data-i18n="showcase.themes.desc">Farben, Hintergründe und Dark Mode nach deinem Geschmack.</div>
-                </div>
-
-      <div class="screenshot-card glass-premium" onclick="openLightbox(this)">
-        <img src="assets/screenshots/settings_l.png" alt="Einstellungen" data-screenshot="settings">
-        <div class="label" data-i18n="showcase.settings.title">Einstellungen</div>
-        <div class="desc" data-i18n="showcase.settings.desc">Passe TaskFuchs ganz nach deinen Wünschen an.</div>
-                </div>
-
-      <div class="screenshot-card glass-premium" onclick="openLightbox(this)">
-        <img src="assets/screenshots/smart aufgabe erstellen_l.png" alt="Smart Aufgabe" data-screenshot="smart aufgabe erstellen">
-        <div class="label" data-i18n="showcase.smart.title">Schnelle Eingabe</div>
-        <div class="desc" data-i18n="showcase.smart.desc">Aufgaben blitzschnell mit natürlicher Sprache erstellen.</div>
-                </div>
-
-      <div class="screenshot-card glass-premium" onclick="openLightbox(this)">
-        <img src="assets/screenshots/Reports.png" alt="Reports" data-screenshot="Reports">
-        <div class="label" data-i18n="showcase.reports.title">Statistiken</div>
-        <div class="desc" data-i18n="showcase.reports.desc">Behalte den Überblick über deine Produktivität.</div>
-            </div>
+  <!-- Discover Section -->
+  <section class="discover-section">
+    <div class="discover-inner">
+      <div class="discover-content slide-in">
+        <h2 data-i18n="discover.title">Wie sieht TaskFuchs aus?</h2>
+        <p class="discover-lead" data-i18n="discover.lead">
+          Genau so, wie <em>du</em> es möchtest.
+        </p>
+        <p data-i18n="discover.text">
+          TaskFuchs passt sich dir an – nicht umgekehrt. Wähle aus verschiedenen Themes, Hintergrundbildern und Farben. Erlebe das interaktive Onboarding, das dir alles zeigt. Und dann: Mach TaskFuchs zu deinem ganz persönlichen Produktivitätsbegleiter.
+        </p>
+        <div class="discover-highlights">
+          <div class="highlight-item">
+            <span class="highlight-emoji">🎨</span>
+            <span data-i18n="discover.highlight1">Themes & Farben nach deinem Geschmack</span>
+          </div>
+          <div class="highlight-item">
+            <span class="highlight-emoji">🖼️</span>
+            <span data-i18n="discover.highlight2">Wunderschöne Hintergrundbilder</span>
+          </div>
+          <div class="highlight-item">
+            <span class="highlight-emoji">🌙</span>
+            <span data-i18n="discover.highlight3">Light & Dark Mode</span>
+          </div>
+          <div class="highlight-item">
+            <span class="highlight-emoji">✨</span>
+            <span data-i18n="discover.highlight4">Interaktives Onboarding</span>
+          </div>
         </div>
-    </section>
-
-  <!-- Lightbox -->
-  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
-    <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
-    <img src="" alt="" id="lightbox-img">
+        <p class="discover-cta-text" data-i18n="discover.cta">
+          Am besten probierst du es einfach selbst aus – es ist kostenlos und dauert nur Sekunden.
+        </p>
+        <div class="discover-url">
+          <a href="https://app.taskfuchs.de" class="url-link-large">app.taskfuchs.de</a>
         </div>
+      </div>
+    </div>
+  </section>
         
   <!-- Features -->
   <section class="features">
@@ -1655,10 +1678,12 @@
       <h2 data-i18n="cta.title">Bereit, produktiver zu werden?</h2>
       <p data-i18n="cta.subtitle">TaskFuchs ist kostenlos, Open Source und respektiert deine Privatsphäre.</p>
       <div class="cta-buttons">
-        <button class="btn btn-primary" onclick="openPWAModal()" data-i18n="cta.button">
-          Jetzt starten – kostenlos
-        </button>
-        <img src="assets/images/startfox_light.png" alt="" class="startfox-cta" onclick="openPWAModal()" data-startfox>
+        <div class="cta-button-wrapper" onclick="openPWAModal()">
+          <div class="cta-button-inner" data-i18n="cta.button">
+            Jetzt starten – kostenlos
+          </div>
+          <img src="assets/images/startfox_light.png" alt="" class="startfox-cta" data-startfox>
+        </div>
         </div>
             </div>
     </section>
@@ -1705,13 +1730,18 @@
         </div>
     </div>
 
+      <div class="modal-url">
+        <span data-i18n="modal.url_label">Die App findest du unter:</span>
+        <a href="https://app.taskfuchs.de" class="url-link">app.taskfuchs.de</a>
+      </div>
+
       <div class="modal-cta">
         <a href="https://app.taskfuchs.de" class="btn btn-primary" data-i18n="modal.start">
           TaskFuchs öffnen
         </a>
       </div>
-        </div>
     </div>
+  </div>
 
     <!-- Footer -->
   <footer>
@@ -1780,6 +1810,14 @@
         "privacy.noai.desc": "Wir verzichten bewusst auf KI-Funktionen. Warum? Du bist Herr über deine Zeit – nicht ein Algorithmus. Keine automatischen Vorschläge, keine Ablenkung. Nur du und deine Aufgaben.",
         "wallpapers.title": "Hintergründe als Wallpaper",
         "wallpapers.subtitle": "Die schönen Hintergründe aus TaskFuchs jetzt auch für deinen Desktop.",
+        "discover.title": "Wie sieht TaskFuchs aus?",
+        "discover.lead": "Genau so, wie <em>du</em> es möchtest.",
+        "discover.text": "TaskFuchs passt sich dir an – nicht umgekehrt. Wähle aus verschiedenen Themes, Hintergrundbildern und Farben. Erlebe das interaktive Onboarding, das dir alles zeigt. Und dann: Mach TaskFuchs zu deinem ganz persönlichen Produktivitätsbegleiter.",
+        "discover.highlight1": "Themes & Farben nach deinem Geschmack",
+        "discover.highlight2": "Wunderschöne Hintergrundbilder",
+        "discover.highlight3": "Light & Dark Mode",
+        "discover.highlight4": "Interaktives Onboarding",
+        "discover.cta": "Am besten probierst du es einfach selbst aus – es ist kostenlos und dauert nur Sekunden.",
         "cta.title": "Bereit, produktiver zu werden?",
         "cta.subtitle": "TaskFuchs ist kostenlos, Open Source und respektiert deine Privatsphäre.",
         "cta.button": "Jetzt starten – kostenlos",
@@ -1790,6 +1828,7 @@
         "modal.safari": "Teilen-Button → \"Zum Home-Bildschirm\"",
         "modal.edge": "Menü (···) → \"App installieren\"",
         "modal.firefox": "Adresszeile → \"Als App installieren\"",
+        "modal.url_label": "Die App findest du unter:",
         "modal.start": "TaskFuchs öffnen",
         "footer.imprint": "Impressum",
         "footer.privacy": "Datenschutz"
@@ -1842,6 +1881,14 @@
         "privacy.noai.desc": "We deliberately avoid AI features. Why? You're in charge of your time – not an algorithm. No automatic suggestions, no distractions. Just you and your tasks.",
         "wallpapers.title": "Backgrounds as Wallpapers",
         "wallpapers.subtitle": "The beautiful backgrounds from TaskFuchs, now for your desktop.",
+        "discover.title": "What does TaskFuchs look like?",
+        "discover.lead": "Exactly how <em>you</em> want it.",
+        "discover.text": "TaskFuchs adapts to you – not the other way around. Choose from different themes, backgrounds, and colors. Experience the interactive onboarding that shows you everything. And then: Make TaskFuchs your very own productivity companion.",
+        "discover.highlight1": "Themes & colors to your taste",
+        "discover.highlight2": "Beautiful background images",
+        "discover.highlight3": "Light & Dark Mode",
+        "discover.highlight4": "Interactive onboarding",
+        "discover.cta": "Best thing is to try it yourself – it's free and takes only seconds.",
         "cta.title": "Ready to be more productive?",
         "cta.subtitle": "TaskFuchs is free, open source and respects your privacy.",
         "cta.button": "Get started – free",
@@ -1852,6 +1899,7 @@
         "modal.safari": "Share button → \"Add to Home Screen\"",
         "modal.edge": "Menu (···) → \"Install app\"",
         "modal.firefox": "Address bar → \"Install as app\"",
+        "modal.url_label": "You can find the app at:",
         "modal.start": "Open TaskFuchs",
         "footer.imprint": "Imprint",
         "footer.privacy": "Privacy Policy"
@@ -1873,25 +1921,10 @@
     // Theme Toggle
     const themeToggle = document.getElementById('themeToggle');
 
-    // Known themed screenshots (have _l and _d variants)
-    const knownThemedScreenshots = ['Theme-Konfiguration', 'smart aufgabe erstellen', 'settings'];
-
     function setTheme(t) {
       theme = t;
       document.body.classList.toggle('dark', t === 'dark');
       localStorage.setItem('tf-theme', t);
-      
-      // Update screenshots with themed variants
-      const suffix = t === 'dark' ? '_d' : '_l';
-      document.querySelectorAll('img[data-screenshot]').forEach(img => {
-        const baseName = img.dataset.screenshot;
-        if (knownThemedScreenshots.includes(baseName)) {
-          const newSrc = `assets/screenshots/${baseName}${suffix}.png`;
-          if (img.src !== newSrc && !img.src.endsWith(newSrc)) {
-            img.src = newSrc;
-          }
-        }
-      });
 
       // Update fox images based on theme
       const foxSuffix = t === 'dark' ? 'dark' : 'light';
@@ -1942,9 +1975,8 @@
       document.documentElement.style.setProperty('--accent', c);
       colorDots.forEach(s => s.classList.toggle('active', s.dataset.color === c));
       
-      document.querySelectorAll('.btn-primary').forEach(btn => {
+      document.querySelectorAll('.btn-primary, .hero-cta-button, .cta-button-inner').forEach(btn => {
         btn.style.background = c;
-        btn.style.boxShadow = `0 8px 30px -5px ${c}66`;
       });
       
       document.querySelectorAll('.feature-icon').forEach(icon => {
@@ -1961,22 +1993,6 @@
     colorDots.forEach(dot => {
       dot.onclick = () => setColor(dot.dataset.color);
     });
-
-    // Lightbox
-    function openLightbox(card) {
-      const img = card.querySelector('img');
-            const lightbox = document.getElementById('lightbox');
-      const lightboxImg = document.getElementById('lightbox-img');
-      lightboxImg.src = img.src;
-      lightboxImg.alt = img.alt;
-      lightbox.classList.add('show');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeLightbox() {
-      document.getElementById('lightbox').classList.remove('show');
-            document.body.style.overflow = '';
-        }
 
     // PWA Modal
     function openPWAModal() {
