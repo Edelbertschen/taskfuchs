@@ -414,6 +414,7 @@ const Settings = React.memo(() => {
       '/backgrounds/bg18.png',
       '/backgrounds/bg19.png',
       '/backgrounds/bg20.png',
+      '/backgrounds/bg21.png',
       ...Array.from({ length: 11 }, (_, i) => `/backgrounds/bg${i + 1}.jpg`),
     ];
     const savedGallery = localStorage.getItem('backgroundImageGallery');
@@ -4612,6 +4613,7 @@ const Settings = React.memo(() => {
                             '/backgrounds/bg18.png',
                             '/backgrounds/bg19.png',
                             '/backgrounds/bg20.png',
+                            '/backgrounds/bg21.png',
                             ...Array.from({ length: 11 }, (_, i) => `/backgrounds/bg${i + 1}.jpg`),
                           ];
                           setBackgroundImageGallery(defaults);

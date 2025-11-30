@@ -1994,8 +1994,8 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
                     )}
                   </div>
                   
-                  {/* Regular Gallery Images (including bg20) */}
-                  {['/backgrounds/bg20.png', '/backgrounds/bg1.jpg', '/backgrounds/bg2.jpg', '/backgrounds/bg3.jpg', '/backgrounds/bg4.jpg', '/backgrounds/bg5.jpg', '/backgrounds/bg6.jpg', '/backgrounds/bg7.jpg', '/backgrounds/bg8.jpg', '/backgrounds/bg9.jpg', '/backgrounds/bg10.jpg', '/backgrounds/bg11.jpg'].map((imageUrl) => (
+                  {/* Regular Gallery Images (including bg20, bg21) */}
+                  {['/backgrounds/bg20.png', '/backgrounds/bg21.png', '/backgrounds/bg1.jpg', '/backgrounds/bg2.jpg', '/backgrounds/bg3.jpg', '/backgrounds/bg4.jpg', '/backgrounds/bg5.jpg', '/backgrounds/bg6.jpg', '/backgrounds/bg7.jpg', '/backgrounds/bg8.jpg', '/backgrounds/bg9.jpg', '/backgrounds/bg10.jpg', '/backgrounds/bg11.jpg'].map((imageUrl) => (
                     <div 
                       key={imageUrl}
                       className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
