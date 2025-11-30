@@ -6,7 +6,7 @@
   <title>TaskFuchs – Der Task-Manager, der Spaß macht</title>
   <meta name="description" content="TaskFuchs ist der elegante, minimalistische Task-Manager für alle, die fokussiert arbeiten wollen. Open Source. Kostenlos.">
   
-  <link rel="icon" type="image/png" href="assets/images/3d_fox.png">
+  <link rel="icon" type="image/png" href="assets/images/3d_fox.webp">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -328,10 +328,16 @@
 
     .fox-container {
             position: relative;
-      margin-bottom: 2rem;
+      margin-bottom: 4rem;
             display: flex;
             align-items: center;
             justify-content: center;
+    }
+    
+    @media (max-width: 768px) {
+      .fox-container {
+        margin-bottom: 5rem;
+      }
     }
 
     .fox-main {
@@ -985,13 +991,31 @@
                 text-align: center;
         align-items: center;
       }
+      
+      /* Modal auf Mobile scrollbar machen */
+      .modal-content {
+        max-height: 85vh;
+        overflow-y: auto;
+        margin: auto 1rem;
+      }
+      
+      .modal-overlay {
+        padding: 0.5rem;
+        align-items: flex-start;
+        padding-top: 2rem;
+      }
     }
 
     .color-palette-mobile {
-                display: none;
+      display: none;
       justify-content: center;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+      position: absolute;
+      bottom: -3rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
     }
 
     /* Slide animations - elegant & smooth */
@@ -1586,7 +1610,7 @@
   <header>
     <div class="header-inner glass">
       <a href="#" class="logo">
-        <img src="assets/images/3d_fox_light.png" alt="TaskFuchs" data-fox>
+        <img src="assets/images/3d_fox_light.webp" alt="TaskFuchs" data-fox>
         <span>TaskFuchs</span>
       </a>
       
@@ -1616,17 +1640,16 @@
 
   <!-- Hero -->
   <section class="hero">
-    <!-- Mobile Color Palette -->
-    <div class="color-palette-mobile">
-      <button class="color-dot" style="background:#9a244f" data-color="#9a244f"></button>
-      <button class="color-dot active" style="background:#e06610" data-color="#e06610"></button>
-      <button class="color-dot" style="background:#006d8f" data-color="#006d8f"></button>
-      <button class="color-dot" style="background:#00a78e" data-color="#00a78e"></button>
-            </div>
-            
     <div class="fox-container slide-in">
       <div class="fox-ring"></div>
-      <img src="assets/images/3d_fox_light.png" alt="TaskFuchs" class="fox-main" data-fox>
+      <img src="assets/images/3d_fox_light.webp" alt="TaskFuchs" class="fox-main" data-fox>
+      <!-- Mobile Color Palette - unter dem Fuchs -->
+      <div class="color-palette-mobile">
+        <button class="color-dot" style="background:#9a244f" data-color="#9a244f"></button>
+        <button class="color-dot active" style="background:#e06610" data-color="#e06610"></button>
+        <button class="color-dot" style="background:#006d8f" data-color="#006d8f"></button>
+        <button class="color-dot" style="background:#00a78e" data-color="#00a78e"></button>
+      </div>
         </div>
         
     <h1 class="slide-in" style="transition-delay: 0.1s">
@@ -1642,7 +1665,7 @@
       <div class="hero-cta-button">
         <span data-i18n="hero.tryNow">Jetzt ausprobieren</span>
             </div>
-      <img src="assets/images/startfox_light.png" alt="" class="startfox-hero" data-startfox>
+      <img src="assets/images/startfox_light.webp" alt="" class="startfox-hero" data-startfox>
             </div>
             
     <div class="scroll-indicator">
@@ -1991,7 +2014,7 @@
           <div class="cta-button-inner" data-i18n="cta.button">
             Jetzt starten – kostenlos
             </div>
-          <img src="assets/images/startfox_light.png" alt="" class="startfox-cta" data-startfox>
+          <img src="assets/images/startfox_light.webp" alt="" class="startfox-cta" data-startfox>
                     </div>
             </div>
         </div>
@@ -2003,7 +2026,7 @@
       <button class="modal-close" onclick="closePWAModal()">&times;</button>
       
                 <div class="modal-header">
-        <img src="assets/images/3d_fox_light.png" alt="TaskFuchs" data-fox>
+        <img src="assets/images/3d_fox_light.webp" alt="TaskFuchs" data-fox>
         <h3 data-i18n="modal.title">TaskFuchs starten</h3>
                 </div>
 
@@ -2062,7 +2085,7 @@
                 </div>
       <div class="footer-copy">
         <span>© 2025</span>
-        <img src="assets/images/3d_fox_light.png" alt="" data-fox>
+        <img src="assets/images/3d_fox_light.webp" alt="" data-fox>
         <span>TaskFuchs</span>
             </div>
         </div>
@@ -2239,12 +2262,12 @@
       // Update fox images based on theme
       const foxSuffix = t === 'dark' ? 'dark' : 'light';
       document.querySelectorAll('img[data-fox]').forEach(img => {
-        img.src = `assets/images/3d_fox_${foxSuffix}.png`;
+        img.src = `assets/images/3d_fox_${foxSuffix}.webp`;
       });
       
       // Update startfox images
       document.querySelectorAll('img[data-startfox]').forEach(img => {
-        img.src = `assets/images/startfox_${foxSuffix}.png`;
+        img.src = `assets/images/startfox_${foxSuffix}.webp`;
       });
     }
 
