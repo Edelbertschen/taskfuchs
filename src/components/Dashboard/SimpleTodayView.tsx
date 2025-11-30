@@ -1678,7 +1678,7 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
                     className="group relative p-2 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-orange-400 transition-all bg-white dark:bg-gray-800"
                   >
                     <div className="aspect-[4/3] rounded-lg overflow-hidden mb-2 relative">
-                      <img src="/backgrounds/bg12.webp" alt="Standard" className="w-full h-full object-cover" />
+                      <img src="/backgrounds/thumbs/bg12_thumb.webp" alt="Standard" className="w-full h-full object-cover" />
                       <div className="absolute top-1 right-1 w-3 h-3 rounded-full border border-white shadow-sm" style={{ backgroundColor: '#f97316' }} />
                       <div className="absolute bottom-1 left-1 bg-white/90 rounded px-1 py-0.5">
                         <Sun className="w-2.5 h-2.5 text-amber-500" />
@@ -1701,7 +1701,7 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
                     className="group relative p-2 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-cyan-400 transition-all bg-white dark:bg-gray-800"
                   >
                     <div className="aspect-[4/3] rounded-lg overflow-hidden mb-2 relative">
-                      <img src="/backgrounds/bg2.jpg" alt="Cyan & Dark" className="w-full h-full object-cover" />
+                      <img src="/backgrounds/thumbs/bg2_thumb.webp" alt="Cyan & Dark" className="w-full h-full object-cover" />
                       <div className="absolute top-1 right-1 w-3 h-3 rounded-full border border-white shadow-sm" style={{ backgroundColor: '#22d3ee' }} />
                       <div className="absolute bottom-1 left-1 bg-gray-900/90 rounded px-1 py-0.5">
                         <Moon className="w-2.5 h-2.5 text-blue-400" />
@@ -1724,7 +1724,7 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
                     className="group relative p-2 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-purple-500 transition-all bg-white dark:bg-gray-800"
                   >
                     <div className="aspect-[4/3] rounded-lg overflow-hidden mb-2 relative">
-                      <img src="/backgrounds/bg8.jpg" alt="Lila & Dunkel" className="w-full h-full object-cover" />
+                      <img src="/backgrounds/thumbs/bg8_thumb.webp" alt="Lila & Dunkel" className="w-full h-full object-cover" />
                       <div className="absolute top-1 right-1 w-3 h-3 rounded-full border border-white shadow-sm" style={{ backgroundColor: '#7b2ff2' }} />
                       <div className="absolute bottom-1 left-1 bg-gray-900/90 rounded px-1 py-0.5">
                         <Moon className="w-2.5 h-2.5 text-blue-400" />
@@ -1747,7 +1747,7 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
                     className="group relative p-2 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-teal-500 transition-all bg-white dark:bg-gray-800"
                   >
                     <div className="aspect-[4/3] rounded-lg overflow-hidden mb-2 relative">
-                      <img src="/backgrounds/bg11.jpg" alt="Petrol & Hell" className="w-full h-full object-cover" />
+                      <img src="/backgrounds/thumbs/bg11_thumb.webp" alt="Petrol & Hell" className="w-full h-full object-cover" />
                       <div className="absolute top-1 right-1 w-3 h-3 rounded-full border border-white shadow-sm" style={{ backgroundColor: '#006d8f' }} />
                       <div className="absolute bottom-1 left-1 bg-white/90 rounded px-1 py-0.5">
                         <Sun className="w-2.5 h-2.5 text-amber-500" />
@@ -1844,11 +1844,11 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
                           {/* Stack of images */}
                           <div className="absolute inset-0 flex">
                             <div className="flex-1 relative overflow-hidden">
-                              <img src="/backgrounds/bg12.webp" alt="" className="w-full h-full object-cover" />
+                              <img src="/backgrounds/thumbs/bg12_thumb.webp" alt="" className="w-full h-full object-cover" />
                             </div>
                             <div className="w-px bg-gray-300 dark:bg-gray-600" />
                             <div className="flex-1 relative overflow-hidden">
-                              <img src="/backgrounds/bg13.webp" alt="" className="w-full h-full object-cover" />
+                              <img src="/backgrounds/thumbs/bg13_thumb.webp" alt="" className="w-full h-full object-cover" />
                             </div>
                           </div>
                           {/* Stacked cards effect */}
@@ -1904,14 +1904,14 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
                           >
                             <div className="flex h-12">
                               <div className="relative flex-1 overflow-hidden">
-                                <img src={`/backgrounds/${pair.light}`} alt="Light" className="w-full h-full object-cover" />
+                                <img src={`/backgrounds/thumbs/${pair.light.replace('.webp', '_thumb.webp')}`} alt="Light" className="w-full h-full object-cover" />
                                 <div className="absolute bottom-0.5 left-0.5 bg-white/90 rounded px-0.5 py-0.5">
                                   <Sun className="w-2 h-2 text-amber-500" />
                                 </div>
                               </div>
                               <div className="w-px bg-gray-300 dark:bg-gray-600" />
                               <div className="relative flex-1 overflow-hidden">
-                                <img src={`/backgrounds/${pair.dark}`} alt="Dark" className="w-full h-full object-cover" />
+                                <img src={`/backgrounds/thumbs/${pair.dark.replace('.webp', '_thumb.webp')}`} alt="Dark" className="w-full h-full object-cover" />
                                 <div className="absolute bottom-0.5 right-0.5 bg-gray-900/90 rounded px-0.5 py-0.5">
                                   <Moon className="w-2 h-2 text-blue-400" />
                                 </div>

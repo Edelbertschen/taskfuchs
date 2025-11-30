@@ -3902,7 +3902,7 @@ const Settings = React.memo(() => {
                 >
                   <div className="aspect-[4/3] rounded-lg overflow-hidden mb-2 relative">
                     <img 
-                      src="/backgrounds/bg12.webp" 
+                      src="/backgrounds/thumbs/bg12_thumb.webp" 
                       alt="Default Theme"
                       className="w-full h-full object-cover"
                     />
@@ -3934,7 +3934,7 @@ const Settings = React.memo(() => {
                 >
                   <div className="aspect-[4/3] rounded-lg overflow-hidden mb-2 relative">
                     <img 
-                      src="/backgrounds/bg2.jpg" 
+                      src="/backgrounds/thumbs/bg2_thumb.webp" 
                       alt="Cyan & Dark Theme"
                       className="w-full h-full object-cover"
                     />
@@ -3966,7 +3966,7 @@ const Settings = React.memo(() => {
                 >
                   <div className="aspect-[4/3] rounded-lg overflow-hidden mb-2 relative">
                     <img 
-                      src="/backgrounds/bg8.jpg" 
+                      src="/backgrounds/thumbs/bg8_thumb.webp" 
                       alt="Purple & Dark Theme"
                       className="w-full h-full object-cover"
                     />
@@ -3998,7 +3998,7 @@ const Settings = React.memo(() => {
                 >
                   <div className="aspect-[4/3] rounded-lg overflow-hidden mb-2 relative">
                     <img 
-                      src="/backgrounds/bg11.jpg" 
+                      src="/backgrounds/thumbs/bg11_thumb.webp" 
                       alt="Teal & Light Theme"
                       className="w-full h-full object-cover"
                     />
@@ -4296,11 +4296,11 @@ const Settings = React.memo(() => {
                             {/* Stack of images */}
                             <div className="absolute inset-0 flex">
                               <div className="flex-1 relative overflow-hidden">
-                                <img src="/backgrounds/bg12.webp" alt="" className="w-full h-full object-cover" />
+                                <img src="/backgrounds/thumbs/bg12_thumb.webp" alt="" className="w-full h-full object-cover" />
                               </div>
                               <div className="w-px bg-gray-300 dark:bg-gray-600" />
                               <div className="flex-1 relative overflow-hidden">
-                                <img src="/backgrounds/bg13.webp" alt="" className="w-full h-full object-cover" />
+                                <img src="/backgrounds/thumbs/bg13_thumb.webp" alt="" className="w-full h-full object-cover" />
                               </div>
                             </div>
                             {/* Stacked cards effect */}
@@ -4356,14 +4356,14 @@ const Settings = React.memo(() => {
                               >
                                 <div className="flex h-16">
                                   <div className="relative flex-1 overflow-hidden">
-                                    <img src={`/backgrounds/${pair.light}`} alt="Light" className="w-full h-full object-cover" />
+                                    <img src={`/backgrounds/thumbs/${pair.light.replace('.webp', '_thumb.webp')}`} alt="Light" className="w-full h-full object-cover" />
                                     <div className="absolute bottom-0.5 left-0.5 bg-white/90 rounded px-1 py-0.5">
                                       <Sun className="w-2.5 h-2.5 text-amber-500" />
                                     </div>
                                   </div>
                                   <div className="w-px bg-gray-300 dark:bg-gray-600" />
                                   <div className="relative flex-1 overflow-hidden">
-                                    <img src={`/backgrounds/${pair.dark}`} alt="Dark" className="w-full h-full object-cover" />
+                                    <img src={`/backgrounds/thumbs/${pair.dark.replace('.webp', '_thumb.webp')}`} alt="Dark" className="w-full h-full object-cover" />
                                     <div className="absolute bottom-0.5 right-0.5 bg-gray-900/90 rounded px-1 py-0.5">
                                       <Moon className="w-2.5 h-2.5 text-blue-400" />
                                     </div>
@@ -4410,7 +4410,10 @@ const Settings = React.memo(() => {
                           onClick={() => handleSelectImageFromGallery(imageUrl)}
                         >
                           <img 
-                            src={imageUrl} 
+                            src={imageUrl.startsWith('/backgrounds/') && imageUrl.endsWith('.webp') 
+                              ? imageUrl.replace('/backgrounds/', '/backgrounds/thumbs/').replace('.webp', '_thumb.webp')
+                              : imageUrl
+                            } 
                             alt={`Hintergrundbild ${index + 1}`}
                             className="w-full h-20 object-cover"
                             onError={(e) => {
