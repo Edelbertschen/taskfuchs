@@ -1860,7 +1860,7 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
                               <Sun className="w-3 h-3 text-amber-400" />
                               <span className="text-xs font-medium">/</span>
                               <Moon className="w-3 h-3 text-blue-400" />
-                              <span className="text-xs font-medium ml-1">Theme-Paare</span>
+                              <span className="text-xs font-medium ml-1">{t('settings_appearance.themePairs')}</span>
                               <ChevronDown className="w-3 h-3 ml-1" />
                             </div>
                           </div>

@@ -4312,7 +4312,7 @@ const Settings = React.memo(() => {
                                 <Sun className="w-4 h-4 text-amber-400" />
                                 <span className="text-sm font-medium">/</span>
                                 <Moon className="w-4 h-4 text-blue-400" />
-                                <span className="text-sm font-medium ml-2">Theme-Paare</span>
+                                <span className="text-sm font-medium ml-2">{t('settings_appearance.themePairs')}</span>
                                 <ChevronDown className={`w-4 h-4 ml-1 transition-transform duration-300 ${showThemePairs ? 'rotate-180' : ''}`} />
                               </div>
                             </div>
@@ -5191,8 +5191,8 @@ const Settings = React.memo(() => {
                               onClick={async () => {
                                 const { notificationService } = await import('../../utils/notificationService');
                                 await notificationService.showNotification({
-                                  title: 'Test-Benachrichtigung',
-                                  body: 'Ihre Benachrichtigungen funktionieren einwandfrei.',
+                                  title: t('settings_notifications.testNotificationTitle'),
+                                  body: t('settings_notifications.testNotificationBody'),
                                   icon: '/3d_fox.png',
                                   tag: 'test-notification',
                                   silent: false,
@@ -5212,35 +5212,35 @@ const Settings = React.memo(() => {
                               <AlertCircle className="w-6 h-6 text-red-600 dark:text-red-400 mt-0.5" />
                               <div className="flex-1">
                                 <div className="text-sm font-medium text-red-900 dark:text-red-100 mb-2">
-                                  🚫 Benachrichtigungen sind blockiert
+                                  🚫 {t('settings_notifications.notificationsBlocked')}
                                 </div>
                                 <div className="text-xs text-red-600 dark:text-red-400 mb-3">
-                                  Aktivieren Sie Benachrichtigungen in Ihren Browser-Einstellungen:
+                                  {t('settings_notifications.enableInBrowserSettings')}
                                 </div>
                                 
                                 {/* Step-by-step instructions */}
                                 <div className="space-y-2 text-xs text-red-600 dark:text-red-400">
                                   <div className="flex items-start space-x-2">
                                     <span className="font-medium">1.</span>
-                                    <span>Klicken Sie auf das 🔒 Symbol in der Adressleiste</span>
+                                    <span>{t('settings_notifications.step1')}</span>
                                   </div>
                                   <div className="flex items-start space-x-2">
                                     <span className="font-medium">2.</span>
-                                    <span>Wählen Sie "Benachrichtigungen" → "Zulassen"</span>
+                                    <span>{t('settings_notifications.step2')}</span>
                                   </div>
                                   <div className="flex items-start space-x-2">
                                     <span className="font-medium">3.</span>
-                                    <span>Laden Sie die Seite neu (F5 oder Strg+R)</span>
+                                    <span>{t('settings_notifications.step3')}</span>
                                   </div>
                                 </div>
                                 
                                 {/* Browser-specific instructions */}
                                 <div className="mt-3 pt-3 border-t border-red-200 dark:border-red-800">
                                   <div className="text-xs text-red-500 dark:text-red-400 mb-2">
-                                    <strong>Alternative (Chrome):</strong>
+                                    <strong>{t('settings_notifications.alternativeChrome')}</strong>
                                   </div>
                                   <div className="text-xs text-red-500 dark:text-red-400">
-                                    Einstellungen → Datenschutz und Sicherheit → Website-Einstellungen → Benachrichtigungen
+                                    {t('settings_notifications.chromeSettingsPath')}
                                   </div>
                                 </div>
                                 
@@ -5326,10 +5326,10 @@ const Settings = React.memo(() => {
                               <Bell className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                               <div>
                                 <div className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                                  Benachrichtigungen aktivieren
+                                  {t('settings_notifications.enableNotifications')}
                                 </div>
                                 <div className="text-xs text-blue-600 dark:text-blue-400">
-                                  Erhalten Sie Erinnerungen für Ihre Aufgaben
+                                  {t('settings_notifications.getTaskReminders')}
                                 </div>
                               </div>
                             </div>

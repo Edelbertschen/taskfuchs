@@ -2129,6 +2129,7 @@
     "addImageFile": "Bilddatei hinzufügen",
     "defaultImages": "Standardbilder",
     "restoreDefaultImages": "Standardbilder wiederherstellen",
+    "themePairs": "Theme-Paare",
     "photoCredits": "Foto von [Ray Hennessy](https://unsplash.com/de/@rayhennessy?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash) auf [Unsplash](https://unsplash.com/de/fotos/brown-fox-on-snow-field-xUUZcpQlqpM?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash)\n\nFoto von [Dario Jud](https://unsplash.com/de/@dariojud_?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash) auf [Unsplash](https://unsplash.com/de/fotos/neblige-baume-die-in-einen-nebligen-dunst-gehullt-sind-4EvreRzmq44?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash)\n\nFoto von [Christoph de Haar](https://pixabay.com/de/users/dehaar-8454267/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=3250275) auf [Pixabay](https://pixabay.com/de/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=3250275)\n\nFoto von [John Lee](https://unsplash.com/de/@john_artifexfilm?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash) auf [Unsplash](https://unsplash.com/de/fotos/landschaft-der-berge-oMneOBYhJxY?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash)\n\nFoto von [NEOM](https://unsplash.com/de/@neom?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash) auf [Unsplash](https://unsplash.com/de/fotos/die-sonne-geht-uber-einer-wustenlandschaft-unter-va9218QJFAk?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash)\n\nFoto von [Mark Harpur](https://unsplash.com/de/@luckybeanz?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash) auf [Unsplash](https://unsplash.com/de/fotos/brauner-holzsteg-zwischen-lavendelblumenfeld-in-der-nahe-eines-gewassers-wahrend-der-goldenen-stunde-K2s_YE031CA?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash)\n\nFoto von [Abubakr Abdelatif](https://pixabay.com/de/users/onatee-27254887/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=8650151) auf [Pixabay](https://pixabay.com/de/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=8650151)\n\nFoto von [Jonathan Reichel](https://pixabay.com/de/users/orcatec-2164300/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=4335571) auf [Pixabay](https://pixabay.com/de/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=4335571)\n\nBild von [Angi128](https://pixabay.com/de/users/angi128-22878334/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=6553345) auf [Pixabay](https://pixabay.com/de/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=6553345)\n\nBild von [Dan Fador](https://pixabay.com/de/users/danfador-55851/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=190055) auf [Pixabay](https://pixabay.com/de/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=190055)"
   },
   "settings_notes": {
@@ -2166,7 +2167,18 @@
     "successSound": "Erfolgsklang",
     "behavior": "Verhalten",
     "showTaskPriorities": "Aufgaben-Prioritäten anzeigen",
-    "showsPriorityIndicators": "Zeigt Prioritäts-Indikatoren in Aufgaben"
+    "showsPriorityIndicators": "Zeigt Prioritäts-Indikatoren in Aufgaben",
+    "notificationsBlocked": "Benachrichtigungen sind blockiert",
+    "enableInBrowserSettings": "Aktivieren Sie Benachrichtigungen in Ihren Browser-Einstellungen:",
+    "step1": "Klicken Sie auf das Schloss-/Schild-Symbol in der Adressleiste",
+    "step2": "Wählen Sie \"Benachrichtigungen\" → \"Zulassen\"",
+    "step3": "Laden Sie die Seite neu (F5)",
+    "alternativeChrome": "Alternative (Chrome):",
+    "chromeSettingsPath": "Einstellungen → Datenschutz und Sicherheit → Website-Einstellungen → Benachrichtigungen",
+    "enableNotifications": "Benachrichtigungen aktivieren",
+    "getTaskReminders": "Erhalten Sie Erinnerungen für Ihre Aufgaben",
+    "testNotificationTitle": "Test-Benachrichtigung",
+    "testNotificationBody": "Ihre Benachrichtigungen funktionieren einwandfrei."
   },
   "settings_timer": {
     "title": "Zeiterfassung",
