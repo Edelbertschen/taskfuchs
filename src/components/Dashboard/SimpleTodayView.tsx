@@ -35,7 +35,7 @@ import {
   Clock, FileText, Edit3, Bold, Italic, Code, List, ListOrdered, 
   Link as LinkIcon, Minus, HelpCircle, Heading1, Heading2, Heading3, ExternalLink,
   Zap, CheckSquare, Bell, Calendar, Edit, Settings, Trash2, MoreVertical,
-  Sun, Moon
+  Sun, Moon, ChevronDown
 } from 'lucide-react';
 import { TaskModal } from '../Tasks/TaskModal';
 import { SmartTaskModal } from '../Tasks/SmartTaskModal';
@@ -364,6 +364,7 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
   
   // Customization panel state
   const [showCustomizePanel, setShowCustomizePanel] = useState(false);
+  const [showThemePairs, setShowThemePairs] = useState(false);
   const customizePanelRef = React.useRef<HTMLDivElement>(null);
   
   // Close customize panel on ESC or click outside
@@ -1830,209 +1831,108 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
                   {state.preferences.language === 'de' ? 'Hintergrundbilder' : 'Background Images'}
                 </h4>
                 <div className="grid grid-cols-3 gap-3">
-                  {/* Light/Dark Mode Pair - bg12 & bg13 */}
-                  <div 
-                    className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all col-span-2 ${
-                      state.preferences.backgroundImage?.includes('bg12.png') || state.preferences.backgroundImage?.includes('bg13.png')
-                        ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800'
-                        : 'border-gray-200 dark:border-gray-600 hover:border-gray-300'
-                    }`}
-                    style={(state.preferences.backgroundImage?.includes('bg12.png') || state.preferences.backgroundImage?.includes('bg13.png')) ? {
-                      borderColor: state.preferences.accentColor,
-                      boxShadow: `0 0 0 2px ${state.preferences.accentColor}20, 0 0 0 4px ${state.preferences.accentColor}`
-                    } : {}}
-                    onClick={() => dispatch({ type: 'UPDATE_PREFERENCES', payload: { backgroundImage: '/backgrounds/bg12.png', backgroundType: 'image' }})}
-                  >
-                    <div className="flex h-16">
-                      <div className="relative flex-1 overflow-hidden">
-                        <img src="/backgrounds/bg12.png" alt="Light" className="w-full h-full object-cover" />
-                        <div className="absolute bottom-1 left-1 bg-white/90 rounded px-1 py-0.5 flex items-center gap-0.5">
-                          <Sun className="w-2 h-2 text-amber-500" />
-                          <span className="text-[9px] font-medium text-gray-700">Light</span>
+                  {/* Light/Dark Theme Pairs - Collapsible Stack */}
+                  <div className="col-span-3 mb-2">
+                    <button
+                      onClick={() => setShowThemePairs(!showThemePairs)}
+                      className={`w-full relative group cursor-pointer rounded-xl overflow-hidden border-2 transition-all duration-300 ${
+                        showThemePairs 
+                          ? 'border-transparent' 
+                          : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+                      }`}
+                      style={showThemePairs ? {
+                        borderColor: state.preferences.accentColor,
+                      } : {}}
+                    >
+                      {/* Stacked Preview (collapsed state) */}
+                      <div className={`relative h-14 transition-all duration-300 ${showThemePairs ? 'opacity-0 h-0' : 'opacity-100'}`}>
+                        {/* Stack of images */}
+                        <div className="absolute inset-0 flex">
+                          <div className="flex-1 relative overflow-hidden">
+                            <img src="/backgrounds/bg12.png" alt="" className="w-full h-full object-cover" />
+                          </div>
+                          <div className="w-px bg-gray-300 dark:bg-gray-600" />
+                          <div className="flex-1 relative overflow-hidden">
+                            <img src="/backgrounds/bg13.png" alt="" className="w-full h-full object-cover" />
+                          </div>
                         </div>
-                      </div>
-                      <div className="w-0.5 bg-gradient-to-b from-white/50 via-gray-400 to-white/50" />
-                      <div className="relative flex-1 overflow-hidden">
-                        <img src="/backgrounds/bg13.png" alt="Dark" className="w-full h-full object-cover" />
-                        <div className="absolute bottom-1 right-1 bg-gray-900/90 rounded px-1 py-0.5 flex items-center gap-0.5">
-                          <Moon className="w-2 h-2 text-blue-400" />
-                          <span className="text-[9px] font-medium text-white">Dark</span>
+                        {/* Stacked cards effect */}
+                        <div className="absolute inset-x-1 -bottom-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-b-lg opacity-60" />
+                        <div className="absolute inset-x-2 -bottom-2 h-2 bg-gray-300 dark:bg-gray-600 rounded-b-lg opacity-40" />
+                        {/* Overlay with label */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent flex items-end justify-center pb-2">
+                          <div className="flex items-center gap-2 text-white">
+                            <Sun className="w-3 h-3 text-amber-400" />
+                            <span className="text-xs font-medium">/</span>
+                            <Moon className="w-3 h-3 text-blue-400" />
+                            <span className="text-xs font-medium ml-1">Theme-Paare</span>
+                            <ChevronDown className={`w-3 h-3 ml-1 transition-transform duration-300 ${showThemePairs ? 'rotate-180' : ''}`} />
+                          </div>
                         </div>
+                        {/* Active pair indicator */}
+                        {(state.preferences.backgroundImage?.match(/bg1[2-9]\.png|bg2[0-3]\.png/)) && (
+                          <div className="absolute top-2 right-2">
+                            <div className="w-2.5 h-2.5 rounded-full animate-pulse" style={{ backgroundColor: state.preferences.accentColor }} />
+                          </div>
+                        )}
                       </div>
+                    </button>
+                    
+                    {/* Expanded pairs */}
+                    <div 
+                      className={`grid grid-cols-2 gap-2 overflow-hidden transition-all duration-500 ease-out ${
+                        showThemePairs ? 'max-h-[400px] opacity-100 mt-2' : 'max-h-0 opacity-0'
+                      }`}
+                    >
+                      {/* Theme Pair Cards */}
+                      {[
+                        { light: 'bg12.png', dark: 'bg13.png' },
+                        { light: 'bg14.png', dark: 'bg15.png' },
+                        { light: 'bg16.png', dark: 'bg17.png' },
+                        { light: 'bg18.png', dark: 'bg19.png' },
+                        { light: 'bg22.png', dark: 'bg23.png' },
+                      ].map((pair) => {
+                        const isSelected = state.preferences.backgroundImage?.includes(pair.light) || state.preferences.backgroundImage?.includes(pair.dark);
+                        return (
+                          <div
+                            key={pair.light}
+                            onClick={() => dispatch({ type: 'UPDATE_PREFERENCES', payload: { backgroundImage: `/backgrounds/${pair.light}`, backgroundType: 'image' }})}
+                            className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all duration-200 hover:scale-[1.02] ${
+                              isSelected
+                                ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800'
+                                : 'border-gray-200 dark:border-gray-600 hover:border-gray-300'
+                            }`}
+                            style={isSelected ? {
+                              borderColor: state.preferences.accentColor,
+                              boxShadow: `0 0 0 2px ${state.preferences.accentColor}20, 0 0 0 4px ${state.preferences.accentColor}`
+                            } : {}}
+                          >
+                            <div className="flex h-12">
+                              <div className="relative flex-1 overflow-hidden">
+                                <img src={`/backgrounds/${pair.light}`} alt="Light" className="w-full h-full object-cover" />
+                                <div className="absolute bottom-0.5 left-0.5 bg-white/90 rounded px-0.5 py-0.5">
+                                  <Sun className="w-2 h-2 text-amber-500" />
+                                </div>
+                              </div>
+                              <div className="w-px bg-gray-300 dark:bg-gray-600" />
+                              <div className="relative flex-1 overflow-hidden">
+                                <img src={`/backgrounds/${pair.dark}`} alt="Dark" className="w-full h-full object-cover" />
+                                <div className="absolute bottom-0.5 right-0.5 bg-gray-900/90 rounded px-0.5 py-0.5">
+                                  <Moon className="w-2 h-2 text-blue-400" />
+                                </div>
+                              </div>
+                            </div>
+                            {isSelected && (
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                                <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: state.preferences.accentColor }}>
+                                  <Check className="w-3 h-3 text-white" />
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
-                    {(state.preferences.backgroundImage?.includes('bg12.png') || state.preferences.backgroundImage?.includes('bg13.png')) && (
-                      <div className="absolute bottom-1 left-1/2 -translate-x-1/2">
-                        <div className="text-white text-[9px] px-1.5 py-0.5 rounded font-medium flex items-center gap-0.5" 
-                             style={{ backgroundColor: state.preferences.accentColor }}>
-                          <Check className="w-2 h-2" />
-                          Aktiv
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Light/Dark Mode Pair - bg14 & bg15 */}
-                  <div 
-                    className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all col-span-2 ${
-                      state.preferences.backgroundImage?.includes('bg14.png') || state.preferences.backgroundImage?.includes('bg15.png')
-                        ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800'
-                        : 'border-gray-200 dark:border-gray-600 hover:border-gray-300'
-                    }`}
-                    style={(state.preferences.backgroundImage?.includes('bg14.png') || state.preferences.backgroundImage?.includes('bg15.png')) ? {
-                      borderColor: state.preferences.accentColor,
-                      boxShadow: `0 0 0 2px ${state.preferences.accentColor}20, 0 0 0 4px ${state.preferences.accentColor}`
-                    } : {}}
-                    onClick={() => dispatch({ type: 'UPDATE_PREFERENCES', payload: { backgroundImage: '/backgrounds/bg14.png', backgroundType: 'image' }})}
-                  >
-                    <div className="flex h-16">
-                      <div className="relative flex-1 overflow-hidden">
-                        <img src="/backgrounds/bg14.png" alt="Light 2" className="w-full h-full object-cover" />
-                        <div className="absolute bottom-1 left-1 bg-white/90 rounded px-1 py-0.5 flex items-center gap-0.5">
-                          <Sun className="w-2 h-2 text-amber-500" />
-                          <span className="text-[8px] font-medium text-gray-700">Light</span>
-                        </div>
-                      </div>
-                      <div className="w-px bg-gray-300 dark:bg-gray-600" />
-                      <div className="relative flex-1 overflow-hidden">
-                        <img src="/backgrounds/bg15.png" alt="Dark 2" className="w-full h-full object-cover" />
-                        <div className="absolute bottom-1 right-1 bg-gray-900/90 rounded px-1 py-0.5 flex items-center gap-0.5">
-                          <Moon className="w-2 h-2 text-blue-400" />
-                          <span className="text-[8px] font-medium text-gray-200">Dark</span>
-                        </div>
-                      </div>
-                    </div>
-                    {(state.preferences.backgroundImage?.includes('bg14.png') || state.preferences.backgroundImage?.includes('bg15.png')) && (
-                      <div className="absolute bottom-1 left-1/2 -translate-x-1/2">
-                        <div className="text-white text-[9px] px-1.5 py-0.5 rounded font-medium flex items-center gap-0.5" 
-                             style={{ backgroundColor: state.preferences.accentColor }}>
-                          <Check className="w-2 h-2" />
-                          Aktiv
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Light/Dark Mode Pair - bg16 & bg17 */}
-                  <div 
-                    className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all col-span-2 ${
-                      state.preferences.backgroundImage?.includes('bg16.png') || state.preferences.backgroundImage?.includes('bg17.png')
-                        ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800'
-                        : 'border-gray-200 dark:border-gray-600 hover:border-gray-300'
-                    }`}
-                    style={(state.preferences.backgroundImage?.includes('bg16.png') || state.preferences.backgroundImage?.includes('bg17.png')) ? {
-                      borderColor: state.preferences.accentColor,
-                      boxShadow: `0 0 0 2px ${state.preferences.accentColor}20, 0 0 0 4px ${state.preferences.accentColor}`
-                    } : {}}
-                    onClick={() => dispatch({ type: 'UPDATE_PREFERENCES', payload: { backgroundImage: '/backgrounds/bg16.png', backgroundType: 'image' }})}
-                  >
-                    <div className="flex h-16">
-                      <div className="relative flex-1 overflow-hidden">
-                        <img src="/backgrounds/bg16.png" alt="Light 3" className="w-full h-full object-cover" />
-                        <div className="absolute bottom-1 left-1 bg-white/90 rounded px-1 py-0.5 flex items-center gap-0.5">
-                          <Sun className="w-2 h-2 text-amber-500" />
-                          <span className="text-[8px] font-medium text-gray-700">Light</span>
-                        </div>
-                      </div>
-                      <div className="w-px bg-gray-300 dark:bg-gray-600" />
-                      <div className="relative flex-1 overflow-hidden">
-                        <img src="/backgrounds/bg17.png" alt="Dark 3" className="w-full h-full object-cover" />
-                        <div className="absolute bottom-1 right-1 bg-gray-900/90 rounded px-1 py-0.5 flex items-center gap-0.5">
-                          <Moon className="w-2 h-2 text-blue-400" />
-                          <span className="text-[8px] font-medium text-gray-200">Dark</span>
-                        </div>
-                      </div>
-                    </div>
-                    {(state.preferences.backgroundImage?.includes('bg16.png') || state.preferences.backgroundImage?.includes('bg17.png')) && (
-                      <div className="absolute bottom-1 left-1/2 -translate-x-1/2">
-                        <div className="text-white text-[9px] px-1.5 py-0.5 rounded font-medium flex items-center gap-0.5" 
-                             style={{ backgroundColor: state.preferences.accentColor }}>
-                          <Check className="w-2 h-2" />
-                          Aktiv
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Light/Dark Mode Pair - bg18 & bg19 */}
-                  <div 
-                    className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all col-span-2 ${
-                      state.preferences.backgroundImage?.includes('bg18.png') || state.preferences.backgroundImage?.includes('bg19.png')
-                        ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800'
-                        : 'border-gray-200 dark:border-gray-600 hover:border-gray-300'
-                    }`}
-                    style={(state.preferences.backgroundImage?.includes('bg18.png') || state.preferences.backgroundImage?.includes('bg19.png')) ? {
-                      borderColor: state.preferences.accentColor,
-                      boxShadow: `0 0 0 2px ${state.preferences.accentColor}20, 0 0 0 4px ${state.preferences.accentColor}`
-                    } : {}}
-                    onClick={() => dispatch({ type: 'UPDATE_PREFERENCES', payload: { backgroundImage: '/backgrounds/bg18.png', backgroundType: 'image' }})}
-                  >
-                    <div className="flex h-16">
-                      <div className="relative flex-1 overflow-hidden">
-                        <img src="/backgrounds/bg18.png" alt="Light 4" className="w-full h-full object-cover" />
-                        <div className="absolute bottom-1 left-1 bg-white/90 rounded px-1 py-0.5 flex items-center gap-0.5">
-                          <Sun className="w-2 h-2 text-amber-500" />
-                          <span className="text-[8px] font-medium text-gray-700">Light</span>
-                        </div>
-                      </div>
-                      <div className="w-px bg-gray-300 dark:bg-gray-600" />
-                      <div className="relative flex-1 overflow-hidden">
-                        <img src="/backgrounds/bg19.png" alt="Dark 4" className="w-full h-full object-cover" />
-                        <div className="absolute bottom-1 right-1 bg-gray-900/90 rounded px-1 py-0.5 flex items-center gap-0.5">
-                          <Moon className="w-2 h-2 text-blue-400" />
-                          <span className="text-[8px] font-medium text-gray-200">Dark</span>
-                        </div>
-                      </div>
-                    </div>
-                    {(state.preferences.backgroundImage?.includes('bg18.png') || state.preferences.backgroundImage?.includes('bg19.png')) && (
-                      <div className="absolute bottom-1 left-1/2 -translate-x-1/2">
-                        <div className="text-white text-[9px] px-1.5 py-0.5 rounded font-medium flex items-center gap-0.5" 
-                             style={{ backgroundColor: state.preferences.accentColor }}>
-                          <Check className="w-2 h-2" />
-                          Aktiv
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Light/Dark Mode Pair - bg22 & bg23 */}
-                  <div 
-                    className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all col-span-2 ${
-                      state.preferences.backgroundImage?.includes('bg22.png') || state.preferences.backgroundImage?.includes('bg23.png')
-                        ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800'
-                        : 'border-gray-200 dark:border-gray-600 hover:border-gray-300'
-                    }`}
-                    style={(state.preferences.backgroundImage?.includes('bg22.png') || state.preferences.backgroundImage?.includes('bg23.png')) ? {
-                      borderColor: state.preferences.accentColor,
-                      boxShadow: `0 0 0 2px ${state.preferences.accentColor}20, 0 0 0 4px ${state.preferences.accentColor}`
-                    } : {}}
-                    onClick={() => dispatch({ type: 'UPDATE_PREFERENCES', payload: { backgroundImage: '/backgrounds/bg22.png', backgroundType: 'image' }})}
-                  >
-                    <div className="flex h-16">
-                      <div className="relative flex-1 overflow-hidden">
-                        <img src="/backgrounds/bg22.png" alt="Light 5" className="w-full h-full object-cover" />
-                        <div className="absolute bottom-1 left-1 bg-white/90 rounded px-1 py-0.5 flex items-center gap-0.5">
-                          <Sun className="w-2 h-2 text-amber-500" />
-                          <span className="text-[8px] font-medium text-gray-700">Light</span>
-                        </div>
-                      </div>
-                      <div className="w-px bg-gray-300 dark:bg-gray-600" />
-                      <div className="relative flex-1 overflow-hidden">
-                        <img src="/backgrounds/bg23.png" alt="Dark 5" className="w-full h-full object-cover" />
-                        <div className="absolute bottom-1 right-1 bg-gray-900/90 rounded px-1 py-0.5 flex items-center gap-0.5">
-                          <Moon className="w-2 h-2 text-blue-400" />
-                          <span className="text-[8px] font-medium text-gray-200">Dark</span>
-                        </div>
-                      </div>
-                    </div>
-                    {(state.preferences.backgroundImage?.includes('bg22.png') || state.preferences.backgroundImage?.includes('bg23.png')) && (
-                      <div className="absolute bottom-1 left-1/2 -translate-x-1/2">
-                        <div className="text-white text-[9px] px-1.5 py-0.5 rounded font-medium flex items-center gap-0.5" 
-                             style={{ backgroundColor: state.preferences.accentColor }}>
-                          <Check className="w-2 h-2" />
-                          Aktiv
-                        </div>
-                      </div>
-                    )}
                   </div>
                   
                   {/* Regular Gallery Images (including bg20, bg21) */}
@@ -2980,47 +2880,6 @@ function ReminderModal({ isOpen, onClose, item, onSave, accentColor }: ReminderM
               backgroundColor: accentColor + '10',
               borderColor: accentColor + '30'
             }}
-          >
-            <div className="flex items-center space-x-2">
-              <Bell className="w-4 h-4" style={{ color: accentColor }} />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Erinnerung wird ausgelöst:
-              </span>
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              {reminderDate === new Date().toISOString().split('T')[0] ? 'Heute' : 
-               format(new Date(reminderDate), 'dd.MM.yyyy', { locale: de })} um {reminderTime} Uhr
-            </p>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex items-center justify-end space-x-3">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
-          >
-            Abbrechen
-          </button>
-          <button
-            onClick={handleSave}
-            className="px-6 py-2 text-white rounded-xl font-medium transition-all duration-200 hover:scale-105 transform"
-            style={{ backgroundColor: accentColor }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = accentColor + 'dd';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = accentColor;
-            }}
-          >
-            Erinnerung setzen
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
           >
             <div className="flex items-center space-x-2">
               <Bell className="w-4 h-4" style={{ color: accentColor }} />

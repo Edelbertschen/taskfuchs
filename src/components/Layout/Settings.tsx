@@ -451,6 +451,7 @@ const Settings = React.memo(() => {
   
   // Stock Photos modal state
   const [showStockPhotosModal, setShowStockPhotosModal] = useState(false);
+  const [showThemePairs, setShowThemePairs] = useState(false);
   
   // Enhanced Nextcloud Synchronization
   const [nextcloudUrl, setNextcloudUrl] = useState(localStorage.getItem('nextcloudUrl') || '');
@@ -4280,296 +4281,109 @@ const Settings = React.memo(() => {
                       </button>
                     </div>
                     <div className="grid grid-cols-3 gap-4">
-                      {/* Light/Dark Mode Background Pair - bg12.png & bg13.png */}
-                      {backgroundImageGallery.some(url => url.includes('bg12.png') || url.includes('bg13.png')) && (
-                        <div 
-                          className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all col-span-2 ${
-                            state.preferences.backgroundImage?.includes('bg12.png') || state.preferences.backgroundImage?.includes('bg13.png')
-                              ? 'border-2 ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800'
+                      {/* Light/Dark Theme Pairs - Collapsible Stack */}
+                      <div className="col-span-3 mb-2">
+                        <button
+                          onClick={() => setShowThemePairs(!showThemePairs)}
+                          className={`w-full relative group cursor-pointer rounded-xl overflow-hidden border-2 transition-all duration-300 ${
+                            showThemePairs 
+                              ? 'border-transparent' 
                               : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
                           }`}
-                          style={(state.preferences.backgroundImage?.includes('bg12.png') || state.preferences.backgroundImage?.includes('bg13.png')) ? {
+                          style={showThemePairs ? {
                             borderColor: getAccentColorStyles().border.borderColor,
-                            boxShadow: `0 0 0 2px ${getAccentColorStyles().bg.backgroundColor}20, 0 0 0 4px ${getAccentColorStyles().bg.backgroundColor}`
                           } : {}}
-                          onClick={() => handleSelectImageFromGallery('/backgrounds/bg12.png')}
                         >
-                          <div className="flex h-20">
-                            {/* Light Mode Half */}
-                            <div className="relative flex-1 overflow-hidden">
-                              <img 
-                                src="/backgrounds/bg12.png" 
-                                alt="Light Mode Hintergrund"
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute bottom-1 left-1 bg-white/90 dark:bg-white/80 rounded px-1.5 py-0.5 flex items-center gap-1">
-                                <Sun className="w-3 h-3 text-amber-500" />
-                                <span className="text-[10px] font-medium text-gray-700">Light</span>
+                          {/* Stacked Preview (collapsed state) */}
+                          <div className={`relative h-16 transition-all duration-300 ${showThemePairs ? 'opacity-0 h-0' : 'opacity-100'}`}>
+                            {/* Stack of images */}
+                            <div className="absolute inset-0 flex">
+                              <div className="flex-1 relative overflow-hidden">
+                                <img src="/backgrounds/bg12.png" alt="" className="w-full h-full object-cover" />
+                              </div>
+                              <div className="w-px bg-gray-300 dark:bg-gray-600" />
+                              <div className="flex-1 relative overflow-hidden">
+                                <img src="/backgrounds/bg13.png" alt="" className="w-full h-full object-cover" />
                               </div>
                             </div>
-                            {/* Divider */}
-                            <div className="w-0.5 bg-gradient-to-b from-white/50 via-gray-400 to-white/50 dark:from-gray-600/50 dark:via-gray-500 dark:to-gray-600/50" />
-                            {/* Dark Mode Half */}
-                            <div className="relative flex-1 overflow-hidden">
-                              <img 
-                                src="/backgrounds/bg13.png" 
-                                alt="Dark Mode Hintergrund"
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute bottom-1 right-1 bg-gray-900/90 dark:bg-gray-900/80 rounded px-1.5 py-0.5 flex items-center gap-1">
-                                <Moon className="w-3 h-3 text-blue-400" />
-                                <span className="text-[10px] font-medium text-white">Dark</span>
+                            {/* Stacked cards effect */}
+                            <div className="absolute inset-x-1 -bottom-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-b-lg opacity-60" />
+                            <div className="absolute inset-x-2 -bottom-2 h-2 bg-gray-300 dark:bg-gray-600 rounded-b-lg opacity-40" />
+                            {/* Overlay with label */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent flex items-end justify-center pb-2">
+                              <div className="flex items-center gap-2 text-white">
+                                <Sun className="w-4 h-4 text-amber-400" />
+                                <span className="text-sm font-medium">/</span>
+                                <Moon className="w-4 h-4 text-blue-400" />
+                                <span className="text-sm font-medium ml-2">Theme-Paare</span>
+                                <ChevronDown className={`w-4 h-4 ml-1 transition-transform duration-300 ${showThemePairs ? 'rotate-180' : ''}`} />
                               </div>
                             </div>
+                            {/* Active pair indicator */}
+                            {(state.preferences.backgroundImage?.match(/bg1[2-9]\.png|bg2[0-3]\.png/)) && (
+                              <div className="absolute top-2 right-2">
+                                <div className="w-3 h-3 rounded-full animate-pulse" style={{ backgroundColor: getAccentColorStyles().bg.backgroundColor }} />
+                              </div>
+                            )}
                           </div>
-                          {/* Pair indicator overlay */}
-                          <div className="absolute top-1 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-sm rounded-full px-2 py-0.5 flex items-center gap-1.5">
-                            <Sun className="w-3 h-3 text-amber-400" />
-                            <span className="text-[10px] font-semibold text-white">/</span>
-                            <Moon className="w-3 h-3 text-blue-400" />
-                          </div>
-                          {/* Hover overlay */}
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-opacity" />
-                          {/* Selected indicator */}
-                          {(state.preferences.backgroundImage?.includes('bg12.png') || state.preferences.backgroundImage?.includes('bg13.png')) && (
-                            <div className="absolute bottom-1 left-1/2 -translate-x-1/2">
-                              <div className="text-white text-xs px-2 py-0.5 rounded text-center font-medium flex items-center gap-1" 
-                                   style={{ backgroundColor: getAccentColorStyles().bg.backgroundColor }}>
-                                <Check className="w-3 h-3" />
-                                {settings_appearance.current()}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      
-                      {/* Light/Dark Mode Background Pair - bg14.png & bg15.png */}
-                      {backgroundImageGallery.some(url => url.includes('bg14.png') || url.includes('bg15.png')) && (
+                        </button>
+                        
+                        {/* Expanded pairs */}
                         <div 
-                          className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all col-span-2 ${
-                            state.preferences.backgroundImage?.includes('bg14.png') || state.preferences.backgroundImage?.includes('bg15.png')
-                              ? 'border-2 ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800'
-                              : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+                          className={`grid grid-cols-2 gap-3 overflow-hidden transition-all duration-500 ease-out ${
+                            showThemePairs ? 'max-h-[600px] opacity-100 mt-3' : 'max-h-0 opacity-0'
                           }`}
-                          style={(state.preferences.backgroundImage?.includes('bg14.png') || state.preferences.backgroundImage?.includes('bg15.png')) ? {
-                            borderColor: getAccentColorStyles().border.borderColor,
-                            boxShadow: `0 0 0 2px ${getAccentColorStyles().bg.backgroundColor}20, 0 0 0 4px ${getAccentColorStyles().bg.backgroundColor}`
-                          } : {}}
-                          onClick={() => handleSelectImageFromGallery('/backgrounds/bg14.png')}
                         >
-                          <div className="flex h-20">
-                            {/* Light Mode Half */}
-                            <div className="relative flex-1 overflow-hidden">
-                              <img 
-                                src="/backgrounds/bg14.png" 
-                                alt="Light Mode Hintergrund 2"
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute bottom-1 left-1 bg-white/90 dark:bg-white/80 rounded px-1.5 py-0.5 flex items-center gap-1">
-                                <Sun className="w-3 h-3 text-amber-500" />
-                                <span className="text-[10px] font-medium text-gray-700">Light</span>
+                          {/* Theme Pair Cards */}
+                          {[
+                            { light: 'bg12.png', dark: 'bg13.png', num: 1 },
+                            { light: 'bg14.png', dark: 'bg15.png', num: 2 },
+                            { light: 'bg16.png', dark: 'bg17.png', num: 3 },
+                            { light: 'bg18.png', dark: 'bg19.png', num: 4 },
+                            { light: 'bg22.png', dark: 'bg23.png', num: 5 },
+                          ].map((pair, idx) => {
+                            const isSelected = state.preferences.backgroundImage?.includes(pair.light) || state.preferences.backgroundImage?.includes(pair.dark);
+                            return (
+                              <div
+                                key={pair.light}
+                                onClick={() => handleSelectImageFromGallery(`/backgrounds/${pair.light}`)}
+                                className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all duration-200 hover:scale-[1.02] ${
+                                  isSelected
+                                    ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800'
+                                    : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+                                }`}
+                                style={isSelected ? {
+                                  borderColor: getAccentColorStyles().border.borderColor,
+                                  boxShadow: `0 0 0 2px ${getAccentColorStyles().bg.backgroundColor}20, 0 0 0 4px ${getAccentColorStyles().bg.backgroundColor}`
+                                } : {}}
+                              >
+                                <div className="flex h-16">
+                                  <div className="relative flex-1 overflow-hidden">
+                                    <img src={`/backgrounds/${pair.light}`} alt="Light" className="w-full h-full object-cover" />
+                                    <div className="absolute bottom-0.5 left-0.5 bg-white/90 rounded px-1 py-0.5">
+                                      <Sun className="w-2.5 h-2.5 text-amber-500" />
+                                    </div>
+                                  </div>
+                                  <div className="w-px bg-gray-300 dark:bg-gray-600" />
+                                  <div className="relative flex-1 overflow-hidden">
+                                    <img src={`/backgrounds/${pair.dark}`} alt="Dark" className="w-full h-full object-cover" />
+                                    <div className="absolute bottom-0.5 right-0.5 bg-gray-900/90 rounded px-1 py-0.5">
+                                      <Moon className="w-2.5 h-2.5 text-blue-400" />
+                                    </div>
+                                  </div>
+                                </div>
+                                {isSelected && (
+                                  <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                                    <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: getAccentColorStyles().bg.backgroundColor }}>
+                                      <Check className="w-4 h-4 text-white" />
+                                    </div>
+                                  </div>
+                                )}
                               </div>
-                            </div>
-                            {/* Divider */}
-                            <div className="w-px bg-gray-300 dark:bg-gray-600" />
-                            {/* Dark Mode Half */}
-                            <div className="relative flex-1 overflow-hidden">
-                              <img 
-                                src="/backgrounds/bg15.png" 
-                                alt="Dark Mode Hintergrund 2"
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute bottom-1 right-1 bg-gray-900/90 dark:bg-gray-900/80 rounded px-1.5 py-0.5 flex items-center gap-1">
-                                <Moon className="w-3 h-3 text-blue-400" />
-                                <span className="text-[10px] font-medium text-gray-200">Dark</span>
-                              </div>
-                            </div>
-                          </div>
-                          {/* Hover overlay */}
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-opacity" />
-                          {/* Selected indicator */}
-                          {(state.preferences.backgroundImage?.includes('bg14.png') || state.preferences.backgroundImage?.includes('bg15.png')) && (
-                            <div className="absolute bottom-1 left-1/2 -translate-x-1/2">
-                              <div className="text-white text-xs px-2 py-0.5 rounded text-center font-medium flex items-center gap-1" 
-                                   style={{ backgroundColor: getAccentColorStyles().bg.backgroundColor }}>
-                                <Check className="w-3 h-3" />
-                                {settings_appearance.current()}
-                              </div>
-                            </div>
-                          )}
+                            );
+                          })}
                         </div>
-                      )}
-                      
-                      {/* Light/Dark Mode Background Pair - bg16.png & bg17.png */}
-                      {backgroundImageGallery.some(url => url.includes('bg16.png') || url.includes('bg17.png')) && (
-                        <div 
-                          className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all col-span-2 ${
-                            state.preferences.backgroundImage?.includes('bg16.png') || state.preferences.backgroundImage?.includes('bg17.png')
-                              ? 'border-2 ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800'
-                              : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
-                          }`}
-                          style={(state.preferences.backgroundImage?.includes('bg16.png') || state.preferences.backgroundImage?.includes('bg17.png')) ? {
-                            borderColor: getAccentColorStyles().border.borderColor,
-                            boxShadow: `0 0 0 2px ${getAccentColorStyles().bg.backgroundColor}20, 0 0 0 4px ${getAccentColorStyles().bg.backgroundColor}`
-                          } : {}}
-                          onClick={() => handleSelectImageFromGallery('/backgrounds/bg16.png')}
-                        >
-                          <div className="flex h-20">
-                            {/* Light Mode Half */}
-                            <div className="relative flex-1 overflow-hidden">
-                              <img 
-                                src="/backgrounds/bg16.png" 
-                                alt="Light Mode Hintergrund 3"
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute bottom-1 left-1 bg-white/90 dark:bg-white/80 rounded px-1.5 py-0.5 flex items-center gap-1">
-                                <Sun className="w-3 h-3 text-amber-500" />
-                                <span className="text-[10px] font-medium text-gray-700">Light</span>
-                              </div>
-                            </div>
-                            {/* Divider */}
-                            <div className="w-px bg-gray-300 dark:bg-gray-600" />
-                            {/* Dark Mode Half */}
-                            <div className="relative flex-1 overflow-hidden">
-                              <img 
-                                src="/backgrounds/bg17.png" 
-                                alt="Dark Mode Hintergrund 3"
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute bottom-1 right-1 bg-gray-900/90 dark:bg-gray-900/80 rounded px-1.5 py-0.5 flex items-center gap-1">
-                                <Moon className="w-3 h-3 text-blue-400" />
-                                <span className="text-[10px] font-medium text-gray-200">Dark</span>
-                              </div>
-                            </div>
-                          </div>
-                          {/* Hover overlay */}
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-opacity" />
-                          {/* Selected indicator */}
-                          {(state.preferences.backgroundImage?.includes('bg16.png') || state.preferences.backgroundImage?.includes('bg17.png')) && (
-                            <div className="absolute bottom-1 left-1/2 -translate-x-1/2">
-                              <div className="text-white text-xs px-2 py-0.5 rounded text-center font-medium flex items-center gap-1" 
-                                   style={{ backgroundColor: getAccentColorStyles().bg.backgroundColor }}>
-                                <Check className="w-3 h-3" />
-                                {settings_appearance.current()}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      
-                      {/* Light/Dark Mode Background Pair - bg18.png & bg19.png */}
-                      {backgroundImageGallery.some(url => url.includes('bg18.png') || url.includes('bg19.png')) && (
-                        <div 
-                          className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all col-span-2 ${
-                            state.preferences.backgroundImage?.includes('bg18.png') || state.preferences.backgroundImage?.includes('bg19.png')
-                              ? 'border-2 ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800'
-                              : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
-                          }`}
-                          style={(state.preferences.backgroundImage?.includes('bg18.png') || state.preferences.backgroundImage?.includes('bg19.png')) ? {
-                            borderColor: getAccentColorStyles().border.borderColor,
-                            boxShadow: `0 0 0 2px ${getAccentColorStyles().bg.backgroundColor}20, 0 0 0 4px ${getAccentColorStyles().bg.backgroundColor}`
-                          } : {}}
-                          onClick={() => handleSelectImageFromGallery('/backgrounds/bg18.png')}
-                        >
-                          <div className="flex h-20">
-                            {/* Light Mode Half */}
-                            <div className="relative flex-1 overflow-hidden">
-                              <img 
-                                src="/backgrounds/bg18.png" 
-                                alt="Light Mode Hintergrund 4"
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute bottom-1 left-1 bg-white/90 dark:bg-white/80 rounded px-1.5 py-0.5 flex items-center gap-1">
-                                <Sun className="w-3 h-3 text-amber-500" />
-                                <span className="text-[10px] font-medium text-gray-700">Light</span>
-                              </div>
-                            </div>
-                            {/* Divider */}
-                            <div className="w-px bg-gray-300 dark:bg-gray-600" />
-                            {/* Dark Mode Half */}
-                            <div className="relative flex-1 overflow-hidden">
-                              <img 
-                                src="/backgrounds/bg19.png" 
-                                alt="Dark Mode Hintergrund 4"
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute bottom-1 right-1 bg-gray-900/90 dark:bg-gray-900/80 rounded px-1.5 py-0.5 flex items-center gap-1">
-                                <Moon className="w-3 h-3 text-blue-400" />
-                                <span className="text-[10px] font-medium text-gray-200">Dark</span>
-                              </div>
-                            </div>
-                          </div>
-                          {/* Hover overlay */}
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-opacity" />
-                          {/* Selected indicator */}
-                          {(state.preferences.backgroundImage?.includes('bg18.png') || state.preferences.backgroundImage?.includes('bg19.png')) && (
-                            <div className="absolute bottom-1 left-1/2 -translate-x-1/2">
-                              <div className="text-white text-xs px-2 py-0.5 rounded text-center font-medium flex items-center gap-1" 
-                                   style={{ backgroundColor: getAccentColorStyles().bg.backgroundColor }}>
-                                <Check className="w-3 h-3" />
-                                {settings_appearance.current()}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      
-                      {/* Light/Dark Mode Background Pair - bg22.png & bg23.png */}
-                      {backgroundImageGallery.some(url => url.includes('bg22.png') || url.includes('bg23.png')) && (
-                        <div 
-                          className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all col-span-2 ${
-                            state.preferences.backgroundImage?.includes('bg22.png') || state.preferences.backgroundImage?.includes('bg23.png')
-                              ? 'border-2 ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800'
-                              : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
-                          }`}
-                          style={(state.preferences.backgroundImage?.includes('bg22.png') || state.preferences.backgroundImage?.includes('bg23.png')) ? {
-                            borderColor: getAccentColorStyles().border.borderColor,
-                            boxShadow: `0 0 0 2px ${getAccentColorStyles().bg.backgroundColor}20, 0 0 0 4px ${getAccentColorStyles().bg.backgroundColor}`
-                          } : {}}
-                          onClick={() => handleSelectImageFromGallery('/backgrounds/bg22.png')}
-                        >
-                          <div className="flex h-20">
-                            {/* Light Mode Half */}
-                            <div className="relative flex-1 overflow-hidden">
-                              <img 
-                                src="/backgrounds/bg22.png" 
-                                alt="Light Mode Hintergrund 5"
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute bottom-1 left-1 bg-white/90 dark:bg-white/80 rounded px-1.5 py-0.5 flex items-center gap-1">
-                                <Sun className="w-3 h-3 text-amber-500" />
-                                <span className="text-[10px] font-medium text-gray-700">Light</span>
-                              </div>
-                            </div>
-                            {/* Divider */}
-                            <div className="w-px bg-gray-300 dark:bg-gray-600" />
-                            {/* Dark Mode Half */}
-                            <div className="relative flex-1 overflow-hidden">
-                              <img 
-                                src="/backgrounds/bg23.png" 
-                                alt="Dark Mode Hintergrund 5"
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute bottom-1 right-1 bg-gray-900/90 dark:bg-gray-900/80 rounded px-1.5 py-0.5 flex items-center gap-1">
-                                <Moon className="w-3 h-3 text-blue-400" />
-                                <span className="text-[10px] font-medium text-gray-200">Dark</span>
-                              </div>
-                            </div>
-                          </div>
-                          {/* Hover overlay */}
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-opacity" />
-                          {/* Selected indicator */}
-                          {(state.preferences.backgroundImage?.includes('bg22.png') || state.preferences.backgroundImage?.includes('bg23.png')) && (
-                            <div className="absolute bottom-1 left-1/2 -translate-x-1/2">
-                              <div className="text-white text-xs px-2 py-0.5 rounded text-center font-medium flex items-center gap-1" 
-                                   style={{ backgroundColor: getAccentColorStyles().bg.backgroundColor }}>
-                                <Check className="w-3 h-3" />
-                                {settings_appearance.current()}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
+                      </div>
                       
                       {/* Regular Gallery Images (excluding paired backgrounds) */}
                       {backgroundImageGallery
@@ -8800,67 +8614,6 @@ const Settings = React.memo(() => {
       {/* Image Storage Debugger */}
       {showImageStorageDebugger && (
         <ImageStorageDebugger
-          onClose={() => setShowImageStorageDebugger(false)}
-        />
-      )}
-
-      {/* Stock Photos Modal */}
-      <StockPhotosModal
-          isOpen={showStockPhotosModal}
-          onClose={() => setShowStockPhotosModal(false)}
-          onSelectPhoto={handleSelectStockPhoto}
-        />
-
-      {/* Photo Credits Modal - render at root with highest z-index */}
-      {showPhotoCreditsModal && createPortal(
-        <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowPhotoCreditsModal(false)} />
-          <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-lg w-full mx-4 p-5 border border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('settings_appearance.photoCredentials')}</h3>
-              <button onClick={() => setShowPhotoCreditsModal(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white">✕</button>
-            </div>
-            <div className="prose prose-sm dark:prose-invert max-h-80 overflow-y-auto">
-              <ReactMarkdown
-                components={{
-                  a: ({ href, children }) => (
-                    <a 
-                      href={href} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-blue-600 dark:text-blue-400 hover:underline"
-                    >
-                      {children}
-                    </a>
-                  ),
-                  p: ({ children }) => <p className="mb-2">{children}</p>,
-                  br: () => <br />
-                }}
-              >
-                {t('settings_appearance.photoCredits')}
-              </ReactMarkdown>
-            </div>
-            <div className="mt-4 text-right">
-              <button
-                onClick={() => setShowPhotoCreditsModal(false)}
-                className="px-3 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/60"
-              >
-                {t('common.close')}
-              </button>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
-
-      {/* Todoist entfernt */}
-    </>
-  );
-});
-
-Settings.displayName = 'Settings';
-
-export { Settings };
           onClose={() => setShowImageStorageDebugger(false)}
         />
       )}
