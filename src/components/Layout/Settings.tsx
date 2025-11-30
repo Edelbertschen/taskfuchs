@@ -3875,7 +3875,7 @@ const Settings = React.memo(() => {
             <div className="settings-card p-6 border">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                  {state.preferences.language === 'de' ? 'Theme Presets' : 'Theme Presets'}
+                  {state.preferences.language === 'de' ? 'Design-Voreinstellungen' : 'Theme Presets'}
                 </h3>
               </div>
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
@@ -4422,17 +4422,20 @@ const Settings = React.memo(() => {
                           <div className="hidden w-full h-20 bg-gray-100 dark:bg-gray-700 items-center justify-center">
                             <span className="text-xs text-gray-500">Bild nicht verfügbar</span>
                           </div>
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-opacity flex items-center justify-center">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleRemoveImageFromGallery(imageUrl);
-                              }}
-                              className="opacity-0 group-hover:opacity-100 bg-red-500 text-white p-1.5 rounded-full transition-opacity hover:bg-red-600"
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
-                          </div>
+                          {/* Only show delete button for custom images, not default backgrounds */}
+                          {!imageUrl.startsWith('/backgrounds/') && (
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-opacity flex items-center justify-center">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleRemoveImageFromGallery(imageUrl);
+                                }}
+                                className="opacity-0 group-hover:opacity-100 bg-red-500 text-white p-1.5 rounded-full transition-opacity hover:bg-red-600"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </div>
+                          )}
                           {state.preferences.backgroundImage === imageUrl && (
                             <div className="absolute bottom-1 left-1 right-1">
                               <div className="text-white text-xs px-1 py-0.5 rounded text-center truncate font-medium" 

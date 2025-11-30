@@ -465,7 +465,7 @@ function LanguageSelectionModal({ isDark, accentColor, onSelect, onSkip }: Langu
           <img 
             src={getFoxImagePath()}
             alt="TaskFuchs" 
-            className="w-20 h-20 object-contain"
+            className="w-[120px] h-[120px] object-contain"
             onError={(e) => {
               const img = e.target as HTMLImageElement;
               if (img.src.includes('/3d_fox.png')) img.src = './3d_fox.png';
@@ -1474,7 +1474,7 @@ export function OnboardingTour({ isOpen, onClose, onNavigate }: OnboardingTourPr
                 <img 
                   src={getFoxImagePath()}
                 alt="TaskFuchs" 
-                  className="w-24 h-24 object-contain"
+                  className="w-[144px] h-[144px] object-contain"
                   onError={(e) => {
                     const img = e.target as HTMLImageElement;
                     if (img.src.includes('/3d_fox.png')) img.src = './3d_fox.png';
@@ -1878,14 +1878,14 @@ export function SplashModal({ isOpen, onClose, onStartOnboarding, showOnboarding
           <img 
             src={getFoxImagePath()}
             alt="TaskFuchs" 
-            className="w-20 h-20 object-contain"
+            className="w-[120px] h-[120px] object-contain"
             onError={(e) => {
               const img = e.target as HTMLImageElement;
               if (img.src.includes('/3d_fox.png')) img.src = './3d_fox.png';
             }}
             style={{ animation: 'bounce-gentle 2s ease-in-out infinite' }}
           />
-                </div>
+        </div>
         
         {/* Title */}
         <div className="text-center px-6 pb-4">

@@ -465,7 +465,16 @@
         "title": "Todoist",
         "description": "Tag-based synchronization with Todoist"
       }
-    }
+    },
+    "addBackgroundImage": "Add Background Image",
+    "imageUrl": "Image URL",
+    "findImageUrls": "How to find image URLs",
+    "rightClickImage": "Right-click on an image → \"Copy image address\"",
+    "unsplash": "Unsplash.com – Free high-resolution photos",
+    "pexels": "Pexels.com – Free stock photos",
+    "uploadToCloud": "Upload your own image to cloud and copy URL",
+    "cancel": "Cancel",
+    "add": "Add"
   },
   "dashboard": {
     "your_day_your_territory": "Your day, your territory.",
@@ -1404,6 +1413,7 @@
     "delete_project": "Delete Project"
   },
   "planner": {
+    "drag_hint": "Drag tasks into day columns",
     "export_tasks": "Export tasks",
     "archive_completed": "Archive completed tasks",
     "focus_column": "Focus column", 

@@ -101,8 +101,18 @@ export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, pro
 
   // Focus input when modal opens
   useEffect(() => {
-    if (isOpen && inputRef.current) {
-      setTimeout(() => inputRef.current?.focus(), 100);
+    if (isOpen) {
+      // Use requestAnimationFrame to ensure DOM is ready, then focus with a small delay
+      const focusInput = () => {
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            if (inputRef.current) {
+              inputRef.current.focus();
+            }
+          }, 50);
+        });
+      };
+      focusInput();
     }
   }, [isOpen]);
 

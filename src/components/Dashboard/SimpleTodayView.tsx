@@ -1657,7 +1657,7 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
               
               {/* Theme Presets - Like Settings */}
               <div className="mb-6">
-                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Theme Presets</h4>
+                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{state.preferences.language === 'de' ? 'Design-Voreinstellungen' : 'Theme Presets'}</h4>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
                   {state.preferences.language === 'de' 
                     ? 'Wähle ein vordefiniertes Theme'
@@ -1992,7 +1992,7 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
               <img 
                 src={getFuchsImagePath()} 
                 alt="Fuchs Logo" 
-                className="w-12 h-12 object-contain"
+                className="w-[72px] h-[72px] object-contain"
                 onError={(e) => { (e.currentTarget as HTMLImageElement).src = getImagePath('Fuchs.svg'); }}
               />
               <p className={`text-4xl font-medium tracking-wide ${
