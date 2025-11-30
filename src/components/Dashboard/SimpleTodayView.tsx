@@ -1670,7 +1670,7 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
                       dispatch({ type: 'UPDATE_PREFERENCES', payload: { 
                         theme: 'light', 
                         accentColor: '#f97316',
-                        backgroundImage: '/backgrounds/bg12.png',
+                        backgroundImage: '/backgrounds/bg12.webp',
                         backgroundType: 'image'
                       }});
                       document.documentElement.classList.remove('dark');
@@ -1678,7 +1678,7 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
                     className="group relative p-2 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-orange-400 transition-all bg-white dark:bg-gray-800"
                   >
                     <div className="aspect-[4/3] rounded-lg overflow-hidden mb-2 relative">
-                      <img src="/backgrounds/bg12.png" alt="Standard" className="w-full h-full object-cover" />
+                      <img src="/backgrounds/bg12.webp" alt="Standard" className="w-full h-full object-cover" />
                       <div className="absolute top-1 right-1 w-3 h-3 rounded-full border border-white shadow-sm" style={{ backgroundColor: '#f97316' }} />
                       <div className="absolute bottom-1 left-1 bg-white/90 rounded px-1 py-0.5">
                         <Sun className="w-2.5 h-2.5 text-amber-500" />
@@ -1844,11 +1844,11 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
                           {/* Stack of images */}
                           <div className="absolute inset-0 flex">
                             <div className="flex-1 relative overflow-hidden">
-                              <img src="/backgrounds/bg12.png" alt="" className="w-full h-full object-cover" />
+                              <img src="/backgrounds/bg12.webp" alt="" className="w-full h-full object-cover" />
                             </div>
                             <div className="w-px bg-gray-300 dark:bg-gray-600" />
                             <div className="flex-1 relative overflow-hidden">
-                              <img src="/backgrounds/bg13.png" alt="" className="w-full h-full object-cover" />
+                              <img src="/backgrounds/bg13.webp" alt="" className="w-full h-full object-cover" />
                             </div>
                           </div>
                           {/* Stacked cards effect */}
@@ -1880,12 +1880,12 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
                         <div className="grid grid-cols-2 gap-2">
                         {/* Theme Pair Cards */}
                         {[
-                          { light: 'bg12.png', dark: 'bg13.png' },
-                          { light: 'bg14.png', dark: 'bg15.png' },
-                          { light: 'bg16.png', dark: 'bg17.png' },
-                          { light: 'bg18.png', dark: 'bg19.png' },
-                          { light: 'bg22.png', dark: 'bg23.png' },
-                          { light: 'bg24.png', dark: 'bg25.png' },
+                          { light: 'bg12.webp', dark: 'bg13.webp' },
+                          { light: 'bg14.webp', dark: 'bg15.webp' },
+                          { light: 'bg16.webp', dark: 'bg17.webp' },
+                          { light: 'bg18.webp', dark: 'bg19.webp' },
+                          { light: 'bg22.webp', dark: 'bg23.webp' },
+                          { light: 'bg24.webp', dark: 'bg25.webp' },
                         ].map((pair) => {
                         const isSelected = state.preferences.backgroundImage?.includes(pair.light) || state.preferences.backgroundImage?.includes(pair.dark);
                         return (
@@ -1941,7 +1941,7 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
                   </div>
                   
                   {/* Regular Gallery Images (including bg20, bg21) */}
-                  {['/backgrounds/bg20.png', '/backgrounds/bg21.png', '/backgrounds/bg1.jpg', '/backgrounds/bg2.jpg', '/backgrounds/bg3.jpg', '/backgrounds/bg4.jpg', '/backgrounds/bg5.jpg', '/backgrounds/bg6.jpg', '/backgrounds/bg7.jpg', '/backgrounds/bg8.jpg', '/backgrounds/bg9.jpg', '/backgrounds/bg10.jpg', '/backgrounds/bg11.jpg'].map((imageUrl) => (
+                  {['/backgrounds/bg20.webp', '/backgrounds/bg21.webp', '/backgrounds/bg1.jpg', '/backgrounds/bg2.jpg', '/backgrounds/bg3.jpg', '/backgrounds/bg4.jpg', '/backgrounds/bg5.jpg', '/backgrounds/bg6.webp', '/backgrounds/bg7.jpg', '/backgrounds/bg8.jpg', '/backgrounds/bg9.jpg', '/backgrounds/bg10.jpg', '/backgrounds/bg11.jpg'].map((imageUrl) => (
                     <div 
                       key={imageUrl}
                       className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${

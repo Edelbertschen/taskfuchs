@@ -982,37 +982,37 @@ function MainApp() {
         // Check for bg12/bg13 pair
         const isBg12or13 = /\/backgrounds\/bg1(2|3)\.(png|jpg)$/.test(img);
         if (isBg12or13) {
-          return isDarkMode ? '/backgrounds/bg13.png' : '/backgrounds/bg12.png';
+          return isDarkMode ? '/backgrounds/bg13.webp' : '/backgrounds/bg12.webp';
         }
         // Check for bg14/bg15 pair
         const isBg14or15 = /\/backgrounds\/bg1(4|5)\.(png|jpg)$/.test(img);
         if (isBg14or15) {
-          return isDarkMode ? '/backgrounds/bg15.png' : '/backgrounds/bg14.png';
+          return isDarkMode ? '/backgrounds/bg15.webp' : '/backgrounds/bg14.webp';
         }
         // Check for bg16/bg17 pair
         const isBg16or17 = /\/backgrounds\/bg1(6|7)\.(png|jpg)$/.test(img);
         if (isBg16or17) {
-          return isDarkMode ? '/backgrounds/bg17.png' : '/backgrounds/bg16.png';
+          return isDarkMode ? '/backgrounds/bg17.webp' : '/backgrounds/bg16.webp';
         }
         // Check for bg18/bg19 pair
         const isBg18or19 = /\/backgrounds\/bg1(8|9)\.(png|jpg)$/.test(img);
         if (isBg18or19) {
-          return isDarkMode ? '/backgrounds/bg19.png' : '/backgrounds/bg18.png';
+          return isDarkMode ? '/backgrounds/bg19.webp' : '/backgrounds/bg18.webp';
         }
         // Check for bg22/bg23 pair
         const isBg22or23 = /\/backgrounds\/bg2(2|3)\.(png|jpg)$/.test(img);
         if (isBg22or23) {
-          return isDarkMode ? '/backgrounds/bg23.png' : '/backgrounds/bg22.png';
+          return isDarkMode ? '/backgrounds/bg23.webp' : '/backgrounds/bg22.webp';
         }
         // Check for bg24/bg25 pair
         const isBg24or25 = /\/backgrounds\/bg2(4|5)\.(png|jpg)$/.test(img);
         if (isBg24or25) {
-          return isDarkMode ? '/backgrounds/bg25.png' : '/backgrounds/bg24.png';
+          return isDarkMode ? '/backgrounds/bg25.webp' : '/backgrounds/bg24.webp';
         }
         return img;
       }
-      // Fallback when no image is chosen: always use bg12.png
-      return '/backgrounds/bg12.png';
+      // Fallback when no image is chosen: always use bg12.webp
+      return '/backgrounds/bg12.webp';
     }
     return undefined as unknown as string | undefined;
   })();

@@ -278,7 +278,7 @@ const initialState: AppState = {
     theme: 'light',
     language: 'de',
     accentColor: '#f97316',
-    backgroundImage: '/backgrounds/bg12.png',
+    backgroundImage: '/backgrounds/bg12.webp',
     backgroundType: 'image',
     dateFormat: 'dd.MM.yyyy',
     recentBackgroundImages: [],
@@ -3110,7 +3110,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           migratedPreferences.backgroundImage &&
           !migratedPreferences.backgroundImage.startsWith('/')
         ) {
-          migratedPreferences.backgroundImage = '/backgrounds/bg12.png';
+          migratedPreferences.backgroundImage = '/backgrounds/bg12.webp';
         }
 
         // Sanitize gallery in localStorage: keep only local paths and ensure defaults are present

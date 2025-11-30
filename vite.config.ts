@@ -26,8 +26,9 @@ export default defineConfig({
         skipWaiting: true,
         clientsClaim: true,
         // IMPORTANT: Exclude HTML to ensure fresh scripts are loaded on each visit
-        globPatterns: ['**/*.{js,css,ico,png,svg,json,woff2}'],
-        globIgnores: ['**/screenshots/**', '**/node_modules/**', '**/index.html'],
+        globPatterns: ['**/*.{js,css,ico,svg,json,woff2}'],
+        // Exclude large background images and screenshots from precache
+        globIgnores: ['**/screenshots/**', '**/backgrounds/**', '**/node_modules/**', '**/index.html'],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
         runtimeCaching: [
           // HTML: Always try network first to get fresh app
@@ -75,6 +76,18 @@ export default defineConfig({
               expiration: {
                 maxEntries: 20,
                 maxAgeSeconds: 60 * 60 * 24 * 7 // 1 Woche
+              }
+            }
+          },
+          // Background images: Cache on demand (too large for precache)
+          {
+            urlPattern: /\/backgrounds\/.*/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'backgrounds-cache',
+              expiration: {
+                maxEntries: 30,
+                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 Tage
               }
             }
           }

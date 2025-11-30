@@ -407,18 +407,18 @@ const Settings = React.memo(() => {
   const [backgroundImageGallery, setBackgroundImageGallery] = useState(() => {
     // Use local bundled backgrounds from public/backgrounds
     const desiredDefaults = [
-      '/backgrounds/bg12.png',
-      '/backgrounds/bg13.png',
-      '/backgrounds/bg14.png',
-      '/backgrounds/bg15.png',
-      '/backgrounds/bg16.png',
-      '/backgrounds/bg17.png',
-      '/backgrounds/bg18.png',
-      '/backgrounds/bg19.png',
-      '/backgrounds/bg20.png',
-      '/backgrounds/bg21.png',
-      '/backgrounds/bg22.png',
-      '/backgrounds/bg23.png',
+      '/backgrounds/bg12.webp',
+      '/backgrounds/bg13.webp',
+      '/backgrounds/bg14.webp',
+      '/backgrounds/bg15.webp',
+      '/backgrounds/bg16.webp',
+      '/backgrounds/bg17.webp',
+      '/backgrounds/bg18.webp',
+      '/backgrounds/bg19.webp',
+      '/backgrounds/bg20.webp',
+      '/backgrounds/bg21.webp',
+      '/backgrounds/bg22.webp',
+      '/backgrounds/bg23.webp',
       ...Array.from({ length: 11 }, (_, i) => `/backgrounds/bg${i + 1}.jpg`),
     ];
     const savedGallery = localStorage.getItem('backgroundImageGallery');
@@ -919,7 +919,7 @@ const Settings = React.memo(() => {
 
   // Set new default image as background if no image is currently set
   useEffect(() => {
-    const defaultImage = '/backgrounds/bg12.png';
+    const defaultImage = '/backgrounds/bg12.webp';
     if (!state.preferences.backgroundImage && backgroundImageGallery.includes(defaultImage)) {
       dispatch({
         type: 'UPDATE_PREFERENCES',
@@ -3892,7 +3892,7 @@ const Settings = React.memo(() => {
                       payload: {
                         theme: 'light',
                         accentColor: '#f97316',
-                        backgroundImage: '/backgrounds/bg12.png',
+                        backgroundImage: '/backgrounds/bg12.webp',
                         backgroundType: 'image'
                       }
                     });
@@ -3902,7 +3902,7 @@ const Settings = React.memo(() => {
                 >
                   <div className="aspect-[4/3] rounded-lg overflow-hidden mb-2 relative">
                     <img 
-                      src="/backgrounds/bg12.png" 
+                      src="/backgrounds/bg12.webp" 
                       alt="Default Theme"
                       className="w-full h-full object-cover"
                     />
@@ -4296,11 +4296,11 @@ const Settings = React.memo(() => {
                             {/* Stack of images */}
                             <div className="absolute inset-0 flex">
                               <div className="flex-1 relative overflow-hidden">
-                                <img src="/backgrounds/bg12.png" alt="" className="w-full h-full object-cover" />
+                                <img src="/backgrounds/bg12.webp" alt="" className="w-full h-full object-cover" />
                               </div>
                               <div className="w-px bg-gray-300 dark:bg-gray-600" />
                               <div className="flex-1 relative overflow-hidden">
-                                <img src="/backgrounds/bg13.png" alt="" className="w-full h-full object-cover" />
+                                <img src="/backgrounds/bg13.webp" alt="" className="w-full h-full object-cover" />
                               </div>
                             </div>
                             {/* Stacked cards effect */}
@@ -4332,12 +4332,12 @@ const Settings = React.memo(() => {
                           {/* Theme Pair Cards */}
                           <div className="grid grid-cols-2 gap-3">
                           {[
-                            { light: 'bg12.png', dark: 'bg13.png' },
-                            { light: 'bg14.png', dark: 'bg15.png' },
-                            { light: 'bg16.png', dark: 'bg17.png' },
-                            { light: 'bg18.png', dark: 'bg19.png' },
-                            { light: 'bg22.png', dark: 'bg23.png' },
-                            { light: 'bg24.png', dark: 'bg25.png' },
+                            { light: 'bg12.webp', dark: 'bg13.webp' },
+                            { light: 'bg14.webp', dark: 'bg15.webp' },
+                            { light: 'bg16.webp', dark: 'bg17.webp' },
+                            { light: 'bg18.webp', dark: 'bg19.webp' },
+                            { light: 'bg22.webp', dark: 'bg23.webp' },
+                            { light: 'bg24.webp', dark: 'bg25.webp' },
                           ].map((pair) => {
                             const isSelected = state.preferences.backgroundImage?.includes(pair.light) || state.preferences.backgroundImage?.includes(pair.dark);
                             return (
@@ -4394,7 +4394,7 @@ const Settings = React.memo(() => {
                       
                       {/* Regular Gallery Images (excluding paired backgrounds) */}
                       {backgroundImageGallery
-                        .filter(url => !url.includes('bg12.png') && !url.includes('bg13.png') && !url.includes('bg14.png') && !url.includes('bg15.png') && !url.includes('bg16.png') && !url.includes('bg17.png') && !url.includes('bg18.png') && !url.includes('bg19.png') && !url.includes('bg22.png') && !url.includes('bg23.png') && !url.includes('bg24.png') && !url.includes('bg25.png'))
+                        .filter(url => !url.includes('bg12.webp') && !url.includes('bg13.webp') && !url.includes('bg14.webp') && !url.includes('bg15.webp') && !url.includes('bg16.webp') && !url.includes('bg17.webp') && !url.includes('bg18.webp') && !url.includes('bg19.webp') && !url.includes('bg22.webp') && !url.includes('bg23.webp') && !url.includes('bg24.webp') && !url.includes('bg25.webp'))
                         .map((imageUrl, index) => (
                         <div 
                           key={index}
@@ -4487,18 +4487,18 @@ const Settings = React.memo(() => {
                       <button
                         onClick={() => {
                           const defaults = [
-                            '/backgrounds/bg12.png',
-                            '/backgrounds/bg13.png',
-                            '/backgrounds/bg14.png',
-                            '/backgrounds/bg15.png',
-                            '/backgrounds/bg16.png',
-                            '/backgrounds/bg17.png',
-                            '/backgrounds/bg18.png',
-                            '/backgrounds/bg19.png',
-                            '/backgrounds/bg20.png',
-                            '/backgrounds/bg21.png',
-                            '/backgrounds/bg22.png',
-                            '/backgrounds/bg23.png',
+                            '/backgrounds/bg12.webp',
+                            '/backgrounds/bg13.webp',
+                            '/backgrounds/bg14.webp',
+                            '/backgrounds/bg15.webp',
+                            '/backgrounds/bg16.webp',
+                            '/backgrounds/bg17.webp',
+                            '/backgrounds/bg18.webp',
+                            '/backgrounds/bg19.webp',
+                            '/backgrounds/bg20.webp',
+                            '/backgrounds/bg21.webp',
+                            '/backgrounds/bg22.webp',
+                            '/backgrounds/bg23.webp',
                             ...Array.from({ length: 11 }, (_, i) => `/backgrounds/bg${i + 1}.jpg`),
                           ];
                           setBackgroundImageGallery(defaults);

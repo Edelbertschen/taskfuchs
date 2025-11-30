@@ -19,18 +19,18 @@ const DEMO_BACKGROUND_IMAGES = [
   '/backgrounds/bg2.jpg',
   '/backgrounds/bg8.jpg',
   '/backgrounds/bg11.jpg',
-  '/backgrounds/bg12.png',
-  '/backgrounds/bg13.png',
-  '/backgrounds/bg14.png',
-  '/backgrounds/bg15.png',
-  '/backgrounds/bg16.png',
-  '/backgrounds/bg17.png',
-  '/backgrounds/bg18.png',
-  '/backgrounds/bg19.png',
-  '/backgrounds/bg20.png',
-  '/backgrounds/bg21.png',
-  '/backgrounds/bg22.png',
-  '/backgrounds/bg23.png'
+  '/backgrounds/bg12.webp',
+  '/backgrounds/bg13.webp',
+  '/backgrounds/bg14.webp',
+  '/backgrounds/bg15.webp',
+  '/backgrounds/bg16.webp',
+  '/backgrounds/bg17.webp',
+  '/backgrounds/bg18.webp',
+  '/backgrounds/bg19.webp',
+  '/backgrounds/bg20.webp',
+  '/backgrounds/bg21.webp',
+  '/backgrounds/bg22.webp',
+  '/backgrounds/bg23.webp'
 ];
 
 // Check if we're in a PWA/Web context (not Electron)
