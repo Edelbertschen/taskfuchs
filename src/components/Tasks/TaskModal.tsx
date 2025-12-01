@@ -1074,6 +1074,12 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
     setEditTimeHours(hours);
     setEditTimeMinutes(minutes);
     setIsEditingTime(true);
+    
+    // Focus the hours input after rendering
+    setTimeout(() => {
+      const firstInput = document.querySelector('[data-tracked-time-input]') as HTMLInputElement;
+      if (firstInput) firstInput.focus();
+    }, 0);
   };
 
   // Save edited time
@@ -1089,12 +1095,14 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
     dispatch({
       type: 'UPDATE_TASK',
       payload: preservePlacement(task!, {
-        trackedTime: newTrackedTime,
+        trackedTime: newTrackedTime || 0, // Allow setting to 0
         updatedAt: new Date().toISOString()
       })
     });
 
     setIsEditingTime(false);
+    setEditTimeHours(0);
+    setEditTimeMinutes(0);
   };
 
   // Cancel time editing
@@ -3017,42 +3025,62 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                     </div>
                     
                     {/* Tracked Time - Editable */}
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center space-x-2">
                         <Timer className="w-4 h-4 text-gray-400" />
                         <span className="text-sm text-gray-600 dark:text-gray-400">{t('tasks.modal.time_tracked')}</span>
                       </div>
                       {isEditingTime ? (
-                        <div className="flex items-center space-x-1">
+                        <div className="flex items-center gap-1">
                           <input
                             type="number"
                             min="0"
                             value={editTimeHours}
                             onChange={(e) => setEditTimeHours(Math.max(0, parseInt(e.target.value) || 0))}
-                            className="w-12 px-1.5 py-0.5 text-sm text-center border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                saveEditedTime();
+                              } else if (e.key === 'Escape') {
+                                e.preventDefault();
+                                cancelTimeEditing();
+                              }
+                            }}
+                            placeholder="0"
+                            data-tracked-time-input
+                            className="w-10 px-1 py-0.5 text-xs text-center border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1"
                             style={{ '--tw-ring-color': state.preferences.accentColor } as React.CSSProperties}
                           />
-                          <span className="text-xs text-gray-400">h</span>
+                          <span className="text-xs text-gray-400">:</span>
                           <input
                             type="number"
                             min="0"
                             max="59"
-                            value={editTimeMinutes}
+                            value={editTimeMinutes.toString().padStart(2, '0')}
                             onChange={(e) => setEditTimeMinutes(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))}
-                            className="w-12 px-1.5 py-0.5 text-sm text-center border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                saveEditedTime();
+                              } else if (e.key === 'Escape') {
+                                e.preventDefault();
+                                cancelTimeEditing();
+                              }
+                            }}
+                            placeholder="00"
+                            className="w-10 px-1 py-0.5 text-xs text-center border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1"
                             style={{ '--tw-ring-color': state.preferences.accentColor } as React.CSSProperties}
                           />
-                          <span className="text-xs text-gray-400">min</span>
                           <button
                             onClick={saveEditedTime}
-                            className="p-1 text-green-500 hover:text-green-600 transition-colors"
+                            className="p-0.5 text-green-500 hover:text-green-600 transition-colors"
                             title={t('common.save')}
                           >
                             <Check className="w-4 h-4" />
                           </button>
                           <button
                             onClick={cancelTimeEditing}
-                            className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                            className="p-0.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                             title={t('common.cancel')}
                           >
                             <X className="w-4 h-4" />
@@ -3067,12 +3095,11 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                         >
                           {(() => {
                             const trackedTime = getCurrentTrackedTime();
-                            if (trackedTime === 0) return '0 min';
+                            if (trackedTime === 0) return '0:00';
                             const roundedTime = Math.round(trackedTime);
                             const hours = Math.floor(roundedTime / 60);
                             const mins = roundedTime % 60;
-                            if (hours > 0) return `${hours}h ${mins}min`;
-                            return `${mins} min`;
+                            return `${hours}:${mins.toString().padStart(2, '0')}`;
                           })()}
                         </button>
                       )}
