@@ -1843,7 +1843,7 @@ function InboxTaskCard({
                       border: '1px solid rgba(255, 255, 255, 0.3)'
                     }}
                   >
-                    {t(`task.priority.${task.priority}`)}
+                    {t(`tasks.priority.${task.priority}`)}
                   </span>
                 )}
               </div>
