@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useCelebration } from '../../context/CelebrationContext';
 import { useAppTranslation } from '../../utils/i18nHelpers';
 import { useTranslation } from 'react-i18next';
 import { isPast, differenceInDays, format } from 'date-fns';
@@ -23,6 +24,7 @@ const WIDGET_TEXT_STYLES = {
 
 export function DeadlineWidget({ onTaskClick }: DeadlineWidgetProps = {}) {
   const { state, dispatch } = useApp();
+  const { triggerCelebration } = useCelebration();
   const { simpleTodayView } = useAppTranslation();
   const { i18n } = useTranslation();
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -70,6 +72,9 @@ export function DeadlineWidget({ onTaskClick }: DeadlineWidgetProps = {}) {
   const handleCompleteTask = (taskId: string) => {
     const task = state.tasks.find(t => t.id === taskId);
     if (task) {
+      // Trigger celebration animation
+      triggerCelebration();
+      
       dispatch({
         type: 'UPDATE_TASK',
         payload: { ...task, completed: true, completedAt: new Date().toISOString(), updatedAt: new Date().toISOString() }

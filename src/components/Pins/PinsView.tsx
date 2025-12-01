@@ -951,7 +951,7 @@ export function PinsView() {
             <p className={`text-xs ${
               isMinimalDesign ? 'text-gray-500 dark:text-gray-400' : (isDarkMode ? 'text-gray-400' : 'text-gray-600')
             }`}>
-              Ziehe Aufgaben in die Pin-Spalten
+              {t('pins.drag_tasks_hint')}
             </p>
           </div>
           
@@ -989,7 +989,7 @@ export function PinsView() {
                     <p className={`px-4 py-2 text-xs italic ${
                       isMinimalDesign ? 'text-gray-500 dark:text-gray-400' : (isDarkMode ? 'text-gray-500' : 'text-gray-500')
                     }`}>
-                      Keine Aufgaben für heute
+                      {t('pins.no_tasks_today')}
                     </p>
                   ) : (
                     todayTasks.map(task => (
@@ -1014,7 +1014,7 @@ export function PinsView() {
               <div className={`px-4 pb-2 text-xs font-medium uppercase tracking-wider ${
                 isMinimalDesign ? 'text-gray-500 dark:text-gray-400' : (isDarkMode ? 'text-gray-400' : 'text-gray-500')
               }`}>
-                Projektaufgaben
+                {t('pins.project_tasks')}
               </div>
               
               {projectTasks.length === 0 ? (
@@ -1022,7 +1022,7 @@ export function PinsView() {
                   isMinimalDesign ? 'text-gray-500 dark:text-gray-400' : (isDarkMode ? 'text-gray-400' : 'text-gray-500')
                 }`}>
                   <Folder className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                  <p className="text-xs">Keine Projektaufgaben</p>
+                  <p className="text-xs">{t('pins.no_project_tasks')}</p>
                 </div>
               ) : (
                 projectTasks.map(({ project, tasks: projTasks }) => (
@@ -1098,7 +1098,7 @@ export function PinsView() {
                     <div className="p-1.5 rounded-lg" style={{ backgroundColor: state.preferences.accentColor + '20' }}>
                       <Filter className="w-4 h-4" style={{ color: state.preferences.accentColor }} />
                 </div>
-                    <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter</h3>
+                    <h3 className="text-sm font-medium text-gray-900 dark:text-white">{t('pins.filter')}</h3>
                     {(priorityFilter !== 'all' || tagFilters.length > 0) && (
                       <span 
                         className="px-2 py-0.5 rounded-full text-xs font-bold text-white"
@@ -1117,7 +1117,7 @@ export function PinsView() {
                         }}
                         className="px-2 py-1 text-xs font-medium text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-all duration-200"
                       >
-                        Zurücksetzen
+                        {t('pins.reset')}
                       </button>
                     )}
                     <button
@@ -1206,7 +1206,7 @@ export function PinsView() {
                       );
                     })}
                     {state.tags.filter(tag => tag.count > 0).length === 0 && (
-                      <span className="text-xs text-gray-500 dark:text-gray-400">Keine Tags vorhanden</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">{t('pins.no_tags_available')}</span>
                     )}
               </div>
             </div>

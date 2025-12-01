@@ -68,6 +68,7 @@ import {
   Edit3
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { useCelebration } from '../../context/CelebrationContext';
 import { useTranslation } from 'react-i18next';
 import { format, parseISO, isToday, isTomorrow, isYesterday, differenceInDays, isPast, isFuture, isThisWeek, isThisMonth, formatDistanceToNow, addWeeks, startOfWeek, endOfWeek } from 'date-fns';
 import { de } from 'date-fns/locale';
@@ -188,6 +189,8 @@ function ModernTaskItem({
   onSelect
 }: ModernTaskItemProps) {
   const { state, dispatch } = useApp();
+  const { triggerCelebration } = useCelebration();
+  const { t } = useTranslation();
   const accentColor = state.preferences.accentColor || '#0ea5e9';
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [hoveredAction, setHoveredAction] = useState<string | null>(null);
@@ -307,9 +310,9 @@ function ModernTaskItem({
     e.stopPropagation();
     const newCompletedState = !task.completed;
     
-    // Play completion sound if task is being completed
-    if (newCompletedState && state.preferences.sounds) {
-      playCompletionSound(state.preferences.completionSound, state.preferences.soundVolume).catch(console.warn);
+    // Trigger celebration animation if task is being completed
+    if (newCompletedState) {
+      triggerCelebration();
     }
     
     dispatch({
@@ -441,7 +444,7 @@ function ModernTaskItem({
             <button
               onClick={handlePlayStop}
               className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-              title={isTimerRunning ? 'Timer stoppen' : 'Timer starten'}
+              title={isTimerRunning ? t('actions.stop_timer') : t('actions.start_timer')}
             >
               {isTimerRunning ? (
                 <PauseCircle className="w-4 h-4 text-red-500" />
@@ -599,7 +602,7 @@ function ModernTaskItem({
                 <button
                   onClick={handlePlayStop}
                   className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-                  title={isTimerRunning ? 'Timer stoppen' : 'Timer starten'}
+                  title={isTimerRunning ? t('actions.stop_timer') : t('actions.start_timer')}
                 >
                   {isTimerRunning ? (
                     <PauseCircle className="w-4 h-4 text-red-500" />
@@ -837,7 +840,7 @@ function ModernTaskItem({
                     ? 'bg-red-500 hover:bg-red-600 text-white shadow-md hover:shadow-lg hover:scale-105' 
                     : 'hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
-                title={isTimerRunning ? 'Timer stoppen' : 'Timer starten'}
+                title={isTimerRunning ? t('actions.stop_timer') : t('actions.start_timer')}
                 onMouseEnter={() => setHoveredAction('timer')}
                 onMouseLeave={() => setHoveredAction(null)}
               >

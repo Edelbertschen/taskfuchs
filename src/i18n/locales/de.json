@@ -255,7 +255,9 @@
   "tags": {
     "filter_by_tags": "Nach Tags filtern",
     "add_tag": "Tag hinzufügen",
-    "no_tags": "Keine Tags"
+    "no_tags": "Keine Tags",
+    "usage": "Verwendung",
+    "usages": "Verwendungen"
   },
   "timebudget": {
     "title": "Zeitbudget-Planung",
@@ -373,7 +375,8 @@
     "reset": "Zurücksetzen",
     "locale": "de-DE",
     "show_completed": "Erledigt anzeigen",
-    "clear_filters": "Löschen"
+    "clear_filters": "Löschen",
+    "customize": "Anpassen"
   },
   "settings": {
     "title": "Einstellungen",
@@ -581,6 +584,9 @@
     "cancel": "Abbrechen",
     "save": "Speichern",
     "add": "Hinzufügen",
+    "start_timer": "Timer starten",
+    "stop_timer": "Timer stoppen",
+    "timer_running": "Timer läuft",
     "filter": "Filter",
     "close": "Schließen",
     "expand": "Vergrößern",
@@ -1722,7 +1728,14 @@
     "pin_important_tasks_flexible_columns": "Pinne wichtige Aufgaben in flexiblen Spalten für schnellen Zugriff.",
     "select_pin_column_dropdown": "Wähle eine Pin-Spalte aus dem Dropdown-Menü",
     "right_click_pin_options": "Rechtsklick → Pin-Optionen → Spalte auswählen",
-    "auto_unpin_completed_tasks": "Erledigte Aufgaben automatisch entpinnen"
+    "auto_unpin_completed_tasks": "Erledigte Aufgaben automatisch entpinnen",
+    "drag_tasks_hint": "Ziehe Aufgaben in die Pin-Spalten",
+    "no_tasks_today": "Keine Aufgaben für heute",
+    "project_tasks": "Projektaufgaben",
+    "no_project_tasks": "Keine Projektaufgaben",
+    "no_tags_available": "Keine Tags vorhanden",
+    "filter": "Filter",
+    "reset": "Zurücksetzen"
   },
   "series": {
     "title": "Serien verwalten",

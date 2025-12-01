@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Play, Pause, Square, Check, X, Plus, Minus, Clock, Timer, Calendar, ChevronRight, Star, Eye } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { useCelebration } from '../../context/CelebrationContext';
 import { useAppTranslation } from '../../utils/i18nHelpers';
 import type { Task } from '../../types';
 import { playCompletionSound } from '../../utils/soundUtils';
@@ -19,6 +20,7 @@ interface FocusViewProps {
 
 export function FocusView({ onExit }: FocusViewProps) {
   const { state, dispatch } = useApp();
+  const { triggerCelebration } = useCelebration();
   const { t, focusView } = useAppTranslation();
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [selectedTaskForModal, setSelectedTaskForModal] = useState<Task | null>(null);
@@ -237,6 +239,9 @@ export function FocusView({ onExit }: FocusViewProps) {
       } catch {}
     }
 
+    // Trigger celebration animation
+    triggerCelebration();
+
     // Mark current task as completed
     dispatch({
       type: 'UPDATE_TASK',
@@ -247,10 +252,6 @@ export function FocusView({ onExit }: FocusViewProps) {
         updatedAt: new Date().toISOString()
       }
     });
-
-    if (state.preferences.sounds) {
-      playCompletionSound(state.preferences.completionSound);
-    }
 
     // Auto-progression: Find next task and start timer
     setTimeout(async () => {

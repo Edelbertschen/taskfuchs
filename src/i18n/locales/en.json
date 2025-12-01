@@ -253,7 +253,9 @@
   "tags": {
     "filter_by_tags": "Filter by tags",
     "add_tag": "Add Tag",
-    "no_tags": "No tags"
+    "no_tags": "No tags",
+    "usage": "usage",
+    "usages": "usages"
   },
   "timebudget": {
     "title": "Time Budget Planning",
@@ -371,7 +373,8 @@
     "reset": "Reset",
     "locale": "en-US",
     "show_completed": "Show completed",
-    "clear_filters": "Clear"
+    "clear_filters": "Clear",
+    "customize": "Customize"
   },
   "settings": {
     "title": "Settings",
@@ -520,6 +523,9 @@
     "cancel": "Cancel",
     "save": "Save",
     "add": "Add",
+    "start_timer": "Start timer",
+    "stop_timer": "Stop timer",
+    "timer_running": "Timer running",
     "filter": "Filter",
     "close": "Close",
     "expand": "Expand",
@@ -1285,7 +1291,14 @@
     "pin_important_tasks_flexible_columns": "Pin important tasks in flexible columns for quick access.",
     "select_pin_column_dropdown": "Select a pin column from the dropdown menu",
     "right_click_pin_options": "Right-click → Pin Options → Select Column",
-    "auto_unpin_completed_tasks": "Automatically unpin completed tasks"
+    "auto_unpin_completed_tasks": "Automatically unpin completed tasks",
+    "drag_tasks_hint": "Drag tasks to the pin columns",
+    "no_tasks_today": "No tasks for today",
+    "project_tasks": "Project Tasks",
+    "no_project_tasks": "No project tasks",
+    "no_tags_available": "No tags available",
+    "filter": "Filter",
+    "reset": "Reset"
   },
   "series": {
     "title": "Manage Series",

@@ -22,13 +22,12 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
+import { useCelebration } from '../../context/CelebrationContext';
 import { Task } from '../../types';
 // ⚡ Lazy Loading: TaskModal wird erst bei Bedarf geladen
 const LazyTaskModal = React.lazy(() => import('./TaskModal').then(module => ({ default: module.TaskModal })));
-import { Celebration } from '../Common/Celebration';
 import { DeleteConfirmationModal } from '../Common/DeleteConfirmationModal';
 import { SeriesDeleteModal } from '../Common/SeriesDeleteModal';
-import { playCompletionSound } from '../../utils/soundUtils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { format } from 'date-fns';
@@ -49,11 +48,11 @@ interface TaskCardProps {
 
 const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTask = false, isFirst = false, isLast = false, isInDragOverlay = false, isFocusMode = false, currentColumn, isDeadlineReminder = false }: TaskCardProps) => {
   const { state, dispatch } = useApp();
+  const { triggerCelebration } = useCelebration();
   const { t } = useTranslation();
   const [isEditingTitle, setIsEditingTitle] = useState(isNewTask);
   const [editTitle, setEditTitle] = useState(task.title);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showCelebration, setShowCelebration] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -220,14 +219,9 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
     
     const newCompletedState = !task.completed;
     
-    // Show celebration only if task is being completed AND celebration is enabled
-    if (newCompletedState && state.preferences.enableCelebration) {
-      setShowCelebration(true);
-    }
-    
-    // Play completion sound if task is being completed
-    if (newCompletedState && state.preferences.sounds) {
-      playCompletionSound(state.preferences.completionSound, state.preferences.soundVolume).catch(console.warn);
+    // Trigger celebration animation if task is being completed
+    if (newCompletedState) {
+      triggerCelebration();
     }
     
     dispatch({
@@ -854,7 +848,7 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
                   onClick={handleStopTimer}
                   onPointerDown={(e) => e.stopPropagation()}
                   className={`${isFocusMode ? 'p-1' : 'p-1.5'} rounded transition-all duration-200 bg-red-500 hover:bg-red-600 text-white shadow-md hover:shadow-lg hover:scale-105`}
-                  title="Timer stoppen"
+                  title={t('actions.stop_timer')}
                 >
                   <Square className={`${isFocusMode ? 'w-3 h-3' : 'w-3.5 h-3.5'}`} />
                 </button>
@@ -894,7 +888,7 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
                     backgroundColor: accentColor,
                     color: 'white'
                   }}
-                  title="Timer starten"
+                  title={t('actions.start_timer')}
                 >
                   <Play className={`${isFocusMode ? 'w-3 h-3 ml-0.5' : 'w-3.5 h-3.5 ml-0.5'}`} />
                 </button>
@@ -988,10 +982,6 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
         `}
       </style>
 
-      {/* Celebration effect */}
-      {showCelebration && (
-        <Celebration isVisible={showCelebration} onComplete={() => setShowCelebration(false)} />
-      )}
 
       {/* 🚀 Performance Boost: Lazy loaded TaskModal */}
       {isModalOpen && (

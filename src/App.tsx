@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, Suspense } from 'react';
 import { createPortal } from 'react-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { CelebrationProvider } from './context/CelebrationContext';
 import { WelcomeScreen } from './components/Auth/WelcomeScreen';
 import { Sidebar } from './components/Layout/Sidebar';
 import { MobileShell } from './components/Layout/MobileShell';
@@ -292,9 +293,9 @@ function MainApp() {
     window.dispatchEvent(new CustomEvent('column-navigate', { detail: { direction } }));
   }, []);
 
-  // Mobile PWA: Show minimalistic mobile shell
+  // Mobile: Show coming soon page until mobile version is ready
   if (isMobilePWAEnvironment()) {
-    return <MobileShell />;
+    return <MobileComingSoon />;
   }
 
   // Quick navigation with subtle fade/morph effect
@@ -1522,7 +1523,9 @@ function AppRouter() {
   // Show main app if authenticated or in guest mode (including returning users)
   return (
     <AppProvider>
-      <MainApp />
+      <CelebrationProvider>
+        <MainApp />
+      </CelebrationProvider>
     </AppProvider>
   );
 }

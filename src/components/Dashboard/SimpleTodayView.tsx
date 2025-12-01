@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useApp } from '../../context/AppContext';
+import { useCelebration } from '../../context/CelebrationContext';
 import { format, isToday, isYesterday, isTomorrow, isPast, subDays } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
 import { MaterialIcon } from '../Common/MaterialIcon';
@@ -270,6 +271,7 @@ const TaskItem = ({
 
 export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
   const { state, dispatch } = useApp();
+  const { triggerCelebration } = useCelebration();
   const { t, i18n } = useTranslation();
   const { simpleTodayView, header, forms } = useAppTranslation();
   
@@ -1188,6 +1190,9 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
   const handleCompleteTask = (taskId: string) => {
     const task = state.tasks.find(t => t.id === taskId);
     if (task) {
+      // Trigger celebration animation
+      triggerCelebration();
+      
       dispatch({
         type: 'UPDATE_TASK',
         payload: { ...task, completed: true, completedAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
@@ -1603,7 +1608,7 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
               }}
             >
               <MaterialIcon name="palette" size={18} style={{ color: showCustomizePanel ? 'white' : state.preferences.accentColor }} />
-              <span className="text-sm font-medium">{t('common.customize', { defaultValue: 'Anpassen' })}</span>
+              <span className="text-sm font-medium">{t('common.customize')}</span>
             </button>
             
             {/* Theme Toggle */}
@@ -1645,7 +1650,7 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
               {/* Header */}
               <div className="flex items-center justify-between mb-5">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {t('settings.customize', { defaultValue: 'Anpassen' })}
+                  {t('common.customize')}
                 </h3>
                 <button
                   onClick={() => setShowCustomizePanel(false)}
@@ -2571,7 +2576,7 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
             {/* Modal Footer */}
             <div className="flex items-center justify-between p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-750">
               <div className="text-sm text-gray-500 dark:text-gray-400">
-                Erstellt: {format(new Date(selectedNote.createdAt), 'dd.MM.yyyy HH:mm', { locale: de })}
+                {t('forms.created_label')}: {format(new Date(selectedNote.createdAt), 'dd.MM.yyyy HH:mm', { locale: i18n.language === 'en' ? enUS : de })}
                 {hasUnsavedChanges && <span className="ml-2" style={getAccentColorStyles().text}>• Automatisches Speichern...</span>}
               </div>
               <div className="flex space-x-3">

@@ -22,9 +22,8 @@ import { parseTaskInput } from '../../utils/taskParser';
 import type { ParseResult } from '../../types';
 import { format, addDays, startOfDay, isSameDay, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isAfter, isBefore, isSameMonth } from 'date-fns';
 import { de } from 'date-fns/locale';
-import { playCompletionSound } from '../../utils/soundUtils';
 import { RecurringTaskSection } from './RecurringTaskSection';
-import { Celebration } from '../Common/Celebration';
+import { useCelebration } from '../../context/CelebrationContext';
 
 
 interface TaskModalProps {
@@ -59,6 +58,7 @@ interface FormData {
 
 export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNavigateNext, shouldCloseOnSave = true, navDirection = null }: TaskModalProps) {
   const { state, dispatch } = useApp();
+  const { triggerCelebration } = useCelebration();
   const { actions, forms, titles, messages, taskModal, pins } = useAppTranslation();
   const { t } = useTranslation();
   const [navPos, setNavPos] = useState<{ top: number; leftX: number; rightX: number } | null>(null);
@@ -107,7 +107,6 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
     kanbanColumnId: task?.kanbanColumnId,
   });
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [showCelebration, setShowCelebration] = useState(false);
   const [showNotesOverlay, setShowNotesOverlay] = useState(false);
   const [showMarkdownHelp, setShowMarkdownHelp] = useState(false);
   const [notesSearchQuery, setNotesSearchQuery] = useState('');
@@ -127,6 +126,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
       setIsNotesExpanded(true);
     }
   }, [formData.subtasks.length, formData.linkedNotes.length]);
+
 
   // Block all interactions behind the modal when opened
   useEffect(() => {
@@ -1159,9 +1159,9 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
     if (task) {
       const newCompletedState = !task.completed;
       
-      // Play completion sound if task is being completed
-      if (newCompletedState && state.preferences.sounds) {
-        playCompletionSound(state.preferences.completionSound, state.preferences.soundVolume).catch(console.warn);
+      // Trigger celebration if task is being completed
+      if (newCompletedState) {
+        triggerCelebration();
       }
       
       dispatch({
@@ -1173,43 +1173,27 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
         }
       });
     }
-  }, [task, dispatch, state.preferences]);
+  }, [task, dispatch, triggerCelebration]);
 
   // Handle task completion and close modal
   const handleCompleteAndClose = useCallback(() => {
     if (task) {
-      // Mark task as completed
-      const newCompletedState = true;
-      
-      // Show celebration if enabled
-      if (state.preferences.enableCelebration) {
-        setShowCelebration(true);
-      }
-      
-      // Play completion sound
-      if (state.preferences.sounds) {
-        playCompletionSound(state.preferences.completionSound, state.preferences.soundVolume).catch(console.warn);
-      }
+      // Trigger celebration animation (handled by global provider)
+      triggerCelebration();
       
       dispatch({
         type: 'UPDATE_TASK',
         payload: {
           ...task,
-          completed: newCompletedState,
+          completed: true,
           updatedAt: new Date().toISOString()
         }
       });
 
-      // Close modal after a short delay if celebration is shown, otherwise immediately
-      if (state.preferences.enableCelebration) {
-        setTimeout(() => {
-          onClose();
-        }, 500);
-      } else {
-        onClose();
-      }
+      // Close modal immediately - celebration is handled globally
+      onClose();
     }
-  }, [task, dispatch, state.preferences, onClose]);
+  }, [task, dispatch, triggerCelebration, onClose]);
 
   const adjustTextareaHeight = () => {
     if (textareaRef.current) {
@@ -3657,15 +3641,15 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                 }
                 title={
                   state.activeTimer?.taskId === task?.id && state.activeTimer?.isActive && !state.activeTimer?.isPaused
-                    ? 'Timer läuft'
-                    : 'Timer starten'
+                    ? t('actions.timer_running')
+                    : t('actions.start_timer')
                 }
               >
                 <Play className="w-4 h-4" />
                 <span>
                   {state.activeTimer?.taskId === task?.id && state.activeTimer?.isActive && !state.activeTimer?.isPaused
-                    ? 'Timer läuft'
-                    : 'Timer starten'}
+                    ? t('actions.timer_running')
+                    : t('actions.start_timer')}
                 </span>
               </button>
 
@@ -4235,13 +4219,6 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
   return (
     <>
       {createPortal(modalContent, document.body)}
-      {/* Celebration effect for task completion */}
-      {showCelebration && (
-        <Celebration 
-          isVisible={showCelebration} 
-          onComplete={() => setShowCelebration(false)} 
-        />
-      )}
     </>
   );
 } 

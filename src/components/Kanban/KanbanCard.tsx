@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useDraggable } from '@dnd-kit/core';
+import { useTranslation } from 'react-i18next';
 import type { Task, KanbanGroupingMode } from '../../types';
 import { 
   Calendar, 
@@ -16,9 +17,8 @@ import {
 import { format, parseISO, isValid } from 'date-fns';
 import { TaskModal } from '../Tasks/TaskModal';
 import { useApp } from '../../context/AppContext';
+import { useCelebration } from '../../context/CelebrationContext';
 import { parseTaskInput } from '../../utils/taskParser';
-import { playCompletionSound } from '../../utils/soundUtils';
-import { Celebration } from '../Common/Celebration';
 
 interface KanbanCardProps {
   task: Task;
@@ -28,11 +28,12 @@ interface KanbanCardProps {
 
 export function KanbanCard({ task, isDragging = false }: KanbanCardProps) {
   const { state, dispatch } = useApp();
+  const { triggerCelebration } = useCelebration();
+  const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
-  const [showCelebration, setShowCelebration] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Focus input when editing starts
@@ -87,14 +88,9 @@ export function KanbanCard({ task, isDragging = false }: KanbanCardProps) {
     
     const newCompletedState = !task.completed;
     
-    // Show celebration only if task is being completed AND celebration is enabled
-    if (newCompletedState && state.preferences.enableCelebration) {
-      setShowCelebration(true);
-    }
-    
-    // Play completion sound if task is being completed
-    if (newCompletedState && state.preferences.sounds) {
-      playCompletionSound(state.preferences.completionSound, state.preferences.soundVolume).catch(console.warn);
+    // Trigger celebration animation if task is being completed
+    if (newCompletedState) {
+      triggerCelebration();
     }
     
     dispatch({
@@ -404,7 +400,7 @@ export function KanbanCard({ task, isDragging = false }: KanbanCardProps) {
                       <button
                         onClick={handleStartTimer}
                         className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                        title="Timer starten"
+                        title={t('actions.start_timer')}
                       >
                         <Play 
                           className="w-4 h-4 fill-current" 
@@ -488,14 +484,6 @@ export function KanbanCard({ task, isDragging = false }: KanbanCardProps) {
           onClose={() => setIsModalOpen(false)}
         />,
         document.body
-      )}
-
-      {/* Celebration effect */}
-      {showCelebration && (
-        <Celebration 
-          isVisible={showCelebration} 
-          onComplete={() => setShowCelebration(false)} 
-        />
       )}
     </>
   );

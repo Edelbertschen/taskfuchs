@@ -1,5 +1,6 @@
 import React, { useMemo, useCallback } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useCelebration } from '../../context/CelebrationContext';
 import { format, isToday, isYesterday, startOfDay } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { Clock, Calendar, CheckCircle2, Circle, Star, AlertCircle } from 'lucide-react';
@@ -8,6 +9,7 @@ import type { Task } from '../../types';
 
 export function TodayTasksWidget() {
   const { state, dispatch } = useApp();
+  const { triggerCelebration } = useCelebration();
   const { t } = useTranslation();
 
   // Memoize expensive filtering operations
@@ -45,12 +47,15 @@ export function TodayTasksWidget() {
   const handleCompleteTask = useCallback((taskId: string) => {
     const task = state.tasks.find(t => t.id === taskId);
     if (task) {
+      // Trigger celebration animation
+      triggerCelebration();
+      
       dispatch({
         type: 'UPDATE_TASK',
         payload: { ...task, completed: true, completedAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
       });
     }
-  }, [state.tasks, dispatch]);
+  }, [state.tasks, dispatch, triggerCelebration]);
 
   const handleTaskClick = useCallback((taskId: string) => {
     window.dispatchEvent(new CustomEvent('navigate-to-tasks', { detail: { taskId } }));

@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Hash, Edit2, Trash2, Palette, BarChart3, FileText, CheckSquare, Plus } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAppTranslation } from '../../utils/i18nHelpers';
+import { useTranslation } from 'react-i18next';
 import { getBackgroundStyles, getDarkModeBackgroundStyles } from '../../utils/backgroundUtils';
 import { Header } from '../Layout/Header';
 
@@ -9,6 +10,7 @@ import { Header } from '../Layout/Header';
 export function TagManager() {
   const { state, dispatch } = useApp();
   const { tagManager } = useAppTranslation();
+  const { t } = useTranslation();
   const isMinimalDesign = state.preferences.minimalDesign;
   const [activeTab, setActiveTab] = useState<'tasks' | 'notes'>('tasks');
 
@@ -270,28 +272,33 @@ export function TagManager() {
   };
 
   const handleConfirmDeleteTag = () => {
-    if (!tagToDelete) return;
+    if (!tagToDelete || !tagToDelete.name) return;
 
-    if (activeTab === 'tasks') {
-      // Remove tag from all tasks
-      const updatedTasks = state.tasks.map(task => ({
-        ...task,
-        tags: task.tags.filter(tagName => tagName !== tagToDelete.name)
-      }));
-      dispatch({ type: 'SET_TASKS', payload: updatedTasks });
+    try {
+      if (activeTab === 'tasks') {
+        // Remove tag from all tasks
+        const updatedTasks = state.tasks.map(task => ({
+          ...task,
+          tags: task.tags.filter(tagName => tagName !== tagToDelete.name)
+        }));
+        dispatch({ type: 'SET_TASKS', payload: updatedTasks });
+      } else {
+        // Remove tag from all notes
+        const notes = state.notes?.notes || [];
+        const updatedNotes = notes.map(note => ({
+          ...note,
+          tags: (note.tags || []).filter(tagName => tagName !== tagToDelete.name)
+        }));
+        dispatch({ type: 'SET_NOTES', payload: updatedNotes });
+      }
       
-      // Remove from global tags if it exists
+      // Always remove from global tags if it exists (for both tabs)
       const globalTag = state.tags.find(t => t.name === tagToDelete.name);
       if (globalTag) {
         dispatch({ type: 'DELETE_TAG', payload: globalTag.id });
       }
-    } else {
-      // Remove tag from all notes
-      const updatedNotes = state.notes.notes.map(note => ({
-        ...note,
-        tags: note.tags.filter(tagName => tagName !== tagToDelete.name)
-      }));
-      dispatch({ type: 'SET_NOTES', payload: updatedNotes });
+    } catch (error) {
+      console.error('Error deleting tag:', error);
     }
     
     setTagToDelete(null);
@@ -372,7 +379,7 @@ export function TagManager() {
           }`}>
             <p className={`text-sm font-medium ${isMinimalDesign ? 'text-gray-700 dark:text-gray-200' : 'text-white'}`}
                style={{ textShadow: isMinimalDesign ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.5)', lineHeight: '1.5' }}>
-              {totalTags} {totalTags === 1 ? 'Tag' : 'Tags'} • {totalTagUsage} {totalTagUsage === 1 ? 'Verwendung' : 'Verwendungen'}
+              {totalTags} {totalTags === 1 ? 'Tag' : 'Tags'} • {totalTagUsage} {totalTagUsage === 1 ? t('tags.usage') : t('tags.usages')}
             </p>
           </div>
           

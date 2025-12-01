@@ -259,7 +259,7 @@ export function PinnedTasksWidget({ className = '' }: PinnedTasksWidgetProps) {
                   ? { filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8))' }
                   : {}
                 }
-                title={isTimerRunning ? 'Timer stoppen' : 'Timer starten'}
+                title={isTimerRunning ? t('actions.stop_timer') : t('actions.start_timer')}
               >
                 {isTimerRunning ? (
                   <Pause className="w-4 h-4" />
