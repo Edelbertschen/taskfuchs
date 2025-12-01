@@ -1,0 +1,55 @@
+services:
+  taskfuchs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ""
+        VITE_MS_CLIENT_ID: ${VITE_MS_CLIENT_ID}
+        VITE_MS_TENANT_ID: ${VITE_MS_TENANT_ID}
+    image: taskfuchs:latest
+    container_name: taskfuchs
+    ports:
+      - "5173:8080"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - MS_CLIENT_ID=${MS_CLIENT_ID}
+      - MS_CLIENT_SECRET=${MS_CLIENT_SECRET}
+      - MS_TENANT_ID=${MS_TENANT_ID}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - NODE_ENV=production
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    restart: always
+    networks:
+      - app-network
+    env_file:
+      - .env
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: ngrok-taskfuchs
+    restart: always
+    command:
+      - "start"
+      - "--all"
+      - "--config"
+      - "/etc/ngrok.yml"
+    volumes:
+      - ./ngrok.yml:/etc/ngrok.yml
+    ports:
+      - "4041:4040"
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    networks:
+      - app-network
+    depends_on:
+      - taskfuchs
+    env_file:
+      - .env
+
+networks:
+  app-network:
+    driver: bridge
+

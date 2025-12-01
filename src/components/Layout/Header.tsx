@@ -74,7 +74,6 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
 
   const [showUserGuide, setShowUserGuide] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [showPersonalCapacity, setShowPersonalCapacity] = useState(false);
   const [projectSidebarMinimized, setProjectSidebarMinimized] = useState(false);
   const [taskSidebarMinimized, setTaskSidebarMinimized] = useState(false);
   const [pinsSidebarMinimized, setPinsSidebarMinimized] = useState(true);
@@ -1380,62 +1379,23 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
                                 setShowMoreMenu(false);
                               }}
                               className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors relative"
-                              title={state.isBulkMode ? 'Mehrfachauswahl beenden' : 'Mehrfachauswahl starten'}
+                              title={state.isBulkMode ? t('header.bulk_mode_end') : t('header.bulk_mode_start')}
                             >
                               <CheckSquare className="w-4 h-4" />
-                              <span>{state.isBulkMode ? 'Mehrfachauswahl beenden' : 'Mehrfachauswahl'}</span>
+                              <span>{state.isBulkMode ? t('header.bulk_mode_end') : t('header.bulk_mode')}</span>
                               {state.selectedTaskIds.length > 0 && (
                                 <span className="absolute right-4 text-xs text-gray-500">{state.selectedTaskIds.length > 9 ? '9+' : state.selectedTaskIds.length}</span>
                               )}
                             </button>
-                            {/* Toggle completed tasks (moved from header) */}
-                            <button
-                              onClick={() => {
-                                dispatch({ type: 'TOGGLE_SHOW_COMPLETED_TASKS' });
-                                setShowMoreMenu(false);
-                              }}
-                              className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors relative"
-                              title={t('header.completed_tasks_toggle_tooltip', { show: state.showCompletedTasks })}
-                            >
-                              <CheckCircle className="w-4 h-4" />
-                              <span>{state.showCompletedTasks ? t('header.completed_hide') : t('header.completed_show')}</span>
-                              {state.showCompletedTasks && (
-                                <span 
-                                  className="absolute right-4 w-2 h-2 rounded-full"
-                                  style={{ backgroundColor: state.preferences.accentColor }}
-                                />
-                              )}
-                            </button>
-                            <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
                           </>
                         )}
-                        <button
-                          onClick={() => {
-                            setShowPersonalCapacity(true);
-                            setShowMoreMenu(false);
-                          }}
-                          className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                        >
-                          <User className="w-4 h-4" />
-                          <span>{t('capacity.personal_capacity')}</span>
-                        </button>
-                        <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
-                        {/* Removed: settings, user guide, onboarding now on sidebar user icon */}
+                        {/* Removed: settings, user guide, onboarding, personal capacity now on sidebar user icon */}
                       </div>
                     </div>,
                     document.body
                   )}
                 </div>
                 )}
-                
-                {/* Logout Button */}
-                <button
-                  onClick={handleLogout}
-                  className="group p-2.5 text-gray-600 dark:text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 h-[44px] w-[44px] flex items-center justify-center"
-                  title="Abmelden"
-                >
-                  <LogOut className="w-5 h-5" />
-                </button>
               </>
             )}
             
@@ -1578,10 +1538,10 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
                                 setShowMoreMenu(false);
                               }}
                               className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors relative"
-                              title={state.isBulkMode ? 'Mehrfachauswahl beenden' : 'Mehrfachauswahl starten'}
+                              title={state.isBulkMode ? t('header.bulk_mode_end') : t('header.bulk_mode_start')}
                             >
                               <CheckSquare className="w-4 h-4" />
-                              <span>{state.isBulkMode ? 'Mehrfachauswahl beenden' : 'Mehrfachauswahl'}</span>
+                              <span>{state.isBulkMode ? t('header.bulk_mode_end') : t('header.bulk_mode')}</span>
                               {state.selectedTaskIds.length > 0 && (
                                 <span className="absolute right-4 text-xs text-gray-500">{state.selectedTaskIds.length > 9 ? '9+' : state.selectedTaskIds.length}</span>
                               )}

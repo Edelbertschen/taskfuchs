@@ -1,0 +1,1493 @@
+{
+  "tasks": [
+    {
+      "id": "fc469ded-962e-48b4-9206-bc87cce457e4",
+      "title": "Test task",
+      "description": "",
+      "completed": false,
+      "priority": "medium",
+      "estimatedTime": 29,
+      "tags": [
+        "testtag"
+      ],
+      "subtasks": [],
+      "columnId": "date-2025-12-02",
+      "dueDate": "2025-12-02",
+      "reminderDate": "2025-12-02",
+      "createdAt": "2025-12-01T08:42:33.233Z",
+      "updatedAt": "2025-12-01T08:43:01.078Z",
+      "position": 1764578553233,
+      "linkedNotes": []
+    },
+    {
+      "id": "96a1df82-fc94-4901-8d70-fa938a3dbeb0",
+      "title": "Test task 2",
+      "description": "",
+      "completed": false,
+      "tags": [],
+      "subtasks": [],
+      "projectId": "project-1752561187805-9xtzj8v39",
+      "kanbanColumnId": "col-1752561188719-g4l45kms7",
+      "createdAt": "2025-12-01T08:43:14.212Z",
+      "updatedAt": "2025-12-01T08:43:14.212Z",
+      "position": 1764578594212
+    },
+    {
+      "id": "77e54866-1aee-4472-8efa-f47a921bd0fa",
+      "title": "Test 3",
+      "description": "",
+      "completed": true,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-12-01",
+      "reminderDate": "2025-12-01",
+      "createdAt": "2025-12-01T08:43:45.758Z",
+      "updatedAt": "2025-12-01T08:43:45.758Z",
+      "position": 1764578625758
+    },
+    {
+      "id": "002c2360-9414-4e6f-b7e7-b801d9f1f2d8",
+      "title": "Test 4",
+      "description": "",
+      "completed": true,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-12-01",
+      "reminderDate": "2025-12-01",
+      "createdAt": "2025-12-01T08:43:57.503Z",
+      "updatedAt": "2025-12-01T08:43:57.503Z",
+      "position": 1764578637503
+    },
+    {
+      "id": "78dd6364-d3a2-4e5a-afa3-3f6b0e7411cd",
+      "title": "Test 5",
+      "description": "",
+      "completed": false,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-12-01",
+      "reminderDate": "2025-12-01",
+      "createdAt": "2025-12-01T08:44:13.088Z",
+      "updatedAt": "2025-12-01T08:44:17.520Z",
+      "position": 1764578653088,
+      "pinColumnId": "default-pin",
+      "pinned": true
+    }
+  ],
+  "archivedTasks": [
+    {
+      "id": "6d507fa1-5f10-4944-aabb-9905e6d4f2a0",
+      "title": "Umsatzabfragen Bauer AG",
+      "description": "[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFdjnOHAAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (29.9.2025)",
+      "completed": true,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-10-08",
+      "createdAt": "2025-09-29T06:54:57.522Z",
+      "updatedAt": "2025-10-02T09:09:41.688Z",
+      "position": 1759327531316,
+      "estimatedTime": 45,
+      "linkedNotes": [],
+      "projectId": "project-1752561187805-9xtzj8v39",
+      "kanbanColumnId": "col-1752561188719-g4l45kms7",
+      "pinned": false,
+      "reminderDate": "2025-10-08",
+      "trackedTime": 0,
+      "dueDate": "2025-10-08"
+    },
+    {
+      "id": "77046fe3-6b61-47c1-af4d-0843f57dfcaf",
+      "title": "Kontakt mit Krauhausen wegen Berichtslayout",
+      "description": "[📧 Mail](https://outlook.office.com/owa/?ItemID=AAkALgAAAAAAHYQDEapmEc2byACqAC%2FEWg0A3giTJBGu5Eanj%2B1b%2BQowoAAFhFg8MQAA&viewmodel=ReadMessageItem&path=&exvsurl=1) (15.10.2025)",
+      "completed": true,
+      "tags": [],
+      "subtasks": [],
+      "columnId": "date-2025-10-20",
+      "createdAt": "2025-10-15T12:06:47.226Z",
+      "updatedAt": "2025-10-23T08:07:24.739Z",
+      "position": 1760684626503,
+      "kanbanColumnId": "col-1752561731913-q9e4bm5aa",
+      "estimatedTime": 0,
+      "linkedNotes": [],
+      "reminderDate": "2025-10-20",
+      "dueDate": "2025-10-20",
+      "pinColumnId": "default-pin",
+      "pinned": true
+    }
+  ],
+  "columns": [
+    {
+      "id": "date-2025-12-01",
+      "title": "01.12.2025",
+      "type": "date",
+      "date": "2025-12-01",
+      "order": 1,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-02",
+      "title": "02.12.2025",
+      "type": "date",
+      "date": "2025-12-02",
+      "order": 2,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-03",
+      "title": "03.12.2025",
+      "type": "date",
+      "date": "2025-12-03",
+      "order": 3,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-04",
+      "title": "04.12.2025",
+      "type": "date",
+      "date": "2025-12-04",
+      "order": 4,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-05",
+      "title": "05.12.2025",
+      "type": "date",
+      "date": "2025-12-05",
+      "order": 5,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-06",
+      "title": "06.12.2025",
+      "type": "date",
+      "date": "2025-12-06",
+      "order": 6,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-07",
+      "title": "07.12.2025",
+      "type": "date",
+      "date": "2025-12-07",
+      "order": 7,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-08",
+      "title": "08.12.2025",
+      "type": "date",
+      "date": "2025-12-08",
+      "order": 8,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-09",
+      "title": "09.12.2025",
+      "type": "date",
+      "date": "2025-12-09",
+      "order": 9,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-10",
+      "title": "10.12.2025",
+      "type": "date",
+      "date": "2025-12-10",
+      "order": 10,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-11",
+      "title": "11.12.2025",
+      "type": "date",
+      "date": "2025-12-11",
+      "order": 11,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-12",
+      "title": "12.12.2025",
+      "type": "date",
+      "date": "2025-12-12",
+      "order": 12,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-13",
+      "title": "13.12.2025",
+      "type": "date",
+      "date": "2025-12-13",
+      "order": 13,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-14",
+      "title": "14.12.2025",
+      "type": "date",
+      "date": "2025-12-14",
+      "order": 14,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-15",
+      "title": "15.12.2025",
+      "type": "date",
+      "date": "2025-12-15",
+      "order": 15,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-16",
+      "title": "16.12.2025",
+      "type": "date",
+      "date": "2025-12-16",
+      "order": 16,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-17",
+      "title": "17.12.2025",
+      "type": "date",
+      "date": "2025-12-17",
+      "order": 17,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-18",
+      "title": "18.12.2025",
+      "type": "date",
+      "date": "2025-12-18",
+      "order": 18,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-19",
+      "title": "19.12.2025",
+      "type": "date",
+      "date": "2025-12-19",
+      "order": 19,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-20",
+      "title": "20.12.2025",
+      "type": "date",
+      "date": "2025-12-20",
+      "order": 20,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-21",
+      "title": "21.12.2025",
+      "type": "date",
+      "date": "2025-12-21",
+      "order": 21,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-22",
+      "title": "22.12.2025",
+      "type": "date",
+      "date": "2025-12-22",
+      "order": 22,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-23",
+      "title": "23.12.2025",
+      "type": "date",
+      "date": "2025-12-23",
+      "order": 23,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-24",
+      "title": "24.12.2025",
+      "type": "date",
+      "date": "2025-12-24",
+      "order": 24,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-25",
+      "title": "25.12.2025",
+      "type": "date",
+      "date": "2025-12-25",
+      "order": 25,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-26",
+      "title": "26.12.2025",
+      "type": "date",
+      "date": "2025-12-26",
+      "order": 26,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-27",
+      "title": "27.12.2025",
+      "type": "date",
+      "date": "2025-12-27",
+      "order": 27,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-28",
+      "title": "28.12.2025",
+      "type": "date",
+      "date": "2025-12-28",
+      "order": 28,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-29",
+      "title": "29.12.2025",
+      "type": "date",
+      "date": "2025-12-29",
+      "order": 29,
+      "tasks": []
+    },
+    {
+      "id": "date-2025-12-30",
+      "title": "30.12.2025",
+      "type": "date",
+      "date": "2025-12-30",
+      "order": 30,
+      "tasks": []
+    },
+    {
+      "id": "project-1752561187805-9xtzj8v39",
+      "title": "Aufgaben",
+      "type": "project",
+      "order": 1,
+      "tasks": [],
+      "updatedAt": "2025-08-28T08:51:01.633+00:00",
+      "deleted": false,
+      "linkedNotes": []
+    },
+    {
+      "id": "project-1764143181734-3akj58yx9",
+      "title": "Jahresplanung 2026",
+      "type": "project",
+      "order": 1,
+      "tasks": []
+    }
+  ],
+  "tags": [
+    {
+      "id": "tag-testtag",
+      "name": "testtag",
+      "color": "#6b7280",
+      "count": 1
+    }
+  ],
+  "kanbanBoards": [],
+  "pinColumns": [
+    {
+      "id": "default-pin",
+      "title": "Next",
+      "color": "#006d8f",
+      "order": 0,
+      "createdAt": "2025-11-05T08:42:49.554Z",
+      "updatedAt": "2025-11-12T08:00:15.820Z"
+    },
+    {
+      "id": "pin-1757922281000-w9i7d6pdk",
+      "title": "Ivy Lee",
+      "color": "#006d8f",
+      "order": 1,
+      "createdAt": "2025-11-05T08:42:49.554Z",
+      "updatedAt": "2025-11-26T07:50:59.525Z"
+    },
+    {
+      "id": "pin-1757485531204-gd2cjcjp5",
+      "title": "Zurückgestellt",
+      "color": "#006d8f",
+      "order": 2,
+      "createdAt": "2025-11-05T08:42:49.554Z",
+      "updatedAt": "2025-11-26T07:51:07.992Z"
+    }
+  ],
+  "notes": [
+    {
+      "id": "1752561253685v0yk2nn82",
+      "title": "Vorstellungsgespräch Naheed",
+      "content": "- Briefly introduce myself and explain that I am the IT manager\n- Ask how they would like to be addressed\n- Ask them to briefly introduce themselves\n\n\nAmong other things, I am responsible for our internal infrastructure, IT security, data protection issues, and supporting our end devices (laptops for employees). We provide IT for our employees and also develop some solutions for specialist departments and projects. Among other things, we have started to develop applications (expert database, calculation aid for travel times, insurance management software, etc.) and develop tailor-made AI solutions for projects and project work.\n\nThere are currently two of us in our IT department. Besides me, there is Ashik, who provides first-level support and develops applications.\n \nIT security is a well-known topic for you. Banking sector and genomics\n\n\nWe work in accordance with BSI standards and ISO 27001.\n\nIf you are hired, you will work with us in various areas. Part of your working time will be spent in internal IT.\n- Linux server support and Linux desktops\n- Coordination of security risks, emergency planning, and GDPR implementation.\n\nI am particularly interested in how you work in these areas and where you see yourself – both technically and in terms of collaboration with other teams.\n\n- Which Linux distribution do you prefer for servers? In CV: redhat and Debian. Why?\n- How do you deal with distribution updates and upgrades? What do you do if security vulnerabilities are known but an update/upgrade is not currently possible?\n- Do you have experience with server virtualization via Proxmox?\n\n- Have you had any contact with data protection requirements in previous projects? Can you give an example?\n- How do you handle the storage and processing of personal data?\n- What measures would you take to ensure that data transfers are GDPR-compliant?\n- Are you familiar with the most important principles of the GDPR? (Lawfulness, processing in good faith, transparency, purpose limitation, data minimization, integrity and confidentiality, accountability\n\n- How do you assess the risk of a new application or architecture?\n- Do you have experience in creating emergency or recovery plans?\n- Are you familiar with the most important elements of a security concept?\n- How do you document security measures so that they remain traceable for others?\n- Do you have experience with backup strategies for large amounts of data (> TB range)?\n- Have you ever been involved in ISO 27001 certification?\n- How do you document technical and organizational measures (TOM)?\n- Describe a project that went wrong. What did you learn from it?\n\n- Are there any topics that would be particularly important to you if you started here?\n- Do you have any questions?\n",
+      "tags": [
+        "devops"
+      ],
+      "linkedTasks": [
+        "2ffe85b2-c104-4ecc-bdba-6208d6f29651"
+      ],
+      "linkedNotes": [],
+      "pinned": true,
+      "archived": true,
+      "createdAt": "2025-07-15T06:34:13.685Z",
+      "updatedAt": "2025-07-23T15:02:32.719+00:00",
+      "deleted": false
+    },
+    {
+      "id": "1753252738490v4xdxvdua",
+      "title": "TaskFuchs-Entwicklung",
+      "content": "# Ideen\n- [ ] Umschaltung des Editors zu WYSIWYG\n- [ ] Pexels-Einbindung mit API.\n- [X] CalDAV-Sync: Sync-Intervall festlegen.\n- [X] Notizen bearbeiten: Button \"In Notizen öffnen\" funktioniert nicht.\n- [X] Bei Smart-Parsing: Wichtigkeit bleibt im Aufgabennamen bestehen. So steht z.B. im Aufgabennamen !!! bei sehr wichtig. Gewünschtes Verhalten: Wenn WIchtigkeit geparst ist, sollen die Ausrufezeichen aus dem Aufgabennamen verschwinden.\n- [X] Wenn Aufgabe mit Datum über Smart-Parsing hinzugefügt wurde, darf sie nicht in \"Eingang\" landen, sondern in der entsprechenden Datumsspalte in Planer. Sie muss das Datum zugewiesen bekommen.\n- [ ] Wenn eine Aufgabenbeschreibung eine URL beinhaltet, die mit [UNIQUE Helpdesk](https://unique.zammad.com/#ticket) beginnt, dann weise der Aufgabe automatisch den Tag #ticket zu.\n\n\n# Bugs\n- [X] Tag-Verwaltung: Manche Tags lassen sich nicht löschen. Alle Tags sollen löschbar sein.\n- [x] Filterliste im Header in Notizen öffnet nicht\n- [x] In NOtizen: In rechter SPalte: Keine Anzeige von \"Keine Tags\", \"Keine verknüpften Aufgaben\", \"Keine Verknüpften Projekte\" Wenn eh nichts zu sehen ist. Erst Verknüpfungen anzeigen, wenn vorhanden.\n- [ ] In MD-Editor: Aufgabenelemente schreiben sich nicht automatisch fort. Wenn ich eine Zeile, die mit - [ ] beginnt mit ENTER beende, soll die nächste Zeile mit - [ ] beginnen.\n- [X] Planer und Projekte: Tabellenspalten sind nicht scrollbar. Man kann aktuell nicht nach unten scrollen. Fixe das. Scrollbar soll nicht angezeigt werden.\n- [X] Projekte: Bei laufendem Timer lassen sich Aufgaben nicht archivieren.\n- [X] Planer: Filter nach Tag funktioniert nicht. Es werden Tags angezeigt, die gar nicht mehr vorkommen, etwa weil die Aufgabe nicht mehr vorhanden ist.\n- [ ] Checklisten lassen sich nicht abhaken\n---\n\n# Huntergrundbilder\n![pexels photo 32767147](https://images.pexels.com/photos/32767147/pexels-photo-32767147.jpeg?_gl=1*r1lq9g*_ga*Nzg4MTMzMzk4LjE3NTMyOTk2NjU.*_ga_8JE65Q40S6*czE3NTMyOTk2NjUkbzEkZzEkdDE3NTMyOTk3NjckajE5JGwwJGgw)\n\n# Notizen\n**Kalenderfreigabe**\n>https://outlook.office365.com/owa/calendar/55a7744a282c437a836eb3dad44c6709@unique-landuse.de/25a0968e13534bc195ceb38e5beddc4b1348024555792318342/S-1-8-3574032643-298043167-3273186133-1683214480/reachcalendar.ics",
+      "tags": [],
+      "linkedTasks": [],
+      "linkedNotes": [],
+      "linkedProjects": [],
+      "pinned": true,
+      "archived": false,
+      "createdAt": "2025-07-23T06:38:58.490Z",
+      "updatedAt": "2025-07-24T07:05:50.142+00:00",
+      "deleted": false
+    },
+    {
+      "id": "1753255557504pkwrhqb79",
+      "title": "Mittwoch, 23. Juli 2025",
+      "content": "# Mittwoch, 23. Juli 2025\n\n",
+      "tags": [
+        "daily"
+      ],
+      "linkedTasks": [],
+      "linkedNotes": [],
+      "linkedProjects": [],
+      "pinned": false,
+      "archived": false,
+      "createdAt": "2025-07-23T07:25:57.504Z",
+      "updatedAt": "2025-07-23T07:25:57.504+00:00",
+      "dailyNote": true,
+      "dailyNoteDate": "2025-07-23",
+      "deleted": false
+    },
+    {
+      "id": "1753270651558n86mkwp9g",
+      "title": "Vorstellunggespräch JittaHanumesh",
+      "content": "- Briefly introduce myself and explain that I am the IT manager\n\n## Intrduction\nAmong other things, I am responsible for our internal infrastructure, IT security, data protection issues, and supporting our end devices (laptops for employees). We provide IT for our employees and also develop some solutions for specialist departments and projects. Among other things, we have started to develop applications (expert database, calculation aid for travel times, insurance management software, etc.) and develop tailor-made AI solutions for projects and project work.\nWe work in accordance with BSI standards and ISO 27001.\n\nThere are currently two of us in our IT department. Besides me, there is Ashik, who provides first-level support and develops applications.\n \nIf you are hired, you will work with us in various areas. Part of your working time will be spent in internal IT.\n- Linux server support and Linux desktops\n- Coordination of security risks, emergency planning, and GDPR implementation.\n\nI am particularly interested in how you work in these areas and where you see yourself – both technically and in terms of collaboration with other teams.\n\n- Could you briefly describe your technuical skills concerning Windows and Linux?\n- Any experiences with Debian based systems??\n- Do you have experience with server virtualization via Proxmox? - Knows VMWare\n- How do you deal with distribution updates and upgrades? What do you do if security vulnerabilities are known but an update/upgrade is not currently possible?\n\n\n- Have you had any contact with data protection requirements in previous projects? Can you give an example?\n- Are you familiar with the most important principles of the GDPR? (Lawfulness, processing in good faith, transparency, purpose limitation, data minimization, integrity and confidentiality, accountability\n- How do you handle the storage and processing of personal data? Are you aware of the special requirements of treting sensitive data?\n- Do you have experience in creating emergency or recovery plans?\n- Are you familiar with the most important elements of a security concept?\n- How do you document security measures so that they remain traceable for others?\n- Do you have experience with backup strategies for large amounts of data (> TB range)?\n- Have you ever been involved in ISO 27001 certification?\n- How do you document technical and organizational measures (TOM)?\n- Describe a project that went wrong. What did you learn from it?\n\n- Are there any topics that would be particularly important to you if you started here?\n- Do you have any questions?\n",
+      "tags": [
+        "devops"
+      ],
+      "linkedTasks": [],
+      "linkedNotes": [],
+      "linkedProjects": [],
+      "pinned": false,
+      "archived": true,
+      "createdAt": "2025-07-23T11:37:31.558Z",
+      "updatedAt": "2025-07-23T15:02:40.017+00:00",
+      "deleted": false
+    },
+    {
+      "id": "17533005205792t3mxf2wb",
+      "title": "Hintergrundbilder fü",
+      "content": "",
+      "tags": [],
+      "linkedTasks": [],
+      "linkedNotes": [],
+      "linkedProjects": [],
+      "pinned": false,
+      "archived": true,
+      "createdAt": "2025-07-23T19:55:20.579Z",
+      "updatedAt": "2025-07-23T19:55:29.07+00:00",
+      "deleted": false
+    },
+    {
+      "id": "1753868924485969kvl9um",
+      "title": "Unbenannte Notiz",
+      "content": "![image.png](storage://img_1753871182879_zykbl7lei)",
+      "tags": [],
+      "linkedTasks": [
+        "e83aadf1-5057-43e7-899d-9d0d768ff004"
+      ],
+      "linkedNotes": [],
+      "linkedProjects": [],
+      "pinned": false,
+      "archived": true,
+      "createdAt": "2025-07-30T09:48:44.485Z",
+      "updatedAt": "2025-07-30T10:26:24.887+00:00",
+      "deleted": false
+    },
+    {
+      "id": "17538712546469q5y2ou89",
+      "title": "Mittwoch, 30. Juli 2025",
+      "content": "# Mittwoch, 30. Juli 2025\n\n",
+      "tags": [
+        "daily"
+      ],
+      "linkedTasks": [],
+      "linkedNotes": [],
+      "linkedProjects": [],
+      "pinned": false,
+      "archived": false,
+      "createdAt": "2025-07-30T10:27:34.646Z",
+      "updatedAt": "2025-07-30T10:27:34.646+00:00",
+      "dailyNote": true,
+      "dailyNoteDate": "2025-07-30",
+      "deleted": false
+    },
+    {
+      "id": "1756113203100u2u18ql5v",
+      "title": "Montag, 25. August 2025",
+      "content": "## Partnerplusbenefit\n**neues Passwort:**\n\nMV2XZrueOHj4jl9F",
+      "tags": [
+        "daily"
+      ],
+      "linkedTasks": [],
+      "linkedNotes": [],
+      "linkedProjects": [],
+      "pinned": false,
+      "archived": false,
+      "createdAt": "2025-08-25T09:13:23.100Z",
+      "updatedAt": "2025-08-25T09:15:17.134+00:00",
+      "dailyNote": true,
+      "dailyNoteDate": "2025-08-25",
+      "deleted": false
+    },
+    {
+      "id": "1756471025249xlphakca9",
+      "title": "Freitag, 29. August 2025",
+      "content": "# Freitag, 29. August 2025\n\n## Remote\n**Passwort:** uf1j9roIKDZuxXSwrv\n\n[Get Show Timesheet](https://developer.remote.com/reference/get_show_timesheet)",
+      "tags": [
+        "daily"
+      ],
+      "linkedTasks": [],
+      "linkedNotes": [],
+      "linkedProjects": [],
+      "pinned": false,
+      "archived": false,
+      "createdAt": "2025-08-29T12:37:05.249Z",
+      "updatedAt": "2025-08-29T12:59:21.376Z",
+      "dailyNote": true,
+      "dailyNoteDate": "2025-08-29"
+    },
+    {
+      "id": "1756797127181zha0070cv",
+      "title": "Test",
+      "content": "",
+      "tags": [],
+      "linkedTasks": [],
+      "linkedNotes": [],
+      "linkedProjects": [],
+      "pinned": false,
+      "archived": false,
+      "createdAt": "2025-09-02T07:12:07.181Z",
+      "updatedAt": "2025-09-02T07:12:12.238Z"
+    },
+    {
+      "id": "1756798629247bgls7a7d4",
+      "title": "Dienstag, 02. September 2025",
+      "content": "# Dienstag, 02. September 2025\nfiYjEIAa4BQA\n",
+      "tags": [
+        "daily"
+      ],
+      "linkedTasks": [],
+      "linkedNotes": [],
+      "linkedProjects": [],
+      "pinned": false,
+      "archived": false,
+      "createdAt": "2025-09-02T07:37:09.247Z",
+      "updatedAt": "2025-09-02T07:37:16.883Z",
+      "dailyNote": true,
+      "dailyNoteDate": "2025-09-02"
+    },
+    {
+      "id": "1758552675277ccpj8kt92",
+      "title": "Montag, 22. September 2025",
+      "content": "# Montag, 22. September 2025\n\nHallo zusammen,\n\nwir haben ja am Donnerstag unser Treffen zur Datengrundlage der Leistungspprämienberechnung.\nIch würde mich gerne auf das Meeting vorbereiten, habe aber ein paar Fragen/Anmerkungen:\n\nSo weit ich verstehe kommen alle Daten als Grundlage für die Prämienberechnung aus Personio (FTE, Grundgehalt, Lohngruppe, ... ), richtig? Tina hat je bereits einen Report angeleget, der alle notwendigen Daten enthält.\nZählt beim Monatsgehalt der letzte Monat des Vorjahres oder wird über das JK",
+      "tags": [
+        "daily"
+      ],
+      "linkedTasks": [],
+      "linkedNotes": [],
+      "linkedProjects": [],
+      "pinned": false,
+      "archived": false,
+      "createdAt": "2025-09-22T14:51:15.277Z",
+      "updatedAt": "2025-09-22T14:51:25.106Z",
+      "dailyNote": true,
+      "dailyNoteDate": "2025-09-22"
+    },
+    {
+      "id": "1758793107850ss98f1a1x",
+      "title": "Donnerstag, 25. September 2025",
+      "content": "# Donnerstag, 25. September 2025\n\n## Remote\n**Passwort:** glCGcPt3gRvqXz",
+      "tags": [
+        "daily"
+      ],
+      "linkedTasks": [],
+      "linkedNotes": [],
+      "linkedProjects": [],
+      "pinned": false,
+      "archived": false,
+      "createdAt": "2025-09-25T09:38:27.850Z",
+      "updatedAt": "2025-09-25T09:39:02.322Z",
+      "dailyNote": true,
+      "dailyNoteDate": "2025-09-25"
+    },
+    {
+      "id": "1759917568691n2edqtb9h",
+      "title": "Mittwoch, 08. Oktober 2025",
+      "content": "# Mittwoch, 08. Oktober 2025\n\n![image.png](storage://img_1759917573873_jnjsxscw7)",
+      "tags": [
+        "daily"
+      ],
+      "linkedTasks": [],
+      "linkedNotes": [],
+      "linkedProjects": [],
+      "pinned": false,
+      "archived": false,
+      "createdAt": "2025-10-08T09:59:28.691Z",
+      "updatedAt": "2025-10-08T09:59:35.464Z",
+      "dailyNote": true,
+      "dailyNoteDate": "2025-10-08"
+    }
+  ],
+  "noteLinks": [],
+  "notesViewState": {
+    "selectedNote": null,
+    "isEditing": false,
+    "searchQuery": "",
+    "selectedTags": [],
+    "view": "grid",
+    "sortBy": "updated",
+    "sortOrder": "desc",
+    "showArchived": false,
+    "showLinkPreviews": true,
+    "editorMode": "split",
+    "dailyNotesMode": false,
+    "emailMode": false,
+    "selectedDailyNoteDate": null
+  },
+  "preferences": {
+    "0": {
+      "0": {
+        "id": "global",
+        "updatedAt": "2025-08-28T08:51:54.757+00:00",
+        "theme": "dark",
+        "language": "de",
+        "accentColor": "#006d8f",
+        "backgroundImage": "/backgrounds/bg2.jpg",
+        "backgroundType": "image",
+        "dateFormat": "dd.MM.yyyy",
+        "recentBackgroundImages": [
+          "/backgrounds/bg2.jpg",
+          "https://imgproxy.nanxiongnandi.com/arw77ZKXimAY7EM0ci5sBzbH2ADkctdEJCtLIJtSpwQ/w:1920/q:100/att:1/aHR0cHM6Ly9pbWcu/bmFueGlvbmduYW5k/aS5jb20vMjAyNTA3/L01vbmdvbGlhWXVy/dHMuanBn.jpg",
+          "/fox_onboarding2.jpg"
+        ],
+        "notifications": {
+          "email": true,
+          "push": true,
+          "timerReminders": true,
+          "deadlineReminders": true
+        },
+        "privacy": {
+          "analytics": false,
+          "crashReports": true
+        },
+        "sounds": true,
+        "soundVolume": 0.8,
+        "completionSound": "chime",
+        "completionSoundEnabled": true,
+        "enableCelebration": true,
+        "celebrationText": "Gut gemacht!",
+        "celebrationDuration": 3000,
+        "timerDisplayMode": "topBar",
+        "columns": {
+          "visible": 5,
+          "showProjects": true
+        },
+        "showPriorities": true,
+        "sidebar": {
+          "hiddenItems": [],
+          "itemOrder": [
+            "today",
+            "inbox",
+            "tasks",
+            "kanban",
+            "notes",
+            "tags",
+            "statistics",
+            "archive"
+          ]
+        },
+        "enableEndOfDay": true,
+        "enableFocusMode": true,
+        "pomodoro": {
+          "enabled": false,
+          "workDuration": 25,
+          "shortBreakDuration": 5,
+          "longBreakDuration": 15,
+          "longBreakInterval": 4,
+          "autoStartBreaks": false,
+          "autoStartWork": false,
+          "soundEnabled": true,
+          "pomodoroSound": "chime",
+          "breakSound": "bell",
+          "taskSound": "pop",
+          "whiteNoiseEnabled": false,
+          "whiteNoiseType": "clock",
+          "whiteNoiseVolume": 0.3
+        },
+        "toggl": {
+          "enabled": false,
+          "apiToken": "",
+          "workspaceId": "",
+          "defaultProjectId": "",
+          "autoSync": true,
+          "syncOnStart": true,
+          "syncOnPause": true,
+          "syncOnStop": true,
+          "createProjectsAutomatically": true,
+          "useTaskDescriptions": true,
+          "roundTimeToMinutes": true
+        },
+        "caldav": {
+          "enabled": false,
+          "serverUrl": "",
+          "username": "",
+          "password": "",
+          "calendarUrl": "",
+          "autoSync": true,
+          "syncInterval": 30,
+          "syncOnStart": true,
+          "syncOnTaskChange": true,
+          "syncOnlyCompleted": false,
+          "bidirectionalSync": true,
+          "conflictResolution": "manual"
+        },
+        "microsoftTodo": {
+          "enabled": false,
+          "selectedListId": "",
+          "selectedListName": "",
+          "autoSync": true,
+          "syncInterval": 30,
+          "syncOnStart": true,
+          "syncOnTaskChange": true,
+          "bidirectionalSync": true,
+          "conflictResolution": "manual"
+        },
+        "todoist": {
+          "enabled": false,
+          "apiToken": "",
+          "syncTags": [
+            "todoist"
+          ],
+          "autoSync": true,
+          "syncInterval": 30,
+          "syncOnStart": true,
+          "syncOnTaskChange": true,
+          "bidirectionalSync": true,
+          "syncCompletedTasks": false,
+          "defaultProjectId": "",
+          "conflictResolution": "manual"
+        },
+        "timer": {
+          "showOverlay": true,
+          "overlayPosition": {
+            "x": 20,
+            "y": 20
+          },
+          "overlayMinimized": false,
+          "autoOpenTaskOnStart": true,
+          "showRemainingTime": true
+        },
+        "backgroundEffects": {
+          "blur": false,
+          "overlay": true,
+          "overlayOpacity": 0.2
+        },
+        "calendars": {
+          "sources": [],
+          "showInPlanner": false,
+          "defaultDuration": 60,
+          "hiddenEvents": []
+        },
+        "dropbox": {
+          "enabled": false,
+          "appKey": "",
+          "accessToken": "",
+          "refreshToken": "",
+          "appFolderPath": "/TaskFuchs",
+          "fileName": "taskfuchs.json"
+        },
+        "hasCompletedOnboarding": true,
+        "greetingText": "Hallo Malte!",
+        "backgroundColor": "#9a244f",
+        "taskCompletionSound": {
+          "enabled": true,
+          "soundType": "chime",
+          "volume": 0.5
+        },
+        "glassEffects": {
+          "enabled": true,
+          "primarySidebar": true,
+          "secondarySidebar": true
+        },
+        "minimalisticMode": false,
+        "minimalDesign": false,
+        "deleted": false
+      },
+      "id": "global",
+      "updatedAt": "2025-08-28T08:51:58.746+00:00",
+      "deleted": false
+    },
+    "theme": "dark",
+    "language": "de",
+    "accentColor": "#22d3ee",
+    "backgroundImage": "/backgrounds/bg24.webp",
+    "backgroundType": "image",
+    "dateFormat": "dd.MM.yyyy",
+    "recentBackgroundImages": [
+      "/backgrounds/bg12.png",
+      "/backgrounds/bg2.jpg"
+    ],
+    "notifications": {
+      "email": true,
+      "push": true,
+      "timerReminders": true,
+      "deadlineReminders": true
+    },
+    "privacy": {
+      "analytics": false,
+      "crashReports": true
+    },
+    "sounds": true,
+    "soundVolume": 0.8,
+    "completionSound": "bell",
+    "completionSoundEnabled": true,
+    "enableCelebration": true,
+    "celebrationText": "Gut gemacht!",
+    "celebrationDuration": 3000,
+    "timerDisplayMode": "topBar",
+    "columns": {
+      "visible": 5,
+      "showProjects": true,
+      "plannerVisible": 5,
+      "projectsVisible": 7,
+      "pinsVisible": 7
+    },
+    "showPriorities": true,
+    "sidebar": {
+      "hiddenItems": [],
+      "itemOrder": [
+        "inbox",
+        "today",
+        "pins",
+        "tasks",
+        "kanban",
+        "notes",
+        "tags",
+        "statistics",
+        "archive",
+        "review",
+        "series"
+      ],
+      "moreItems": [
+        "series",
+        "archive",
+        "tags",
+        "statistics",
+        "review",
+        "notes"
+      ]
+    },
+    "enableEndOfDay": true,
+    "timer": {
+      "showOverlay": true,
+      "overlayPosition": {
+        "x": 20,
+        "y": 20
+      },
+      "overlayMinimized": false,
+      "autoOpenTaskOnStart": true,
+      "showRemainingTime": true,
+      "dimControlsWhenNoTask": true,
+      "soundEnabled": true,
+      "taskSound": "yeah",
+      "whiteNoiseEnabled": false,
+      "whiteNoiseType": "clock",
+      "whiteNoiseVolume": 0.3
+    },
+    "toggl": {
+      "enabled": false,
+      "apiToken": "",
+      "workspaceId": "",
+      "defaultProjectId": "",
+      "autoSync": true,
+      "syncOnStart": true,
+      "syncOnPause": true,
+      "syncOnStop": true,
+      "createProjectsAutomatically": true,
+      "useTaskDescriptions": true,
+      "roundTimeToMinutes": true
+    },
+    "caldav": {
+      "enabled": true,
+      "serverUrl": "",
+      "username": "",
+      "password": "",
+      "calendarUrl": "",
+      "autoSync": true,
+      "syncInterval": 30,
+      "syncOnStart": true,
+      "syncOnTaskChange": true,
+      "syncOnlyCompleted": false,
+      "bidirectionalSync": true,
+      "conflictResolution": "manual"
+    },
+    "microsoftTodo": {
+      "enabled": false,
+      "selectedListId": "",
+      "selectedListName": "",
+      "autoSync": true,
+      "syncInterval": 30,
+      "syncOnStart": true,
+      "syncOnTaskChange": true,
+      "bidirectionalSync": true,
+      "conflictResolution": "manual"
+    },
+    "todoist": {
+      "enabled": false,
+      "apiToken": "",
+      "syncTags": [
+        "todoist"
+      ],
+      "autoSync": true,
+      "syncInterval": 30,
+      "syncOnStart": true,
+      "syncOnTaskChange": true,
+      "bidirectionalSync": true,
+      "syncCompletedTasks": false,
+      "defaultProjectId": "",
+      "conflictResolution": "manual"
+    },
+    "dropbox": {
+      "enabled": true,
+      "appKey": "uxcrjsqboqgzc6t",
+      "accessToken": "sl.u.AGAjVznMA58_CPXzDsf5WgmPMH3J3kkv9h-dpK2eUa_cd7K3nftjRnTk9-i8tbKwHtuTY8dRhoHmYAAEq3N3T8RJ6aUr5H_mmipiNVYfNlTCfnS2kLXNeyZ6Vfy_RwiAtP9LWlbtzCcZEOAsbtCOAPTBWB1LPurHBvgB53Dn7N6pRVogdUr8oKD2TM9erhBT7MCn-dFngTaI8Jmdsl2UGQAAK3r1nU_kgpPjX7PGmFXoYcWiY5LYWxgvs_zOiACM0EmkmfIE-_tfvFX0bMcTSyM767hnZXEOrteuMtAqZaCsjxveBFnTw4Jlq9uGS52UcQEgqjJZUrlrznqb9nu2cn6xSQzjNegnwtDwK4B6Q58JiaI8Tmk9-dGGY8TXKzk7aBfDS6_YSA86ii2ZF5Tl5s05AgHbInqPR4EgYZuG4hCuD-bY75Cm0DP55I6Sa6f9K6i6YORt_O-l4vsu9Pvl2EkgfgwdDfLKC9-RKMG6NmQ_AwbCdhhtEn6ZAAHjiMt5zLkiG0e5c_BPTOk2L1nYDUaF4SX64z7DMzg4VkIpUmWLvAiCRKOS5iLtUG5k3nb1Q_hOqcAI3FmGnKKK7YWSsmGZ5yePEZgoTAfte4tBIIS0w-X7lI8201C8VBwHwOqrT2A3A5lW4u9LDgfTnxbN15z4HdsWGWrhubiqjRteQfVw7ynEF4BwkDNheBdxAEJclxYuEUF-SGbI6EQxk7SXKRsHQUAdWzW0L_DR41eFDe5VClXMHu01TvWkV36QJqd7N2wrvEEXRaGdjgGXJmWs4xotwNs647IiYiuiwYqggOFH0T8RnLdNsjFf-5tf3TrvR2860aCoxaIxyaf0xI4oBt4Y02mwTxhaQkxvnuAcPEplAZtss5W72CnTW1SnIokYjF9onVMaHtmUpQDE2WmIjfiWaPHP36uDl6a7Vat5mQZPmN_RrfYkqIRuFjGyaWLuF5bYHBdy2q28x11RJVULc20fWebDpZ4T3ruVIdBjVIb3soqbY8tWe17nFx2PAaNeBro_L8bA73m5VgNzaJCcLgD0Bh5Cht10S3ZtLlep7Na0ETaOutvYeCTcoFcKGUwbhl6lvQ3Nsle-pGigqaCLdk5HlATAHIprW1EZT5LSntroCkLh6eQse0jk4ijKGwJh2cb5X6VwLpwOjR4h8nwe7PdeqSM0q1ALjK4mDMf00HKSTXuPmlhS1t5FKDsbXG7IjQ9s0dV7fLNpBiS21zLceCN6a1YqoTD5wD0FUZCsYHbytPfXOcQ5uy5MXcO5j49mjQBQpSTk9P7eOIAA6A8xBiIJaAaUnLpIBYiexDFUjnujIg",
+      "refreshToken": "xbmrcCoO718AAAAAAAAAAfpX5Imyy0846ivSM-qlssNu7S1GhpD5re8termPBrff",
+      "expiresAt": 1759950030344,
+      "accountEmail": "",
+      "accountName": "",
+      "folderPath": "/Apps/TaskFuchs",
+      "autoSync": true,
+      "syncInterval": 30,
+      "lastSyncStatus": "success",
+      "lastSync": "2025-10-08T09:04:58.656Z",
+      "conflictResolution": "manual",
+      "rememberPassphrase": true,
+      "passphraseHint": ""
+    },
+    "backgroundEffects": {
+      "blur": false,
+      "overlay": false,
+      "overlayOpacity": 0.4
+    },
+    "enableFocusMode": true,
+    "pomodoro": {
+      "enabled": true,
+      "workDuration": 25,
+      "shortBreakDuration": 5,
+      "longBreakDuration": 15,
+      "longBreakInterval": 4,
+      "autoStartBreaks": false,
+      "autoStartWork": false,
+      "soundEnabled": true,
+      "pomodoroSound": "chime",
+      "breakSound": "bell",
+      "taskSound": "yeah",
+      "whiteNoiseEnabled": false,
+      "whiteNoiseType": "clock",
+      "whiteNoiseVolume": 0.3
+    },
+    "calendars": {
+      "sources": [],
+      "showInPlanner": true,
+      "defaultDuration": 60,
+      "hiddenEvents": [],
+      "collapsedEvents": [
+        "1764234520214-040000008200E00074C5B7101A82E00800000000CCF632C4E45ADC01000000000000000010000000594D7F37C973824DA7ADD084CD215CC6"
+      ]
+    },
+    "hasCompletedOnboarding": true,
+    "backup": {
+      "enabled": true,
+      "intervalMinutes": 60,
+      "notify": true,
+      "lastSuccess": "2025-11-28T16:15:02.523Z"
+    },
+    "greetingText": "Hallo Malte!",
+    "backgroundColor": "#9a244f",
+    "taskCompletionSound": {
+      "enabled": true,
+      "soundType": "chime",
+      "volume": 0.5
+    },
+    "glassEffects": {
+      "enabled": true,
+      "primarySidebar": true,
+      "secondarySidebar": true
+    },
+    "minimalDesign": false,
+    "minimalisticMode": false,
+    "minimalistMode": false,
+    "gradientFrom": "#d6d6d6",
+    "gradientTo": "#fffbb9",
+    "gradientDirection": "to top left",
+    "deleted": false,
+    "updatedAt": "2025-08-28T08:52:29.146+00:00"
+  },
+  "viewState": {
+    "currentMode": "columns",
+    "kanbanGrouping": "status",
+    "taskView": "board",
+    "projectKanban": {
+      "selectedProjectId": "project-1752561187805-9xtzj8v39",
+      "columns": [
+        {
+          "id": "col-1752561188719-g4l45kms7",
+          "title": "To Do",
+          "projectId": "project-1752561187805-9xtzj8v39",
+          "order": 0,
+          "isDefault": false
+        },
+        {
+          "id": "col-1752561731913-q9e4bm5aa",
+          "title": "Next",
+          "projectId": "project-1752561187805-9xtzj8v39",
+          "order": 1,
+          "isDefault": false
+        },
+        {
+          "id": "col-1757568209247-jnfk10ygc",
+          "title": "Ivy Lee",
+          "projectId": "project-1752561187805-9xtzj8v39",
+          "order": 2,
+          "isDefault": false
+        },
+        {
+          "id": "col-1758119346702-sfse3zlp5",
+          "title": "Backlog",
+          "projectId": "project-1752561187805-9xtzj8v39",
+          "order": 3,
+          "isDefault": false
+        },
+        {
+          "id": "col-1764143184198-ld6fsz1cq",
+          "title": "To Do",
+          "projectId": "project-1764143181734-3akj58yx9",
+          "order": 0,
+          "isDefault": true
+        },
+        {
+          "id": "col-1764143188846-ybhefk3an",
+          "title": "Doing",
+          "projectId": "project-1764143181734-3akj58yx9",
+          "order": 1,
+          "isDefault": false
+        },
+        {
+          "id": "col-1764143193773-ed4yip6gh",
+          "title": "Done",
+          "projectId": "project-1764143181734-3akj58yx9",
+          "order": 2,
+          "isDefault": false
+        }
+      ],
+      "searchQuery": "",
+      "priorityFilters": [],
+      "tagFilters": [],
+      "showCompleted": false,
+      "viewType": "board"
+    }
+  },
+  "projectKanbanColumns": [
+    {
+      "id": "col-1752561188719-g4l45kms7",
+      "title": "To Do",
+      "projectId": "project-1752561187805-9xtzj8v39",
+      "order": 0,
+      "isDefault": false
+    },
+    {
+      "id": "col-1752561731913-q9e4bm5aa",
+      "title": "Next",
+      "projectId": "project-1752561187805-9xtzj8v39",
+      "order": 1,
+      "isDefault": false
+    },
+    {
+      "id": "col-1757568209247-jnfk10ygc",
+      "title": "Ivy Lee",
+      "projectId": "project-1752561187805-9xtzj8v39",
+      "order": 2,
+      "isDefault": false
+    },
+    {
+      "id": "col-1758119346702-sfse3zlp5",
+      "title": "Backlog",
+      "projectId": "project-1752561187805-9xtzj8v39",
+      "order": 3,
+      "isDefault": false
+    },
+    {
+      "id": "col-1764143184198-ld6fsz1cq",
+      "title": "To Do",
+      "projectId": "project-1764143181734-3akj58yx9",
+      "order": 0,
+      "isDefault": true
+    },
+    {
+      "id": "col-1764143188846-ybhefk3an",
+      "title": "Doing",
+      "projectId": "project-1764143181734-3akj58yx9",
+      "order": 1,
+      "isDefault": false
+    },
+    {
+      "id": "col-1764143193773-ed4yip6gh",
+      "title": "Done",
+      "projectId": "project-1764143181734-3akj58yx9",
+      "order": 2,
+      "isDefault": false
+    }
+  ],
+  "projectKanbanState": {
+    "selectedProjectId": "project-1752561187805-9xtzj8v39",
+    "columns": [
+      {
+        "id": "col-1752561188719-g4l45kms7",
+        "title": "To Do",
+        "projectId": "project-1752561187805-9xtzj8v39",
+        "order": 0,
+        "isDefault": false
+      },
+      {
+        "id": "col-1752561731913-q9e4bm5aa",
+        "title": "Next",
+        "projectId": "project-1752561187805-9xtzj8v39",
+        "order": 1,
+        "isDefault": false
+      },
+      {
+        "id": "col-1757568209247-jnfk10ygc",
+        "title": "Ivy Lee",
+        "projectId": "project-1752561187805-9xtzj8v39",
+        "order": 2,
+        "isDefault": false
+      },
+      {
+        "id": "col-1758119346702-sfse3zlp5",
+        "title": "Backlog",
+        "projectId": "project-1752561187805-9xtzj8v39",
+        "order": 3,
+        "isDefault": false
+      },
+      {
+        "id": "col-1764143184198-ld6fsz1cq",
+        "title": "To Do",
+        "projectId": "project-1764143181734-3akj58yx9",
+        "order": 0,
+        "isDefault": true
+      },
+      {
+        "id": "col-1764143188846-ybhefk3an",
+        "title": "Doing",
+        "projectId": "project-1764143181734-3akj58yx9",
+        "order": 1,
+        "isDefault": false
+      },
+      {
+        "id": "col-1764143193773-ed4yip6gh",
+        "title": "Done",
+        "projectId": "project-1764143181734-3akj58yx9",
+        "order": 2,
+        "isDefault": false
+      }
+    ],
+    "searchQuery": "",
+    "priorityFilters": [],
+    "tagFilters": [],
+    "showCompleted": false,
+    "viewType": "board"
+  },
+  "events": [
+    {
+      "id": "1764234520214-040000008200E00074C5B7101A82E00800000000D92B433ECE39DC010000000000000000100000006D827F8764611149A9E245CAAEE04060",
+      "calendarUrl": "https://outlook.office365.com/owa/calendar/55a7744a282c437a836eb3dad44c6709@unique-landuse.de/25a0968e13534bc195ceb38e5beddc4b1348024555792318342/S-1-8-3574032643-298043167-3273186133-1683214480/reachcalendar.ics",
+      "description": "Hi everyone,\n\nas trainees or new employees of Unique, you are invited to a series of short sessions to help to get to know the company and its departments - in this case, the IT-department. The goal is to give you a clear overview of what each team does and how they work together, as well as give you the opportunity to ask questions.  You have the option to join online or in person.\n\nYou will receive calendar invites for further relevant sessions.\n\nWe look forward to seeing you there and helping you get oriented quickly!\n\nBest,\n\nViviana\n\n________________________________________________________________________________\nMicrosoft Teams Benötigen Sie Hilfe?<https://aka.ms/JoinTeamsMeeting?omkt=de-DE>\nJetzt an der Besprechung teilnehmen<https://teams.microsoft.com/l/meetup-join/19%3ameeting_OTYzODVhNjgtMThiZS00YjQxLTk5ZjYtOTI5ZWVhNDIzMmFk%40thread.v2/0?context=%7b%22Tid%22%3a%22297317b0-49c5-4c14-9699-fbc83ce87cf4%22%2c%22Oid%22%3a%22693a12ba-44cc-4f09-9a76-7e7cd1426e14%22%7d>\nBesprechungs-ID: 325 161 180 545 8\nKennung: xx3GQ6mm\n________________________________\nFür Organisatoren: Besprechungsoptionen<https://teams.microsoft.com/meetingOptions/?organizerId=693a12ba-44cc-4f09-9a76-7e7cd1426e14&tenantId=297317b0-49c5-4c14-9699-fbc83ce87cf4&threadId=19_meeting_OTYzODVhNjgtMThiZS00YjQxLTk5ZjYtOTI5ZWVhNDIzMmFk@thread.v2&messageId=0&language=de-DE>\nDatenschutz und Sicherheit<https://www.unique-landuse.de/datenschutzerklaerung>\n________________________________________________________________________________\n",
+      "uid": "040000008200E00074C5B7101A82E00800000000D92B433ECE39DC010000000000000000100000006D827F8764611149A9E245CAAEE04060",
+      "title": "Trainee session IT",
+      "startTime": "2025-12-02T09:00:00.000Z",
+      "allDay": false,
+      "endTime": "2025-12-02T11:00:00.000Z",
+      "lastModified": "2025-12-01T08:21:38.000Z",
+      "status": "confirmed",
+      "location": "4.1 kl. Besprechungsraum"
+    },
+    {
+      "id": "1764234520214-040000008200E00074C5B7101A82E00800000000D090061A0744DC0100000000000000001000000075289CB14462C34887B274BACDC77C8B",
+      "calendarUrl": "https://outlook.office365.com/owa/calendar/55a7744a282c437a836eb3dad44c6709@unique-landuse.de/25a0968e13534bc195ceb38e5beddc4b1348024555792318342/S-1-8-3574032643-298043167-3273186133-1683214480/reachcalendar.ics",
+      "description": "\n",
+      "uid": "040000008200E00074C5B7101A82E00800000000D090061A0744DC0100000000000000001000000075289CB14462C34887B274BACDC77C8B",
+      "title": "Unique Landuse",
+      "startTime": "2025-12-03T08:00:00.000Z",
+      "allDay": false,
+      "endTime": "2025-12-03T16:00:00.000Z",
+      "lastModified": "2025-12-01T08:21:38.000Z",
+      "status": "confirmed",
+      "location": ""
+    },
+    {
+      "id": "1764234520214-040000008200E00074C5B7101A82E0080000000017BB564D1A5ADC010000000000000000100000009B461CC422012844848D7B239B31DADB",
+      "calendarUrl": "https://outlook.office365.com/owa/calendar/55a7744a282c437a836eb3dad44c6709@unique-landuse.de/25a0968e13534bc195ceb38e5beddc4b1348024555792318342/S-1-8-3574032643-298043167-3273186133-1683214480/reachcalendar.ics",
+      "description": "Dear all,\n\nI hope you are doing well.\n\nAs we approach theend of this year’s upward feedback process, implemented in a modified format, we would like to invite you to an MV lunch to discuss your experience, hear your perspectives, and collect suggestions for future improvements.\n\nAs always, you are very welcome to join either in person or online, with or without a lunch box.\n🙂\n\nBest,\nDennis and Julia\n(for MV/ Mitarbeitervertretung = employee representatives)\n\n________________________________________________________________________________\nMicrosoft Teams Need help?<https://aka.ms/JoinTeamsMeeting?omkt=en-US>\nJoin the meeting now<https://teams.microsoft.com/l/meetup-join/19%3ameeting_YzhmMDQ2ZWYtOTA5MS00YzY1LTg5YTEtNzVhMzY4OGM4MzNm%40thread.v2/0?context=%7b%22Tid%22%3a%22297317b0-49c5-4c14-9699-fbc83ce87cf4%22%2c%22Oid%22%3a%22d3a28a70-9240-4fe9-ba80-46f22fe36ffb%22%7d>\nMeeting ID: 311 816 983 743 75\nPasscode: mj9Sf9ww\n________________________________\nFor organizers: Meeting options<https://teams.microsoft.com/meetingOptions/?organizerId=d3a28a70-9240-4fe9-ba80-46f22fe36ffb&tenantId=297317b0-49c5-4c14-9699-fbc83ce87cf4&threadId=19_meeting_YzhmMDQ2ZWYtOTA5MS00YzY1LTg5YTEtNzVhMzY4OGM4MzNm@thread.v2&messageId=0&language=en-US>\nPrivacy and security<https://www.unique-landuse.de/datenschutzerklaerung>\n________________________________________________________________________________\n",
+      "uid": "040000008200E00074C5B7101A82E0080000000017BB564D1A5ADC010000000000000000100000009B461CC422012844848D7B239B31DADB",
+      "title": "MV lunch upward feedback",
+      "startTime": "2025-12-04T11:30:00.000Z",
+      "allDay": false,
+      "endTime": "2025-12-04T12:30:00.000Z",
+      "lastModified": "2025-12-01T08:21:38.000Z",
+      "status": "confirmed",
+      "location": "4.2 gr. Besprechungsraum"
+    },
+    {
+      "id": "1764234520214-040000008200E00074C5B7101A82E00800000000A9C79D5D8A5FDC01000000000000000010000000411F13DF114EEB49BF007A97A39FCA42",
+      "calendarUrl": "https://outlook.office365.com/owa/calendar/55a7744a282c437a836eb3dad44c6709@unique-landuse.de/25a0968e13534bc195ceb38e5beddc4b1348024555792318342/S-1-8-3574032643-298043167-3273186133-1683214480/reachcalendar.ics",
+      "description": "Hi everyone,\nJoin us for a Brown Bag Lunch to get a first look at FieldMate: Our new AI-powered tool that supports every type of field data collection. It’s like having an AI consultant in your pocket to streamline on-the-ground inventories, checks, and documentation.\nWhat’s on the agenda:\n\n  *\nQuick presentation and overview of the functions\n  *\nA short, practical demo of FieldMate\n  *\nOpen Q&A\n\nBBL details:\n\n  *\nDate/Time: Friday, 5th December 12 pm\n  *\nLocation: Meeting Room 4.2 & Teams\n\nSee you there.\n\nWarm regards\nAdrian\n\n\n________________________________________________________________________________\nMicrosoft Teams Need help?<https://aka.ms/JoinTeamsMeeting?omkt=en-GB>\nJoin the meeting now<https://teams.microsoft.com/l/meetup-join/19%3ameeting_YjViZDI1ZmYtNTZlZC00NzAzLTljMmItNTc4NjlkODNjNjI3%40thread.v2/0?context=%7b%22Tid%22%3a%22297317b0-49c5-4c14-9699-fbc83ce87cf4%22%2c%22Oid%22%3a%22bde76c01-e3c1-4826-b9ee-dfa3069d830d%22%7d>\nMeeting ID: 392 532 100 638 95\nPasscode: BR3FV3i8\n________________________________\nFor organisers: Meeting options<https://teams.microsoft.com/meetingOptions/?organizerId=bde76c01-e3c1-4826-b9ee-dfa3069d830d&tenantId=297317b0-49c5-4c14-9699-fbc83ce87cf4&threadId=19_meeting_YjViZDI1ZmYtNTZlZC00NzAzLTljMmItNTc4NjlkODNjNjI3@thread.v2&messageId=0&language=en-GB>\nPrivacy and security<https://www.unique-landuse.de/datenschutzerklaerung>\n________________________________________________________________________________\n",
+      "uid": "040000008200E00074C5B7101A82E00800000000A9C79D5D8A5FDC01000000000000000010000000411F13DF114EEB49BF007A97A39FCA42",
+      "title": "BBL - FieldMate: AI-based data collection support",
+      "startTime": "2025-12-05T11:00:00.000Z",
+      "allDay": false,
+      "endTime": "2025-12-05T11:30:00.000Z",
+      "lastModified": "2025-12-01T08:21:38.000Z",
+      "status": "confirmed",
+      "location": "4.2 gr. Besprechungsraum"
+    },
+    {
+      "id": "1764234520214-evbd5hq17ji6pghp5vqrk0fbq0@google.com",
+      "calendarUrl": "https://outlook.office365.com/owa/calendar/55a7744a282c437a836eb3dad44c6709@unique-landuse.de/25a0968e13534bc195ceb38e5beddc4b1348024555792318342/S-1-8-3574032643-298043167-3273186133-1683214480/reachcalendar.ics",
+      "recurrence": "FREQ=YEARLY;UNTIL=20251213T230000Z;INTERVAL=1;BYMONTHDAY=14;BYMONTH=12",
+      "uid": "evbd5hq17ji6pghp5vqrk0fbq0@google.com",
+      "title": "Privater Termin",
+      "startTime": "2025-12-14T00:00:00.000Z",
+      "allDay": true,
+      "endTime": "2025-12-15T00:00:00.000Z",
+      "lastModified": "2025-12-01T08:21:38.000Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "1764234520214-040000008200E00074C5B7101A82E008000000006071CAF0C93EDC01000000000000000010000000D6375A912ADFBD4383DB923923A15AA0",
+      "calendarUrl": "https://outlook.office365.com/owa/calendar/55a7744a282c437a836eb3dad44c6709@unique-landuse.de/25a0968e13534bc195ceb38e5beddc4b1348024555792318342/S-1-8-3574032643-298043167-3273186133-1683214480/reachcalendar.ics",
+      "description": "\n________________________________________________________________________________\nMicrosoft Teams Benötigen Sie Hilfe?<https://aka.ms/JoinTeamsMeeting?omkt=de-DE>\nJetzt an der Besprechung teilnehmen<https://teams.microsoft.com/l/meetup-join/19%3ameeting_ZmQ3OWVjOTItMjVjMy00NGQ1LWFiYWMtODk1YmI3Yjg1Zjcy%40thread.v2/0?context=%7b%22Tid%22%3a%22297317b0-49c5-4c14-9699-fbc83ce87cf4%22%2c%22Oid%22%3a%22c83fd253-6fc0-497d-aaa0-d46459e52b43%22%7d>\nBesprechungs-ID: 362 643 329 966 1\nPasscode: ev9me2UT\n________________________________\nFür Organisatoren: Besprechungsoptionen<https://teams.microsoft.com/meetingOptions/?organizerId=c83fd253-6fc0-497d-aaa0-d46459e52b43&tenantId=297317b0-49c5-4c14-9699-fbc83ce87cf4&threadId=19_meeting_ZmQ3OWVjOTItMjVjMy00NGQ1LWFiYWMtODk1YmI3Yjg1Zjcy@thread.v2&messageId=0&language=de-DE>\nDatenschutz und Sicherheit<https://www.unique-landuse.de/datenschutzerklaerung>\n________________________________________________________________________________\n\n",
+      "uid": "040000008200E00074C5B7101A82E008000000006071CAF0C93EDC01000000000000000010000000D6375A912ADFBD4383DB923923A15AA0",
+      "title": "Jahresplanung IT",
+      "startTime": "2025-12-15T13:00:00.000Z",
+      "allDay": false,
+      "endTime": "2025-12-15T14:30:00.000Z",
+      "lastModified": "2025-12-01T08:21:38.000Z",
+      "status": "confirmed",
+      "location": "Microsoft Teams-Besprechung"
+    },
+    {
+      "id": "1764234520214-i53h9o1c9u0lmfl1ab6e77fbsg@google.com",
+      "calendarUrl": "https://outlook.office365.com/owa/calendar/55a7744a282c437a836eb3dad44c6709@unique-landuse.de/25a0968e13534bc195ceb38e5beddc4b1348024555792318342/S-1-8-3574032643-298043167-3273186133-1683214480/reachcalendar.ics",
+      "recurrence": "FREQ=YEARLY;UNTIL=20251215T230000Z;INTERVAL=1;BYMONTHDAY=16;BYMONTH=12",
+      "uid": "i53h9o1c9u0lmfl1ab6e77fbsg@google.com",
+      "title": "Privater Termin",
+      "startTime": "2025-12-16T00:00:00.000Z",
+      "allDay": true,
+      "endTime": "2025-12-17T00:00:00.000Z",
+      "lastModified": "2025-12-01T08:21:38.000Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "1764234520214-040000008200E00074C5B7101A82E00800000000E15FF23AB261DB0100000000000000001000000002AFA29DB0A3B240A6822905A3E162CC",
+      "calendarUrl": "https://outlook.office365.com/owa/calendar/55a7744a282c437a836eb3dad44c6709@unique-landuse.de/25a0968e13534bc195ceb38e5beddc4b1348024555792318342/S-1-8-3574032643-298043167-3273186133-1683214480/reachcalendar.ics",
+      "description": "Generate new MS365 secret for use in zammad.unique-apps.de\n\n________________________________________________________________________________\nMicrosoft Teams Need help?<https://aka.ms/JoinTeamsMeeting?omkt=en-US>\nJoin the meeting now<https://teams.microsoft.com/l/meetup-join/19%3ameeting_ZGI1NjA5OTAtNTAxZS00ZTM3LTgxNTgtODY4OGQxYmNhMzhl%40thread.v2/0?context=%7b%22Tid%22%3a%22297317b0-49c5-4c14-9699-fbc83ce87cf4%22%2c%22Oid%22%3a%220bd0dc47-18c7-439e-8e89-791e51b426c2%22%7d>\nMeeting ID: 379 617 107 358\nPasscode: Gw9fB3GL\n________________________________\nFor organizers: Meeting options<https://teams.microsoft.com/meetingOptions/?organizerId=0bd0dc47-18c7-439e-8e89-791e51b426c2&tenantId=297317b0-49c5-4c14-9699-fbc83ce87cf4&threadId=19_meeting_ZGI1NjA5OTAtNTAxZS00ZTM3LTgxNTgtODY4OGQxYmNhMzhl@thread.v2&messageId=0&language=en-US>\nPrivacy and security<https://www.unique-landuse.de/datenschutzerklaerung>\n________________________________________________________________________________\n",
+      "uid": "040000008200E00074C5B7101A82E00800000000E15FF23AB261DB0100000000000000001000000002AFA29DB0A3B240A6822905A3E162CC",
+      "title": "reminder: rotate Zammad creds",
+      "startTime": "2025-12-16T08:30:00.000Z",
+      "allDay": false,
+      "endTime": "2025-12-16T09:00:00.000Z",
+      "lastModified": "2025-12-01T08:21:38.000Z",
+      "status": "confirmed",
+      "location": "Microsoft Teams Meeting"
+    },
+    {
+      "id": "1764234520214-1bfdfb69-76a2-4cbe-8cf7-a57794f9023f",
+      "calendarUrl": "https://outlook.office365.com/owa/calendar/55a7744a282c437a836eb3dad44c6709@unique-landuse.de/25a0968e13534bc195ceb38e5beddc4b1348024555792318342/S-1-8-3574032643-298043167-3273186133-1683214480/reachcalendar.ics",
+      "description": "\n________________________________\nVon: Maximilian Manderscheid <maximilian.manderscheid@sphinx.at>\nGesendet: Dienstag, 25. November 2025 15:11:31 (UTC+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna\nAn: Maximilian Manderscheid <maximilian.manderscheid@sphinx.at>; Thomas Asbeck <thomas.asbeck@unique-landuse.de>\nBetreff: OpenProject - Demo Unique LandUse\nWann: Dienstag, 16. Dezember 2025 11:00-12:00.\nWo:\n\nJoin this meeting online on https://teams.microsoft.com/l/meetup-join/19%3ameeting_ZmNiNTIyNWQtYTdkYi00N2I4LTk0NjAtZjdiOGFjNTYxMWRh%40thread.v2/0?context=%7b%22Tid%22%3a%228de7c094-0bc3-4f38-87e3-a78a7ccdf48f%22%2c%22Oid%22%3a%2287f475bd-afd6-49dc-9263-074d8ebdd093%22%7d\n",
+      "uid": "1bfdfb69-76a2-4cbe-8cf7-a57794f9023f",
+      "title": "OpenProject - Demo Unique LandUse",
+      "startTime": "2025-12-16T10:00:00.000Z",
+      "allDay": false,
+      "endTime": "2025-12-16T11:00:00.000Z",
+      "lastModified": "2025-12-01T08:21:38.000Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "1764234520214-040000008200E00074C5B7101A82E00800000000E03E1C56EA32DC01000000000000000010000000FB854841DDCC104BBF2CCA69EB88DD24",
+      "calendarUrl": "https://outlook.office365.com/owa/calendar/55a7744a282c437a836eb3dad44c6709@unique-landuse.de/25a0968e13534bc195ceb38e5beddc4b1348024555792318342/S-1-8-3574032643-298043167-3273186133-1683214480/reachcalendar.ics",
+      "description": "Liebes Unique-Team,\n\nhier die Reservierung für die Weihnachtsfeier. Sie findet wie in den letzten Jahre im Waldsee statt.\nBitte tragt euch in die Liste ein, ob ihr kommt und bitte auch wenn ihr nicht kommt, damit wir planen können.\nFamilien und PartenerInnen sind herzlich eingeladen.\n\nHere is the reservation for the Christmas party. As in previous years, it will take place at Waldsee.\nPlease sign up on the list if you are coming, and also if you are not coming, so that we can plan accordingly.\nFamilies and partners are welcome to attend.\n\nHier die Liste zum Eintragen bis spätestens 05.12.2025. [xlsx-Symbol]  2025-12-19 Weihnachtsfeier.xlsx<https://uniquelandusede149.sharepoint.com/:x:/s/1_01TeamUL/EQHv_yDXNxFPqbeBF8UIMqEBN3AU-aXvCj7vk0sJ0gNOHg?e=0U2OeT>\nHere is the list to sign up by December 5, 2025 at the latest.\n\nViele Grüße Gwen und Tina\n",
+      "uid": "040000008200E00074C5B7101A82E00800000000E03E1C56EA32DC01000000000000000010000000FB854841DDCC104BBF2CCA69EB88DD24",
+      "title": "Weihnachtsfeier im Waldsee",
+      "startTime": "2025-12-19T17:30:00.000Z",
+      "allDay": false,
+      "endTime": "2025-12-19T22:30:00.000Z",
+      "lastModified": "2025-12-01T08:21:38.000Z",
+      "status": "confirmed",
+      "location": "Gaststätte Waldsee (Waldseestr. 84, , 79117  Freiburg im Breisgau  Baden-Württemberg)"
+    },
+    {
+      "id": "1764234520214-oovdqe07p2qepla0uth9gtub2c@google.com",
+      "calendarUrl": "https://outlook.office365.com/owa/calendar/55a7744a282c437a836eb3dad44c6709@unique-landuse.de/25a0968e13534bc195ceb38e5beddc4b1348024555792318342/S-1-8-3574032643-298043167-3273186133-1683214480/reachcalendar.ics",
+      "recurrence": "FREQ=YEARLY;UNTIL=20251227T230000Z;INTERVAL=1;BYMONTHDAY=28;BYMONTH=12",
+      "uid": "oovdqe07p2qepla0uth9gtub2c@google.com",
+      "title": "Privater Termin",
+      "startTime": "2025-12-28T00:00:00.000Z",
+      "allDay": true,
+      "endTime": "2025-12-29T00:00:00.000Z",
+      "lastModified": "2025-12-01T08:21:38.000Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "1764234520214-040000008200E00074C5B7101A82E00800000000301C1B6DFF06D8010000000000000000100000005B6D91B614F95D4E93C5D53B2CA0F790",
+      "calendarUrl": "https://outlook.office365.com/owa/calendar/55a7744a282c437a836eb3dad44c6709@unique-landuse.de/25a0968e13534bc195ceb38e5beddc4b1348024555792318342/S-1-8-3574032643-298043167-3273186133-1683214480/reachcalendar.ics",
+      "description": "Der Schlüssel ist zu finden unter:\nhttps://tasks.office.com/unique-landuse.de/Home/Task/yxKBqMWXV0W6sUhbzUBDFZcAP57o?Type=TaskLink&Channel=Link&CreatedTime=637775080275190000\n",
+      "recurrence": "FREQ=YEARLY;UNTIL=20260110T090000Z;INTERVAL=1;BYMONTHDAY=10;BYMONTH=1",
+      "uid": "040000008200E00074C5B7101A82E00800000000301C1B6DFF06D8010000000000000000100000005B6D91B614F95D4E93C5D53B2CA0F790",
+      "title": "Drive Image - Geheimen Schlüssel erneuern",
+      "startTime": "2026-01-10T09:00:00.000Z",
+      "allDay": false,
+      "endTime": "2026-01-10T09:30:00.000Z",
+      "lastModified": "2025-12-01T08:21:38.000Z",
+      "status": "confirmed",
+      "location": "https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Credentials/appId/4c251b61-5ef6-4423-84de-5a8765e8b56d/isMSAApp/"
+    },
+    {
+      "id": "1764234520214-040000008200E00074C5B7101A82E008000000002BB23DF725B8DB010000000000000000100000003DA82D9D0ECCFB4A9184AF26F969EBD7",
+      "calendarUrl": "https://outlook.office365.com/owa/calendar/55a7744a282c437a836eb3dad44c6709@unique-landuse.de/25a0968e13534bc195ceb38e5beddc4b1348024555792318342/S-1-8-3574032643-298043167-3273186133-1683214480/reachcalendar.ics",
+      "description": "[https://res.public.onecdn.static.microsoft/assets/mail/file-icon/png/docx_16x16.png]Technische Ressourcen-unique-EN.docx<https://uniquelandusede149.sharepoint.com/:w:/s/1_07AkquisitionUL/Ec-cVlSLwH5PuW2FlZx_MCkBPgQu98J2KqGIx69jJ8ZNOA?e=z95ciI>\n",
+      "uid": "040000008200E00074C5B7101A82E008000000002BB23DF725B8DB010000000000000000100000003DA82D9D0ECCFB4A9184AF26F969EBD7",
+      "title": "Liste Technische Ressourcen aktualisieren",
+      "startTime": "2026-01-14T06:45:00.000Z",
+      "allDay": false,
+      "endTime": "2026-01-14T07:00:00.000Z",
+      "lastModified": "2025-12-01T08:21:38.000Z",
+      "status": "confirmed",
+      "location": ""
+    },
+    {
+      "id": "1764234520214-040000008200E00074C5B7101A82E008000000008B91DF91BA8DDB0100000000000000001000000082D10C4117675045B559054DEA4DC309",
+      "calendarUrl": "https://outlook.office365.com/owa/calendar/55a7744a282c437a836eb3dad44c6709@unique-landuse.de/25a0968e13534bc195ceb38e5beddc4b1348024555792318342/S-1-8-3574032643-298043167-3273186133-1683214480/reachcalendar.ics",
+      "description": "\n",
+      "uid": "040000008200E00074C5B7101A82E008000000008B91DF91BA8DDB0100000000000000001000000082D10C4117675045B559054DEA4DC309",
+      "title": "Schlüssel für DS Supportmail erneuern (Zammad)",
+      "startTime": "2026-01-26T06:45:00.000Z",
+      "allDay": false,
+      "endTime": "2026-01-26T07:00:00.000Z",
+      "lastModified": "2025-12-01T08:21:38.000Z",
+      "status": "confirmed",
+      "location": ""
+    }
+  ],
+  "calendarSources": [
+    {
+      "id": "1764234520214",
+      "name": "Mein Kalender",
+      "url": "https://outlook.office365.com/owa/calendar/55a7744a282c437a836eb3dad44c6709@unique-landuse.de/25a0968e13534bc195ceb38e5beddc4b1348024555792318342/S-1-8-3574032643-298043167-3273186133-1683214480/reachcalendar.ics",
+      "color": "#3b82f6",
+      "enabled": true,
+      "createdAt": "2025-11-27T09:08:40.214Z",
+      "updatedAt": "2025-11-27T09:08:40.214Z",
+      "lastSync": "2025-12-01T08:24:01.418Z"
+    }
+  ],
+  "ical": {
+    "preferences": {
+      "sources": [],
+      "showInPlanner": true,
+      "defaultDuration": 60,
+      "hiddenEvents": [],
+      "collapsedEvents": [
+        "1764234520214-040000008200E00074C5B7101A82E00800000000CCF632C4E45ADC01000000000000000010000000594D7F37C973824DA7ADD084CD215CC6"
+      ]
+    },
+    "sources": [
+      {
+        "id": "1764234520214",
+        "name": "Mein Kalender",
+        "url": "https://outlook.office365.com/owa/calendar/55a7744a282c437a836eb3dad44c6709@unique-landuse.de/25a0968e13534bc195ceb38e5beddc4b1348024555792318342/S-1-8-3574032643-298043167-3273186133-1683214480/reachcalendar.ics",
+        "color": "#3b82f6",
+        "enabled": true,
+        "createdAt": "2025-11-27T09:08:40.214Z",
+        "updatedAt": "2025-11-27T09:08:40.214Z",
+        "lastSync": "2025-12-01T08:24:01.418Z"
+      }
+    ]
+  },
+  "imageStorage": {
+    "images": [],
+    "totalSize": 0,
+    "maxSize": 104857600,
+    "autoCleanup": true,
+    "cleanupAfterDays": 30,
+    "compressionQuality": 0.8,
+    "maxImageSize": 10485760
+  },
+  "searchQuery": "",
+  "activeTagFilters": [],
+  "activePriorityFilters": [],
+  "focusMode": false,
+  "focusedColumnId": null,
+  "showCompletedTasks": false,
+  "projectColumnOffset": 0,
+  "notifications": [],
+  "activeTimer": null,
+  "currentDate": "2025-12-01T08:43:29.282Z",
+  "isNoteEditorFullScreen": false,
+  "recurrence": {
+    "rules": [],
+    "activeRule": null,
+    "generatedTasks": [],
+    "upcomingTasks": [],
+    "completedTasks": [],
+    "skippedTasks": [],
+    "showCompleted": false,
+    "showSkipped": false,
+    "selectedTimeframe": "month",
+    "sortBy": "date",
+    "sortOrder": "asc",
+    "overallStats": {
+      "totalRules": 0,
+      "activeRules": 0,
+      "totalTasks": 0,
+      "completedTasks": 0,
+      "averageCompletionRate": 0
+    }
+  },
+  "personalCapacity": null,
+  "exportDate": "2025-12-01T08:44:24.238Z",
+  "version": "2.3",
+  "metadata": {
+    "totalTasks": 5,
+    "totalArchivedTasks": 2,
+    "totalNotes": 14,
+    "totalDailyNotes": 8,
+    "totalEmailNotes": 0,
+    "totalTags": 1,
+    "totalBoards": 0,
+    "totalColumns": 32,
+    "totalPinColumns": 3,
+    "totalNoteLinks": 0,
+    "totalImages": 0,
+    "totalNotifications": 0,
+    "totalEvents": 14,
+    "totalCalendarSources": 1,
+    "hasActiveTimer": false,
+    "hasPersonalCapacity": false,
+    "projectsWithTimebudgets": 0,
+    "appVersion": "2.3",
+    "dataSize": 63925,
+    "exportTime": 1764578664238
+  }
+}

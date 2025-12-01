@@ -173,6 +173,7 @@ export interface User {
   email: string;
   name: string;
   avatar?: string;
+  isAdmin?: boolean;
   createdAt: string;
   lastLoginAt: string;
   profiles: Profile[];

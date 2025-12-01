@@ -3,10 +3,14 @@ import { createPortal } from 'react-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CelebrationProvider } from './context/CelebrationContext';
+import { ToastProvider } from './context/ToastContext';
 import { WelcomeScreen } from './components/Auth/WelcomeScreen';
+import { LoginPage } from './components/Auth/LoginPage';
+import { UserManagement } from './components/Admin/UserManagement';
 import { Sidebar } from './components/Layout/Sidebar';
 import { MobileShell } from './components/Layout/MobileShell';
 import { MobileComingSoon } from './components/Common/MobileComingSoon';
+import { isStandalonePWA } from './utils/device';
 import { Header } from './components/Layout/Header';
 import { TaskBoard } from './components/Tasks/TaskBoard';
 import { InboxView } from './components/Inbox/InboxView';
@@ -39,7 +43,7 @@ import { BulkActionsBar } from './components/Common/BulkActionsBar';
 import { ImageTest } from './components/Common/ImageTest';
 import { FloatingAddButton } from './components/Common/FloatingAddButton';
 import { LoadingSpinner } from './components/Common/LoadingSpinner';
-import { Plus, Home, Inbox, CheckSquare, Columns, FileText, MoreHorizontal } from 'lucide-react';
+import { Plus, Home, Inbox, CheckSquare, Columns, FileText, MoreHorizontal, X } from 'lucide-react';
 import { MaterialIcon } from './components/Common/MaterialIcon';
 import './App.css';
 import { initializeAudioOnUserInteraction } from './utils/soundUtils';
@@ -88,7 +92,7 @@ const hslToHex = (h: number, s: number, l: number) => {
   return `#${f(0)}${f(8)}${f(4)}`;
 };
 
-type ViewType = 'today' | 'tasks' | 'kanban' | 'focus' | 'pins' | 'archive' | 'inbox' | 'statistics' | 'series';
+type ViewType = 'today' | 'tasks' | 'kanban' | 'focus' | 'pins' | 'archive' | 'inbox' | 'statistics' | 'series' | 'admin';
 
 // Column Switcher Component with scroll arrows
 interface ColumnSwitcherProps {
@@ -262,7 +266,11 @@ function MainApp() {
   const [canNavigateNext, setCanNavigateNext] = React.useState(true);
   
   const { state, dispatch } = useApp();
+  const { state: authState } = useAuth();
   const { t, i18n } = useTranslation();
+  
+  // Check if we're in online mode (not guest mode) - backup only relevant for guest mode
+  const isOnlineMode = authState.isOnlineMode;
 
   // Ensure i18n reflects stored preference (single source of truth)
   React.useEffect(() => {
@@ -467,10 +475,9 @@ function MainApp() {
         } else if (action === 'stop-all') {
           // Stop task timer AND reset Pomodoro
           dispatch({ type: 'STOP_TIMER' });
-          timerService.stopPomodoroSession();
+          // Note: Pomodoro session handled separately
         } else if (action === 'skip-pomodoro') {
-          // Skip pomodoro phase
-          timerService.skipPomodoroPhase();
+          // Skip pomodoro phase - handled by Pomodoro component
         }
       };
 
@@ -581,10 +588,9 @@ function MainApp() {
           } else if (action === 'stop-all') {
             // Stop task timer AND reset Pomodoro
             dispatch({ type: 'STOP_TIMER' });
-            timerService.stopPomodoroSession();
+            // Note: Pomodoro session handled separately
           } else if (action === 'skip-pomodoro') {
-            // Skip pomodoro phase
-            timerService.skipPomodoroPhase();
+            // Skip pomodoro phase - handled by Pomodoro component
           }
         }
       };
@@ -940,6 +946,8 @@ function MainApp() {
         );
       case 'imagetest':
         return <ImageTest />;
+      case 'admin':
+        return <UserManagement />;
       default:
         return <SimpleTodayView />;
     }
@@ -1257,7 +1265,11 @@ function MainApp() {
             setSelectedTaskForModal(null);
           };
           const handleOpenBackupSetup = () => {
-            setShowBackupSetup(true);
+            // Only open backup setup in guest mode (not online mode)
+            const jwt = sessionStorage.getItem('taskfuchs_jwt');
+            if (!jwt) {
+              setShowBackupSetup(true);
+            }
           };
           window.addEventListener('open-task-modal', handleOpenTaskModal as any);
           window.addEventListener('close-task-modal', handleCloseTaskModal);
@@ -1270,8 +1282,11 @@ function MainApp() {
           };
         }, []);
 
-  // Initialize and manage backup service
+  // Initialize and manage backup service (only in guest mode, not online mode)
   React.useEffect(() => {
+    // Skip backup initialization in online mode - data is in the database
+    if (isOnlineMode) return;
+    
     const initBackup = async () => {
       try {
         const { backupService } = await import('./utils/backupService');
@@ -1281,7 +1296,7 @@ function MainApp() {
       }
     };
     initBackup();
-  }, []);
+  }, [isOnlineMode]);
 
   // Automated local JSON backup scheduler using BackupService
   // Store state ref for backup data getter (to avoid re-triggering useEffect on every state change)
@@ -1291,6 +1306,9 @@ function MainApp() {
   }, [state]);
 
   React.useEffect(() => {
+    // Skip auto-backup in online mode - data is in the database
+    if (isOnlineMode) return;
+    
     const setupAutoBackup = async () => {
       try {
         const { backupService } = await import('./utils/backupService');
@@ -1311,7 +1329,7 @@ function MainApp() {
             archivedTasks: (currentState as any).archivedTasks || [],
             columns: currentState.columns,
             tags: currentState.tags,
-            boards: currentState.boards || [],
+            boards: (currentState as any).boards || [],
             preferences: currentState.preferences,
             viewState: (currentState as any).viewState || {},
             projectKanbanColumns: (currentState as any).viewState?.projectKanban?.columns || [],
@@ -1354,8 +1372,8 @@ function MainApp() {
         backupService.stopAutoBackup();
       }).catch(() => {});
     };
-  // Only re-run when backup config changes, NOT when data changes
-  }, [state.preferences.backup?.enabled, state.preferences.backup?.intervalMinutes]);
+  // Only re-run when backup config changes or online mode changes, NOT when data changes
+  }, [state.preferences.backup?.enabled, state.preferences.backup?.intervalMinutes, isOnlineMode]);
 
   // Dropbox auto-sync scheduler
   React.useEffect(() => {
@@ -1370,7 +1388,7 @@ function MainApp() {
     // Start auto-sync
     const startAutoSync = async () => {
       try {
-        const { startAutoSync: start, getDropboxClient } = await import('./utils/dropboxSync');
+        const { startAutoSync: start } = await import('./utils/dropboxSync');
         const { getDropboxClient: getClient } = await import('./utils/dropboxClient');
         
         // Check if authenticated
@@ -1405,8 +1423,8 @@ function MainApp() {
         return null;
       })()}
 
-      {/* Backup Setup Modal */}
-      {showBackupSetup && (
+      {/* Backup Setup Modal - Only show in guest mode (not online mode) */}
+      {!isOnlineMode && showBackupSetup && (
         <BackupSetupModal
           isOpen={true}
           onClose={() => setShowBackupSetup(false)}
@@ -1488,24 +1506,21 @@ function MainApp() {
 
 // App Router Component
 function AppRouter() {
-  const { state } = useAuth();
+  const { state, loginWithMicrosoft } = useAuth();
   
-  // Check if user has used the app before (has saved data in localStorage)
-  const hasUsedAppBefore = React.useMemo(() => {
-    try {
-      // Check for any stored app data that indicates returning user
-      const hasPreferences = localStorage.getItem('taskfuchs-preferences');
-      const hasTasks = localStorage.getItem('taskfuchs-tasks');
-      const hasSeenSplash = localStorage.getItem('taskfuchs-splash-seen');
-      const hasGuestMode = localStorage.getItem('taskfuchs-guest-mode');
-      return !!(hasPreferences || hasTasks || hasSeenSplash || hasGuestMode);
-    } catch {
-      return false;
+  // Detect if running as PWA (installed app) vs web browser
+  const isPWA = React.useMemo(() => isStandalonePWA(), []);
+  
+  // Check if user explicitly chose guest mode this session
+  // PWA always starts in guest mode (no login required)
+  const [guestMode, setGuestMode] = React.useState(() => {
+    // PWA mode: always guest mode by default
+    if (isPWA) {
+      return true;
     }
-  }, []);
-  
-  // Auto-enter guest mode for returning users
-  const [guestMode, setGuestMode] = React.useState(hasUsedAppBefore);
+    // Web mode: check localStorage for explicit guest mode
+    return localStorage.getItem('taskfuchs-guest-mode') === 'true';
+  });
 
   // Handle guest mode
   const handleGuestMode = () => {
@@ -1515,30 +1530,75 @@ function AppRouter() {
     setGuestMode(true);
   };
 
-  // Show welcome screen ONLY for first-time users who are not authenticated
-  if (!state.isAuthenticated && !guestMode) {
-    return <WelcomeScreen onGuestMode={handleGuestMode} />;
+  // Handle going online from guest mode
+  const handleGoOnline = () => {
+    loginWithMicrosoft();
+  };
+
+  // Listen for logout events to exit guest mode and show login
+  React.useEffect(() => {
+    const handleLogout = () => {
+      // In PWA mode, stay in guest mode after logout
+      if (isPWA) {
+        return;
+      }
+      // In web mode, clear guest mode flag to show login page
+      localStorage.removeItem('taskfuchs-guest-mode');
+      setGuestMode(false);
+    };
+    
+    window.addEventListener('auth:logout', handleLogout);
+    return () => window.removeEventListener('auth:logout', handleLogout);
+  }, [isPWA]);
+
+  // Check if on auth callback - LoginPage will handle showing loading state
+  const isAuthCallback = window.location.pathname === '/auth/callback';
+
+  // If authenticated (online mode), show main app
+  if (state.isOnlineMode) {
+    return (
+      <AppProvider>
+        <CelebrationProvider>
+          <MainApp />
+        </CelebrationProvider>
+      </AppProvider>
+    );
   }
 
-  // Show main app if authenticated or in guest mode (including returning users)
+  // In web browser mode (not PWA): show login page if not explicitly in guest mode
+  // PWA mode: always skip login page, go directly to guest mode
+  if (!guestMode && !isPWA) {
+    return <LoginPage isProcessingCallback={isAuthCallback} />;
+  }
+
+  // Show main app in guest mode (localStorage only) with "Go Online" context
+  // Note: In PWA mode, the "Go Online" button in sidebar allows switching to online mode
   return (
-    <AppProvider>
-      <CelebrationProvider>
-        <MainApp />
-      </CelebrationProvider>
-    </AppProvider>
+    <GuestModeContext.Provider value={{ goOnline: handleGoOnline }}>
+      <AppProvider>
+        <CelebrationProvider>
+          <MainApp />
+        </CelebrationProvider>
+      </AppProvider>
+    </GuestModeContext.Provider>
   );
 }
+
+// Context for guest mode "Go Online" functionality
+const GuestModeContext = React.createContext<{ goOnline: () => void } | null>(null);
+export const useGuestMode = () => React.useContext(GuestModeContext);
 
 // Root App Component
 function App() {
   // PWA update handling moved to main.tsx (no hook usage here)
 
   return (
-    <AuthProvider>
-      {/* No custom update banner: manual reload activates latest SW (skipWaiting+clientsClaim) */}
-      <AppRouter />
-    </AuthProvider>
+    <ToastProvider>
+      <AuthProvider>
+        {/* No custom update banner: manual reload activates latest SW (skipWaiting+clientsClaim) */}
+        <AppRouter />
+      </AuthProvider>
+    </ToastProvider>
   );
 }
 

@@ -28,9 +28,16 @@ dist-electron/
 *.rpm
 *.snap
 
-# Env
+# Env (keep .env.*.example files as templates)
 .env
-.env.*
+.env.local
+.env.development
+.env.production
+!.env.example
+!.env.docker.example
+
+# ngrok config (contains secrets)
+ngrok.yml
 
 # Backups & temp
 *.bak

@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { X, Archive, ArrowRight, Clock, CheckCircle, AlertCircle, Cloud, Upload, Wifi, WifiOff, HardDrive, FolderOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
 import { syncManager, SyncLogEntry, SyncStats } from '../../utils/syncUtils';
 import type { Task, SyncStatus } from '../../types';
 import { format, nextMonday, addDays, isFriday } from 'date-fns';
@@ -39,12 +40,16 @@ const getSkillLevels = (language: string) => ({
 
 export function EndOfDayModal({ isOpen, onClose }: EndOfDayModalProps) {
   const { state, dispatch } = useApp();
+  const { state: authState } = useAuth();
   const { i18n } = useTranslation();
   const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
   const [showMoveConfirm, setShowMoveConfirm] = useState(false);
   const canDropbox = state.preferences.dropbox?.enabled;
   const [eodUploading, setEodUploading] = useState(false);
   const [eodUploadMsg, setEodUploadMsg] = useState('');
+  
+  // Check if we're in online mode (not guest mode) - backup only relevant for guest mode
+  const isOnlineMode = authState.isOnlineMode;
   
   // Local backup state
   const [localBackupSaving, setLocalBackupSaving] = useState(false);
@@ -548,51 +553,53 @@ export function EndOfDayModal({ isOpen, onClose }: EndOfDayModalProps) {
               </div>
             )}
 
-            {/* Local Backup Section */}
-            <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200/50 dark:border-gray-700/50">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={getAccentColorStyles().bgLight}>
-                  <HardDrive className="w-4 h-4" style={getAccentColorStyles().text} />
-                </div>
-                <div>
-                  <div className="text-sm font-medium text-gray-900 dark:text-white">
-                    {i18n.language === 'en' ? 'Local Backup' : 'Lokales Backup'}
+            {/* Local Backup Section - Only show in guest mode (not online mode) */}
+            {!isOnlineMode && (
+              <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200/50 dark:border-gray-700/50">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={getAccentColorStyles().bgLight}>
+                    <HardDrive className="w-4 h-4" style={getAccentColorStyles().text} />
                   </div>
-                  {localBackupMsg ? (
-                    <div className="text-xs" style={getAccentColorStyles().text}>{localBackupMsg}</div>
-                  ) : !hasBackupDir ? (
-                    <div className="text-xs text-amber-600 dark:text-amber-400">
-                      {i18n.language === 'en' ? 'No backup folder set' : 'Kein Backup-Ordner gewählt'}
+                  <div>
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">
+                      {i18n.language === 'en' ? 'Local Backup' : 'Lokales Backup'}
                     </div>
-                  ) : (
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
-                      {state.preferences.backup?.lastSuccess 
-                        ? `${i18n.language === 'en' ? 'Last:' : 'Zuletzt:'} ${format(new Date(state.preferences.backup.lastSuccess), 'dd.MM. HH:mm')}`
-                        : (i18n.language === 'en' ? 'No backup yet' : 'Noch kein Backup')
-                      }
-                    </div>
-                  )}
+                    {localBackupMsg ? (
+                      <div className="text-xs" style={getAccentColorStyles().text}>{localBackupMsg}</div>
+                    ) : !hasBackupDir ? (
+                      <div className="text-xs text-amber-600 dark:text-amber-400">
+                        {i18n.language === 'en' ? 'No backup folder set' : 'Kein Backup-Ordner gewählt'}
+                      </div>
+                    ) : (
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        {state.preferences.backup?.lastSuccess 
+                          ? `${i18n.language === 'en' ? 'Last:' : 'Zuletzt:'} ${format(new Date(state.preferences.backup.lastSuccess), 'dd.MM. HH:mm')}`
+                          : (i18n.language === 'en' ? 'No backup yet' : 'Noch kein Backup')
+                        }
+                      </div>
+                    )}
+                  </div>
                 </div>
+                <button
+                  onClick={handleLocalBackup}
+                  disabled={localBackupSaving}
+                  className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-all hover:opacity-90 hover:shadow-md disabled:opacity-60"
+                  style={getAccentColorStyles().bg}
+                >
+                  {hasBackupDir ? (
+                    <>
+                      <HardDrive className="w-4 h-4 mr-2 inline" />
+                      {localBackupSaving ? (i18n.language === 'en' ? 'Saving…' : 'Speichern…') : (i18n.language === 'en' ? 'Save Backup' : 'Backup speichern')}
+                    </>
+                  ) : (
+                    <>
+                      <FolderOpen className="w-4 h-4 mr-2 inline" />
+                      {i18n.language === 'en' ? 'Setup' : 'Einrichten'}
+                    </>
+                  )}
+                </button>
               </div>
-              <button
-                onClick={handleLocalBackup}
-                disabled={localBackupSaving}
-                className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-all hover:opacity-90 hover:shadow-md disabled:opacity-60"
-                style={getAccentColorStyles().bg}
-              >
-                {hasBackupDir ? (
-                  <>
-                    <HardDrive className="w-4 h-4 mr-2 inline" />
-                    {localBackupSaving ? (i18n.language === 'en' ? 'Saving…' : 'Speichern…') : (i18n.language === 'en' ? 'Save Backup' : 'Backup speichern')}
-                  </>
-                ) : (
-                  <>
-                    <FolderOpen className="w-4 h-4 mr-2 inline" />
-                    {i18n.language === 'en' ? 'Setup' : 'Einrichten'}
-                  </>
-                )}
-              </button>
-            </div>
+            )}
 
             {/* Dropbox Upload small card (placed after local backup) */}
             {canDropbox && (

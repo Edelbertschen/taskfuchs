@@ -3,6 +3,47 @@
     "name": "TaskFuchs",
     "tagline": "Your smart task management"
   },
+  "auth": {
+    "user": "User",
+    "logout": "Sign Out",
+    "signOut": "Sign Out"
+  },
+  "admin": {
+    "userManagement": "User Management",
+    "manageAllUsers": "Manage all online users",
+    "accessDenied": "Access Denied",
+    "adminRequired": "You need admin privileges to view this page.",
+    "totalUsers": "Users",
+    "totalTasks": "Tasks",
+    "totalProjects": "Projects",
+    "totalNotes": "Notes",
+    "active7Days": "Active (7d)",
+    "active30Days": "Active (30d)",
+    "searchUsers": "Search users...",
+    "user": "User",
+    "stats": "Statistics",
+    "created": "Created",
+    "lastLogin": "Last Login",
+    "actions": "Actions",
+    "noUsersFound": "No users found",
+    "noUsers": "No users yet",
+    "confirmDelete": "Delete user?",
+    "deleteWarning": "This action cannot be undone. All user data will be deleted.",
+    "revokeAdmin": "Revoke admin privileges",
+    "makeAdmin": "Make admin",
+    "deleteUser": "Delete user"
+  },
+  "login": {
+    "subtitle": "Smart task management",
+    "signInWithMicrosoft": "Sign in with Microsoft",
+    "signingIn": "Signing in..."
+  },
+  "features": {
+    "tasks": "Tasks",
+    "kanban": "Kanban",
+    "timer": "Timer",
+    "notes": "Notes"
+  },
   "navigation": {
     "tasks": "Tasks",
     "kanban": "Kanban",
@@ -417,7 +458,7 @@
         "description": "Sounds & behavior"
       },
       "timer": {
-        "title": "Timer",
+        "title": "Time Tracking",
         "description": "Timer settings"
       },
       "integrations": {
@@ -443,6 +484,10 @@
       "privacy": {
         "title": "Privacy",
         "description": "Security & privacy"
+      },
+      "information": {
+        "title": "Information",
+        "description": "Privacy & Performance"
       }
     },
     "integrations": {
@@ -1697,7 +1742,52 @@
   "header": {
     "settings": "Settings",
     "user_guide": "User Guide",
-    "onboarding_tour": "Onboarding Tour"
+    "onboarding_tour": "Onboarding Tour",
+    "logout_confirm": "Do you really want to sign out?",
+    "task_due": "Task Due",
+    "task_due_message": "\"{title}\" is due now!",
+    "no_overdue_tasks": "No overdue tasks",
+    "all_tasks_current": "All tasks are up to date.",
+    "tasks_moved": "Tasks moved",
+    "overdue_moved_message": "{count} overdue tasks have been moved to today.",
+    "today": "Today",
+    "date_select": "Select date",
+    "notes_show_details": "Show note details",
+    "notes_hide_details": "Hide note details",
+    "project_tasks_show": "Show project tasks",
+    "project_tasks_hide": "Hide project tasks",
+    "move_overdue_tasks_tooltip": "Move {{count}} overdue tasks to today",
+    "overdue_tasks": "{{count}} Overdue",
+    "search": "Search",
+    "search_placeholder": {
+      "settings": "Search settings...",
+      "general": "Search tasks and notes...",
+      "c": "Search tasks and notes..."
+    },
+    "search_results": {
+      "tasks": "Tasks ({count})",
+      "notes": "Notes ({count})"
+    },
+    "filter": "Filter",
+    "filter_close": "Close filter",
+    "move_overdue": "Move {count} overdue tasks to today",
+    "completed_tasks": "Completed",
+    "completed_show": "Show completed",
+    "completed_hide": "Hide completed",
+    "completed_tasks_show": "Show completed tasks",
+    "completed_tasks_hide": "Hide completed tasks",
+    "completed_tasks_toggle_tooltip": "Toggle completed tasks visibility",
+    "events": "Events",
+    "events_show": "Show events",
+    "events_hide": "Hide events",
+    "events_show_tooltip": "Show calendar events",
+    "events_hide_tooltip": "Hide calendar events",
+    "events_toggle_tooltip": "Toggle events visibility",
+    "bulk_mode": "Multi-select",
+    "bulk_mode_start": "Start multi-select",
+    "bulk_mode_end": "End multi-select",
+    "organize_columns": "Organize columns",
+    "export_planner": "Export planner"
   },
   "landing_page": {
     "tagline": "Your smart helper for focused work.",

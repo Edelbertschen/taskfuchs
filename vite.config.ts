@@ -183,9 +183,14 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true,
-    // Faster HMR
+    // Allow custom domain access via ngrok
+    allowedHosts: ['taskfuchs.unique-landuse.de', 'localhost', '.ngrok.io', '.ngrok-free.app'],
+    // HMR configuration for external access
     hmr: {
-      overlay: false
+      overlay: false,
+      // Use the client's host for HMR WebSocket (needed for ngrok)
+      clientPort: 443,
+      protocol: 'wss'
     },
     // Better caching
     fs: {
@@ -197,18 +202,39 @@ export default defineConfig({
     watch: {
       ignored: ['**/superproductivity/**', '**/node_modules/**']
     },
-    // Proxy for Toggl API to avoid CORS issues
+    // Proxy configuration (more specific routes first!)
     proxy: {
+      // Proxy for Toggl API to avoid CORS issues (must be before /api)
       '/api/toggl': {
         target: 'https://api.track.toggl.com',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/toggl/, ''),
         configure: (proxy) => {
           proxy.on('error', (err) => {
-            console.log('Proxy error:', err);
+            console.log('Toggl Proxy error:', err);
           });
           proxy.on('proxyReq', (proxyReq) => {
             proxyReq.setHeader('User-Agent', 'TaskFuchs/1.0');
+          });
+        }
+      },
+      // Proxy all /api requests to the backend server
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        secure: false,
+        ws: true, // Enable WebSocket proxying
+        configure: (proxy) => {
+          proxy.on('error', (err, req, res) => {
+            console.log('API Proxy error:', err.message);
+            // Send error response if possible (res can be Socket or ServerResponse)
+            if (res && 'writeHead' in res && !res.headersSent) {
+              res.writeHead(502, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ error: 'Backend server not reachable' }));
+            }
+          });
+          proxy.on('proxyReq', (proxyReq, req) => {
+            console.log('Proxying:', req.method, req.url);
           });
         }
       }

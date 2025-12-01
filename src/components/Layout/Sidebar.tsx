@@ -26,8 +26,13 @@ import {
   Cloud,
   CloudOff,
   ChevronDown,
+  Users,
+  LogOut,
+  Settings,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
+import { useGuestMode } from '../../App';
 import { EndOfDayModal } from '../Common/EndOfDayModal';
 import { getAssetVersion } from '../../utils/imageUtils';
 import { PlannerAssignmentModal } from '../Common/PlannerAssignmentModal';
@@ -42,6 +47,9 @@ interface SidebarProps {
 export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: SidebarProps) {
   const { t } = useTranslation();
   const { state, dispatch } = useApp();
+  const { state: authState, logout } = useAuth();
+  const guestModeContext = useGuestMode();
+  const isGuestMode = !authState.isOnlineMode;
   const [showEndOfDayModal, setShowEndOfDayModal] = useState(false);
   const [showPlannerModal, setShowPlannerModal] = useState(false);
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
@@ -120,7 +128,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
     setDropboxSyncMessage('Synchronisiere...');
     
     try {
-      const { dropboxSync, getDropboxClient } = await import('../../utils/dropboxSync');
+      const { dropboxSync } = await import('../../utils/dropboxSync');
       const { getDropboxClient: getClient } = await import('../../utils/dropboxClient');
       
       const prefs = state.preferences.dropbox;
@@ -204,7 +212,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
         archivedTasks: state.archivedTasks || [],
         columns: state.columns,
         tags: state.tags,
-        boards: state.boards || [],
+        boards: (state as any).boards || [],
         preferences: state.preferences,
         viewState: state.viewState || {},
         projectKanbanColumns: state.viewState?.projectKanban?.columns || [],
@@ -528,8 +536,16 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
       icon: Archive,
       active: activeView === 'archive',
       onClick: () => onViewChange('archive')
-    }
-  ], [activeView, onViewChange, t, handleTasksClick, isPlannerDropActive]);
+    },
+    // Admin only item - conditionally rendered
+    ...(authState.isAdmin ? [{
+      id: 'admin',
+      label: t('navigation.admin', 'Admin'),
+      icon: Users,
+      active: activeView === 'admin',
+      onClick: () => onViewChange('admin')
+    }] : [])
+  ], [activeView, onViewChange, t, handleTasksClick, isPlannerDropActive, authState.isAdmin]);
 
   // Filter and order navigation items based on preferences
   const navigationItems = (() => {
@@ -649,8 +665,9 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                     window.dispatchEvent(new CustomEvent('navigate-to-settings'));
                     setShowPlannerUserMenu(false);
                   }}
-                  className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3"
                 >
+                  <Settings className="w-4 h-4" />
                   {t('header.settings')}
                 </button>
                 <button
@@ -658,10 +675,39 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                     window.dispatchEvent(new CustomEvent('start-onboarding'));
                     setShowPlannerUserMenu(false);
                   }}
-                  className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3"
                 >
+                  <Sparkles className="w-4 h-4" />
                   {t('header.onboarding_tour')}
                 </button>
+                
+                {/* Divider */}
+                <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+                
+                {/* Sign Out / Go Online */}
+                {isGuestMode ? (
+                  <button
+                    onClick={() => {
+                      guestModeContext?.goOnline();
+                      setShowPlannerUserMenu(false);
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3"
+                  >
+                    <Cloud className="w-4 h-4" />
+                    {t('auth.goOnline', 'Mit Microsoft anmelden')}
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      logout();
+                      setShowPlannerUserMenu(false);
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    {t('auth.logout', 'Abmelden')}
+                  </button>
+                )}
               </div>
             </div>,
             document.body
@@ -826,71 +872,74 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
           </div>
         </nav>
 
-        {/* Bottom section (Backup) */}
-        <div className="sidebar-content px-2 pb-4">
-          {canLocalBackup && (
-            <div className="mt-2 flex flex-col items-center px-1">
-              <button 
-                onClick={handleManualBackup}
-                onContextMenu={handleBackupContextMenu}
-                disabled={backupRunning}
-                data-backup-button
-                className={`
-                  relative w-10 h-10 rounded-full flex items-center justify-center 
-                  transition-all duration-200
-                  ${backupButtonPressed ? 'scale-90' : 'scale-100'}
-                  ${backupRunning ? 'animate-pulse' : ''}
-                  ${showBackupSuccess
-                    ? 'bg-green-500 text-white'
-                    : isDarkMode
-                      ? 'bg-gray-700/50 hover:bg-gray-600/60 text-gray-400 hover:text-gray-300'
-                      : 'bg-gray-200/60 hover:bg-gray-300/70 text-gray-500 hover:text-gray-600'
-                  }
-                  focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2
-                  dark:focus:ring-offset-gray-900
-                `}
-                title={`${t('backup.manual_backup') || 'Backup jetzt sichern'}${backupDirName ? ` (${backupDirName})` : ''}`} 
-                aria-label={t('backup.manual_backup') || 'Backup jetzt sichern'}
-              >
-                <HardDrive className="w-5 h-5" />
-              </button>
-            </div>
-          )}
-          {/* Backup Warning Icon - show when backup is not configured */}
-          {!canLocalBackup && (
-            <div className="mt-2 flex items-center justify-center px-1">
-              <button 
-                onClick={() => window.dispatchEvent(new CustomEvent('open-backup-setup'))}
-                onContextMenu={handleBackupContextMenu}
-                className={`
-                  relative w-10 h-10 rounded-full flex items-center justify-center 
-                  transition-all duration-200 hover:scale-105
-                  ${state.preferences.design?.mode === 'minimal'
-                    ? 'bg-amber-500 hover:bg-amber-600 text-white'
-                    : isDarkMode
-                      ? 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-400'
-                      : 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-600'
-                  }
-                  focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2
-                  dark:focus:ring-offset-gray-900
-                  animate-pulse
-                `}
-                title={t('backup.setup_backup') || 'Backup einrichten'} 
-                aria-label={t('backup.setup_backup') || 'Backup einrichten'}
-              >
-                <AlertTriangle className="w-5 h-5" />
-              </button>
-            </div>
-          )}
-        </div>
+        {/* Bottom section (Backup) - Only show in guest mode, not in online mode */}
+        {isGuestMode && (
+          <div className="sidebar-content px-2 pb-4">
+            {canLocalBackup && (
+              <div className="mt-2 flex flex-col items-center px-1">
+                <button 
+                  onClick={handleManualBackup}
+                  onContextMenu={handleBackupContextMenu}
+                  disabled={backupRunning}
+                  data-backup-button
+                  className={`
+                    relative w-10 h-10 rounded-full flex items-center justify-center 
+                    transition-all duration-200
+                    ${backupButtonPressed ? 'scale-90' : 'scale-100'}
+                    ${backupRunning ? 'animate-pulse' : ''}
+                    ${showBackupSuccess
+                      ? 'bg-green-500 text-white'
+                      : isDarkMode
+                        ? 'bg-gray-700/50 hover:bg-gray-600/60 text-gray-400 hover:text-gray-300'
+                        : 'bg-gray-200/60 hover:bg-gray-300/70 text-gray-500 hover:text-gray-600'
+                    }
+                    focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2
+                    dark:focus:ring-offset-gray-900
+                  `}
+                  title={`${t('backup.manual_backup') || 'Backup jetzt sichern'}${backupDirName ? ` (${backupDirName})` : ''}`} 
+                  aria-label={t('backup.manual_backup') || 'Backup jetzt sichern'}
+                >
+                  <HardDrive className="w-5 h-5" />
+                </button>
+              </div>
+            )}
+            {/* Backup Warning Icon - show when backup is not configured */}
+            {!canLocalBackup && (
+              <div className="mt-2 flex items-center justify-center px-1">
+                <button 
+                  onClick={() => window.dispatchEvent(new CustomEvent('open-backup-setup'))}
+                  onContextMenu={handleBackupContextMenu}
+                  className={`
+                    relative w-10 h-10 rounded-full flex items-center justify-center 
+                    transition-all duration-200 hover:scale-105
+                    ${(state.preferences as any).design?.mode === 'minimal'
+                      ? 'bg-amber-500 hover:bg-amber-600 text-white'
+                      : isDarkMode
+                        ? 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-400'
+                        : 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-600'
+                    }
+                    focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2
+                    dark:focus:ring-offset-gray-900
+                    animate-pulse
+                  `}
+                  title={t('backup.setup_backup') || 'Backup einrichten'} 
+                  aria-label={t('backup.setup_backup') || 'Backup einrichten'}
+                >
+                  <AlertTriangle className="w-5 h-5" />
+                </button>
+              </div>
+            )}
+
+          </div>
+        )}
 
       </div>
 
 
 
       
-      {/* Backup Context Menu */}
-      {backupContextMenu && createPortal(
+      {/* Backup Context Menu - Only show in guest mode */}
+      {isGuestMode && backupContextMenu && createPortal(
         <div 
           className="fixed z-[99999] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-1 min-w-[180px] animate-in fade-in zoom-in-95 duration-150"
           style={{ 

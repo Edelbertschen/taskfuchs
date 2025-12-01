@@ -4,7 +4,45 @@
     "tagline": "Deine smarte Aufgabenverwaltung"
   },
   "auth": {
-    "user": "Benutzer"
+    "user": "Benutzer",
+    "logout": "Abmelden",
+    "signOut": "Abmelden"
+  },
+  "admin": {
+    "userManagement": "Benutzerverwaltung",
+    "manageAllUsers": "Verwalten Sie alle Online-Benutzer",
+    "accessDenied": "Zugriff verweigert",
+    "adminRequired": "Sie benötigen Admin-Rechte, um diese Seite zu sehen.",
+    "totalUsers": "Benutzer",
+    "totalTasks": "Aufgaben",
+    "totalProjects": "Projekte",
+    "totalNotes": "Notizen",
+    "active7Days": "Aktiv (7d)",
+    "active30Days": "Aktiv (30d)",
+    "searchUsers": "Benutzer suchen...",
+    "user": "Benutzer",
+    "stats": "Statistiken",
+    "created": "Erstellt",
+    "lastLogin": "Letzter Login",
+    "actions": "Aktionen",
+    "noUsersFound": "Keine Benutzer gefunden",
+    "noUsers": "Noch keine Benutzer vorhanden",
+    "confirmDelete": "Benutzer löschen?",
+    "deleteWarning": "Diese Aktion kann nicht rückgängig gemacht werden. Alle Daten des Benutzers werden gelöscht.",
+    "revokeAdmin": "Admin-Rechte entziehen",
+    "makeAdmin": "Zum Admin machen",
+    "deleteUser": "Benutzer löschen"
+  },
+  "login": {
+    "subtitle": "Intelligente Aufgabenverwaltung",
+    "signInWithMicrosoft": "Mit Microsoft anmelden",
+    "signingIn": "Anmelden..."
+  },
+  "features": {
+    "tasks": "Aufgaben",
+    "kanban": "Kanban",
+    "timer": "Timer",
+    "notes": "Notizen"
   },
   "navigation": {
     "tasks": "Aufgaben",
@@ -420,7 +458,7 @@
         "description": "Sounds & Verhalten"
       },
       "timer": {
-        "title": "Timer",
+        "title": "Zeiterfassung",
         "description": "Timer-Einstellungen"
       },
       "integrations": {
@@ -446,6 +484,10 @@
       "privacy": {
         "title": "Datenschutz",
         "description": "Sicherheit & Privatsphäre"
+      },
+      "information": {
+        "title": "Informationen",
+        "description": "Datenschutz & Performance"
       }
     },
     "integrations": {
@@ -576,7 +618,10 @@
     "show_project_sidebar": "Projektsidebar einblenden",
     "hide_project_sidebar": "Projektsidebar ausblenden",
     "organize_columns": "Spalten organisieren",
-    "export_planner": "Planer exportieren"
+    "export_planner": "Planer exportieren",
+    "bulk_mode": "Mehrfachauswahl",
+    "bulk_mode_start": "Mehrfachauswahl starten",
+    "bulk_mode_end": "Mehrfachauswahl beenden"
   },
   "actions": {
     "edit": "Bearbeiten",

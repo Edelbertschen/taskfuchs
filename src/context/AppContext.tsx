@@ -7,6 +7,13 @@ import { notificationService } from '../utils/notificationService';
 import { loadImageStorage, saveImageStorage, updateImageUsage, cleanupUnusedImages, parseImageReferences } from '../utils/imageStorage';
 import { recurrenceService } from '../utils/recurrenceService';
 import { initializeRecurringTaskMaintenance } from '../utils/recurringTaskService';
+import { syncAPI, preferencesAPI, viewStateAPI, tasksAPI, columnsAPI, tagsAPI, notesAPI, pinColumnsAPI, calendarAPI } from '../services/apiService';
+import { showGlobalError } from './ToastContext';
+
+// Check if we're in online mode (has JWT token)
+function isOnlineMode(): boolean {
+  return !!sessionStorage.getItem('taskfuchs_jwt');
+}
 
 
 interface AppState {
@@ -315,6 +322,8 @@ const initialState: AppState = {
     },
     // End-of-day feature
     enableEndOfDay: true,
+    // Focus mode setting
+    enableFocusMode: false,
     // Timer settings
     timer: {
       showOverlay: true,
@@ -3056,11 +3065,98 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Load data from localStorage on initialization and setup columns
+  // Load data from localStorage OR database on initialization and setup columns
   useEffect(() => {
     let loadedColumns: Column[] = [];
     let isNewUser = false;
     
+    // If online mode, fetch from API
+    if (isOnlineMode()) {
+      console.log('[AppContext] Online mode detected, fetching from database...');
+      syncAPI.getFullData()
+        .then((data) => {
+          console.log('[AppContext] Data loaded from database:', data);
+          
+          if (data.tasks) {
+            dispatch({ type: 'SET_TASKS', payload: data.tasks });
+          }
+          if (data.archivedTasks) {
+            dispatch({ type: 'SET_ARCHIVED_TASKS', payload: data.archivedTasks });
+          }
+          if (data.columns) {
+            loadedColumns = data.columns;
+          }
+          if (data.tags) {
+            dispatch({ type: 'SET_TAGS', payload: data.tags });
+          }
+          if (data.notes) {
+            dispatch({ type: 'SET_NOTES', payload: data.notes });
+          }
+          if (data.pinColumns) {
+            dispatch({ type: 'SET_PIN_COLUMNS', payload: data.pinColumns });
+          }
+          if (data.calendarSources) {
+            dispatch({ type: 'SET_CALENDAR_SOURCES', payload: data.calendarSources });
+          }
+          if (data.events) {
+            dispatch({ type: 'SET_EVENTS', payload: data.events });
+          }
+          if (data.preferences) {
+            dispatch({ type: 'UPDATE_PREFERENCES', payload: data.preferences });
+          }
+          if (data.viewState) {
+            // Direct state update for viewState
+            state.viewState = { ...state.viewState, ...data.viewState };
+          }
+          
+          // Generate and merge columns
+          const today = startOfDay(new Date());
+          const dateColumns: Column[] = [];
+          for (let i = 0; i < 30; i++) {
+            const date = addDays(today, i);
+            const dateStr = format(date, 'yyyy-MM-dd');
+            dateColumns.push({
+              id: `date-${dateStr}`,
+              title: format(date, 'dd.MM.yyyy'),
+              type: 'date',
+              date: dateStr,
+              order: i + 1,
+              tasks: [],
+            });
+          }
+          
+          const existingProjectColumns = loadedColumns.filter(col => col.type === 'project');
+          const finalColumns = [...dateColumns, ...existingProjectColumns];
+          dispatch({ type: 'SET_COLUMNS', payload: finalColumns });
+          
+          // Mark that we just loaded from DB - delay to let state settle
+          justLoadedFromDB.current = true;
+          setTimeout(() => {
+            // Initialize refs with loaded data and enable sync
+            prevTaskIds.current = new Set(data.tasks?.map((t: any) => t.id) || []);
+            prevArchivedTaskIds.current = new Set(data.archivedTasks?.map((t: any) => t.id) || []);
+            prevColumnIds.current = new Set(existingProjectColumns.map(c => c.id));
+            prevTagIds.current = new Set(data.tags?.map((t: any) => t.id) || []);
+            prevNoteIds.current = new Set(data.notes?.map((n: any) => n.id) || []);
+            prevPinColumnIds.current = new Set(data.pinColumns?.map((p: any) => p.id) || []);
+            
+            initialLoadComplete.current = true;
+            justLoadedFromDB.current = false;
+            console.log('[AppContext] DB load complete, sync effects enabled');
+          }, 500);
+        })
+        .catch((error) => {
+          console.error('[AppContext] Error loading from database:', error);
+          showGlobalError(`Failed to load data from server: ${error.message || 'Connection error'}`);
+          // Still mark as complete on error so app isn't stuck
+          initialLoadComplete.current = true;
+        });
+      
+      return; // Exit early for online mode
+    }
+    
+    // Guest mode: Load from localStorage
+    console.log('[AppContext] Guest mode, loading from localStorage...');
     try {
       const savedTasks = localStorage.getItem('taskfuchs-tasks');
       const savedArchivedTasks = localStorage.getItem('taskfuchs-archived-tasks');
@@ -3266,6 +3362,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     dispatch({ type: 'SET_COLUMNS', payload: finalColumns });
     
+    // For guest mode, mark initial load complete after a delay
+    if (!isOnlineMode()) {
+      setTimeout(() => {
+        prevTaskIds.current = new Set(state.tasks.map(t => t.id));
+        prevArchivedTaskIds.current = new Set(state.archivedTasks.map(t => t.id));
+        prevColumnIds.current = new Set(finalColumns.filter(c => c.type === 'project').map(c => c.id));
+        prevTagIds.current = new Set(state.tags.map(t => t.id));
+        prevNoteIds.current = new Set(state.notes.notes.map(n => n.id));
+        prevPinColumnIds.current = new Set(state.pinColumns.map(p => p.id));
+        
+        initialLoadComplete.current = true;
+        console.log('[AppContext] Guest mode load complete, save effects enabled');
+      }, 500);
+    }
+    
     // Initialize recurring task maintenance after a delay to ensure all data is loaded
     setTimeout(() => {
       initializeRecurringTaskMaintenance(state.tasks, (updatedTasks) => {
@@ -3279,24 +3390,155 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }, 1000);
   }, []);
 
-  // Save data to localStorage whenever state changes
+  // Track if initial load is complete to avoid saving during load
+  const initialLoadComplete = useRef(false);
+  
+  // Track if we just loaded from database to prevent re-syncing
+  const justLoadedFromDB = useRef(false);
+  
+  // Track previous state for content-aware change detection (for online mode)
+  // Using JSON strings to detect ANY changes, not just ID additions/removals
+  const prevTasksJson = useRef<string>('');
+  const prevArchivedTasksJson = useRef<string>('');
+  const prevColumnsJson = useRef<string>('');
+  const prevTagsJson = useRef<string>('');
+  const prevNotesJson = useRef<string>('');
+  const prevPinColumnsJson = useRef<string>('');
+  // Also track IDs separately for deletion detection
+  const prevTaskIds = useRef<Set<string>>(new Set());
+  const prevArchivedTaskIds = useRef<Set<string>>(new Set());
+  const prevColumnIds = useRef<Set<string>>(new Set());
+  const prevTagIds = useRef<Set<string>>(new Set());
+  const prevNoteIds = useRef<Set<string>>(new Set());
+  const prevPinColumnIds = useRef<Set<string>>(new Set());
+  
+
+  // Save data to localStorage OR database whenever state changes
   useEffect(() => {
-    try {
-      localStorage.setItem('taskfuchs-tasks', JSON.stringify(state.tasks));
-    } catch (error) {
-      console.error('Error saving tasks to localStorage:', error);
+    if (!initialLoadComplete.current) return;
+    if (justLoadedFromDB.current) return; // Don't re-sync data we just loaded
+    
+    if (isOnlineMode()) {
+      const currentTaskIds = new Set(state.tasks.map(t => t.id));
+      
+      // Find deleted tasks (were in previous state but not in current)
+      const deletedTaskIds = [...prevTaskIds.current].filter(id => !currentTaskIds.has(id));
+      
+      // Delete removed tasks from database
+      if (deletedTaskIds.length > 0) {
+        console.log('[AppContext] Deleting tasks from database:', deletedTaskIds);
+        Promise.all(deletedTaskIds.map(id => 
+          tasksAPI.delete(id).catch(err => {
+            // Ignore 404 errors (task may not exist in DB yet)
+            if (!err.message?.includes('not found')) {
+              console.error(`[AppContext] Error deleting task ${id}:`, err);
+            }
+          })
+        ));
+      }
+      
+      // Create JSON snapshot for content-aware change detection
+      // This detects ANY changes including completed status, title, etc.
+      const currentTasksJson = JSON.stringify(state.tasks.map(t => ({
+        id: t.id,
+        title: t.title,
+        completed: t.completed,
+        completedAt: t.completedAt,
+        updatedAt: t.updatedAt,
+        description: t.description,
+        priority: t.priority,
+        tags: t.tags,
+        columnId: t.columnId,
+        projectId: t.projectId,
+        pinColumnId: t.pinColumnId,
+        reminderDate: t.reminderDate,
+        dueDate: t.dueDate,
+        estimatedTime: t.estimatedTime,
+        trackedTime: t.trackedTime,
+        subtasks: t.subtasks,
+        position: t.position,
+        archived: t.archived
+      })));
+      
+      // Detect actual content changes, not just ID changes
+      const hasContentChanges = currentTasksJson !== prevTasksJson.current;
+      
+      if ((hasContentChanges || deletedTaskIds.length > 0) && state.tasks.length > 0) {
+        console.log('[AppContext] Syncing tasks to database (content changed)...');
+        tasksAPI.bulkSync(state.tasks.map(t => ({ ...t, externalId: t.id }))).catch(err => {
+          console.error('[AppContext] Error syncing tasks to database:', err);
+          showGlobalError(`Failed to save tasks: ${err.message || 'Connection error'}`);
+        });
+      }
+      
+      // Update previous state trackers
+      prevTaskIds.current = currentTaskIds;
+      prevTasksJson.current = currentTasksJson;
+    } else {
+      try {
+        localStorage.setItem('taskfuchs-tasks', JSON.stringify(state.tasks));
+      } catch (error) {
+        console.error('Error saving tasks to localStorage:', error);
+      }
     }
   }, [state.tasks]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('taskfuchs-archived-tasks', JSON.stringify(state.archivedTasks));
-    } catch (error) {
-      console.error('Error saving archived tasks to localStorage:', error);
+    if (!initialLoadComplete.current) return;
+    if (justLoadedFromDB.current) return;
+    
+    if (isOnlineMode()) {
+      const currentArchivedIds = new Set(state.archivedTasks.map(t => t.id));
+      
+      // Find deleted archived tasks
+      const deletedArchivedIds = [...prevArchivedTaskIds.current].filter(id => !currentArchivedIds.has(id));
+      
+      // Delete removed archived tasks from database
+      if (deletedArchivedIds.length > 0) {
+        console.log('[AppContext] Deleting archived tasks from database:', deletedArchivedIds);
+        Promise.all(deletedArchivedIds.map(id => 
+          tasksAPI.delete(id).catch(err => {
+            if (!err.message?.includes('not found')) {
+              console.error(`[AppContext] Error deleting archived task ${id}:`, err);
+            }
+          })
+        ));
+      }
+      
+      // Create JSON snapshot for content-aware change detection
+      const currentArchivedJson = JSON.stringify(state.archivedTasks.map(t => ({
+        id: t.id,
+        title: t.title,
+        completed: t.completed,
+        completedAt: t.completedAt,
+        updatedAt: t.updatedAt,
+        archived: t.archived
+      })));
+      
+      // Detect actual content changes
+      const hasContentChanges = currentArchivedJson !== prevArchivedTasksJson.current;
+      
+      if ((hasContentChanges || deletedArchivedIds.length > 0) && state.archivedTasks.length > 0) {
+        tasksAPI.bulkSync(state.archivedTasks.map(t => ({ ...t, externalId: t.id, archived: true }))).catch(err => {
+          console.error('[AppContext] Error syncing archived tasks to database:', err);
+          showGlobalError(`Failed to save archived tasks: ${err.message || 'Connection error'}`);
+        });
+      }
+      
+      prevArchivedTaskIds.current = currentArchivedIds;
+      prevArchivedTasksJson.current = currentArchivedJson;
+    } else {
+      try {
+        localStorage.setItem('taskfuchs-archived-tasks', JSON.stringify(state.archivedTasks));
+      } catch (error) {
+        console.error('Error saving archived tasks to localStorage:', error);
+      }
     }
   }, [state.archivedTasks]);
 
   useEffect(() => {
+    if (!initialLoadComplete.current) return;
+    
     try {
       localStorage.setItem('taskfuchs-show-completed', JSON.stringify(state.showCompletedTasks));
     } catch (error) {
@@ -3305,6 +3547,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [state.showCompletedTasks]);
 
   useEffect(() => {
+    if (!initialLoadComplete.current) return;
+    
+    // Kanban boards not yet synced to database, only localStorage
     try {
       localStorage.setItem('taskfuchs-boards', JSON.stringify(state.kanbanBoards));
     } catch (error) {
@@ -3313,30 +3558,133 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [state.kanbanBoards]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('taskfuchs-tags', JSON.stringify(state.tags));
-    } catch (error) {
-      console.error('Error saving tags to localStorage:', error);
+    if (!initialLoadComplete.current) return;
+    if (justLoadedFromDB.current) return;
+    
+    if (isOnlineMode()) {
+      const currentTagIds = new Set(state.tags.map(t => t.id));
+      
+      // Find deleted tags
+      const deletedTagIds = [...prevTagIds.current].filter(id => !currentTagIds.has(id));
+      
+      // Delete removed tags from database
+      if (deletedTagIds.length > 0) {
+        console.log('[AppContext] Deleting tags from database:', deletedTagIds);
+        Promise.all(deletedTagIds.map(id => 
+          tagsAPI.delete(id).catch(err => {
+            if (!err.message?.includes('not found')) {
+              console.error(`[AppContext] Error deleting tag ${id}:`, err);
+            }
+          })
+        ));
+      }
+      
+      // Create JSON snapshot for content-aware change detection
+      const currentTagsJson = JSON.stringify(state.tags.map(t => ({
+        id: t.id,
+        name: t.name,
+        color: t.color,
+        count: t.count
+      })));
+      
+      // Detect actual content changes
+      const hasContentChanges = currentTagsJson !== prevTagsJson.current;
+      
+      // Sync tags if content changed
+      if ((hasContentChanges || deletedTagIds.length > 0) && state.tags.length > 0) {
+        tagsAPI.bulkSync(state.tags.map(t => ({ ...t, externalId: t.id }))).catch(err => {
+          console.error('[AppContext] Error syncing tags to database:', err);
+          showGlobalError(`Failed to save tags: ${err.message || 'Connection error'}`);
+        });
+      }
+      
+      prevTagIds.current = currentTagIds;
+      prevTagsJson.current = currentTagsJson;
+    } else {
+      try {
+        localStorage.setItem('taskfuchs-tags', JSON.stringify(state.tags));
+      } catch (error) {
+        console.error('Error saving tags to localStorage:', error);
+      }
     }
   }, [state.tags]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('taskfuchs-preferences', JSON.stringify(state.preferences));
-    } catch (error) {
-      console.error('Error saving preferences to localStorage:', error);
+    if (!initialLoadComplete.current) return;
+    
+    if (isOnlineMode()) {
+      preferencesAPI.update(state.preferences).catch(err => {
+        console.error('[AppContext] Error syncing preferences to database:', err);
+        showGlobalError(`Failed to save settings: ${err.message || 'Connection error'}`);
+      });
+    } else {
+      try {
+        localStorage.setItem('taskfuchs-preferences', JSON.stringify(state.preferences));
+      } catch (error) {
+        console.error('Error saving preferences to localStorage:', error);
+      }
     }
   }, [state.preferences]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('taskfuchs-notes', JSON.stringify(state.notes.notes));
-    } catch (error) {
-      console.error('Error saving notes to localStorage:', error);
+    if (!initialLoadComplete.current) return;
+    if (justLoadedFromDB.current) return;
+    
+    if (isOnlineMode()) {
+      const currentNoteIds = new Set(state.notes.notes.map(n => n.id));
+      
+      // Find deleted notes
+      const deletedNoteIds = [...prevNoteIds.current].filter(id => !currentNoteIds.has(id));
+      
+      // Delete removed notes from database
+      if (deletedNoteIds.length > 0) {
+        console.log('[AppContext] Deleting notes from database:', deletedNoteIds);
+        Promise.all(deletedNoteIds.map(id => 
+          notesAPI.delete(id).catch(err => {
+            if (!err.message?.includes('not found')) {
+              console.error(`[AppContext] Error deleting note ${id}:`, err);
+            }
+          })
+        ));
+      }
+      
+      // Create JSON snapshot for content-aware change detection
+      const currentNotesJson = JSON.stringify(state.notes.notes.map(n => ({
+        id: n.id,
+        title: n.title,
+        content: n.content,
+        tags: n.tags,
+        pinned: n.pinned,
+        archived: n.archived,
+        updatedAt: n.updatedAt
+      })));
+      
+      // Detect actual content changes
+      const hasContentChanges = currentNotesJson !== prevNotesJson.current;
+      
+      // Sync notes if content changed
+      if ((hasContentChanges || deletedNoteIds.length > 0) && state.notes.notes.length > 0) {
+        notesAPI.bulkSync(state.notes.notes.map(n => ({ ...n, externalId: n.id }))).catch(err => {
+          console.error('[AppContext] Error syncing notes to database:', err);
+          showGlobalError(`Failed to save notes: ${err.message || 'Connection error'}`);
+        });
+      }
+      
+      prevNoteIds.current = currentNoteIds;
+      prevNotesJson.current = currentNotesJson;
+    } else {
+      try {
+        localStorage.setItem('taskfuchs-notes', JSON.stringify(state.notes.notes));
+      } catch (error) {
+        console.error('Error saving notes to localStorage:', error);
+      }
     }
   }, [state.notes.notes]);
 
   useEffect(() => {
+    if (!initialLoadComplete.current) return;
+    
+    // Note links stored as part of notes, no separate API
     try {
       localStorage.setItem('taskfuchs-note-links', JSON.stringify(state.noteLinks));
     } catch (error) {
@@ -3345,47 +3693,170 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [state.noteLinks]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('taskfuchs-columns', JSON.stringify(state.columns));
-    } catch (error) {
-      console.error('Error saving columns to localStorage:', error);
+    if (!initialLoadComplete.current) return;
+    
+    if (justLoadedFromDB.current) return;
+    
+    if (isOnlineMode()) {
+      // Only sync project columns to database (date columns are generated)
+      const projectColumns = state.columns.filter(c => c.type === 'project');
+      const currentColumnIds = new Set(projectColumns.map(c => c.id));
+      
+      // Find deleted columns
+      const deletedColumnIds = [...prevColumnIds.current].filter(id => !currentColumnIds.has(id));
+      
+      // Delete removed columns from database
+      if (deletedColumnIds.length > 0) {
+        console.log('[AppContext] Deleting columns from database:', deletedColumnIds);
+        Promise.all(deletedColumnIds.map(id => 
+          columnsAPI.delete(id).catch(err => {
+            if (!err.message?.includes('not found')) {
+              console.error(`[AppContext] Error deleting column ${id}:`, err);
+            }
+          })
+        ));
+      }
+      
+      // Create JSON snapshot for content-aware change detection
+      const currentColumnsJson = JSON.stringify(projectColumns.map(c => ({
+        id: c.id,
+        title: c.title,
+        type: c.type,
+        order: c.order,
+        linkedNotes: c.linkedNotes,
+        timebudget: c.timebudget
+      })));
+      
+      // Detect actual content changes
+      const hasContentChanges = currentColumnsJson !== prevColumnsJson.current;
+      
+      // Sync columns if content changed
+      if ((hasContentChanges || deletedColumnIds.length > 0) && projectColumns.length > 0) {
+        columnsAPI.bulkSync(projectColumns.map(c => ({ ...c, externalId: c.id }))).catch(err => {
+          console.error('[AppContext] Error syncing columns to database:', err);
+          showGlobalError(`Failed to save projects: ${err.message || 'Connection error'}`);
+        });
+      }
+      
+      prevColumnIds.current = currentColumnIds;
+      prevColumnsJson.current = currentColumnsJson;
+    } else {
+      try {
+        localStorage.setItem('taskfuchs-columns', JSON.stringify(state.columns));
+      } catch (error) {
+        console.error('Error saving columns to localStorage:', error);
+      }
     }
   }, [state.columns]);
 
   // Persist pin columns separately to avoid loss of names/order
   useEffect(() => {
-    try {
-      localStorage.setItem('taskfuchs-pin-columns', JSON.stringify(state.pinColumns));
-    } catch (error) {
-      console.error('Error saving pin columns to localStorage:', error);
+    if (!initialLoadComplete.current) return;
+    if (justLoadedFromDB.current) return;
+    
+    if (isOnlineMode()) {
+      const currentPinColumnIds = new Set(state.pinColumns.map(p => p.id));
+      
+      // Find deleted pin columns
+      const deletedPinColumnIds = [...prevPinColumnIds.current].filter(id => !currentPinColumnIds.has(id));
+      
+      // Delete removed pin columns from database
+      if (deletedPinColumnIds.length > 0) {
+        console.log('[AppContext] Deleting pin columns from database:', deletedPinColumnIds);
+        Promise.all(deletedPinColumnIds.map(id => 
+          pinColumnsAPI.delete(id).catch(err => {
+            if (!err.message?.includes('not found')) {
+              console.error(`[AppContext] Error deleting pin column ${id}:`, err);
+            }
+          })
+        ));
+      }
+      
+      // Create JSON snapshot for content-aware change detection
+      const currentPinColumnsJson = JSON.stringify(state.pinColumns.map(p => ({
+        id: p.id,
+        title: p.title,
+        color: p.color,
+        order: p.order
+      })));
+      
+      // Detect actual content changes
+      const hasContentChanges = currentPinColumnsJson !== prevPinColumnsJson.current;
+      
+      // Sync pin columns if content changed
+      if ((hasContentChanges || deletedPinColumnIds.length > 0) && state.pinColumns.length > 0) {
+        pinColumnsAPI.bulkSync(state.pinColumns.map(p => ({ ...p, externalId: p.id }))).catch(err => {
+          console.error('[AppContext] Error syncing pin columns to database:', err);
+          showGlobalError(`Failed to save pin columns: ${err.message || 'Connection error'}`);
+        });
+      }
+      
+      prevPinColumnIds.current = currentPinColumnIds;
+      prevPinColumnsJson.current = currentPinColumnsJson;
+    } else {
+      try {
+        localStorage.setItem('taskfuchs-pin-columns', JSON.stringify(state.pinColumns));
+      } catch (error) {
+        console.error('Error saving pin columns to localStorage:', error);
+      }
     }
   }, [state.pinColumns]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('taskfuchs-view-state', JSON.stringify(state.viewState));
-    } catch (error) {
-      console.error('Error saving view state to localStorage:', error);
+    if (!initialLoadComplete.current) return;
+    
+    if (isOnlineMode()) {
+      viewStateAPI.update(state.viewState).catch(err => {
+        console.error('[AppContext] Error syncing view state to database:', err);
+        showGlobalError(`Failed to save view state: ${err.message || 'Connection error'}`);
+      });
+    } else {
+      try {
+        localStorage.setItem('taskfuchs-view-state', JSON.stringify(state.viewState));
+      } catch (error) {
+        console.error('Error saving view state to localStorage:', error);
+      }
     }
   }, [state.viewState]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('taskfuchs-events', JSON.stringify(state.events));
-    } catch (error) {
-      console.error('Error saving calendar events to localStorage:', error);
+    if (!initialLoadComplete.current) return;
+    
+    if (isOnlineMode()) {
+      calendarAPI.syncEvents(state.events).catch(err => {
+        console.error('[AppContext] Error syncing events to database:', err);
+        showGlobalError(`Failed to save calendar events: ${err.message || 'Connection error'}`);
+      });
+    } else {
+      try {
+        localStorage.setItem('taskfuchs-events', JSON.stringify(state.events));
+      } catch (error) {
+        console.error('Error saving calendar events to localStorage:', error);
+      }
     }
   }, [state.events]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('taskfuchs-calendar-sources', JSON.stringify(state.calendarSources));
-    } catch (error) {
-      console.error('Error saving calendar sources to localStorage:', error);
+    if (!initialLoadComplete.current) return;
+    
+    if (isOnlineMode()) {
+      calendarAPI.bulkSyncSources(state.calendarSources).catch(err => {
+        console.error('[AppContext] Error syncing calendar sources to database:', err);
+        showGlobalError(`Failed to save calendar sources: ${err.message || 'Connection error'}`);
+      });
+    } else {
+      try {
+        localStorage.setItem('taskfuchs-calendar-sources', JSON.stringify(state.calendarSources));
+      } catch (error) {
+        console.error('Error saving calendar sources to localStorage:', error);
+      }
     }
   }, [state.calendarSources]);
 
   useEffect(() => {
+    if (!initialLoadComplete.current) return;
+    
+    // Checklist items - localStorage only for now
     try {
       localStorage.setItem('taskfuchs-checklist-items', JSON.stringify(state.checklistItems));
     } catch (error) {
@@ -3938,93 +4409,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     root.style.setProperty('--accent-color', state.preferences.accentColor);
   }, [state.preferences.theme, state.preferences.accentColor]);
 
-  // Auto-sync with Todoist when triggered by interval
+  // Auto-sync with Todoist when triggered by interval (disabled - Todoist integration removed)
   useEffect(() => {
     const handleAutoSync = async () => {
-      try {
-        // Import the sync manager dynamically to avoid circular dependencies
-        const { TodoistSyncManager } = await import('../utils/todoistSyncManagerNew');
-        const todoistSyncManager = new TodoistSyncManager();
-        const config = todoistSyncManager.getConfig();
-        
-        if (config?.enabled && config.projectMappings.length > 0) {
-          console.log('⏰ Performing auto-sync with Todoist...');
-          
-          const result = await todoistSyncManager.performSync(state.tasks, state.viewState.projectKanban.columns);
-          
-          // Check for conflicts during auto-sync
-          if (result.conflicts && result.conflicts.length > 0) {
-            console.warn(`⚠️ Auto-sync detected ${result.conflicts.length} conflicts - auto-sync skipped conflicts`);
-            // For auto-sync, we'll skip conflicts and log them for user awareness
-            // TODO: Consider showing a notification to the user about conflicts
-          }
-          
-          if (result.success) {
-            // Add new columns if any were created during sync (as ProjectKanbanColumns)
-            result.localColumnsAdded.forEach(column => {
-              // Convert Column to ProjectKanbanColumn for project-specific Kanban boards
-              if (column.projectId && (column.type === 'date' || column.type === 'project')) {
-                dispatch({ 
-                  type: 'ADD_PROJECT_KANBAN_COLUMN_WITH_ID', 
-                  payload: {
-                    id: column.id,
-                    projectId: column.projectId,
-                    title: column.title || 'Neue Spalte',
-                    color: state.preferences.accentColor || '#0ea5e9', // Use accent color for sync-created columns
-                    order: column.order || 0
-                  }
-                });
-              }
-            });
-            
-            // Update local tasks if needed
-            result.localTasksAdded.forEach(task => {
-              dispatch({ type: 'ADD_TASK', payload: task });
-            });
-            
-            result.localTasksUpdated.forEach(task => {
-              dispatch({ type: 'UPDATE_TASK', payload: task });
-            });
-            
-            // Handle deletions - these are TaskFuchs task IDs that should be deleted
-            result.localTasksDeleted.forEach(taskFuchsTaskId => {
-              console.log(`🗑️ Auto-sync: Deleting TaskFuchs task: ${taskFuchsTaskId} (deleted in Todoist)`);
-              dispatch({ type: 'DELETE_TASK', payload: taskFuchsTaskId });
-            });
-            
-            // NOTE: Do not overwrite or delete local project kanban columns during auto-sync
-            // This avoids unintentional title changes or removals "ohne Zutun".
-            if (result.localColumnsUpdated.length > 0 || result.localColumnsDeleted.length > 0) {
-              console.log(`ℹ️ Auto-sync: Skipping ${result.localColumnsUpdated.length} column rename(s) and ${result.localColumnsDeleted.length} deletion(s) to preserve local project columns.`);
-            }
-          
-          // Note: Automatic date column creation is disabled
-          // Date columns should only come from Todoist sections or be manually created
-          // if (result.dateColumnsNeeded && result.dateColumnsNeeded.length > 0) {
-          //   result.dateColumnsNeeded.forEach(dateStr => {
-          //     dispatch({ type: 'ENSURE_DATE_COLUMN', payload: dateStr });
-          //   });
-          //   console.log(`📅 Auto-sync created ${result.dateColumnsNeeded.length} date columns: ${result.dateColumnsNeeded.join(', ')}`);
-          // }
-          
-          console.log('✅ Auto-sync completed:', result.summary);
-            if (result.localColumnsAdded.length > 0) {
-              console.log(`📂 Added ${result.localColumnsAdded.length} new columns:`, result.localColumnsAdded.map(c => c.title));
-            }
-          }
-        }
-      } catch (error) {
-        console.error('❌ Auto-sync failed:', error);
-      }
+      // Todoist integration has been removed - this is a no-op placeholder
+      // The todoistSyncManager stub always returns enabled: false
     };
 
-    // Listen for auto-sync trigger events
+    // Listen for auto-sync trigger events (kept for potential future re-integration)
     window.addEventListener('todoist-auto-sync-trigger', handleAutoSync);
     
     return () => {
       window.removeEventListener('todoist-auto-sync-trigger', handleAutoSync);
     };
-  }, [state.tasks, state.columns, dispatch]);
+  }, []);
 
   // Memoize context value to prevent unnecessary re-renders
   const contextValue = useMemo(() => ({

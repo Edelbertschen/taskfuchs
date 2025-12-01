@@ -20,7 +20,8 @@ const MICROSOFT_GRAPH_CONFIG = {
   clientId: 'YOUR_AZURE_CLIENT_ID_HERE', // ⚠️ ERSETZEN SIE DIESE PLACEHOLDER MIT IHRER ECHTEN CLIENT ID!
   redirectUri: typeof window !== 'undefined' ? `${window.location.origin}/auth/microsoft` : 'http://localhost:5173/auth/microsoft',
   scope: 'https://graph.microsoft.com/Tasks.ReadWrite offline_access',
-  authority: 'https://login.microsoftonline.com/common',
+  // Use tenant ID for single-tenant apps (set via VITE_MS_TENANT_ID env var)
+  authority: `https://login.microsoftonline.com/${import.meta.env.VITE_MS_TENANT_ID || 'common'}`,
   graphApiUrl: 'https://graph.microsoft.com/v1.0'
 };
 

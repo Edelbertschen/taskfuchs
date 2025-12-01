@@ -173,6 +173,10 @@ const Settings = React.memo(() => {
   const { t, i18n } = useTranslation();
   const { actions, forms, titles, messages, settings_appearance, settings_notes, settings_sidebar, settings_notifications, settings_timer, settings_information, settings_data, settings_sync } = useAppTranslation();
   const { state, dispatch } = useApp();
+  const { state: authState } = useAuth();
+  
+  // Check if we're in online mode (not guest mode) - backup only relevant for guest mode
+  const isOnlineMode = authState.isOnlineMode;
 
   // Settings sections configuration with i18n
   const settingsSections = [
@@ -208,7 +212,7 @@ const Settings = React.memo(() => {
     },
     {
       id: 'timer',
-      title: 'Zeiterfassung',
+      title: t('settings.sections.timer.title', 'Time Tracking'),
       icon: Clock,
       description: t('settings.sections.timer.description')
     },
@@ -226,9 +230,9 @@ const Settings = React.memo(() => {
     },
     {
       id: 'informationen',
-      title: 'Informationen',
+      title: t('settings.sections.information.title', 'Information'),
       icon: Shield,
-      description: 'Datenschutz & Performance'
+      description: t('settings.sections.information.description', 'Privacy & Performance')
     }
   ];
   const [activeSection, setActiveSection] = useState('appearance');
@@ -7298,7 +7302,8 @@ const Settings = React.memo(() => {
                   { id: 'data-export', title: t('settings_data.exportOptions') },
                   { id: 'data-import', title: t('settings_data.importOptions') },
                   { id: 'data-images', title: t('settings_data.imageStorage') },
-                  { id: 'data-backup', title: t('common.backup') },
+                  // Only show backup tab in guest mode (not online mode)
+                  ...(!isOnlineMode ? [{ id: 'data-backup', title: t('common.backup') }] : []),
                   { id: 'data-danger', title: t('settings_data.dangerZone') }
                 ].map((tab) => (
                   <button
@@ -7316,8 +7321,8 @@ const Settings = React.memo(() => {
                 ))}
               </nav>
             </div>
-            {/* Backup Tab */}
-              {activeDataTab === 'data-backup' && (
+            {/* Backup Tab - Only show in guest mode (not online mode) */}
+              {!isOnlineMode && activeDataTab === 'data-backup' && (
               <div>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{t('settings_data.automaticBackup')}</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{t('settings_data.regularBackupDesc')}</p>
@@ -7375,7 +7380,7 @@ const Settings = React.memo(() => {
                         archivedTasks: state.archivedTasks || [],
                         columns: state.columns,
                         tags: state.tags,
-                        boards: state.boards || [],
+                        boards: (state as any).boards || [],
                         preferences: state.preferences,
                         viewState: state.viewState || {},
                         projectKanbanColumns: state.viewState?.projectKanban?.columns || [],
@@ -8033,10 +8038,10 @@ const Settings = React.memo(() => {
           <div className="space-y-6">
             <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                Informationen
+                {t('settings.sections.information.title', 'Information')}
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
-                Datenschutz & Performance
+                {t('settings.sections.information.description', 'Privacy & Performance')}
               </p>
             </div>
             <div className="border-b border-gray-200 dark:border-gray-700">
