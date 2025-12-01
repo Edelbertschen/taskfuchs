@@ -43,6 +43,7 @@ import { BulkActionsBar } from './components/Common/BulkActionsBar';
 import { ImageTest } from './components/Common/ImageTest';
 import { FloatingAddButton } from './components/Common/FloatingAddButton';
 import { LoadingSpinner } from './components/Common/LoadingSpinner';
+import { AppLoadingScreen } from './components/Common/AppLoadingScreen';
 import { Plus, Home, Inbox, CheckSquare, Columns, FileText, MoreHorizontal, X } from 'lucide-react';
 import { MaterialIcon } from './components/Common/MaterialIcon';
 import './App.css';
@@ -1506,6 +1507,7 @@ function MainApp() {
 
 // App Router Component
 function AppRouter() {
+  const { t } = useTranslation();
   const { state, loginWithMicrosoft } = useAuth();
   
   // Check if running in offline-only mode (PWA deployment without backend)
@@ -1566,14 +1568,24 @@ function AppRouter() {
   // Check if on auth callback - LoginPage will handle showing loading state
   const isAuthCallback = window.location.pathname === '/auth/callback';
 
-  // If authenticated (online mode), show main app
-  // But in offline-only mode, ignore online mode state and stay in guest mode
+  // Show loading screen while restoring session (checking JWT validity on page reload)
+  if (state.isRestoringSession) {
+    return <AppLoadingScreen message={t('app.restoringSession', 'Restoring session...')} />;
+  }
+
+  // If authenticated (online mode), render AppProvider to load data
+  // Show loading screen until data is loaded
+  // In offline-only mode, ignore online mode state and stay in guest mode
   if (state.isOnlineMode && !isOfflineOnlyMode) {
     return (
       <AppProvider>
-        <CelebrationProvider>
-          <MainApp />
-        </CelebrationProvider>
+        {!state.isDataLoaded ? (
+          <AppLoadingScreen message={t('app.loadingData', 'Loading your data...')} />
+        ) : (
+          <CelebrationProvider>
+            <MainApp />
+          </CelebrationProvider>
+        )}
       </AppProvider>
     );
   }

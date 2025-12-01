@@ -1,7 +1,9 @@
 {
   "app": {
     "name": "TaskFuchs",
-    "tagline": "Your smart task management"
+    "tagline": "Your smart task management",
+    "restoringSession": "Restoring session...",
+    "loadingData": "Loading your data..."
   },
   "auth": {
     "user": "User",

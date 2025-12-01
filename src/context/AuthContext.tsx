@@ -5,6 +5,8 @@ import type { AuthState, User } from '../types';
 interface ExtendedAuthState extends AuthState {
   isOnlineMode: boolean;
   isAdmin: boolean;
+  isRestoringSession: boolean;  // True when checking stored JWT validity on page load
+  isDataLoaded: boolean;        // True when AppContext has loaded data from database
 }
 
 interface AuthContextType {
@@ -14,6 +16,7 @@ interface AuthContextType {
   updateUser: (updates: Partial<User>) => void;
   isGuest: () => boolean;
   setOnlineMode: (token: string, user: User) => void;
+  setDataLoaded: (loaded: boolean) => void;
 }
 
 // Auth Actions
@@ -24,7 +27,10 @@ type AuthAction =
   | { type: 'LOGOUT' }
   | { type: 'UPDATE_USER'; payload: Partial<User> }
   | { type: 'RESTORE_SESSION'; payload: { user: User; token: string } }
-  | { type: 'CLEAR_ERROR' };
+  | { type: 'CLEAR_ERROR' }
+  | { type: 'SESSION_RESTORE_START' }
+  | { type: 'SESSION_RESTORE_FAILED' }
+  | { type: 'SET_DATA_LOADED'; payload: boolean };
 
 // Use VITE_API_URL if defined, otherwise empty string for same-origin (proxied) requests
 const API_URL = import.meta.env.VITE_API_URL !== undefined 
@@ -41,7 +47,32 @@ const authReducer = (state: ExtendedAuthState, action: AuthAction): ExtendedAuth
         error: null
       };
 
+    case 'SESSION_RESTORE_START':
+      return {
+        ...state,
+        isRestoringSession: true
+      };
+
+    case 'SESSION_RESTORE_FAILED':
+      return {
+        ...state,
+        isRestoringSession: false
+      };
+
     case 'LOGIN_SUCCESS':
+      return {
+        ...state,
+        isAuthenticated: true,
+        isOnlineMode: true,
+        user: action.payload.user,
+        token: action.payload.token,
+        isAdmin: action.payload.user.isAdmin || false,
+        isLoading: false,
+        isRestoringSession: false,
+        isDataLoaded: false, // Data will be loaded by AppContext
+        error: null
+      };
+
     case 'RESTORE_SESSION':
       return {
         ...state,
@@ -51,6 +82,8 @@ const authReducer = (state: ExtendedAuthState, action: AuthAction): ExtendedAuth
         token: action.payload.token,
         isAdmin: action.payload.user.isAdmin || false,
         isLoading: false,
+        isRestoringSession: false,
+        isDataLoaded: false, // Data will be loaded by AppContext
         error: null
       };
 
@@ -63,6 +96,8 @@ const authReducer = (state: ExtendedAuthState, action: AuthAction): ExtendedAuth
         token: undefined,
         isAdmin: false,
         isLoading: false,
+        isRestoringSession: false,
+        isDataLoaded: false,
         error: action.payload
       };
 
@@ -75,6 +110,8 @@ const authReducer = (state: ExtendedAuthState, action: AuthAction): ExtendedAuth
         token: undefined,
         isAdmin: false,
         isLoading: false,
+        isRestoringSession: false,
+        isDataLoaded: false,
         error: null
       };
 
@@ -90,10 +127,19 @@ const authReducer = (state: ExtendedAuthState, action: AuthAction): ExtendedAuth
         error: null
       };
 
+    case 'SET_DATA_LOADED':
+      return {
+        ...state,
+        isDataLoaded: action.payload
+      };
+
     default:
       return state;
   }
 };
+
+// Check if there's a stored JWT on initial load
+const hasStoredToken = typeof window !== 'undefined' && !!sessionStorage.getItem('taskfuchs_jwt');
 
 // Initial State
 const initialState: ExtendedAuthState = {
@@ -102,7 +148,9 @@ const initialState: ExtendedAuthState = {
   isAdmin: false,
   user: null,
   isLoading: false,
-  error: null
+  error: null,
+  isRestoringSession: hasStoredToken, // True if we need to validate a stored token
+  isDataLoaded: false
 };
 
 // Create Context
@@ -136,7 +184,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const restoreSession = async () => {
       const token = sessionStorage.getItem('taskfuchs_jwt');
-      if (!token) return;
+      if (!token) {
+        // No token to restore, clear restoring state
+        dispatch({ type: 'SESSION_RESTORE_FAILED' });
+        return;
+      }
 
       try {
         // Validate token with backend
@@ -155,10 +207,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } else {
           // Token invalid, clear it
           sessionStorage.removeItem('taskfuchs_jwt');
+          dispatch({ type: 'SESSION_RESTORE_FAILED' });
         }
       } catch (error) {
         console.error('Failed to restore session:', error);
         sessionStorage.removeItem('taskfuchs_jwt');
+        dispatch({ type: 'SESSION_RESTORE_FAILED' });
       }
     };
 
@@ -287,13 +341,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: 'LOGIN_SUCCESS', payload: { user, token } });
   }, []);
 
+  // Set data loaded state (called by AppContext when data is loaded)
+  const setDataLoaded = useCallback((loaded: boolean) => {
+    dispatch({ type: 'SET_DATA_LOADED', payload: loaded });
+  }, []);
+
+  // Listen for app:data-loaded event from AppContext
+  useEffect(() => {
+    const handleDataLoaded = () => {
+      dispatch({ type: 'SET_DATA_LOADED', payload: true });
+    };
+    window.addEventListener('app:data-loaded', handleDataLoaded);
+    return () => window.removeEventListener('app:data-loaded', handleDataLoaded);
+  }, []);
+
   const value: AuthContextType = {
     state,
     loginWithMicrosoft,
     logout,
     updateUser,
     isGuest,
-    setOnlineMode
+    setOnlineMode,
+    setDataLoaded
   };
 
   return (

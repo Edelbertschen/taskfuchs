@@ -3143,6 +3143,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             initialLoadComplete.current = true;
             justLoadedFromDB.current = false;
             console.log('[AppContext] DB load complete, sync effects enabled');
+            
+            // Signal to AuthContext that data is loaded
+            window.dispatchEvent(new Event('app:data-loaded'));
           }, 500);
         })
         .catch((error) => {
@@ -3150,6 +3153,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           showGlobalError(`Failed to load data from server: ${error.message || 'Connection error'}`);
           // Still mark as complete on error so app isn't stuck
           initialLoadComplete.current = true;
+          // Still signal data loaded even on error so app isn't stuck on loading screen
+          window.dispatchEvent(new Event('app:data-loaded'));
         });
       
       return; // Exit early for online mode
