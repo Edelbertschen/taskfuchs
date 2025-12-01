@@ -1830,7 +1830,7 @@ function InboxTaskCard({
                 >
                   {task.title}
                 </span>
-                {task.priority && (
+                {task.priority && task.priority !== 'none' && (
                   <span 
                     className="px-2 py-0.5 rounded-full text-xs font-medium backdrop-blur-xl"
                     style={{
@@ -1842,7 +1842,7 @@ function InboxTaskCard({
                       border: '1px solid rgba(255, 255, 255, 0.3)'
                     }}
                   >
-                    {task.priority}
+                    {task.priority === 'high' ? '!!!' : task.priority === 'medium' ? '!!' : '!'}
                   </span>
                 )}
               </div>
