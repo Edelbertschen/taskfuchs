@@ -1681,6 +1681,7 @@ function InboxTaskCard({
   onTaskClick
 }: InboxTaskCardProps) {
   const { state, dispatch } = useApp();
+  const { t } = useTranslation();
   const { actions, inboxView } = useAppTranslation();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
@@ -1842,7 +1843,7 @@ function InboxTaskCard({
                       border: '1px solid rgba(255, 255, 255, 0.3)'
                     }}
                   >
-                    {task.priority === 'high' ? '!!!' : task.priority === 'medium' ? '!!' : '!'}
+                    {t(`task.priority.${task.priority}`)}
                   </span>
                 )}
               </div>
