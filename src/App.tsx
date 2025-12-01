@@ -1508,14 +1508,21 @@ function MainApp() {
 function AppRouter() {
   const { state, loginWithMicrosoft } = useAuth();
   
+  // Check if running in offline-only mode (PWA deployment without backend)
+  // When VITE_OFFLINE_MODE=true, the app is always in guest mode with no login
+  const isOfflineOnlyMode = import.meta.env.VITE_OFFLINE_MODE === 'true';
+  
   // Detect if running as PWA (installed app) vs web browser
   const isPWA = React.useMemo(() => isStandalonePWA(), []);
   
+  // Force guest mode in offline-only mode or PWA mode
+  const forceGuestMode = isOfflineOnlyMode || isPWA;
+  
   // Check if user explicitly chose guest mode this session
-  // PWA always starts in guest mode (no login required)
+  // PWA/offline-only mode always starts in guest mode (no login required)
   const [guestMode, setGuestMode] = React.useState(() => {
-    // PWA mode: always guest mode by default
-    if (isPWA) {
+    // Offline-only or PWA mode: always guest mode by default
+    if (forceGuestMode) {
       return true;
     }
     // Web mode: check localStorage for explicit guest mode
@@ -1530,16 +1537,21 @@ function AppRouter() {
     setGuestMode(true);
   };
 
-  // Handle going online from guest mode
+  // Handle going online from guest mode (disabled in offline-only mode)
   const handleGoOnline = () => {
+    // Prevent going online in offline-only PWA mode
+    if (isOfflineOnlyMode) {
+      console.log('[AppRouter] Online mode disabled in offline-only deployment');
+      return;
+    }
     loginWithMicrosoft();
   };
 
   // Listen for logout events to exit guest mode and show login
   React.useEffect(() => {
     const handleLogout = () => {
-      // In PWA mode, stay in guest mode after logout
-      if (isPWA) {
+      // In offline-only or PWA mode, stay in guest mode after logout
+      if (forceGuestMode) {
         return;
       }
       // In web mode, clear guest mode flag to show login page
@@ -1549,13 +1561,14 @@ function AppRouter() {
     
     window.addEventListener('auth:logout', handleLogout);
     return () => window.removeEventListener('auth:logout', handleLogout);
-  }, [isPWA]);
+  }, [forceGuestMode]);
 
   // Check if on auth callback - LoginPage will handle showing loading state
   const isAuthCallback = window.location.pathname === '/auth/callback';
 
   // If authenticated (online mode), show main app
-  if (state.isOnlineMode) {
+  // But in offline-only mode, ignore online mode state and stay in guest mode
+  if (state.isOnlineMode && !isOfflineOnlyMode) {
     return (
       <AppProvider>
         <CelebrationProvider>
@@ -1565,16 +1578,16 @@ function AppRouter() {
     );
   }
 
-  // In web browser mode (not PWA): show login page if not explicitly in guest mode
-  // PWA mode: always skip login page, go directly to guest mode
-  if (!guestMode && !isPWA) {
+  // In web browser mode (not PWA/offline-only): show login page if not explicitly in guest mode
+  // PWA/offline-only mode: always skip login page, go directly to guest mode
+  if (!guestMode && !forceGuestMode) {
     return <LoginPage isProcessingCallback={isAuthCallback} />;
   }
 
   // Show main app in guest mode (localStorage only) with "Go Online" context
-  // Note: In PWA mode, the "Go Online" button in sidebar allows switching to online mode
+  // Note: In offline-only mode, the "Go Online" button is disabled/hidden
   return (
-    <GuestModeContext.Provider value={{ goOnline: handleGoOnline }}>
+    <GuestModeContext.Provider value={{ goOnline: handleGoOnline, isOfflineOnly: isOfflineOnlyMode }}>
       <AppProvider>
         <CelebrationProvider>
           <MainApp />
@@ -1585,7 +1598,8 @@ function AppRouter() {
 }
 
 // Context for guest mode "Go Online" functionality
-const GuestModeContext = React.createContext<{ goOnline: () => void } | null>(null);
+// isOfflineOnly: when true, hides the "Go Online" button (PWA deployment without backend)
+const GuestModeContext = React.createContext<{ goOnline: () => void; isOfflineOnly: boolean } | null>(null);
 export const useGuestMode = () => React.useContext(GuestModeContext);
 
 // Root App Component

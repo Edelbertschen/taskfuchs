@@ -15,9 +15,9 @@
   "homepage": "./",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "VITE_OFFLINE_MODE=true ./node_modules/.bin/vite",
     "dev:server": "cd server && npm run dev",
-    "dev:all": "concurrently \"npm run dev\" \"npm run dev:server\"",
+    "dev:all": "concurrently \"./node_modules/.bin/vite\" \"npm run dev:server\"",
     "db:push": "cd server && npm run db:push",
     "db:generate": "cd server && npm run db:generate",
     "db:studio": "cd server && npm run db:studio",
@@ -28,8 +28,8 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "electron": "wait-on http://localhost:5173 && electron . --no-sandbox --disable-web-security",
-    "electron-dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron . --no-sandbox --disable-web-security --disable-dev-shm-usage\"",
-    "electron-dev-fast": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && ELECTRON_ENABLE_DEVTOOLS=false electron . --no-sandbox --disable-web-security --disable-dev-shm-usage --disable-extensions\"",
+    "electron-dev": "concurrently \"VITE_OFFLINE_MODE=true ./node_modules/.bin/vite\" \"wait-on http://localhost:5173 && electron . --no-sandbox --disable-web-security --disable-dev-shm-usage\"",
+    "electron-dev-fast": "concurrently \"VITE_OFFLINE_MODE=true ./node_modules/.bin/vite\" \"wait-on http://localhost:5173 && ELECTRON_ENABLE_DEVTOOLS=false electron . --no-sandbox --disable-web-security --disable-dev-shm-usage --disable-extensions\"",
     "electron-pack": "npm run build && electron-builder",
     "preelectron-pack": "npm run build",
     "dist": "npm run build && electron-builder --publish=never",
@@ -44,7 +44,7 @@
     "dist:mac": "npm run build && electron-builder --mac --publish=never",
     "dist:mac-dmg": "TF_TARGET=electron npm run build && electron-builder --mac --publish=never --config.mac.target=dmg",
     "dist:mac-universal": "npm run build && electron-builder --mac --universal --publish=never",
-    "deploy:pwa": "npm run build && rsync -azvh --delete --exclude='.htaccess' --exclude='._*' --exclude='.DS_Store' --no-perms --no-owner --no-group -e 'ssh -o StrictHostKeyChecking=accept-new' dist/ tfuchs@antila.uberspace.de:/var/www/virtual/tfuchs/html/ && ssh -o StrictHostKeyChecking=accept-new tfuchs@antila.uberspace.de 'find /var/www/virtual/tfuchs/html -type d -exec chmod 755 {} \\; && find /var/www/virtual/tfuchs/html -type f -exec chmod 644 {} \\; && [ -f /var/www/virtual/tfuchs/html/.htaccess ] && chmod 644 /var/www/virtual/tfuchs/html/.htaccess || true'"
+    "deploy:pwa": "VITE_OFFLINE_MODE=true npm run build && rsync -azvh --delete --exclude='.htaccess' --exclude='._*' --exclude='.DS_Store' --no-perms --no-owner --no-group -e 'ssh -o StrictHostKeyChecking=accept-new' dist/ tfuchs@antila.uberspace.de:/var/www/virtual/tfuchs/html/ && ssh -o StrictHostKeyChecking=accept-new tfuchs@antila.uberspace.de 'find /var/www/virtual/tfuchs/html -type d -exec chmod 755 {} \\; && find /var/www/virtual/tfuchs/html -type f -exec chmod 644 {} \\; && [ -f /var/www/virtual/tfuchs/html/.htaccess ] && chmod 644 /var/www/virtual/tfuchs/html/.htaccess || true'"
   },
   "dependencies": {
     "@capacitor/cli": "^7.4.2",

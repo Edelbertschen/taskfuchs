@@ -685,7 +685,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                 <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
                 
                 {/* Sign Out / Go Online */}
-                {isGuestMode ? (
+                {isGuestMode && !guestModeContext?.isOfflineOnly ? (
                   <button
                     onClick={() => {
                       guestModeContext?.goOnline();
@@ -696,7 +696,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                     <Cloud className="w-4 h-4" />
                     {t('auth.goOnline', 'Mit Microsoft anmelden')}
                   </button>
-                ) : (
+                ) : !isGuestMode ? (
                   <button
                     onClick={() => {
                       logout();
@@ -707,7 +707,7 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                     <LogOut className="w-4 h-4" />
                     {t('auth.logout', 'Abmelden')}
                   </button>
-                )}
+                ) : null}
               </div>
             </div>,
             document.body
