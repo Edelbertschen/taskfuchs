@@ -63,7 +63,8 @@
     "review": "Review",
     "focus": "Focus",
     "pins": "Pins",
-    "series": "Series"
+    "series": "Series",
+    "admin": "Admin"
   },
   "tasks": {
     "title": "Tasks",
@@ -437,7 +438,8 @@
     "sections": {
       "appearance": {
         "title": "Appearance",
-        "description": "Theme, colors & design"
+        "description": "Theme, colors & design",
+        "description_extended": "Language, theme, colors & design"
       },
       "language": {
         "title": "Language",

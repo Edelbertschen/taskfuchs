@@ -68,7 +68,8 @@ import {
   MoreHorizontal,
   FolderOpen,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Users
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { DeleteConfirmationModal } from '../Common/DeleteConfirmationModal';
@@ -181,16 +182,10 @@ const Settings = React.memo(() => {
   // Settings sections configuration with i18n
   const settingsSections = [
     {
-      id: 'language',
-      title: t('settings.sections.language.title'),
-      icon: Globe,
-      description: t('settings.sections.language.description')
-    },
-    {
       id: 'appearance',
       title: t('settings.sections.appearance.title'),
       icon: Palette,
-      description: t('settings.sections.appearance.description')
+      description: t('settings.sections.appearance.description_extended', 'Sprache, Theme, Farben & Design')
     },
     {
       id: 'notes',
@@ -823,7 +818,9 @@ const Settings = React.memo(() => {
       { id: 'series', label: t('navigation.series'), icon: RefreshCw, visible: true },
       { id: 'tags', label: 'Tags', icon: TagIcon, visible: true },
       { id: 'statistics', label: t('navigation.reports'), icon: BarChart3, visible: true },
-      { id: 'archive', label: t('navigation.archive'), icon: Archive, visible: true }
+      { id: 'archive', label: t('navigation.archive'), icon: Archive, visible: true },
+      // Admin item - only visible for admins
+      ...(authState.isAdmin ? [{ id: 'admin', label: t('navigation.admin', 'Admin'), icon: Users, visible: true }] : [])
     ];
     
     const hiddenItems = state.preferences.sidebar?.hiddenItems || [];
@@ -3822,11 +3819,46 @@ const Settings = React.memo(() => {
                   {t('settings.sections.appearance.title')}
                 </h2>
                 <p className="text-gray-600 dark:text-gray-400">
-                  {t('settings.sections.appearance.description')}
+                  {t('settings.sections.appearance.description_extended', 'Sprache, Theme, Farben & Design')}
                 </p>
               </div>
 
               <div className="space-y-6">
+                {/* Language Selector */}
+                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <div>
+                    <div className="font-medium text-gray-900 dark:text-white">{t('settings.sections.language.title')}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">{t('settings.sections.language.description')}</div>
+                  </div>
+                  <div className="bg-gray-200 dark:bg-gray-700 p-1 rounded-xl inline-flex relative select-none" role="tablist" aria-label="Language">
+                    {([
+                      { code: 'de', name: 'DE' },
+                      { code: 'en', name: 'EN' }
+                    ] as const).map((lang) => {
+                      const active = language === lang.code;
+                      return (
+                        <button
+                          key={lang.code}
+                          onClick={async () => {
+                            if (!active) {
+                              await handleLanguageChange(lang.code);
+                            }
+                          }}
+                          role="tab"
+                          aria-selected={active}
+                          className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                            active 
+                              ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' 
+                              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                          }`}
+                        >
+                          {lang.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <div>
                     <div className="font-medium text-gray-900 dark:text-white">{settings_appearance.darkMode()}</div>
@@ -4698,87 +4730,6 @@ const Settings = React.memo(() => {
 
           </div>
         );
-      case 'language':
-        return (
-          <div className="space-y-6">
-            <div>
-              <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                  {t('settings.sections.language.title')}
-                </h2>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {t('settings.sections.language.description')}
-                </p>
-              </div>
-              
-              {/* Robust Language Toggle */}
-              <div className="bg-gray-100 dark:bg-gray-800 p-2 rounded-2xl inline-flex relative select-none" role="tablist" aria-label="Language">
-                {([
-                  { code: 'de', name: 'Deutsch' },
-                  { code: 'en', name: 'English' }
-                ] as const).map((lang) => {
-                  const active = language === lang.code;
-                  return (
-                    <button
-                      key={lang.code}
-                      onClick={async () => {
-                        if (!active) {
-                          await handleLanguageChange(lang.code);
-                        }
-                      }}
-                      className={`relative z-10 flex items-center justify-center px-6 py-2 rounded-xl transition-colors font-medium ${
-                        active ? 'text-white' : 'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'
-                      }`}
-                      aria-pressed={active}
-                      aria-current={active ? 'true' : undefined}
-                      role="tab"
-                    >
-                      {/* Active pill */}
-                      <span
-                        className="absolute inset-0 rounded-xl transition-colors"
-                        style={{ backgroundColor: active ? state.preferences.accentColor : 'transparent' }}
-                      />
-                      <span className="relative">{lang.name}</span>
-                    </button>
-                  );
-                })}
-              </div>
-              
-              {/* Current Language Info */}
-              <div 
-                className="mt-6 p-4 rounded-xl border"
-                style={{
-                  ...getAccentColorStyles().bgLight,
-                  borderColor: getAccentColorStyles().border.borderColor
-                }}
-              >
-                <div className="flex items-center gap-3">
-                  <Globe 
-                    className="w-5 h-5" 
-                    style={getAccentColorStyles().text}
-                  />
-                  <div>
-                    <p 
-                      className="text-sm font-medium"
-                      style={getAccentColorStyles().text}
-                    >
-                      {t('settings.sections.language.current')}
-                    </p>
-                    <p 
-                      className="text-xs" 
-                      style={{
-                        color: `${getAccentColorStyles().text.color}cc`
-                      }}
-                    >
-                      {t('settings.sections.language.description_text')}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
       case 'notes':
         return (
           <div className="space-y-6">
