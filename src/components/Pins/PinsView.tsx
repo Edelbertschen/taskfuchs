@@ -273,7 +273,36 @@ export function PinsView() {
 
   // Horizontal scroll container ref (for wheel/arrow navigation like Planner/Projects)
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [pinOffset, setPinOffset] = useState(0);
+  
+  // Pin offset with persistence - remember which column was last viewed
+  const [pinOffset, setPinOffset] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem('taskfuchs-pins-offset');
+      const offset = saved ? parseInt(saved, 10) : 0;
+      return isNaN(offset) ? 0 : offset;
+    } catch {
+      return 0;
+    }
+  });
+  
+  // Save pinOffset to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('taskfuchs-pins-offset', String(pinOffset));
+    } catch {
+      // Ignore localStorage errors
+    }
+  }, [pinOffset]);
+  
+  // Validate pinOffset when pin columns change (e.g., columns deleted)
+  useEffect(() => {
+    const visible = (state.preferences.columns.pinsVisible ?? state.preferences.columns.visible) || 3;
+    const totalColumns = state.pinColumns.length + 1; // +1 for "Add Column" button
+    const maxOffset = Math.max(0, totalColumns - visible);
+    if (pinOffset > maxOffset) {
+      setPinOffset(maxOffset);
+    }
+  }, [state.pinColumns.length, state.preferences.columns.pinsVisible, state.preferences.columns.visible, pinOffset]);
 
   // Helper function to navigate columns (includes "Add Column" button as +1)
   const navigateColumns = useCallback((direction: 'prev' | 'next') => {

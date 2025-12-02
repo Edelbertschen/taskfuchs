@@ -112,7 +112,7 @@ export function LoginPage({ isProcessingCallback = false }: LoginPageProps) {
             <img 
               src={isDarkMode ? '/login_dark.webp' : '/login_light.webp'}
               alt="TaskFuchs" 
-              className="w-32 h-32 object-contain drop-shadow-lg"
+              className="w-52 h-52 object-contain drop-shadow-lg"
             />
             <h1 className={`text-3xl font-bold tracking-tight mt-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
               TaskFuchs
