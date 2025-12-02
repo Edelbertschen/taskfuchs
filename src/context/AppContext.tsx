@@ -3140,6 +3140,41 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             prevNoteIds.current = new Set(data.notes?.map((n: any) => n.id) || []);
             prevPinColumnIds.current = new Set(data.pinColumns?.map((p: any) => p.id) || []);
             
+            // Initialize JSON snapshots to track content changes
+            prevColumnsJson.current = JSON.stringify(existingProjectColumns.map(c => ({
+              id: c.id,
+              title: c.title,
+              type: c.type,
+              order: c.order,
+              linkedNotes: c.linkedNotes,
+              timebudget: c.timebudget
+            })));
+            prevPinColumnsJson.current = JSON.stringify((data.pinColumns || []).map((p: any) => ({
+              id: p.externalId || p.id,
+              title: p.title,
+              color: p.color,
+              order: p.order
+            })));
+            prevTagsJson.current = JSON.stringify((data.tags || []).map((t: any) => ({
+              id: t.externalId || t.id,
+              name: t.name,
+              color: t.color,
+              count: t.count
+            })));
+            prevNotesJson.current = JSON.stringify((data.notes || []).map((n: any) => ({
+              id: n.externalId || n.id,
+              title: n.title,
+              content: n.content,
+              tags: n.tags,
+              linkedTasks: n.linkedTasks,
+              linkedNotes: n.linkedNotes,
+              linkedProjects: n.linkedProjects,
+              pinned: n.pinned,
+              archived: n.archived,
+              dailyNote: n.dailyNote,
+              dailyNoteDate: n.dailyNoteDate
+            })));
+            
             initialLoadComplete.current = true;
             justLoadedFromDB.current = false;
             console.log('[AppContext] DB load complete, sync effects enabled');
