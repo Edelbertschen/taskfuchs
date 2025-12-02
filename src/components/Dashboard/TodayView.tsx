@@ -2,11 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { format } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
-import { Search, Sun, Moon, User, Calendar, Clock, Star, CheckSquare, FileText, AlertCircle, Menu, Settings, Cloud } from 'lucide-react';
+import { Search, Sun, Moon, User, Calendar, Clock, CheckSquare, FileText, AlertCircle, Menu, Settings, Cloud } from 'lucide-react';
 import { MaterialIcon } from '../Common/MaterialIcon';
 import { TodayTasksWidget } from './TodayTasksWidget';
 import { ChecklistWidget } from './ChecklistWidget';
-import { PinnedNotesWidget } from './PinnedNotesWidget';
 import { DeadlineWidget } from './DeadlineWidget';
 import { DraggableWidget } from './DraggableWidget';
 import { NextcloudSyncWidget } from './NextcloudSyncWidget';
@@ -192,7 +191,13 @@ export function TodayView({ onNavigate }: TodayViewProps = {}) {
         <div className="text-center mb-12">
           {/* Date Display */}
           <div className="mb-2">
-            <h1 className="text-3xl font-semibold text-gray-800 dark:text-gray-300 mb-3 font-sans">
+            <h1 className="text-3xl font-semibold mb-3 font-sans"
+              style={{ 
+                color: state.preferences.theme === 'dark' ? 'rgb(229, 231, 235)' : 'rgb(55, 65, 81)',
+                textShadow: state.preferences.theme === 'dark'
+                  ? '0 0 8px rgba(0, 0, 0, 0.8), 0 0 16px rgba(0, 0, 0, 0.5)'
+                  : '0 0 8px rgba(255, 255, 255, 0.9), 0 0 16px rgba(255, 255, 255, 0.6)'
+              }}>
               {format(new Date(), 'EEEE, d. MMMM', { locale: i18n.language === 'en' ? enUS : de })}
             </h1>
             <div className="flex items-center justify-center space-x-2 text-gray-600 dark:text-gray-400">
@@ -208,7 +213,14 @@ export function TodayView({ onNavigate }: TodayViewProps = {}) {
               alt="Fuchs Logo" 
               className="w-12 h-12 object-contain"
             />
-            <p className="text-4xl font-medium text-gray-800 dark:text-gray-300 tracking-wide" style={{ fontFamily: "'Roboto', sans-serif" }}>
+            <p className="text-4xl font-medium tracking-wide" 
+              style={{ 
+                fontFamily: "'Roboto', sans-serif",
+                color: state.preferences.theme === 'dark' ? 'rgb(255, 255, 255)' : 'rgb(31, 41, 55)',
+                textShadow: state.preferences.theme === 'dark'
+                  ? '0 0 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 0, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.9)'
+                  : '0 0 8px rgba(255, 255, 255, 0.9), 0 0 20px rgba(255, 255, 255, 0.7), 0 2px 4px rgba(0, 0, 0, 0.3)'
+              }}>
               {t('today.greeting')}
             </p>
           </div>
@@ -262,17 +274,6 @@ export function TodayView({ onNavigate }: TodayViewProps = {}) {
             onLayoutChange={handleLayoutChange}
           >
             <ChecklistWidget />
-          </DraggableWidget>
-
-          {/* Pinned Notes Widget */}
-          <DraggableWidget
-            id="pinned-notes"
-            title={t('dashboard.pinned_notes')}
-            icon={Star}
-            layout={getWidgetLayout('pinned-notes')}
-            onLayoutChange={handleLayoutChange}
-          >
-            <PinnedNotesWidget />
           </DraggableWidget>
 
           {/* Nextcloud Sync Widget */}

@@ -130,4 +130,88 @@ export function getBackgroundOverlayStyles(preferences: UserPreferences, isDarkM
   }
   
   return {};
+}
+
+/**
+ * Calculate the relative luminance of a color
+ * Returns a value between 0 (darkest) and 1 (lightest)
+ */
+function getLuminance(color: string): number {
+  let r: number, g: number, b: number;
+  
+  if (color.startsWith('#')) {
+    const hex = color.slice(1);
+    r = parseInt(hex.slice(0, 2), 16) / 255;
+    g = parseInt(hex.slice(2, 4), 16) / 255;
+    b = parseInt(hex.slice(4, 6), 16) / 255;
+  } else if (color.startsWith('rgb')) {
+    const match = color.match(/\d+/g);
+    if (!match) return 0.5;
+    r = parseInt(match[0]) / 255;
+    g = parseInt(match[1]) / 255;
+    b = parseInt(match[2]) / 255;
+  } else {
+    return 0.5; // Default to middle for unknown formats
+  }
+  
+  // Convert to linear RGB
+  const toLinear = (c: number) => c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  
+  // Calculate relative luminance (WCAG formula)
+  return 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
+}
+
+/**
+ * Get contrasting text color based on background
+ * Returns a color value from white to black depending on background brightness
+ */
+export function getContrastingTextColor(preferences: UserPreferences, isDarkMode: boolean): string {
+  const backgroundType = preferences.backgroundType || 'image';
+  
+  // For background images, use light text with good shadow (images are usually complex)
+  if (backgroundType === 'image' && preferences.backgroundImage) {
+    // Most background images are darker/complex, so use light text
+    // But some bg images are light (like bg12, bg14, bg22-25)
+    const lightBgImages = ['bg12', 'bg14', 'bg22', 'bg23', 'bg24', 'bg25'];
+    const isLightBgImage = lightBgImages.some(img => preferences.backgroundImage?.includes(img));
+    
+    if (isLightBgImage && !isDarkMode) {
+      return 'rgb(31, 41, 55)'; // Dark gray for light backgrounds
+    }
+    return 'rgb(255, 255, 255)'; // White for dark/complex backgrounds
+  }
+  
+  // For solid colors, calculate luminance
+  if (backgroundType === 'color' && preferences.backgroundColor) {
+    const color = isDarkMode ? darkenColor(preferences.backgroundColor) : preferences.backgroundColor;
+    const luminance = getLuminance(color);
+    
+    // Use dark text on light backgrounds (luminance > 0.5)
+    if (luminance > 0.5) {
+      return 'rgb(17, 24, 39)'; // Darkest (gray-900)
+    } else if (luminance > 0.3) {
+      return 'rgb(243, 244, 246)'; // Light gray
+    } else {
+      return 'rgb(255, 255, 255)'; // White for very dark backgrounds
+    }
+  }
+  
+  // For gradients, use the "from" color to estimate
+  if (backgroundType === 'gradient') {
+    const fromColor = isDarkMode 
+      ? darkenColor(preferences.gradientFrom || '#374151')
+      : (preferences.gradientFrom || '#f3f4f6');
+    const luminance = getLuminance(fromColor);
+    
+    if (luminance > 0.5) {
+      return 'rgb(17, 24, 39)';
+    } else if (luminance > 0.3) {
+      return 'rgb(243, 244, 246)';
+    } else {
+      return 'rgb(255, 255, 255)';
+    }
+  }
+  
+  // Default: use theme-appropriate colors
+  return isDarkMode ? 'rgb(243, 244, 246)' : 'rgb(55, 65, 81)';
 } 

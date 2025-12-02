@@ -4826,9 +4826,9 @@ const Settings = React.memo(() => {
                 <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <div className="font-medium text-gray-900 dark:text-white">Screenshots & Bilder verwalten</div>
+                      <div className="font-medium text-gray-900 dark:text-white">{t('settings_data.manageImagesTitle', 'Screenshots & Manage Images')}</div>
                       <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        Verwalte alle über Copy & Paste eingefügten Bilder in deinen Notizen
+                        {t('settings_data.manageImagesDesc', 'Manage all images added via copy & paste in your notes')}
                       </div>
                     </div>
                     <button
@@ -4837,19 +4837,19 @@ const Settings = React.memo(() => {
                       style={getAccentColorStyles().bg}
                     >
                       <ImageIcon className="w-4 h-4" />
-                      <span>Bilder verwalten</span>
+                      <span>{t('settings_data.manageImages', 'Manage Images')}</span>
                     </button>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div className="bg-white dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600">
-                      <div className="text-sm text-gray-500 dark:text-gray-400">Gespeicherte Bilder</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">{t('settings_data.savedImages', 'Saved Images')}</div>
                       <div className="text-xl font-semibold text-gray-900 dark:text-white">
                         {state.imageStorage.images.length}
                       </div>
                     </div>
                     <div className="bg-white dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600">
-                      <div className="text-sm text-gray-500 dark:text-gray-400">Verwendeter Speicher</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">{t('settings_data.storageUsed', 'Storage Used')}</div>
                       <div className="text-xl font-semibold text-gray-900 dark:text-white">
                         {Math.round((state.imageStorage.totalSize / state.imageStorage.maxSize) * 100)}%
                       </div>
@@ -4857,7 +4857,7 @@ const Settings = React.memo(() => {
                   </div>
                   
                   <div className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                    💡 <strong>Tipp:</strong> Füge Screenshots direkt in deine Notizen ein mit Cmd+V (Mac) oder Ctrl+V (Windows/Linux)
+                    💡 <strong>{t('common.tip', 'Tip')}:</strong> {t('settings_data.imageTip', 'Paste screenshots directly into your notes with Cmd+V (Mac) or Ctrl+V (Windows/Linux)')}
                   </div>
                   
                   <div className="pt-4 border-t border-gray-200 dark:border-gray-600">
@@ -4872,12 +4872,12 @@ const Settings = React.memo(() => {
                 </div>
                 
                 <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <div className="font-medium text-gray-900 dark:text-white mb-3">Automatische Bereinigung</div>
+                  <div className="font-medium text-gray-900 dark:text-white mb-3">{t('settings_data.autoCleanup', 'Automatic Cleanup')}</div>
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <div className="text-sm text-gray-900 dark:text-white">Ungenutzte Bilder automatisch löschen</div>
+                      <div className="text-sm text-gray-900 dark:text-white">{t('settings_data.autoDeleteUnusedImages', 'Automatically delete unused images')}</div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        Bilder werden nach {state.imageStorage.cleanupAfterDays} Tagen gelöscht, wenn sie nicht mehr verwendet werden
+                        {t('settings_data.imagesDeletedAfter', { days: state.imageStorage.cleanupAfterDays, defaultValue: `Images will be deleted after ${state.imageStorage.cleanupAfterDays} days if they are no longer used` })}
                       </div>
                     </div>
                     <Toggle 
@@ -7760,14 +7760,14 @@ const Settings = React.memo(() => {
             {/* Image Storage Tab */}
             {activeDataTab === 'data-images' && (
             <div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Bildspeicher</h3>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{t('settings_data.imageStorage', 'Image Storage')}</h3>
               <div className="space-y-6">
                 <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <div className="font-medium text-gray-900 dark:text-white">Screenshots & Bilder verwalten</div>
+                      <div className="font-medium text-gray-900 dark:text-white">{t('settings_data.manageImagesTitle', 'Screenshots & Manage Images')}</div>
                       <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        Verwalte alle über Copy & Paste eingefügten Bilder in deinen Notizen
+                        {t('settings_data.manageImagesDesc', 'Manage all images added via copy & paste in your notes')}
                       </div>
                     </div>
                     <button
@@ -7776,21 +7776,21 @@ const Settings = React.memo(() => {
                       style={getAccentColorStyles().bg}
                     >
                       <ImageIcon className="w-4 h-4" />
-                      <span>Bilder verwalten</span>
+                      <span>{t('settings_data.manageImages', 'Manage Images')}</span>
                     </button>
                   </div>
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div className="bg-white dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600">
-                      <div className="text-sm text-gray-500 dark:text-gray-400">Gespeicherte Bilder</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">{t('settings_data.savedImages', 'Saved Images')}</div>
                       <div className="text-xl font-semibold text-gray-900 dark:text-white">{state.imageStorage.images.length}</div>
                     </div>
                     <div className="bg-white dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600">
-                      <div className="text-sm text-gray-500 dark:text-gray-400">Verwendeter Speicher</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">{t('settings_data.storageUsed', 'Storage Used')}</div>
                       <div className="text-xl font-semibold text-gray-900 dark:text-white">{Math.round((state.imageStorage.totalSize / state.imageStorage.maxSize) * 100)}%</div>
                     </div>
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                    💡 <strong>Tipp:</strong> Füge Screenshots direkt in deine Notizen ein mit Cmd+V (Mac) oder Ctrl+V (Windows/Linux)
+                    💡 <strong>{t('common.tip', 'Tip')}:</strong> {t('settings_data.imageTip', 'Paste screenshots directly into your notes with Cmd+V (Mac) or Ctrl+V (Windows/Linux)')}
                   </div>
                   <div className="pt-4 border-t border-gray-200 dark:border-gray-600">
                     <button
@@ -7803,11 +7803,11 @@ const Settings = React.memo(() => {
                   </div>
                 </div>
                 <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <div className="font-medium text-gray-900 dark:text-white mb-3">Automatische Bereinigung</div>
+                  <div className="font-medium text-gray-900 dark:text-white mb-3">{t('settings_data.autoCleanup', 'Automatic Cleanup')}</div>
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <div className="text-sm text-gray-900 dark:text-white">Ungenutzte Bilder automatisch löschen</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">Bilder werden nach {state.imageStorage.cleanupAfterDays} Tagen gelöscht, wenn sie nicht mehr verwendet werden</div>
+                      <div className="text-sm text-gray-900 dark:text-white">{t('settings_data.autoDeleteUnusedImages', 'Automatically delete unused images')}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('settings_data.imagesDeletedAfter', { days: state.imageStorage.cleanupAfterDays, defaultValue: `Images will be deleted after ${state.imageStorage.cleanupAfterDays} days if they are no longer used` })}</div>
                     </div>
                     <Toggle
                       enabled={state.imageStorage.autoCleanup}
@@ -8018,15 +8018,15 @@ const Settings = React.memo(() => {
             {/* Danger Zone Tab */}
             {activeDataTab === 'data-danger' && (
             <div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Gefahrenzone</h3>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{t('settings_data.dangerZone', 'Danger Zone')}</h3>
               <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-4 border border-red-200 dark:border-red-800">
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-medium text-red-800 dark:text-red-400">
-                      Alle Daten unwiderruflich löschen
+                      {t('settings_data.deleteAllData', 'Delete all data permanently')}
                     </h4>
                     <p className="text-sm text-red-600 dark:text-red-500">
-                      Alle Aufgaben, Boards, Tags und Einstellungen permanent entfernen
+                      {t('settings_data.deleteAllDataDesc', 'Permanently remove all tasks, boards, tags and settings')}
                     </p>
                   </div>
                   <button
@@ -8034,7 +8034,7 @@ const Settings = React.memo(() => {
                     className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2"
                   >
                     <Trash2 className="w-4 h-4" />
-                    <span>Alles löschen</span>
+                    <span>{t('settings_data.deleteAll', 'Delete All')}</span>
                   </button>
                 </div>
               </div>

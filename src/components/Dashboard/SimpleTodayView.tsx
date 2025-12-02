@@ -1986,11 +1986,16 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
           <div className="mb-12 max-w-4xl mx-auto text-center">
             <div className="flex items-center justify-center space-x-2 mb-4">
               <MaterialIcon name="wb_sunny" size={20} style={{ color: state.preferences.accentColor }} />
-                              <h1 className={`text-lg font-medium tracking-wide ${
-                isMinimalDesign 
-                  ? 'text-gray-700 dark:text-gray-300' 
-                  : 'text-gray-300 dark:text-gray-400'
-              }`} style={{ fontFamily: "'Roboto', sans-serif" }}>
+                              <h1 className="text-lg font-medium tracking-wide"
+                style={{ 
+                  fontFamily: "'Roboto', sans-serif",
+                  color: isDarkMode ? 'rgb(229, 231, 235)' : 'rgb(55, 65, 81)',
+                  textShadow: isMinimalDesign 
+                    ? 'none' 
+                    : isDarkMode
+                      ? '0 0 8px rgba(0, 0, 0, 0.8), 0 0 16px rgba(0, 0, 0, 0.5)'
+                      : '0 0 8px rgba(255, 255, 255, 0.9), 0 0 16px rgba(255, 255, 255, 0.6)'
+                }}>
                 {format(new Date(), 'EEEE, d. MMMM', { locale: i18n.language === 'en' ? enUS : de })}
               </h1>
             </div>
@@ -2001,11 +2006,16 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
                 className="w-24 h-24 object-contain"
                 onError={(e) => { (e.currentTarget as HTMLImageElement).src = getImagePath('Fuchs.svg'); }}
               />
-              <p className={`text-4xl font-medium tracking-wide ${
-                isMinimalDesign 
-                  ? 'text-gray-800 dark:text-gray-100' 
-                  : 'text-gray-300 dark:text-gray-200'
-              }`} style={{ fontFamily: "'Roboto', sans-serif" }}>
+              <p className="text-4xl font-medium tracking-wide" 
+                style={{ 
+                  fontFamily: "'Roboto', sans-serif",
+                  color: isDarkMode ? 'rgb(255, 255, 255)' : 'rgb(31, 41, 55)',
+                  textShadow: isMinimalDesign 
+                    ? 'none' 
+                    : isDarkMode
+                      ? '0 0 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 0, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.9)'
+                      : '0 0 8px rgba(255, 255, 255, 0.9), 0 0 20px rgba(255, 255, 255, 0.7), 0 2px 4px rgba(0, 0, 0, 0.3)'
+                }}>
                 {t('today.greeting')}
               </p>
             </div>
