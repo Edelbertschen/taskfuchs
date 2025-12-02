@@ -36,7 +36,7 @@ import {
   Clock, FileText, Edit3, Bold, Italic, Code, List, ListOrdered, 
   Link as LinkIcon, Minus, HelpCircle, Heading1, Heading2, Heading3, ExternalLink,
   Zap, CheckSquare, Bell, Calendar, Edit, Settings, Trash2, MoreVertical,
-  Sun, Moon, ChevronDown, ChevronUp
+  Sun, Moon, ChevronDown, ChevronUp, ChevronRight
 } from 'lucide-react';
 import { TaskModal } from '../Tasks/TaskModal';
 import { SmartTaskModal } from '../Tasks/SmartTaskModal';
@@ -108,8 +108,8 @@ function DropZone({ id, className, children }: { id: string; className?: string;
 
 // Standardized Widget Styles - für absolute Konsistenz
 const WIDGET_STYLES = {
-  // Container Styles
-  container: "p-6 rounded-2xl transition-all duration-300 h-[450px] flex flex-col",
+  // Container Styles - min-h für dynamische Höhe, max-h für Begrenzung
+  container: "p-6 rounded-2xl transition-all duration-300 min-h-[450px] max-h-[600px] flex flex-col",
   
   // Header Styles  
   header: "flex items-center gap-4 mb-4",
@@ -1891,6 +1891,7 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
                           { light: 'bg18.webp', dark: 'bg19.webp' },
                           { light: 'bg22.webp', dark: 'bg23.webp' },
                           { light: 'bg24.webp', dark: 'bg25.webp' },
+                          { light: 'bg26.webp', dark: 'bg27.webp' },
                         ].map((pair) => {
                         const isSelected = state.preferences.backgroundImage?.includes(pair.light) || state.preferences.backgroundImage?.includes(pair.dark);
                         return (
@@ -2193,25 +2194,94 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
                   items={todayTasks.map(t => t.id)}
                   strategy={verticalListSortingStrategy}
                 >
-                  <div className="space-y-1">
-                    {todayTasks.map((task, index) => (
-                      <SwipeableTaskCard
-                        key={task.id}
-                        onSwipeLeft={() => {
-                          setLastArchivedTaskId(task.id);
-                          dispatch({ type: 'UPDATE_TASK', payload: { ...task, columnId: 'archive' } });
-                          setSnackbarOpen(true);
-                        }}
-                        onSwipeRight={() => handleTaskClick(task.id)}
-                      >
-                        <TaskCard
-                          task={task}
-                          isFirst={index === 0}
-                          isLast={index === todayTasks.length - 1}
-                        />
-                      </SwipeableTaskCard>
-                    ))}
+                  {/* Adaptive Grid Layout: 
+                      1-5 Aufgaben: 1 Spalte
+                      6-10 Aufgaben: 2 Spalten 
+                      11+ Aufgaben: 3 Spalten mit horizontalem Scroll */}
+                  <div className={`relative ${
+                    todayTasks.length <= 5 
+                      ? 'space-y-1' 
+                      : todayTasks.length <= 10 
+                        ? 'grid grid-cols-2 gap-2' 
+                        : 'flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600'
+                  }`}>
+                    {todayTasks.length <= 10 ? (
+                      // 1 oder 2 Spalten - alle Aufgaben direkt anzeigen
+                      todayTasks.map((task, index) => (
+                        <SwipeableTaskCard
+                          key={task.id}
+                          onSwipeLeft={() => {
+                            setLastArchivedTaskId(task.id);
+                            dispatch({ type: 'UPDATE_TASK', payload: { ...task, columnId: 'archive' } });
+                            setSnackbarOpen(true);
+                          }}
+                          onSwipeRight={() => handleTaskClick(task.id)}
+                        >
+                          <TaskCard
+                            task={task}
+                            isFirst={todayTasks.length <= 5 ? index === 0 : false}
+                            isLast={todayTasks.length <= 5 ? index === todayTasks.length - 1 : false}
+                          />
+                        </SwipeableTaskCard>
+                      ))
+                    ) : (
+                      // 3 Spalten - horizontaler Scroll
+                      (() => {
+                        // Aufgaben in 3 Spalten aufteilen (je max 5 pro Spalte)
+                        const columns: Task[][] = [[], [], []];
+                        todayTasks.forEach((task, idx) => {
+                          const colIndex = Math.floor(idx / 5) % 3;
+                          if (columns[colIndex].length < 5 || Math.floor(idx / 15) === Math.floor((idx - 1) / 15)) {
+                            columns[Math.min(Math.floor(idx / 5), 2)].push(task);
+                          }
+                        });
+                        
+                        // Für mehr als 15 Aufgaben: weitere Spaltengruppen erstellen
+                        const totalColumns = Math.ceil(todayTasks.length / 5);
+                        const allColumns: Task[][] = [];
+                        for (let i = 0; i < totalColumns; i++) {
+                          allColumns.push(todayTasks.slice(i * 5, (i + 1) * 5));
+                        }
+                        
+                        return allColumns.map((columnTasks, colIdx) => (
+                          <div key={`col-${colIdx}`} className="flex-shrink-0 w-[280px] space-y-1">
+                            {columnTasks.map((task) => (
+                              <SwipeableTaskCard
+                                key={task.id}
+                                onSwipeLeft={() => {
+                                  setLastArchivedTaskId(task.id);
+                                  dispatch({ type: 'UPDATE_TASK', payload: { ...task, columnId: 'archive' } });
+                                  setSnackbarOpen(true);
+                                }}
+                                onSwipeRight={() => handleTaskClick(task.id)}
+                              >
+                                <TaskCard
+                                  task={task}
+                                  isFirst={false}
+                                  isLast={false}
+                                />
+                              </SwipeableTaskCard>
+                            ))}
+                          </div>
+                        ));
+                      })()
+                    )}
                   </div>
+                  
+                  {/* Scroll-Hinweis bei mehr als 10 Aufgaben */}
+                  {todayTasks.length > 10 && (
+                    <div 
+                      className={`flex items-center justify-center gap-2 mt-3 py-2 px-4 rounded-lg text-sm ${
+                        isMinimalDesign 
+                          ? 'bg-gray-100 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400' 
+                          : 'bg-white/10 text-white/80'
+                      }`}
+                    >
+                      <ChevronRight className="w-4 h-4 animate-pulse" style={{ color: state.preferences.accentColor }} />
+                      <span>{i18n.language === 'en' ? 'Scroll right for more tasks' : 'Nach rechts scrollen für weitere Aufgaben'}</span>
+                      <ChevronRight className="w-4 h-4 animate-pulse" style={{ color: state.preferences.accentColor }} />
+                    </div>
+                  )}
                 </SortableContext>
               </>
               )}

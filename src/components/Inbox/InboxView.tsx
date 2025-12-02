@@ -19,7 +19,7 @@ import {
   X,
   FolderOpen,
   Hash,
-  
+  Flag,
   Inbox,
   Plus,
   Filter,
@@ -1686,11 +1686,47 @@ function InboxTaskCard({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
+  const [showPriorityPopup, setShowPriorityPopup] = useState(false);
+  const priorityButtonRef = React.useRef<HTMLButtonElement>(null);
+
+  // Handle priority change
+  const handlePriorityChange = (priority: 'none' | 'low' | 'medium' | 'high') => {
+    dispatch({
+      type: 'UPDATE_TASK',
+      payload: {
+        ...task,
+        priority,
+        updatedAt: new Date().toISOString()
+      }
+    });
+    setShowPriorityPopup(false);
+  };
+
+  // Close priority popup when clicking outside
+  useEffect(() => {
+    if (!showPriorityPopup) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      // Check if click is inside the popup container (which includes the button)
+      const popupContainer = priorityButtonRef.current?.parentElement;
+      if (popupContainer && !popupContainer.contains(e.target as Node)) {
+        setShowPriorityPopup(false);
+      }
+    };
+    // Use setTimeout to avoid closing immediately when opening
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('click', handleClickOutside);
+    }, 0);
+    return () => {
+      clearTimeout(timeoutId);
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [showPriorityPopup]);
 
   // Handle context menu (right-click)
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    setShowPriorityPopup(false); // Close priority popup when context menu opens
     setContextMenu({ x: e.clientX, y: e.clientY });
   };
 
@@ -1704,17 +1740,19 @@ function InboxTaskCard({
   }, [contextMenu]);
 
   const handleComplete = () => {
-    // Stop timer if it's running for this task
-    if (state.activeTimer && state.activeTimer.taskId === task.id) {
+    // If task is being completed, archive it directly
+    if (!task.completed) {
       dispatch({
-        type: 'STOP_TIMER'
+        type: 'ARCHIVE_TASK',
+        payload: task.id
+      });
+    } else {
+      // If task is already completed (unchecking), just toggle completion
+      dispatch({
+        type: 'UPDATE_TASK',
+        payload: { ...task, completed: false }
       });
     }
-    
-    dispatch({
-      type: 'UPDATE_TASK',
-      payload: { ...task, completed: !task.completed }
-    });
   };
 
   const handleDelete = () => {
@@ -1831,6 +1869,7 @@ function InboxTaskCard({
                 >
                   {task.title}
                 </span>
+                {/* Priority Badge - display only, not clickable */}
                 {task.priority && task.priority !== 'none' && (
                   <span 
                     className="px-2 py-0.5 rounded-full text-xs font-medium backdrop-blur-xl"
@@ -1874,6 +1913,38 @@ function InboxTaskCard({
             className={`flex items-center space-x-2 ${isOnboardingSampleTask ? 'onboarding-pulse-icons' : ''}`}
             data-onboarding-task-icons={isOnboardingSampleTask ? 'true' : undefined}
           >
+            {/* Priority button - always visible if priority set, otherwise on hover */}
+            <button
+              ref={priorityButtonRef}
+              data-task-icon="priority"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowPriorityPopup(!showPriorityPopup);
+              }}
+              onPointerDown={(e) => e.stopPropagation()}
+              className={`p-2 rounded-lg backdrop-blur-xl border transition-all duration-200 hover:scale-110 ${
+                (task.priority && task.priority !== 'none') || isOnboardingSampleTask
+                  ? 'opacity-100' 
+                  : 'opacity-0 group-hover:opacity-100'
+              }`}
+              style={{ 
+                background: task.priority === 'high' ? 'rgba(239, 68, 68, 0.2)' :
+                           task.priority === 'medium' ? 'rgba(245, 158, 11, 0.2)' :
+                           task.priority === 'low' ? 'rgba(34, 197, 94, 0.2)' :
+                           'rgba(255, 255, 255, 0.1)',
+                borderColor: task.priority === 'high' ? 'rgb(239, 68, 68)' :
+                            task.priority === 'medium' ? 'rgb(245, 158, 11)' :
+                            task.priority === 'low' ? 'rgb(34, 197, 94)' :
+                            'rgba(255, 255, 255, 0.2)',
+                color: task.priority === 'high' ? 'rgb(239, 68, 68)' :
+                      task.priority === 'medium' ? 'rgb(245, 158, 11)' :
+                      task.priority === 'low' ? 'rgb(34, 197, 94)' :
+                      (isDarkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgb(17, 24, 39)')
+              }}
+              title="Priorität ändern"
+            >
+              <Flag className="w-4 h-4" />
+            </button>
             {/* Date button - always visible if date set, otherwise on hover */}
             <button
               data-task-icon="date"
@@ -1977,6 +2048,43 @@ function InboxTaskCard({
       />
     </div>
 
+    {/* Priority Popup - rendered via Portal to ensure it's on top of everything */}
+    {showPriorityPopup && priorityButtonRef.current && createPortal(
+      <div 
+        className="fixed z-[99999] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-1 min-w-[140px]"
+        style={{ 
+          left: priorityButtonRef.current.getBoundingClientRect().right - 140,
+          top: priorityButtonRef.current.getBoundingClientRect().bottom + 4
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {[
+          { value: 'high', label: t('tasks.priority.high'), color: 'rgb(239, 68, 68)' },
+          { value: 'medium', label: t('tasks.priority.medium'), color: 'rgb(245, 158, 11)' },
+          { value: 'low', label: t('tasks.priority.low'), color: 'rgb(34, 197, 94)' },
+          { value: 'none', label: t('tasks.priority.none') || 'Keine', color: 'rgb(156, 163, 175)' }
+        ].map((prio) => (
+          <button
+            key={prio.value}
+            onClick={(e) => {
+              e.stopPropagation();
+              handlePriorityChange(prio.value as any);
+            }}
+            className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2 ${
+              task.priority === prio.value || (!task.priority && prio.value === 'none') ? 'bg-gray-50 dark:bg-gray-700/50' : ''
+            }`}
+          >
+            <Flag className="w-4 h-4" style={{ color: prio.color }} />
+            <span className="text-gray-700 dark:text-gray-300">{prio.label}</span>
+            {(task.priority === prio.value || (!task.priority && prio.value === 'none')) && (
+              <Check className="w-4 h-4 ml-auto" style={{ color: accentColor }} />
+            )}
+          </button>
+        ))}
+      </div>,
+      document.body
+    )}
+
     {/* Context Menu - rendered via Portal to ensure it's on top of everything */}
     {contextMenu && createPortal(
       <div 
@@ -2018,6 +2126,48 @@ function InboxTaskCard({
           <Calendar className="w-4 h-4" />
           <span>{task.reminderDate ? 'Datum entfernen' : 'Termin setzen'}</span>
         </button>
+        {/* Priority submenu in context menu */}
+        <div className="relative group/priority">
+          <button
+            className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-between"
+          >
+            <div className="flex items-center space-x-2">
+              <Flag className="w-4 h-4" style={{ 
+                color: task.priority === 'high' ? 'rgb(239, 68, 68)' :
+                       task.priority === 'medium' ? 'rgb(245, 158, 11)' :
+                       task.priority === 'low' ? 'rgb(34, 197, 94)' : undefined
+              }} />
+              <span>{t('task_modal.priority')}</span>
+            </div>
+            <ChevronRight className="w-4 h-4" />
+          </button>
+          {/* Priority submenu */}
+          <div className="absolute left-full top-0 ml-1 hidden group-hover/priority:block bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-1 min-w-[120px]">
+            {[
+              { value: 'high', label: t('tasks.priority.high'), color: 'rgb(239, 68, 68)' },
+              { value: 'medium', label: t('tasks.priority.medium'), color: 'rgb(245, 158, 11)' },
+              { value: 'low', label: t('tasks.priority.low'), color: 'rgb(34, 197, 94)' },
+              { value: 'none', label: t('tasks.priority.none') || 'Keine', color: 'rgb(156, 163, 175)' }
+            ].map((prio) => (
+              <button
+                key={prio.value}
+                onClick={() => {
+                  handlePriorityChange(prio.value as any);
+                  setContextMenu(null);
+                }}
+                className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2 ${
+                  task.priority === prio.value || (!task.priority && prio.value === 'none') ? 'bg-gray-50 dark:bg-gray-700/50' : ''
+                }`}
+              >
+                <Flag className="w-4 h-4" style={{ color: prio.color }} />
+                <span className="text-gray-700 dark:text-gray-300">{prio.label}</span>
+                {(task.priority === prio.value || (!task.priority && prio.value === 'none')) && (
+                  <Check className="w-4 h-4 ml-auto" style={{ color: accentColor }} />
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
         <button
           onClick={() => {
             onProjectSelect();

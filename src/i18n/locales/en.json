@@ -1144,7 +1144,7 @@
     "click_to_edit": "Click to edit",
     "delete_tag": "Delete tag",
     "delete_tag_title": "Delete Tag",
-    "delete_confirmation": "Do you really want to delete the tag \"#{name}\"?",
+    "delete_confirmation": "Do you really want to delete the tag \"{{name}}\"?",
     "cancel": "Cancel",
     "delete": "Delete",
     "title": "Manage Tags",
@@ -1567,6 +1567,12 @@
       "title": "Inbox is empty",
       "description": "No tasks in inbox. Use the smart button to create new tasks.",
       "createFirst": "Create first task"
+    },
+    "tooltips": {
+      "deleteTasks": "Delete tasks"
+    },
+    "delete_confirmation": {
+      "multiple": "Are you sure you want to delete {count} selected tasks?"
     }
   },
   "backup_modal": {

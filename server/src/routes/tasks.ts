@@ -243,6 +243,7 @@ app.post('/:id/archive', async (c) => {
     where: { id: taskId },
     data: {
       archived: true,
+      completed: true,
       updatedAt: new Date()
     }
   });

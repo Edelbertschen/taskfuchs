@@ -264,8 +264,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
   const newSubtaskRef = useRef<HTMLInputElement>(null);
 
   const [isEditingTime, setIsEditingTime] = useState(false);
-  const [editTimeHours, setEditTimeHours] = useState(0);
-  const [editTimeMinutes, setEditTimeMinutes] = useState(0);
+  const [editTimeInMinutes, setEditTimeInMinutes] = useState(0);
   const [isEditingEstimatedTime, setIsEditingEstimatedTime] = useState(false);
   // Legacy reminder fields - will be removed when fully migrated
   const [showReminderFields, setShowReminderFields] = useState(false);
@@ -1070,12 +1069,10 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
   // Start editing time
   const startTimeEditing = () => {
     const currentTime = getCurrentTrackedTime();
-    const { hours, minutes } = minutesToHoursAndMinutes(currentTime);
-    setEditTimeHours(hours);
-    setEditTimeMinutes(minutes);
+    setEditTimeInMinutes(Math.round(currentTime));
     setIsEditingTime(true);
     
-    // Focus the hours input after rendering
+    // Focus the input after rendering
     setTimeout(() => {
       const firstInput = document.querySelector('[data-tracked-time-input]') as HTMLInputElement;
       if (firstInput) firstInput.focus();
@@ -1085,9 +1082,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
   // Save edited time
   const saveEditedTime = () => {
     // Validate input
-    const validHours = Math.max(0, editTimeHours);
-    const validMinutes = Math.max(0, Math.min(59, editTimeMinutes));
-    const newTrackedTime = hoursAndMinutesToMinutes(validHours, validMinutes);
+    const newTrackedTime = Math.max(0, editTimeInMinutes);
     
     if (!task) return;
 
@@ -1101,15 +1096,13 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
     });
 
     setIsEditingTime(false);
-    setEditTimeHours(0);
-    setEditTimeMinutes(0);
+    setEditTimeInMinutes(0);
   };
 
   // Cancel time editing
   const cancelTimeEditing = () => {
     setIsEditingTime(false);
-    setEditTimeHours(0);
-    setEditTimeMinutes(0);
+    setEditTimeInMinutes(0);
   };
 
   // Reset tracked time to zero
@@ -2763,7 +2756,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                     <div className="flex items-center space-x-2">
                       <BookOpen className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                       <label className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                        Description
+                        {taskModal.descriptionTitle()}
                   </label>
                     </div>
                     <div className="flex items-center space-x-1">
@@ -2873,7 +2866,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-2">
                       <label className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                        Subtasks ({formData.subtasks.length})
+                        {taskModal.subtasksTitle()} ({formData.subtasks.length})
                       </label>
                       {formData.subtasks.length > 0 && (
                         <button
@@ -2955,29 +2948,28 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                 {/* Priority Buttons - Elegant Pills */}
                 <div data-onboarding-priority="true" data-task-priority="true">
                   <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">
-                    Priority
+                    {taskModal.priority()}
                   </label>
                   <div className="flex gap-2 items-center">
                     {[
-                      { value: 'low', label: "Low", colorBg: 'rgba(34, 197, 94, 0.12)', colorBorder: 'rgb(34, 197, 94)', icon: '!' },
-                      { value: 'medium', label: "Medium", colorBg: 'rgba(234, 179, 8, 0.12)', colorBorder: 'rgb(234, 179, 8)', icon: '!!' },
-                      { value: 'high', label: "High", colorBg: 'rgba(239, 68, 68, 0.12)', colorBorder: 'rgb(239, 68, 68)', icon: '!!!' }
+                      { value: 'low', label: taskModal.priorityLow(), colorBg: 'rgba(34, 197, 94, 0.12)', colorBorder: 'rgb(34, 197, 94)' },
+                      { value: 'medium', label: taskModal.priorityMedium(), colorBg: 'rgba(234, 179, 8, 0.12)', colorBorder: 'rgb(234, 179, 8)' },
+                      { value: 'high', label: taskModal.priorityHigh(), colorBg: 'rgba(239, 68, 68, 0.12)', colorBorder: 'rgb(239, 68, 68)' }
                     ].map((priority) => (
                       <button
                         key={priority.value}
                         onClick={() => setFormData(prev => ({ ...prev, priority: priority.value as any }))}
-                        className={`relative px-3 py-2 rounded-xl text-xs font-bold transition-all duration-300 cursor-pointer ${
+                        className={`relative px-3 py-1.5 rounded-xl text-xs font-medium transition-all duration-300 cursor-pointer ${
                           formData.priority === priority.value ? 'scale-105 shadow-sm' : 'opacity-50 hover:opacity-80'
                         }`}
                         style={{
                           backgroundColor: formData.priority === priority.value ? priority.colorBg : 'transparent',
                           border: `1.5px solid ${formData.priority === priority.value ? priority.colorBorder : priority.colorBorder + '30'}`,
                           color: priority.colorBorder,
-                          fontFamily: 'system-ui',
                         }}
                         title={priority.label}
                       >
-                        {priority.icon}
+                        {priority.label}
                       </button>
                     ))}
                     
@@ -3018,95 +3010,85 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                           }}
                           className="w-16 text-right px-2 py-1 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1"
                           style={{ '--tw-ring-color': state.preferences.accentColor } as React.CSSProperties}
-                          placeholder="0"
+                          placeholder=""
                         />
                         <span className="text-xs text-gray-400">min</span>
                       </div>
                     </div>
                     
                     {/* Tracked Time - Editable */}
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center space-x-2">
-                        <Timer className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm text-gray-600 dark:text-gray-400">{t('tasks.modal.time_tracked')}</span>
-                      </div>
-                      {isEditingTime ? (
-                        <div className="flex items-center gap-1">
-                          <input
-                            type="number"
-                            min="0"
-                            value={editTimeHours}
-                            onChange={(e) => setEditTimeHours(Math.max(0, parseInt(e.target.value) || 0))}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                e.preventDefault();
-                                saveEditedTime();
-                              } else if (e.key === 'Escape') {
-                                e.preventDefault();
-                                cancelTimeEditing();
-                              }
-                            }}
-                            placeholder="0"
-                            data-tracked-time-input
-                            className="w-10 px-1 py-0.5 text-xs text-center border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1"
-                            style={{ '--tw-ring-color': state.preferences.accentColor } as React.CSSProperties}
-                          />
-                          <span className="text-xs text-gray-400">:</span>
-                          <input
-                            type="number"
-                            min="0"
-                            max="59"
-                            value={editTimeMinutes.toString().padStart(2, '0')}
-                            onChange={(e) => setEditTimeMinutes(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                e.preventDefault();
-                                saveEditedTime();
-                              } else if (e.key === 'Escape') {
-                                e.preventDefault();
-                                cancelTimeEditing();
-                              }
-                            }}
-                            placeholder="00"
-                            className="w-10 px-1 py-0.5 text-xs text-center border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1"
-                            style={{ '--tw-ring-color': state.preferences.accentColor } as React.CSSProperties}
-                          />
-                          <button
-                            onClick={saveEditedTime}
-                            className="p-0.5 text-green-500 hover:text-green-600 transition-colors"
-                            title={t('common.save')}
-                          >
-                            <Check className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={cancelTimeEditing}
-                            className="p-0.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                            title={t('common.cancel')}
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
+                    <div>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center space-x-2">
+                          <Timer className="w-4 h-4 text-gray-400" />
+                          <span className="text-sm text-gray-600 dark:text-gray-400">{t('tasks.modal.time_tracked')}</span>
                         </div>
-                      ) : (
-                        <button
-                          onClick={startTimeEditing}
-                          className="text-sm font-medium text-gray-900 dark:text-white hover:underline cursor-pointer transition-colors"
-                          style={{ color: state.preferences.accentColor }}
-                          title={t('tasks.modal.time_tracked_edit')}
-                        >
-                          {(() => {
-                            const trackedTime = getCurrentTrackedTime();
-                            if (trackedTime === 0) return '0:00';
-                            const roundedTime = Math.round(trackedTime);
-                            const hours = Math.floor(roundedTime / 60);
-                            const mins = roundedTime % 60;
-                            return `${hours}:${mins.toString().padStart(2, '0')}`;
-                          })()}
-                        </button>
+                        {isEditingTime ? (
+                          <div className="flex items-center gap-0.5">
+                            <input
+                              type="number"
+                              min="0"
+                              value={editTimeInMinutes || ''}
+                              onChange={(e) => setEditTimeInMinutes(Math.max(0, parseInt(e.target.value) || 0))}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  saveEditedTime();
+                                } else if (e.key === 'Escape') {
+                                  e.preventDefault();
+                                  cancelTimeEditing();
+                                }
+                              }}
+                              placeholder=""
+                              data-tracked-time-input
+                              className="w-12 px-1 py-0.5 text-xs text-right border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1"
+                              style={{ '--tw-ring-color': state.preferences.accentColor } as React.CSSProperties}
+                            />
+                            <span className="text-xs text-gray-400">m</span>
+                            <button
+                              onClick={saveEditedTime}
+                              className="p-0.5 rounded transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 ml-0.5 text-green-500"
+                              title={t('common.save')}
+                            >
+                              <Check className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={cancelTimeEditing}
+                              className="p-0.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
+                              title={t('common.cancel')}
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={startTimeEditing}
+                            className="text-sm font-medium text-gray-900 dark:text-white hover:underline cursor-pointer transition-colors"
+                            style={{ color: state.preferences.accentColor }}
+                            title={t('tasks.modal.time_tracked_edit')}
+                          >
+                            {(() => {
+                              const trackedTime = getCurrentTrackedTime();
+                              const roundedTime = Math.round(trackedTime);
+                              const hours = Math.floor(roundedTime / 60);
+                              const mins = roundedTime % 60;
+                              if (hours > 0) {
+                                return `${hours} h ${mins.toString().padStart(2, '0')} min`;
+                              }
+                              return `${mins} min`;
+                            })()}
+                          </button>
+                        )}
+                      </div>
+                      {isEditingTime && editTimeInMinutes > 0 && (
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 text-right">
+                          = {Math.floor(editTimeInMinutes / 60)}:{(editTimeInMinutes % 60).toString().padStart(2, '0')} h
+                        </div>
                       )}
                     </div>
                     
                     {/* Progress Bar (if estimated time is set) */}
-                    {formData.estimatedTime && formData.estimatedTime > 0 && (
+                    {(formData.estimatedTime ?? 0) > 0 && (
                       <div className="mt-2">
                         <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
                           <span>Fortschritt</span>
@@ -3321,7 +3303,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Reminder
+                      {taskModal.reminder()}
                     </label>
                     {!isEditingReminder && !(task?.reminderDate && task?.reminderTime) && (
                       <button
@@ -3592,14 +3574,14 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
               </div>
 
               {/* Creation & Update Info - at bottom */}
-              <div className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-600">
-                <div className="flex justify-between gap-4 text-xs text-gray-600 dark:text-gray-400">
+              <div className="mt-auto pt-4 border-t border-gray-100 dark:border-gray-700/50">
+                <div className="flex justify-between gap-4 text-[10px] text-gray-400 dark:text-gray-500">
                   <div className="flex-1">
-                    <span className="font-medium">{taskModal.created()}:</span><br />
+                    <span>{taskModal.created()}:</span><br />
                     {format(new Date(task.createdAt), 'dd.MM.yyyy HH:mm', { locale: de })}
                   </div>
                   <div className="flex-1 text-right">
-                    <span className="font-medium">{taskModal.lastModified()}:</span><br />
+                    <span>{taskModal.lastModified()}:</span><br />
                     {format(new Date(task.updatedAt), 'dd.MM.yyyy HH:mm', { locale: de })}
                   </div>
                 </div>

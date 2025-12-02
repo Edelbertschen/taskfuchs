@@ -1019,6 +1019,11 @@ function MainApp() {
         if (isBg24or25) {
           return isDarkMode ? '/backgrounds/bg25.webp' : '/backgrounds/bg24.webp';
         }
+        // Check for bg26/bg27 pair
+        const isBg26or27 = /\/backgrounds\/bg2(6|7)\.(png|jpg|webp)$/.test(img);
+        if (isBg26or27) {
+          return isDarkMode ? '/backgrounds/bg27.webp' : '/backgrounds/bg26.webp';
+        }
         return img;
       }
       // Fallback when no image is chosen: always use bg12.webp

@@ -703,6 +703,23 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      {/* Progress Bar - Top edge - elegant thin line */}
+      {totalEstimatedTime > 0 && !task.completed && (
+        <div
+          className="absolute top-0 left-0 right-0 h-[2px] rounded-t-lg overflow-hidden"
+          style={{ zIndex: 1 }}
+        >
+          <div
+            className="h-full transition-all duration-500 ease-out"
+            style={{
+              width: `${Math.min((trackedMinutes / totalEstimatedTime) * 100, 100)}%`,
+              backgroundColor: trackedMinutes > totalEstimatedTime ? '#ef4444' : accentColor,
+              opacity: 0.9,
+            }}
+          />
+        </div>
+      )}
+
       {/* Priority Bar - Left side */}
       {task.priority && getPriorityColor(task.priority) !== 'transparent' && (
                   <div

@@ -68,7 +68,7 @@ export function LoginPage({ isProcessingCallback = false }: LoginPageProps) {
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-500"
         style={{
-          backgroundImage: `url(${isDarkMode ? '/backgrounds/bg15.png' : '/backgrounds/bg14.png'})`,
+          backgroundImage: `url(${isDarkMode ? '/backgrounds/bg15.webp' : '/backgrounds/bg14.webp'})`,
           backgroundAttachment: 'fixed'
         }}
       />
@@ -107,10 +107,10 @@ export function LoginPage({ isProcessingCallback = false }: LoginPageProps) {
           : 'bg-white/80 border-white/40'
         } backdrop-blur-xl rounded-3xl shadow-2xl p-8 md:p-10 border`}>
           
-          {/* 3D Fox Logo */}
+          {/* Login Logo */}
           <div className="flex flex-col items-center mb-6">
             <img 
-              src={isDarkMode ? '/3d_fox_dark.png' : '/3d_fox_light.png'}
+              src={isDarkMode ? '/login_dark.webp' : '/login_light.webp'}
               alt="TaskFuchs" 
               className="w-32 h-32 object-contain drop-shadow-lg"
             />

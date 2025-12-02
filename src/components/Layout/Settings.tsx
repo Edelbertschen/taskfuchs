@@ -423,6 +423,10 @@ const Settings = React.memo(() => {
       '/backgrounds/bg21.webp',
       '/backgrounds/bg22.webp',
       '/backgrounds/bg23.webp',
+      '/backgrounds/bg24.webp',
+      '/backgrounds/bg25.webp',
+      '/backgrounds/bg26.webp',
+      '/backgrounds/bg27.webp',
       ...Array.from({ length: 11 }, (_, i) => `/backgrounds/bg${i + 1}.jpg`),
     ];
     const savedGallery = localStorage.getItem('backgroundImageGallery');
@@ -4342,6 +4346,7 @@ const Settings = React.memo(() => {
                             { light: 'bg18.webp', dark: 'bg19.webp' },
                             { light: 'bg22.webp', dark: 'bg23.webp' },
                             { light: 'bg24.webp', dark: 'bg25.webp' },
+                            { light: 'bg26.webp', dark: 'bg27.webp' },
                           ].map((pair) => {
                             const isSelected = state.preferences.backgroundImage?.includes(pair.light) || state.preferences.backgroundImage?.includes(pair.dark);
                             return (
@@ -4398,7 +4403,7 @@ const Settings = React.memo(() => {
                       
                       {/* Regular Gallery Images (excluding paired backgrounds) */}
                       {backgroundImageGallery
-                        .filter(url => !url.includes('bg12.webp') && !url.includes('bg13.webp') && !url.includes('bg14.webp') && !url.includes('bg15.webp') && !url.includes('bg16.webp') && !url.includes('bg17.webp') && !url.includes('bg18.webp') && !url.includes('bg19.webp') && !url.includes('bg22.webp') && !url.includes('bg23.webp') && !url.includes('bg24.webp') && !url.includes('bg25.webp'))
+                        .filter(url => !url.includes('bg12.webp') && !url.includes('bg13.webp') && !url.includes('bg14.webp') && !url.includes('bg15.webp') && !url.includes('bg16.webp') && !url.includes('bg17.webp') && !url.includes('bg18.webp') && !url.includes('bg19.webp') && !url.includes('bg22.webp') && !url.includes('bg23.webp') && !url.includes('bg24.webp') && !url.includes('bg25.webp') && !url.includes('bg26.webp') && !url.includes('bg27.webp'))
                         .map((imageUrl, index) => (
                         <div 
                           key={index}
@@ -4506,6 +4511,10 @@ const Settings = React.memo(() => {
                             '/backgrounds/bg21.webp',
                             '/backgrounds/bg22.webp',
                             '/backgrounds/bg23.webp',
+                            '/backgrounds/bg24.webp',
+                            '/backgrounds/bg25.webp',
+                            '/backgrounds/bg26.webp',
+                            '/backgrounds/bg27.webp',
                             ...Array.from({ length: 11 }, (_, i) => `/backgrounds/bg${i + 1}.jpg`),
                           ];
                           setBackgroundImageGallery(defaults);

@@ -136,7 +136,7 @@
       "description_click_to_edit": "Klicken zum Bearbeiten",
       "subtasks_add_first": "Erste Unteraufgabe hinzufügen",
       "time_estimated": "Geschätzte Zeit",
-      "time_tracked": "Aufgezeichnete Zeit",
+      "time_tracked": "Aufgez.",
       "time_tracked_edit": "Aufgezeichnete Zeit bearbeiten",
       "time_tracked_reset": "Aufgezeichnete Zeit zurücksetzen",
       "time_tracked_reset_confirm": "Möchten Sie die aufgezeichnete Zeit wirklich auf 0 zurücksetzen?",
@@ -1494,7 +1494,7 @@
     "click_to_edit": "Klicken zum Bearbeiten",
     "delete_tag": "Tag löschen",
     "delete_tag_title": "Tag löschen",
-    "delete_confirmation": "Möchten Sie den Tag \"#{name}\" wirklich löschen?",
+    "delete_confirmation": "Möchten Sie den Tag \"{{name}}\" wirklich löschen?",
     "cancel": "Abbrechen",
     "delete": "Löschen",
     "title": "Tags verwalten",
@@ -2065,6 +2065,12 @@
       "title": "Inbox ist leer",
       "description": "Keine Aufgaben in der Inbox. Verwende den Smart-Button, um neue Aufgaben zu erstellen.",
       "createFirst": "Erste Aufgabe erstellen"
+    },
+    "tooltips": {
+      "deleteTasks": "Aufgaben löschen"
+    },
+    "delete_confirmation": {
+      "multiple": "Möchten Sie {count} ausgewählte Aufgaben wirklich löschen?"
     }
   },
   "tagManager": {

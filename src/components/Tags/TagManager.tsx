@@ -646,7 +646,7 @@ export function TagManager() {
                 : 'text-gray-900 dark:text-white'
             }`}>{tagManager.deleteTagTitle()}</h3>
             <p className="text-gray-600 dark:text-gray-300 mb-6">
-              {tagManager.deleteConfirmation(tagToDelete?.name || '')}
+              {tagManager.deleteConfirmation({ name: tagToDelete?.name || '' })}
             </p>
             <div className="flex justify-end space-x-3">
               <button
