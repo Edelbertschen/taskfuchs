@@ -185,7 +185,7 @@ const Settings = React.memo(() => {
       id: 'appearance',
       title: t('settings.sections.appearance.title'),
       icon: Palette,
-      description: t('settings.sections.appearance.description_extended', 'Sprache, Theme, Farben & Design')
+      description: t('settings.sections.appearance.description_extended')
     },
     {
       id: 'notes',
@@ -3819,7 +3819,7 @@ const Settings = React.memo(() => {
                   {t('settings.sections.appearance.title')}
                 </h2>
                 <p className="text-gray-600 dark:text-gray-400">
-                  {t('settings.sections.appearance.description_extended', 'Sprache, Theme, Farben & Design')}
+                  {t('settings.sections.appearance.description_extended')}
                 </p>
               </div>
 
