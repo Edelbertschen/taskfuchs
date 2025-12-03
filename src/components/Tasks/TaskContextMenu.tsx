@@ -195,10 +195,10 @@ export function TaskContextMenu({
 
   const getPriorityText = (priority: string) => {
     switch (priority) {
-      case 'high': return tasks.priority.high();
-      case 'medium': return tasks.priority.medium();
-      case 'low': return tasks.priority.low();
-      default: return tasks.priority.none();
+      case 'high': return t('tasks.priority.high', 'High');
+      case 'medium': return t('tasks.priority.medium', 'Medium');
+      case 'low': return t('tasks.priority.low', 'Low');
+      default: return t('tasks.priority.none', 'None');
     }
   };
 
@@ -531,7 +531,7 @@ export function TaskContextMenu({
               className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
             >
               <div className="w-3 h-3 rounded-full bg-red-500" />
-              <span>{tasks.priority.high()}</span>
+              <span>{t('tasks.priority.high', 'High')}</span>
               {task.priority === 'high' && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-red-500" />}
             </button>
             <button
@@ -539,7 +539,7 @@ export function TaskContextMenu({
               className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-colors"
             >
               <div className="w-3 h-3 rounded-full bg-yellow-500" />
-              <span>{tasks.priority.medium()}</span>
+              <span>{t('tasks.priority.medium', 'Medium')}</span>
               {task.priority === 'medium' && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-yellow-500" />}
             </button>
             <button
@@ -547,7 +547,7 @@ export function TaskContextMenu({
               className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors"
             >
               <div className="w-3 h-3 rounded-full bg-green-500" />
-              <span>{tasks.priority.low()}</span>
+              <span>{t('tasks.priority.low', 'Low')}</span>
               {task.priority === 'low' && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-green-500" />}
             </button>
             <button
@@ -555,7 +555,7 @@ export function TaskContextMenu({
               className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
               <div className="w-3 h-3 rounded-full bg-gray-400" />
-              <span>{tasks.priority.none()}</span>
+              <span>{t('tasks.priority.none', 'None')}</span>
               {(task.priority === 'none' || !task.priority) && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-gray-400" />}
             </button>
           </div>
@@ -1095,49 +1095,96 @@ export function TaskContextMenu({
          <Pin className="w-4 h-4" />
          <span>{pins.removePin()}</span>
        </button>
-     ) : (
-       <div className="relative">
-         <button
-           onClick={(e) => {
-             e.stopPropagation();
-             setShowPinSubmenu(!showPinSubmenu);
-           }}
-           className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-         >
-           <Pin className="w-4 h-4" />
-           <span>{t('task_context_menu.set_pin')}</span>
-           <ChevronRight className="w-4 h-4 ml-auto" />
-         </button>
-         
-         {showPinSubmenu && (
-           <div 
-             className={`absolute top-0 ${submenuPosition === 'right' ? 'left-full' : 'right-full'} z-[1000] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1 min-w-48`}
-             style={{ marginLeft: submenuPosition === 'right' ? '4px' : '-4px' }}
-           >
-             {state.pinColumns.map((column) => (
-               <button
-                 key={column.id}
-                 onClick={(e) => {
-                   e.stopPropagation();
-                   dispatch({
-                     type: 'ASSIGN_TASK_TO_PIN',
-                     payload: { taskId: task.id, pinColumnId: column.id }
-                   });
-                   onClose();
-                 }}
-                 className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-               >
-                 <div
-                   className="w-3 h-3 rounded-full border border-gray-300 dark:border-gray-500"
-                   style={{ backgroundColor: column.color || state.preferences.accentColor }}
-                 />
-                 <span>{column.title}</span>
-               </button>
-             ))}
-           </div>
-         )}
-       </div>
-     )}
+    ) : state.pinColumns.length === 0 ? (
+      // No pin columns - directly pin to default
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          // Create default pin column if none exists and pin the task
+          const now = new Date().toISOString();
+          const defaultColumn = {
+            id: 'default-pin-' + Date.now(),
+            title: t('pins.default_column', 'Pinned'),
+            color: state.preferences.accentColor,
+            order: 0,
+            createdAt: now,
+            updatedAt: now
+          };
+          dispatch({
+            type: 'ADD_PIN_COLUMN',
+            payload: defaultColumn
+          });
+          dispatch({
+            type: 'ASSIGN_TASK_TO_PIN',
+            payload: { taskId: task.id, pinColumnId: defaultColumn.id }
+          });
+          onClose();
+        }}
+        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+      >
+        <Pin className="w-4 h-4" />
+        <span>{t('task_context_menu.set_pin')}</span>
+      </button>
+    ) : state.pinColumns.length === 1 ? (
+      // Only one pin column - directly pin to it
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          dispatch({
+            type: 'ASSIGN_TASK_TO_PIN',
+            payload: { taskId: task.id, pinColumnId: state.pinColumns[0].id }
+          });
+          onClose();
+        }}
+        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+      >
+        <Pin className="w-4 h-4" />
+        <span>{t('task_context_menu.set_pin')}</span>
+      </button>
+    ) : (
+      // Multiple pin columns - show submenu
+      <div className="relative">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowPinSubmenu(!showPinSubmenu);
+          }}
+          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        >
+          <Pin className="w-4 h-4" />
+          <span>{t('task_context_menu.set_pin')}</span>
+          <ChevronRight className="w-4 h-4 ml-auto" />
+        </button>
+        
+        {showPinSubmenu && (
+          <div 
+            className={`absolute top-0 ${submenuPosition === 'right' ? 'left-full' : 'right-full'} z-[1000] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1 min-w-48`}
+            style={{ marginLeft: submenuPosition === 'right' ? '4px' : '-4px' }}
+          >
+            {state.pinColumns.map((column) => (
+              <button
+                key={column.id}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  dispatch({
+                    type: 'ASSIGN_TASK_TO_PIN',
+                    payload: { taskId: task.id, pinColumnId: column.id }
+                  });
+                  onClose();
+                }}
+                className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                <div
+                  className="w-3 h-3 rounded-full border border-gray-300 dark:border-gray-500"
+                  style={{ backgroundColor: column.color || state.preferences.accentColor }}
+                />
+                <span>{column.title}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    )}
 
      <div className="border-t border-gray-200 dark:border-gray-600 my-1" />
 

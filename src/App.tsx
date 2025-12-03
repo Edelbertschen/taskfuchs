@@ -1573,24 +1573,27 @@ function AppRouter() {
   // Check if on auth callback - LoginPage will handle showing loading state
   const isAuthCallback = window.location.pathname === '/auth/callback';
 
-  // Show loading screen while restoring session (checking JWT validity on page reload)
-  if (state.isRestoringSession) {
-    return <AppLoadingScreen message={t('app.restoringSession', 'Restoring session...')} />;
+  // Show loading screen while restoring session OR while data is loading (online mode)
+  // This prevents the double loading screen flash by keeping one continuous loading state
+  if (state.isRestoringSession || (state.isOnlineMode && !isOfflineOnlyMode && !state.isDataLoaded)) {
+    const message = state.isRestoringSession 
+      ? t('app.restoringSession', 'Restoring session...')
+      : t('app.loadingData', 'Loading your data...');
+    return (
+      <AppProvider>
+        <AppLoadingScreen message={message} />
+      </AppProvider>
+    );
   }
 
-  // If authenticated (online mode), render AppProvider to load data
-  // Show loading screen until data is loaded
+  // If authenticated (online mode), show main app (data is already loaded)
   // In offline-only mode, ignore online mode state and stay in guest mode
   if (state.isOnlineMode && !isOfflineOnlyMode) {
     return (
       <AppProvider>
-        {!state.isDataLoaded ? (
-          <AppLoadingScreen message={t('app.loadingData', 'Loading your data...')} />
-        ) : (
-          <CelebrationProvider>
-            <MainApp />
-          </CelebrationProvider>
-        )}
+        <CelebrationProvider>
+          <MainApp />
+        </CelebrationProvider>
       </AppProvider>
     );
   }

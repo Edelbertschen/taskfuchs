@@ -1768,6 +1768,7 @@
     "add_column": "Spalte hinzufügen",
     "select_pin_column": "Pin-Spalte auswählen",
     "remove_pin": "Pin entfernen",
+    "default_column": "Fokus",
     "important_tasks_overview": "📌 Pins - Wichtige Aufgaben im Blick",
     "pins_description": "Mit Pins kannst du wichtige Aufgaben aus allen Bereichen sammeln und in benutzerdefinierten Spalten organisieren. Perfekt für den schnellen Zugriff auf das Wichtigste.",
     "pinning_tasks": "Aufgaben pinnen",

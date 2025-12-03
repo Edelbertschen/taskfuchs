@@ -636,6 +636,8 @@ export interface ImageReference {
 // Recurrence-related types
 export interface RecurrenceRule {
   id: string;
+  name: string; // Display name for the rule
+  description?: string; // Optional description
   pattern: RecurrencePattern;
   interval: number; // Every X days/weeks/months/years
   end: RecurrenceEnd;
@@ -645,10 +647,20 @@ export interface RecurrenceRule {
   exceptions?: string[]; // Dates (ISO format) to skip
   createdAt: string;
   updatedAt: string;
+  // Template for generated tasks
+  template?: {
+    title: string;
+    priority?: 'high' | 'medium' | 'low' | 'none';
+    estimatedTime?: number;
+    tags: string[];
+    projectId?: string;
+    notes?: string;
+  };
   // Optional runtime flags/stats used by reducer/UI
   isActive?: boolean;
   stats?: {
     totalGenerated: number;
+    totalCompleted?: number;
     lastGenerated?: string;
     completionRate?: number;
   };
@@ -656,6 +668,10 @@ export interface RecurrenceRule {
 
 export interface RecurrencePattern {
   type: 'daily' | 'weekly' | 'monthly' | 'yearly';
+  interval?: number; // For patterns that need interval at pattern level
+  weekdays?: WeekDay[]; // For weekly patterns
+  monthDay?: number; // For monthly patterns (day of month)
+  monthlyType?: 'date' | 'dayOfMonth' | 'dayOfWeek'; // Type of monthly recurrence
 }
 
 export interface RecurrenceEnd {

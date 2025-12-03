@@ -1331,6 +1331,7 @@
     "add_column": "Add Column",
     "select_pin_column": "Select Pin Column",
     "remove_pin": "Remove Pin",
+    "default_column": "Focus",
     "important_tasks_overview": "📌 Pins - Important Tasks Overview",
     "pins_description": "With Pins you can collect important tasks from all areas and organize them in custom columns. Perfect for quick access to what matters most.",
     "pinning_tasks": "Pinning Tasks",
