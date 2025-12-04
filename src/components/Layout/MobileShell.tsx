@@ -7,17 +7,28 @@ import {
   Sun,
   Sparkles,
   Filter,
-  X
+  WifiOff
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { useTranslation } from 'react-i18next';
 import type { Task } from '../../types';
 import { format } from 'date-fns';
-import { de } from 'date-fns/locale';
+import { de, enUS } from 'date-fns/locale';
+import {
+  initOfflineDB,
+  cacheTasks,
+  getCachedTasks,
+  getCacheMeta,
+  formatCacheAge,
+  isOnline,
+  subscribeToNetworkStatus
+} from '../../services/mobileOfflineStorage';
 
 type View = 'today' | 'inbox';
 
 export function MobileShell() {
   const { state, dispatch } = useApp();
+  const { t, i18n } = useTranslation();
   const [activeView, setActiveView] = useState<View>('today');
   const [newTaskText, setNewTaskText] = useState('');
   const [isAddingTask, setIsAddingTask] = useState(false);
@@ -29,6 +40,75 @@ export function MobileShell() {
   const touchStartY = useRef<number | null>(null);
   const [completedAnimation, setCompletedAnimation] = useState<string | null>(null);
   const [archivedAnimation, setArchivedAnimation] = useState<string | null>(null);
+
+  // Offline State
+  const [isOffline, setIsOffline] = useState(!isOnline());
+  const [cachedTasks, setCachedTasks] = useState<Task[]>([]);
+  const [cacheTimestamp, setCacheTimestamp] = useState<number | null>(null);
+  const [isLoadingCache, setIsLoadingCache] = useState(true);
+
+  // Sync language from desktop app preferences
+  const language = state.preferences.language || 'de';
+  const dateLocale = language === 'en' ? enUS : de;
+  
+  // Update i18n language when preferences change
+  useEffect(() => {
+    if (i18n.language !== language) {
+      i18n.changeLanguage(language);
+    }
+  }, [language, i18n]);
+
+  // Initialize offline storage and load cache
+  useEffect(() => {
+    const init = async () => {
+      await initOfflineDB();
+      
+      // Load cached data
+      const cached = await getCachedTasks();
+      const meta = await getCacheMeta();
+      
+      setCachedTasks(cached);
+      if (meta) {
+        setCacheTimestamp(meta.timestamp);
+      }
+      setIsLoadingCache(false);
+    };
+    
+    init();
+  }, []);
+
+  // Cache tasks when online and tasks change
+  useEffect(() => {
+    if (!isOffline && state.tasks.length > 0) {
+      cacheTasks(state.tasks).then(() => {
+        setCacheTimestamp(Date.now());
+      });
+    }
+  }, [state.tasks, isOffline]);
+
+  // Subscribe to network status changes
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOffline(false);
+      // Vibrate to indicate reconnection
+      if ('vibrate' in navigator) {
+        navigator.vibrate([50, 100, 50]);
+      }
+    };
+    
+    const handleOffline = () => {
+      setIsOffline(true);
+      // Vibrate to indicate disconnection
+      if ('vibrate' in navigator) {
+        navigator.vibrate(200);
+      }
+    };
+    
+    return subscribeToNetworkStatus(handleOnline, handleOffline);
+  }, []);
+
+  // Use cached tasks when offline, real tasks when online
+  const effectiveTasks = isOffline ? cachedTasks : state.tasks;
 
   // Design Settings from Online App
   const accent = state.preferences.accentColor || '#f97316';
@@ -86,9 +166,9 @@ export function MobileShell() {
     });
   }, [activeTagFilters, activePriorityFilters, showCompletedTasks]);
 
-  // Get tasks for each view with filters applied
+  // Get tasks for each view with filters applied (use effectiveTasks for offline support)
   const todayTasks = applyFilters(
-    state.tasks.filter(t => t.columnId === todayId)
+    effectiveTasks.filter(t => t.columnId === todayId)
   ).sort((a, b) => {
     // Completed tasks at bottom
     if (a.completed !== b.completed) return a.completed ? 1 : -1;
@@ -96,7 +176,7 @@ export function MobileShell() {
   });
 
   const inboxTasks = applyFilters(
-    state.tasks.filter(t => t.columnId === 'inbox')
+    effectiveTasks.filter(t => t.columnId === 'inbox')
   ).sort((a, b) => {
     // Completed tasks at bottom
     if (a.completed !== b.completed) return a.completed ? 1 : -1;
@@ -278,14 +358,6 @@ export function MobileShell() {
     return {};
   };
 
-  // Greeting based on time
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Guten Morgen';
-    if (hour < 18) return 'Guten Tag';
-    return 'Guten Abend';
-  };
-
   return (
     <div 
       className="h-[100dvh] w-full flex flex-col overflow-hidden relative"
@@ -304,105 +376,104 @@ export function MobileShell() {
         }}
       />
 
-      {/* Header - iOS Style */}
+      {/* Header - Compact iOS Style */}
       <header 
         className="relative z-10 flex-shrink-0 pt-safe"
         style={{
-          paddingTop: 'env(safe-area-inset-top, 20px)',
+          paddingTop: 'env(safe-area-inset-top, 12px)',
         }}
       >
-        <div className="px-5 pt-4 pb-2">
-          {/* Greeting */}
-          <p 
-            className="text-sm font-medium mb-1"
-            style={{ color: isDarkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.5)' }}
-          >
-            {getGreeting()}
-          </p>
-          
-          {/* View Title */}
-          <h1 
-            className="text-3xl font-bold tracking-tight"
-            style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}
-          >
-            {activeView === 'today' ? 'Heute' : 'Inbox'}
-          </h1>
-          
-          {/* Date or count indicator */}
-          <p 
-            className="text-sm mt-1 font-medium"
-            style={{ color: accent }}
-          >
-            {activeView === 'today' 
-              ? format(new Date(), 'EEEE, d. MMMM', { locale: de })
-              : `${inboxCount} ${inboxCount === 1 ? 'Aufgabe' : 'Aufgaben'}`
-            }
-          </p>
-          
-          {/* Active Filters Indicator */}
-          {hasActiveFilters && (
-            <div className="flex items-center gap-2 mt-2 flex-wrap">
+        <div className="px-5 pt-2 pb-1">
+          {/* Title Row: View Title + Date + Offline Icon */}
+          <div className="flex items-baseline justify-between gap-3">
+            <div className="flex items-baseline gap-2 min-w-0">
+              <h1 
+                className="text-2xl font-bold tracking-tight flex-shrink-0"
+                style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}
+              >
+                {activeView === 'today' 
+                  ? t('mobile.today', 'Heute') 
+                  : t('mobile.inbox', 'Inbox')}
+              </h1>
+              
+              {/* Date or count - secondary info */}
+              <span 
+                className="text-sm font-medium truncate"
+                style={{ color: accent }}
+              >
+                {activeView === 'today' 
+                  ? format(new Date(), 'EEE, d. MMM', { locale: dateLocale })
+                  : `${inboxCount} ${inboxCount === 1 ? t('mobile.task', 'Aufgabe') : t('mobile.tasks', 'Aufgaben')}`
+                }
+              </span>
+              
+              {/* Cache timestamp when offline */}
+              {isOffline && cacheTimestamp && (
+                <span 
+                  className="text-xs flex-shrink-0"
+                  style={{ color: isDarkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)' }}
+                >
+                  • {formatCacheAge(cacheTimestamp)}
+                </span>
+              )}
+            </div>
+            
+            {/* Offline Status Icon */}
+            {isOffline && (
               <div 
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
-                style={{ 
-                  backgroundColor: `${accent}15`,
-                  color: accent,
+                className="flex items-center gap-1 px-2 py-0.5 rounded-full flex-shrink-0"
+                style={{
+                  backgroundColor: 'rgba(245, 158, 11, 0.15)',
                 }}
               >
-                <Filter className="w-3 h-3" />
-                <span>Filter aktiv</span>
+                <WifiOff className="w-3 h-3" style={{ color: '#f59e0b' }} />
               </div>
+            )}
+          </div>
+          
+          {/* Active Filters - Compact */}
+          {hasActiveFilters && (
+            <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+              <Filter className="w-3 h-3 flex-shrink-0" style={{ color: accent }} />
               
-              {/* Show active priority filters */}
+              {/* Priority filters as dots */}
               {activePriorityFilters.map(priority => (
                 <span 
                   key={priority}
-                  className="px-2 py-0.5 rounded-full text-xs font-medium"
+                  className="w-2 h-2 rounded-full"
                   style={{
-                    backgroundColor: priority === 'high' ? 'rgba(239, 68, 68, 0.15)' : 
-                                     priority === 'medium' ? 'rgba(251, 191, 36, 0.15)' :
-                                     priority === 'low' ? 'rgba(59, 130, 246, 0.15)' :
-                                     'rgba(156, 163, 175, 0.15)',
-                    color: priority === 'high' ? '#ef4444' : 
-                           priority === 'medium' ? '#f59e0b' :
-                           priority === 'low' ? '#3b82f6' :
-                           '#9ca3af',
+                    backgroundColor: priority === 'high' ? '#ef4444' : 
+                                     priority === 'medium' ? '#f59e0b' :
+                                     priority === 'low' ? '#3b82f6' : '#9ca3af',
                   }}
-                >
-                  {priority === 'high' ? '🔴 Hoch' : 
-                   priority === 'medium' ? '🟡 Mittel' : 
-                   priority === 'low' ? '🔵 Niedrig' : 
-                   '⚪ Keine'}
-                </span>
+                  title={priority}
+                />
               ))}
               
-              {/* Show active tag filters */}
-              {activeTagFilters.slice(0, 3).map(tag => (
+              {/* Tag filters */}
+              {activeTagFilters.slice(0, 2).map(tag => (
                 <span 
                   key={tag}
-                  className="px-2 py-0.5 rounded-full text-xs font-medium"
-                  style={{
-                    backgroundColor: `${accent}15`,
-                    color: accent,
-                  }}
+                  className="text-xs font-medium"
+                  style={{ color: accent }}
                 >
                   #{tag}
                 </span>
               ))}
-              {activeTagFilters.length > 3 && (
+              {activeTagFilters.length > 2 && (
                 <span 
-                  className="text-xs font-medium"
-                  style={{ color: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)' }}
+                  className="text-xs"
+                  style={{ color: isDarkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)' }}
                 >
-                  +{activeTagFilters.length - 3} mehr
+                  +{activeTagFilters.length - 2}
                 </span>
               )}
             </div>
           )}
         </div>
 
-        {/* View Switcher Pills */}
-        <div className="px-5 py-3">
+        {/* View Switcher Pills - More compact */}
+        <div className="px-5 py-2">
           <div 
             className="flex rounded-2xl p-1 gap-1"
             style={{
@@ -413,7 +484,7 @@ export function MobileShell() {
           >
             <button
               onClick={() => setActiveView('today')}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-semibold transition-all duration-300"
+              className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-sm font-semibold transition-all duration-300"
               style={{
                 backgroundColor: activeView === 'today' ? accent : 'transparent',
                 color: activeView === 'today' ? '#fff' : (isDarkMode ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)'),
@@ -421,10 +492,10 @@ export function MobileShell() {
               }}
             >
               <Sun className="w-4 h-4" />
-              <span>Heute</span>
+              <span>{t('mobile.today', 'Heute')}</span>
               {todayCount > 0 && (
                 <span 
-                  className="ml-1 text-xs px-1.5 py-0.5 rounded-full"
+                  className="text-xs px-1.5 py-0.5 rounded-full min-w-[20px] text-center"
                   style={{
                     backgroundColor: activeView === 'today' ? 'rgba(255,255,255,0.25)' : `${accent}20`,
                     color: activeView === 'today' ? '#fff' : accent,
@@ -437,7 +508,7 @@ export function MobileShell() {
             
             <button
               onClick={() => setActiveView('inbox')}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-semibold transition-all duration-300"
+              className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-sm font-semibold transition-all duration-300"
               style={{
                 backgroundColor: activeView === 'inbox' ? accent : 'transparent',
                 color: activeView === 'inbox' ? '#fff' : (isDarkMode ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)'),
@@ -445,10 +516,10 @@ export function MobileShell() {
               }}
             >
               <Inbox className="w-4 h-4" />
-              <span>Inbox</span>
+              <span>{t('mobile.inbox', 'Inbox')}</span>
               {inboxCount > 0 && (
                 <span 
-                  className="ml-1 text-xs px-1.5 py-0.5 rounded-full"
+                  className="text-xs px-1.5 py-0.5 rounded-full min-w-[20px] text-center"
                   style={{
                     backgroundColor: activeView === 'inbox' ? 'rgba(255,255,255,0.25)' : `${accent}20`,
                     color: activeView === 'inbox' ? '#fff' : accent,
@@ -489,6 +560,7 @@ export function MobileShell() {
                 onArchive={() => handleArchiveTask(task.id)}
                 isCompletingAnimation={completedAnimation === task.id}
                 isArchivingAnimation={archivedAnimation === task.id}
+                disabled={isOffline}
                 style={{
                   animationDelay: `${index * 50}ms`,
                 }}
@@ -498,49 +570,86 @@ export function MobileShell() {
 
           {/* Empty State */}
           {currentTasks.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-64 text-center">
-              <div 
-                className="w-20 h-20 rounded-full flex items-center justify-center mb-4"
-                style={{ backgroundColor: `${accent}15` }}
-              >
-                {activeView === 'today' ? (
-                  <Sparkles className="w-10 h-10" style={{ color: accent }} />
-                ) : (
-                  <Inbox className="w-10 h-10" style={{ color: accent }} />
-                )}
-              </div>
-              <p 
-                className="text-lg font-semibold mb-1"
-                style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}
-              >
-                {activeView === 'today' ? 'Alles erledigt!' : 'Inbox ist leer'}
-              </p>
-              <p 
-                className="text-sm"
-                style={{ color: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)' }}
-              >
-                {activeView === 'today' 
-                  ? 'Genieße deinen freien Tag 🦊' 
-                  : 'Tippe +, um eine neue Aufgabe hinzuzufügen'}
-              </p>
+            <div className="flex flex-col items-center justify-center h-52 text-center">
+              {/* Show celebration image for "All Done" if enabled in preferences */}
+              {!isOffline && activeView === 'today' && state.preferences.enableCelebration ? (
+                <>
+                  <div 
+                    className="w-32 h-32 mb-2 relative"
+                    style={{
+                      filter: `drop-shadow(0 0 12px ${accent}30)`,
+                    }}
+                  >
+                    <img 
+                      src="/salto.png" 
+                      alt="All done!" 
+                      className="w-full h-full object-contain"
+                      style={{
+                        animation: 'gentle-bounce 2s ease-in-out infinite',
+                      }}
+                    />
+                  </div>
+                  <p 
+                    className="text-base font-semibold"
+                    style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}
+                  >
+                    {state.preferences.celebrationText || t('mobile.allDone', 'Alles erledigt!')}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div 
+                    className="w-16 h-16 rounded-full flex items-center justify-center mb-3"
+                    style={{ backgroundColor: isOffline ? 'rgba(245, 158, 11, 0.15)' : `${accent}15` }}
+                  >
+                    {isOffline ? (
+                      <WifiOff className="w-8 h-8" style={{ color: '#f59e0b' }} />
+                    ) : activeView === 'today' ? (
+                      <Sparkles className="w-8 h-8" style={{ color: accent }} />
+                    ) : (
+                      <Inbox className="w-8 h-8" style={{ color: accent }} />
+                    )}
+                  </div>
+                  <p 
+                    className="text-base font-semibold mb-1"
+                    style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}
+                  >
+                    {isOffline && cachedTasks.length === 0 
+                      ? t('mobile.noOfflineData', 'Keine Offline-Daten')
+                      : activeView === 'today' 
+                      ? t('mobile.allDone', 'Alles erledigt!')
+                      : t('mobile.inboxEmpty', 'Inbox ist leer')}
+                  </p>
+                  <p 
+                    className="text-sm px-8"
+                    style={{ color: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)' }}
+                  >
+                    {isOffline && cachedTasks.length === 0
+                      ? t('mobile.connectToLoad', 'Verbinde dich mit dem Internet')
+                      : activeView === 'today' 
+                      ? '🦊' 
+                      : isOffline 
+                      ? t('mobile.offlineNoAdd', 'Offline: Nur Ansicht')
+                      : t('mobile.tapToAdd', 'Tippe + zum Hinzufügen')}
+                  </p>
+                </>
+              )}
             </div>
           )}
 
-          {/* Swipe Hint Indicator */}
-          <div className="flex justify-center mt-8 pb-4">
-            <div className="flex gap-2">
+          {/* Minimal Swipe Indicator */}
+          <div className="flex justify-center mt-4 pb-2">
+            <div className="flex gap-1.5">
               <div 
-                className="w-2 h-2 rounded-full transition-all duration-300"
+                className="w-1.5 h-1.5 rounded-full transition-all duration-300"
                 style={{ 
-                  backgroundColor: activeView === 'today' ? accent : (isDarkMode ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.2)'),
-                  transform: activeView === 'today' ? 'scale(1.2)' : 'scale(1)',
+                  backgroundColor: activeView === 'today' ? accent : (isDarkMode ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)'),
                 }}
               />
               <div 
-                className="w-2 h-2 rounded-full transition-all duration-300"
+                className="w-1.5 h-1.5 rounded-full transition-all duration-300"
                 style={{ 
-                  backgroundColor: activeView === 'inbox' ? accent : (isDarkMode ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.2)'),
-                  transform: activeView === 'inbox' ? 'scale(1.2)' : 'scale(1)',
+                  backgroundColor: activeView === 'inbox' ? accent : (isDarkMode ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)'),
                 }}
               />
             </div>
@@ -604,7 +713,9 @@ export function MobileShell() {
                       setNewTaskText('');
                     }
                   }}
-                  placeholder={activeView === 'today' ? 'Was steht heute an?' : 'Neue Aufgabe...'}
+                  placeholder={activeView === 'today' 
+                    ? t('mobile.whatToday', 'Was steht heute an?') 
+                    : t('mobile.newTask', 'Neue Aufgabe...')}
                   className="flex-1 text-lg bg-transparent border-none outline-none"
                   style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}
                   autoFocus
@@ -621,7 +732,9 @@ export function MobileShell() {
                       color: accent,
                     }}
                   >
-                    {activeView === 'today' ? '📅 Heute' : '📥 Inbox'}
+                    {activeView === 'today' 
+                      ? `📅 ${t('mobile.today', 'Heute')}` 
+                      : `📥 ${t('mobile.inbox', 'Inbox')}`}
                   </span>
                 </div>
                 
@@ -635,7 +748,7 @@ export function MobileShell() {
                     boxShadow: newTaskText.trim() ? `0 4px 12px ${accent}40` : 'none',
                   }}
                 >
-                  Hinzufügen
+                  {t('mobile.add', 'Hinzufügen')}
                 </button>
               </div>
             </div>
@@ -643,39 +756,45 @@ export function MobileShell() {
         </div>
       )}
 
-      {/* Floating Action Button */}
+      {/* Floating Action Button - disabled when offline */}
       <button
-        onClick={() => setIsAddingTask(true)}
-        className="fixed z-40 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 active:scale-95"
+        onClick={() => !isOffline && setIsAddingTask(true)}
+        disabled={isOffline}
+        className="fixed z-40 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
         style={{
           right: '20px',
           bottom: 'calc(env(safe-area-inset-bottom, 20px) + 20px)',
-          backgroundColor: accent,
-          boxShadow: `0 8px 24px ${accent}50`,
+          backgroundColor: isOffline ? '#9ca3af' : accent,
+          boxShadow: isOffline ? '0 4px 12px rgba(0,0,0,0.2)' : `0 8px 24px ${accent}50`,
         }}
       >
-        <Plus className="w-7 h-7 text-white" strokeWidth={2.5} />
+        {isOffline ? (
+          <WifiOff className="w-6 h-6 text-white" />
+        ) : (
+          <Plus className="w-7 h-7 text-white" strokeWidth={2.5} />
+        )}
       </button>
 
-      {/* TaskFuchs Branding */}
+      {/* TaskFuchs Branding - Minimal */}
       <div 
-        className="fixed bottom-0 left-0 right-0 z-30 flex flex-col items-center pb-2 pointer-events-none"
+        className="fixed bottom-0 left-0 right-0 z-30 flex justify-center pb-1 pointer-events-none"
         style={{
-          paddingBottom: 'calc(env(safe-area-inset-bottom, 8px) + 8px)',
+          paddingBottom: 'calc(env(safe-area-inset-bottom, 4px) + 4px)',
         }}
       >
-        <span 
-          className="text-xs font-medium tracking-wide"
-          style={{ color: isDarkMode ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.25)' }}
-        >
-          🦊 TaskFuchs Companion
-        </span>
-        {hasActiveFilters && (
+        {isOffline ? (
           <span 
-            className="text-[10px] mt-0.5"
+            className="text-[10px] font-medium"
+            style={{ color: '#f59e0b' }}
+          >
+            {t('mobile.readOnly', 'Nur Ansicht')}
+          </span>
+        ) : (
+          <span 
+            className="text-[10px]"
             style={{ color: isDarkMode ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)' }}
           >
-            Filter aus Online-App aktiv
+            🦊
           </span>
         )}
       </div>
@@ -718,6 +837,15 @@ export function MobileShell() {
           }
         }
         
+        @keyframes gentle-bounce {
+          0%, 100% {
+            transform: translateY(0) rotate(-2deg);
+          }
+          50% {
+            transform: translateY(-8px) rotate(2deg);
+          }
+        }
+        
         .animate-slide-up {
           animation: slide-up 300ms cubic-bezier(0.2, 0, 0, 1);
         }
@@ -747,6 +875,7 @@ interface SwipeableTaskCardProps {
   onArchive: () => void;
   isCompletingAnimation: boolean;
   isArchivingAnimation: boolean;
+  disabled?: boolean;
   style?: React.CSSProperties;
 }
 
@@ -758,6 +887,7 @@ function SwipeableTaskCard({
   onArchive,
   isCompletingAnimation,
   isArchivingAnimation,
+  disabled = false,
   style,
 }: SwipeableTaskCardProps) {
   const [swipeOffset, setSwipeOffset] = useState(0);
@@ -770,6 +900,7 @@ function SwipeableTaskCard({
   const MAX_OFFSET = 120;
 
   const handleTouchStart = (e: React.TouchEvent) => {
+    if (disabled) return; // Don't allow swipe when offline
     touchStartX.current = e.touches[0].clientX;
     touchStartY.current = e.touches[0].clientY;
     isVerticalScroll.current = false;
@@ -777,6 +908,7 @@ function SwipeableTaskCard({
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
+    if (disabled) return; // Don't allow swipe when offline
     if (touchStartX.current === null || touchStartY.current === null) return;
     
     const deltaX = e.touches[0].clientX - touchStartX.current;
@@ -896,15 +1028,16 @@ function SwipeableTaskCard({
         onTouchEnd={handleTouchEnd}
       >
         <div className="flex items-start gap-3">
-          {/* Checkbox */}
+          {/* Checkbox - disabled when offline */}
           <button
-            onClick={onComplete}
-            className="flex-shrink-0 mt-0.5"
+            onClick={() => !disabled && onComplete()}
+            disabled={disabled}
+            className="flex-shrink-0 mt-0.5 disabled:opacity-60"
           >
             <div 
               className="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200"
               style={{ 
-                borderColor: task.completed ? '#22c55e' : accent,
+                borderColor: task.completed ? '#22c55e' : (disabled ? '#9ca3af' : accent),
                 backgroundColor: task.completed ? '#22c55e' : 'transparent',
               }}
             >

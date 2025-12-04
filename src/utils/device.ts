@@ -31,16 +31,18 @@ export function isMobilePWAEnvironment(): boolean {
     }
   }
   
-  // Mobile companion app - only in browser on mobile devices
-  // NO standalone PWA mode to ensure proper sync with online app
-  // Only show mobile view when accessing via mobile browser (not installed PWA)
-  if (isStandalonePWA()) {
-    // If running as installed PWA, don't use mobile shell
-    // This avoids sync issues - users should use the browser version
-    return false;
+  // Mobile companion app - works in browser AND as installed PWA
+  // PWA has offline read-only capability via IndexedDB cache
+  const ua = (navigator.userAgent || '').toLowerCase();
+  const isMobileUA = /android|iphone|ipad|ipod|mobile|windows phone/.test(ua);
+  
+  // Show mobile companion on:
+  // 1. Mobile device with narrow viewport (browser)
+  // 2. Installed PWA on mobile device
+  if (isStandalonePWA() && isMobileUA) {
+    return true;
   }
   
-  // Only allow MobileShell for mobile browsers with narrow viewport
   return isMobileViewport();
 }
 
