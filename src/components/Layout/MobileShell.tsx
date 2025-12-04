@@ -8,9 +8,13 @@ import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { LoginPage } from '../Auth/LoginPage';
+import { syncAPI } from '../../services/apiService';
 import type { Task } from '../../types';
 import { format } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
+
+// Auto-refresh interval in milliseconds (30 seconds)
+const AUTO_REFRESH_INTERVAL = 30000;
 
 type View = 'today' | 'inbox';
 
@@ -80,6 +84,35 @@ export function MobileShell() {
     if (i18n.language !== language) i18n.changeLanguage(language);
   }, [language, i18n]);
 
+  // Auto-refresh: Fetch fresh data from server every 30 seconds
+  // This ensures Mobile stays in sync with Desktop changes
+  useEffect(() => {
+    const hasToken = !!localStorage.getItem('taskfuchs_jwt');
+    if (!hasToken) return; // Only refresh if logged in
+    
+    const refreshData = async () => {
+      try {
+        console.log('[MobileShell] Auto-refreshing data from server...');
+        const data = await syncAPI.getFullData();
+        
+        if (data.tasks) {
+          dispatch({ type: 'SET_TASKS', payload: data.tasks });
+        }
+        if (data.preferences) {
+          dispatch({ type: 'UPDATE_PREFERENCES', payload: data.preferences });
+        }
+        console.log('[MobileShell] Auto-refresh complete, tasks:', data.tasks?.length);
+      } catch (error) {
+        console.error('[MobileShell] Auto-refresh failed:', error);
+      }
+    };
+
+    // Periodic refresh every 30 seconds
+    const interval = setInterval(refreshData, AUTO_REFRESH_INTERVAL);
+    
+    return () => clearInterval(interval);
+  }, [dispatch]);
+
   useEffect(() => {
     if (!undoState) { setUndoProgress(100); return; }
     const startTime = Date.now();
@@ -147,9 +180,27 @@ export function MobileShell() {
     if (pullDistance > 60 && !isRefreshing) {
       setIsRefreshing(true);
       if ('vibrate' in navigator) navigator.vibrate(20);
-      // Reload page to fetch fresh data from server
-      window.location.reload();
-      return;
+      
+      // Fetch fresh data from server instead of full page reload
+      try {
+        console.log('[MobileShell] Pull-to-refresh: fetching data...');
+        const data = await syncAPI.getFullData();
+        
+        if (data.tasks) {
+          dispatch({ type: 'SET_TASKS', payload: data.tasks });
+        }
+        if (data.archivedTasks) {
+          dispatch({ type: 'SET_ARCHIVED_TASKS', payload: data.archivedTasks });
+        }
+        if (data.preferences) {
+          dispatch({ type: 'UPDATE_PREFERENCES', payload: data.preferences });
+        }
+        console.log('[MobileShell] Pull-to-refresh complete');
+      } catch (error) {
+        console.error('[MobileShell] Pull-to-refresh failed:', error);
+      }
+      
+      setIsRefreshing(false);
     }
     setPullDistance(0);
     setIsPulling(false);
