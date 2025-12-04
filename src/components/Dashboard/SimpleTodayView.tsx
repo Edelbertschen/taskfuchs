@@ -36,7 +36,7 @@ import {
   Clock, FileText, Edit3, Bold, Italic, Code, List, ListOrdered, 
   Link as LinkIcon, Minus, HelpCircle, Heading1, Heading2, Heading3, ExternalLink,
   Zap, CheckSquare, Bell, Calendar, Edit, Settings, Trash2, MoreVertical,
-  Sun, Moon, ChevronDown, ChevronUp, ChevronRight
+  Sun, Moon, ChevronDown, ChevronUp, ChevronRight, Filter, Tag
 } from 'lucide-react';
 import { TaskModal } from '../Tasks/TaskModal';
 import { SmartTaskModal } from '../Tasks/SmartTaskModal';
@@ -294,6 +294,8 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showNavigation, setShowNavigation] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [priorityFilter, setPriorityFilter] = useState<string>('all');
 
   
   // Checklist state
@@ -1389,11 +1391,39 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
   // Get today's tasks from the task board (from today's date column)
   const todayDateString = format(new Date(), 'yyyy-MM-dd');
   const todayColumnId = `date-${todayDateString}`;
-  const todayTasks = state.tasks
+  
+  // Get all today's tasks (unfiltered for count display)
+  const allTodayTasks = state.tasks.filter(task => !task.completed && task.columnId === todayColumnId);
+  
+  // Apply filters
+  const todayTasks = allTodayTasks
     .filter(task => {
-      return !task.completed && task.columnId === todayColumnId;
+      // Apply tag filters from global state
+      if (state.activeTagFilters.length > 0) {
+        const taskTags = task.tags || [];
+        if (!state.activeTagFilters.some(filter => taskTags.includes(filter))) {
+          return false;
+        }
+      }
+      
+      // Apply priority filter (local or global)
+      if (priorityFilter !== 'all') {
+        if ((task.priority || 'none') !== priorityFilter) {
+          return false;
+        }
+      } else if (state.activePriorityFilters.length > 0) {
+        if (!state.activePriorityFilters.includes(task.priority || 'none')) {
+          return false;
+        }
+      }
+      
+      return true;
     })
     .sort((a, b) => a.position - b.position);
+  
+  // Check if filters are active
+  const hasActiveFilters = state.activeTagFilters.length > 0 || priorityFilter !== 'all' || state.activePriorityFilters.length > 0;
+  const activeFiltersCount = state.activeTagFilters.length + (priorityFilter !== 'all' ? 1 : 0) + state.activePriorityFilters.length;
 
   // Calculate total estimated time for today's tasks
   const totalEstimatedTime = todayTasks.reduce((total, task) => {
@@ -2139,17 +2169,39 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
             accentColor={state.preferences.accentColor}
             isMinimalDesign={isMinimalDesign}
             headerAction={
-              <button
-                onClick={handleCreateNewTask}
-                className="p-2 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95"
-                style={{
-                  background: `${state.preferences.accentColor}15`,
-                  color: state.preferences.accentColor
-                }}
-                title={i18n.language === 'en' ? 'Add task' : 'Aufgabe hinzufügen'}
-              >
-                <Plus className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2">
+                {/* Filter Button */}
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className={`p-2 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 relative ${showFilters ? 'ring-2' : ''}`}
+                  style={{
+                    background: hasActiveFilters ? state.preferences.accentColor : `${state.preferences.accentColor}15`,
+                    color: hasActiveFilters ? '#fff' : state.preferences.accentColor,
+                    ringColor: state.preferences.accentColor
+                  }}
+                  title={i18n.language === 'en' ? 'Filter' : 'Filter'}
+                >
+                  <Filter className="w-5 h-5" />
+                  {activeFiltersCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 text-[10px] font-bold rounded-full flex items-center justify-center"
+                      style={{ backgroundColor: hasActiveFilters ? '#fff' : state.preferences.accentColor, color: hasActiveFilters ? state.preferences.accentColor : '#fff' }}>
+                      {activeFiltersCount}
+                    </span>
+                  )}
+                </button>
+                {/* Add Task Button */}
+                <button
+                  onClick={handleCreateNewTask}
+                  className="p-2 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95"
+                  style={{
+                    background: `${state.preferences.accentColor}15`,
+                    color: state.preferences.accentColor
+                  }}
+                  title={i18n.language === 'en' ? 'Add task' : 'Aufgabe hinzufügen'}
+                >
+                  <Plus className="w-5 h-5" />
+                </button>
+              </div>
             }
             footerAction={state.preferences.enableEndOfDay && (
               <button
@@ -2175,10 +2227,117 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
               </button>
             )}
           >
-              {todayTasks.length === 0 ? (
+              {/* Filter Panel */}
+              {showFilters && (
+                <div className={`mb-4 p-3 rounded-lg backdrop-blur-md border ${
+                  isMinimalDesign
+                    ? 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+                    : 'bg-black/70 border-gray-600/50'
+                }`}>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center space-x-2">
+                      <Filter className="w-4 h-4" style={{ color: state.preferences.accentColor }} />
+                      <span className={`text-sm font-medium ${isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : 'text-white'}`}>
+                        {t('common.filter', 'Filter')}
+                      </span>
+                    </div>
+                    {hasActiveFilters && (
+                      <button
+                        onClick={() => {
+                          setPriorityFilter('all');
+                          dispatch({ type: 'CLEAR_TAG_FILTERS' });
+                          dispatch({ type: 'CLEAR_PRIORITY_FILTERS' });
+                        }}
+                        className="text-xs text-gray-500 hover:text-gray-300 flex items-center gap-1"
+                      >
+                        <X className="w-3 h-3" />
+                        {t('common.clearAll', 'Alle löschen')}
+                      </button>
+                    )}
+                  </div>
+                  
+                  {/* Priority Filters */}
+                  <div className="mb-3">
+                    <label className={`block text-xs font-medium mb-2 ${isMinimalDesign ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'}`}>
+                      {t('tasks.priority.label', 'Priorität')}
+                    </label>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => setPriorityFilter('all')}
+                        className={`h-8 px-2 rounded-md text-xs font-bold transition-all ${
+                          priorityFilter === 'all'
+                            ? 'bg-white text-gray-800 shadow-lg'
+                            : (isMinimalDesign ? 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300' : 'bg-gray-600/60 text-gray-300')
+                        }`}
+                      >
+                        ALL
+                      </button>
+                      {[
+                        { key: 'high', label: 'H', color: '#ef4444' },
+                        { key: 'medium', label: 'M', color: '#f59e0b' },
+                        { key: 'low', label: 'L', color: '#10b981' },
+                        { key: 'none', label: '–', color: '#9ca3af' }
+                      ].map(({ key, label, color }) => (
+                        <button
+                          key={key}
+                          onClick={() => setPriorityFilter(priorityFilter === key ? 'all' : key)}
+                          className={`h-8 px-2 rounded-md text-xs font-bold transition-all ${
+                            priorityFilter === key ? 'text-white shadow-lg' : 'text-white/80'
+                          }`}
+                          style={{
+                            backgroundColor: priorityFilter === key ? color : `${color}60`,
+                            boxShadow: priorityFilter === key ? `0 0 12px ${color}40` : 'none'
+                          }}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Tag Filters */}
+                  {state.tags.filter(tag => tag.count > 0).length > 0 && (
+                    <div>
+                      <label className={`block text-xs font-medium mb-2 ${isMinimalDesign ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300'}`}>
+                        Tags
+                      </label>
+                      <div className="flex flex-wrap gap-1.5">
+                        {state.tags.filter(tag => tag.count > 0).slice(0, 8).map(tag => {
+                          const isActive = state.activeTagFilters.includes(tag.name);
+                          return (
+                            <button
+                              key={tag.id}
+                              onClick={() => dispatch({ type: 'TOGGLE_TAG_FILTER', payload: tag.name })}
+                              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
+                                isActive
+                                  ? 'text-white shadow-sm'
+                                  : (isMinimalDesign ? 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300' : 'bg-gray-600/60 text-gray-300')
+                              }`}
+                              style={isActive ? {
+                                backgroundColor: tag.color || state.preferences.accentColor,
+                                boxShadow: `0 0 8px ${tag.color || state.preferences.accentColor}40`
+                              } : {}}
+                            >
+                              {tag.name}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {todayTasks.length === 0 && !hasActiveFilters ? (
               <EmptyState
                 title={i18n.language === 'en' ? "All clear" : "Alles entspannt"}
                 subtitle={i18n.language === 'en' ? "No tasks planned for today" : "Keine Aufgaben für heute geplant"}
+                isMinimalDesign={isMinimalDesign}
+              />
+              ) : todayTasks.length === 0 && hasActiveFilters ? (
+              <EmptyState
+                title={i18n.language === 'en' ? "No matches" : "Keine Treffer"}
+                subtitle={i18n.language === 'en' ? "No tasks match the current filters" : "Keine Aufgaben entsprechen den aktuellen Filtern"}
                 isMinimalDesign={isMinimalDesign}
               />
               ) : (

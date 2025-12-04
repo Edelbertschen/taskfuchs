@@ -15,7 +15,7 @@ import { format } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
 
 // Auto-refresh interval in milliseconds (30 seconds)
-const AUTO_REFRESH_INTERVAL = 30000;
+const AUTO_REFRESH_INTERVAL = 15000; // 15 seconds for better sync
 
 type MainView = 'planner' | 'pins';
 type PlannerSubView = 'today' | 'inbox';
@@ -126,15 +126,49 @@ export function MobileShell() {
   }, [language, i18n]);
 
   // Shared refresh function for pull-to-refresh and auto-refresh
+  // Syncs all data silently without UI interruption
   const refreshFromServer = useCallback(async () => {
     try {
       const data = await syncAPI.getFullData();
       
+      // Sync all data types for complete consistency
       if (data.tasks) {
         dispatch({ type: 'SET_TASKS', payload: data.tasks });
       }
+      if (data.archivedTasks) {
+        dispatch({ type: 'SET_ARCHIVED_TASKS', payload: data.archivedTasks });
+      }
+      if (data.columns) {
+        // Merge date columns (generated) with project columns (from server)
+        const projectColumns = data.columns.filter((c: any) => c.type === 'project');
+        const today = new Date();
+        const dateColumns = [];
+        for (let i = 0; i < 30; i++) {
+          const date = new Date(today);
+          date.setDate(date.getDate() + i);
+          const dateStr = format(date, 'yyyy-MM-dd');
+          dateColumns.push({
+            id: `date-${dateStr}`,
+            title: format(date, 'dd.MM.yyyy'),
+            type: 'date',
+            date: dateStr,
+            order: i + 1,
+            tasks: [],
+          });
+        }
+        dispatch({ type: 'SET_COLUMNS', payload: [...dateColumns, ...projectColumns] });
+      }
+      if (data.tags) {
+        dispatch({ type: 'SET_TAGS', payload: data.tags });
+      }
+      if (data.pinColumns) {
+        dispatch({ type: 'SET_PIN_COLUMNS', payload: data.pinColumns });
+      }
       if (data.preferences) {
         dispatch({ type: 'UPDATE_PREFERENCES', payload: data.preferences });
+      }
+      if (data.viewState) {
+        dispatch({ type: 'SET_VIEW_STATE', payload: data.viewState });
       }
       return true;
     } catch (error) {

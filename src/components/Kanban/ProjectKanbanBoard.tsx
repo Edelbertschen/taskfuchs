@@ -1264,33 +1264,8 @@ export function ProjectKanbanBoard() {
     
     if (!columnIdToUse) return;
     
-    // If the title is empty, delete the column (except for main project column)
-    if (!titleToUse.trim()) {
-      if (columnIdToUse !== selectedProject?.id) {
-        // Check if this is the last custom column
-        const remainingColumns = projectColumns.filter(col => col.id !== columnIdToUse);
-        
-        if (remainingColumns.length === 0) {
-          // Show warning that at least one column must exist
-          alert('Mindestens eine Spalte muss vorhanden bleiben. Ein Projekt ohne Spalten ist nicht möglich.');
-          if (columnId && newTitle !== undefined) {
-            // For external calls, we can't update the editing title directly
-            return;
-          }
-          setEditingColumnTitle(projectColumns.find(col => col.id === columnIdToUse)?.title || '');
-          return;
-        }
-        
-        // Delete empty custom column
-        dispatch({
-          type: 'DELETE_PROJECT_KANBAN_COLUMN',
-          payload: columnIdToUse
-        });
-      }
-      setEditingColumnId(null);
-      setEditingColumnTitle('');
-      return;
-    }
+    // Use default title if empty - never delete columns automatically
+    const finalTitle = titleToUse.trim() || t('projects.newColumn', 'Neue Spalte');
     
     // Check if we're editing the main project column
     if (columnIdToUse === selectedProject?.id) {
@@ -1299,7 +1274,7 @@ export function ProjectKanbanBoard() {
         type: 'UPDATE_COLUMN',
         payload: {
           id: columnIdToUse,
-          title: titleToUse.trim(),
+          title: finalTitle,
           type: 'project'
         } as Column
       });
@@ -1309,7 +1284,7 @@ export function ProjectKanbanBoard() {
         type: 'UPDATE_PROJECT_KANBAN_COLUMN',
         payload: {
           columnId: columnIdToUse,
-          title: titleToUse.trim()
+          title: finalTitle
         }
       });
     }

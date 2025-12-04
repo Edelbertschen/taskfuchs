@@ -94,6 +94,7 @@ type AppAction =
   | { type: 'SET_CURRENT_DATE'; payload: Date }
   | { type: 'NAVIGATE_PROJECTS'; payload: 'prev' | 'next' }
   | { type: 'SET_VIEW_MODE'; payload: 'columns' | 'kanban' }
+  | { type: 'SET_VIEW_STATE'; payload: Partial<ViewState> }
   | { type: 'SET_KANBAN_GROUPING'; payload: KanbanGroupingMode }
   | { type: 'SET_TASK_VIEW'; payload: 'board' | 'list' }
   | { type: 'SET_ACTIVE_KANBAN_BOARD'; payload: string }
@@ -890,6 +891,21 @@ function appReducer(state: AppState, action: AppAction): AppState {
     
     case 'SET_VIEW_MODE':
       return { ...state, viewState: { ...state.viewState, currentMode: action.payload } };
+    
+    case 'SET_VIEW_STATE':
+      return { 
+        ...state, 
+        viewState: { 
+          ...state.viewState, 
+          ...action.payload,
+          // Deep merge projectKanban to preserve columns
+          projectKanban: action.payload.projectKanban ? {
+            ...state.viewState.projectKanban,
+            ...action.payload.projectKanban,
+            columns: action.payload.projectKanban.columns || state.viewState.projectKanban.columns
+          } : state.viewState.projectKanban
+        } 
+      };
     
     case 'SET_KANBAN_GROUPING':
       return { ...state, viewState: { ...state.viewState, kanbanGrouping: action.payload } };
@@ -3105,8 +3121,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             dispatch({ type: 'UPDATE_PREFERENCES', payload: data.preferences });
           }
           if (data.viewState) {
-            // Direct state update for viewState
-            state.viewState = { ...state.viewState, ...data.viewState };
+            // Use dispatch for proper state update
+            dispatch({ type: 'SET_VIEW_STATE', payload: data.viewState });
           }
           
           // Generate and merge columns
@@ -4033,6 +4049,66 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       window.removeEventListener('focus', onFocus);
     };
   }, [state.calendarSources, state.preferences?.calendars?.showInPlanner, dispatch]);
+
+  // Background sync for tasks (every 30 seconds when online)
+  // This ensures Desktop and Mobile stay in sync
+  useEffect(() => {
+    if (!isOnlineMode() || !initialLoadComplete.current) return;
+
+    const backgroundSync = async () => {
+      try {
+        const data = await syncAPI.getFullData();
+        
+        // Only update if we got valid data
+        if (data.tasks) {
+          // Compare and only dispatch if different to avoid unnecessary re-renders
+          const currentTaskIds = new Set(state.tasks.map(t => t.id));
+          const serverTaskIds = new Set(data.tasks.map((t: any) => t.id));
+          
+          // Check if there are differences
+          const hasNewTasks = data.tasks.some((t: any) => !currentTaskIds.has(t.id));
+          const hasDeletedTasks = state.tasks.some(t => !serverTaskIds.has(t.id));
+          const hasUpdatedTasks = data.tasks.some((t: any) => {
+            const localTask = state.tasks.find(lt => lt.id === t.id);
+            return localTask && localTask.updatedAt !== t.updatedAt;
+          });
+          
+          if (hasNewTasks || hasDeletedTasks || hasUpdatedTasks) {
+            dispatch({ type: 'SET_TASKS', payload: data.tasks });
+          }
+        }
+        
+        if (data.archivedTasks) {
+          const currentIds = new Set(state.archivedTasks.map(t => t.id));
+          const serverIds = new Set(data.archivedTasks.map((t: any) => t.id));
+          if (currentIds.size !== serverIds.size || data.archivedTasks.some((t: any) => !currentIds.has(t.id))) {
+            dispatch({ type: 'SET_ARCHIVED_TASKS', payload: data.archivedTasks });
+          }
+        }
+      } catch (error) {
+        // Silently fail - background sync shouldn't interrupt user
+        console.debug('[AppContext] Background sync failed:', error);
+      }
+    };
+
+    // Initial sync after a short delay
+    const initialSync = setTimeout(backgroundSync, 5000);
+    
+    // Sync on window focus (user returns to tab)
+    const onFocus = () => {
+      backgroundSync();
+    };
+    window.addEventListener('focus', onFocus);
+
+    // Periodic sync every 30 seconds
+    const syncInterval = setInterval(backgroundSync, 30000);
+
+    return () => {
+      clearTimeout(initialSync);
+      clearInterval(syncInterval);
+      window.removeEventListener('focus', onFocus);
+    };
+  }, []);
 
   // Initialize timer service ONCE
   useEffect(() => {
