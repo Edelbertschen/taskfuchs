@@ -1877,13 +1877,54 @@ export function TaskBoard() {
                 <div className={`overflow-hidden transition-all duration-300 ${
                   showFilters ? 'max-h-96 opacity-100 mt-3' : 'max-h-0 opacity-0'
                 }`}>
-                  <div className={`p-4 rounded-lg backdrop-blur-sm border space-y-4 ${
+                  <div className={`p-4 rounded-lg backdrop-blur-md border space-y-4 ${
                     isMinimalDesign
                       ? 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
-                      : (isDarkMode ? 'bg-black/20 border-gray-600/30' : 'bg-white/30 border-gray-300/30')
+                      : (isDarkMode ? 'bg-black/70 border-gray-600/50' : 'bg-white/90 border-gray-300/50')
                   }`}>
                     
-                    {/* Priority Filters */}
+                    {/* Header with Filter icon and Clear button */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="p-1.5 rounded-lg" style={{ backgroundColor: state.preferences.accentColor + '20' }}>
+                          <Filter className="w-4 h-4" style={{ color: state.preferences.accentColor }} />
+                        </div>
+                        <h3 className="text-sm font-medium text-gray-900 dark:text-white">
+                          {t('common.filter', 'Filter')}
+                        </h3>
+                        {(priorityFilter !== 'all' || state.activeTagFilters.length > 0) && (
+                          <span 
+                            className="px-2 py-0.5 rounded-full text-xs font-bold text-white"
+                            style={{ backgroundColor: state.preferences.accentColor }}
+                          >
+                            {(priorityFilter !== 'all' ? 1 : 0) + state.activeTagFilters.length}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        {(priorityFilter !== 'all' || state.activeTagFilters.length > 0) && (
+                          <button
+                            onClick={() => {
+                              setPriorityFilter('all');
+                              dispatch({ type: 'CLEAR_TAG_FILTERS' });
+                            }}
+                            className="flex items-center space-x-1 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 px-2 py-1 rounded-lg"
+                          >
+                            <X className="w-3 h-3" />
+                            <span>{t('common.clearAll', 'Alle löschen')}</span>
+                          </button>
+                        )}
+                        <button
+                          onClick={() => setShowFilters(false)}
+                          className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200"
+                          title={t('common.close', 'Schließen')}
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                    
+                    {/* Priority Filters - Compact buttons */}
                     <div>
                       <label className={`block text-xs font-medium mb-2 flex items-center space-x-2 ${
                         isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? 'text-gray-300' : 'text-gray-900')
@@ -1892,14 +1933,14 @@ export function TaskBoard() {
                         <span>Prioritäten</span>
                       </label>
                       
-                      <div className="grid grid-cols-5 gap-1">
+                      <div className="flex gap-1">
                         {/* All Priority Button */}
                         <button
                           onClick={() => setPriorityFilter('all')}
-                          className={`h-8 rounded-md text-xs font-bold transition-all duration-200 ${
+                          className={`h-8 px-2 rounded-md text-xs font-bold transition-all duration-200 ${
                             priorityFilter === 'all'
                               ? 'bg-white text-gray-800 shadow-lg scale-105'
-                              : 'bg-gray-700/60 text-gray-300 hover:bg-gray-600/60 hover:scale-105'
+                              : (isDarkMode ? 'bg-gray-600/60 text-gray-300 hover:bg-gray-500/60' : 'bg-gray-200/80 text-gray-600 hover:bg-gray-300/80') + ' hover:scale-105'
                           }`}
                           title={t('tasks.filter.all_priorities')}
                         >
@@ -1908,15 +1949,15 @@ export function TaskBoard() {
                         
                         {/* Individual Priority Buttons */}
                         {[
-                                          { key: 'high', label: 'H', color: '#ef4444', title: t('tasks.priority.high') + ' Priorität' },
-                { key: 'medium', label: 'M', color: '#f59e0b', title: t('tasks.priority.medium') + ' Priorität' },
-                { key: 'low', label: 'L', color: '#10b981', title: t('tasks.priority.low') + ' Priorität' },
-                { key: 'none', label: '–', color: '#9ca3af', title: t('tasks.priority.none') + ' Priorität' }
+                          { key: 'high', label: 'H', color: '#ef4444', title: t('tasks.priority.high') + ' Priorität' },
+                          { key: 'medium', label: 'M', color: '#f59e0b', title: t('tasks.priority.medium') + ' Priorität' },
+                          { key: 'low', label: 'L', color: '#10b981', title: t('tasks.priority.low') + ' Priorität' },
+                          { key: 'none', label: '–', color: '#9ca3af', title: t('tasks.priority.none') + ' Priorität' }
                         ].map(({ key, label, color, title }) => (
                           <button
                             key={key}
                             onClick={() => setPriorityFilter(key)}
-                            className={`h-8 rounded-md text-xs font-bold transition-all duration-200 ${
+                            className={`h-8 px-2 rounded-md text-xs font-bold transition-all duration-200 ${
                               priorityFilter === key
                                 ? 'text-white shadow-lg scale-105'
                                 : 'text-white/80 hover:text-white hover:scale-105'
@@ -1961,15 +2002,15 @@ export function TaskBoard() {
                                   onClick={() => {
                                     dispatch({ type: 'TOGGLE_TAG_FILTER', payload: tag.name });
                                   }}
-                                  className={`px-2 py-1 rounded-md text-xs font-medium transition-all duration-200 ${
+                                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all duration-200 ${
                                     isActive
-                                      ? 'text-white shadow-lg scale-105'
-                                      : 'text-gray-300 bg-gray-700/60 hover:bg-gray-600/60 hover:scale-105'
+                                      ? 'text-white shadow-sm scale-105'
+                                      : (isDarkMode ? 'bg-gray-600/60 text-gray-300 hover:bg-gray-500/60' : 'bg-gray-200/80 text-gray-700 hover:bg-gray-300/80') + ' hover:scale-105'
                                   }`}
-                                  style={{
-                                    backgroundColor: isActive ? tag.color || state.preferences.accentColor : undefined,
-                                    boxShadow: isActive ? `0 0 8px ${tag.color || state.preferences.accentColor}40` : 'none'
-                                  }}
+                                  style={isActive ? {
+                                    backgroundColor: tag.color || state.preferences.accentColor,
+                                    boxShadow: `0 0 8px ${tag.color || state.preferences.accentColor}40`
+                                  } : {}}
                                   title={`${tag.name} (${tag.count} Aufgaben)`}
                                 >
                                   {tag.name}
@@ -1978,58 +2019,12 @@ export function TaskBoard() {
                             })}
                         </div>
                       ) : (
-                        <div className="text-xs text-gray-500 italic">
-                          Keine Tags verfügbar
+                        <div className={`text-xs italic ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                          {t('common.noTagsAvailable', 'Keine Tags verfügbar')}
                         </div>
                         );
                       })()}
                     </div>
-
-                    {/* Active Filters Summary */}
-                    {(priorityFilter !== 'all' || state.activeTagFilters.length > 0) && (
-                      <div className="pt-3 border-t border-gray-600/30">
-                        <div className="flex items-center justify-between">
-                          <span className={`text-xs ${
-                            isMinimalDesign ? 'text-gray-600 dark:text-gray-300' : 'text-gray-400'
-                          }`}>Aktive Filter:</span>
-                          <button
-                            onClick={() => {
-                              setPriorityFilter('all');
-                              dispatch({ type: 'CLEAR_TAG_FILTERS' });
-                            }}
-                            className="text-xs text-red-400 hover:text-red-300 transition-colors"
-                          >
-                            Alle löschen
-                          </button>
-                        </div>
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          {priorityFilter !== 'all' && (
-                            <span 
-                              className="inline-flex items-center px-2 py-1 rounded text-xs text-white"
-                              style={{ 
-                                backgroundColor: 
-                                  priorityFilter === 'high' ? '#ef4444' :
-                                  priorityFilter === 'medium' ? '#f59e0b' :
-                                  priorityFilter === 'low' ? '#10b981' : '#9ca3af'
-                              }}
-                            >
-                              {priorityFilter === 'high' ? 'Hoch' :
-                               priorityFilter === 'medium' ? 'Mittel' :
-                               priorityFilter === 'low' ? 'Niedrig' : 'Keine'} Priorität
-                            </span>
-                          )}
-                          {state.activeTagFilters.map(tag => (
-                            <span 
-                              key={tag}
-                              className="inline-flex items-center px-2 py-1 rounded text-xs text-white"
-                              style={{ backgroundColor: state.preferences.accentColor }}
-                            >
-                              #{tag}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>

@@ -1154,12 +1154,12 @@ export function PinsView() {
             <Header currentView="pins" />
           </div>
 
-          {/* Filter Panel - Like TaskBoard */}
+          {/* Filter Panel - Unified style like Projects */}
           {showFilterPanel && (
-            <div className={`overflow-hidden transition-all duration-300 max-h-96 opacity-100 mx-4 mt-3 rounded-lg backdrop-blur-sm border ${
+            <div className={`overflow-hidden transition-all duration-300 max-h-96 opacity-100 mx-4 mt-3 rounded-lg backdrop-blur-md border ${
               isMinimalDesign
                 ? 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
-                : (isDarkMode ? 'bg-black/20 border-gray-600/30' : 'bg-white/30 border-gray-300/30')
+                : (isDarkMode ? 'bg-black/70 border-gray-600/50' : 'bg-white/90 border-gray-300/50')
           }`}>
               <div className="p-4 space-y-4">
             <div className="flex items-center justify-between">
@@ -1184,9 +1184,10 @@ export function PinsView() {
                           setPriorityFilter('all');
                           setTagFilters([]);
                         }}
-                        className="px-2 py-1 text-xs font-medium text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-all duration-200"
+                        className="flex items-center space-x-1 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 px-2 py-1 rounded-lg"
                       >
-                        {t('pins.reset')}
+                        <X className="w-3 h-3" />
+                        <span>{t('common.clearAll', 'Alle löschen')}</span>
                       </button>
                     )}
                     <button
@@ -1198,7 +1199,7 @@ export function PinsView() {
                   </div>
                 </div>
                 
-                {/* Priority Filters */}
+                {/* Priority Filters - Compact buttons */}
                 <div>
                   <label className={`block text-xs font-medium mb-2 flex items-center space-x-2 ${
                     isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? 'text-gray-300' : 'text-gray-900')
@@ -1206,13 +1207,13 @@ export function PinsView() {
                     <AlertCircle className="w-3 h-3" />
                     <span>Prioritäten</span>
                   </label>
-                  <div className="grid grid-cols-5 gap-1">
+                  <div className="flex gap-1">
                     <button
                       onClick={() => setPriorityFilter('all')}
-                      className={`h-8 rounded-md text-xs font-bold transition-all duration-200 ${
+                      className={`h-8 px-2 rounded-md text-xs font-bold transition-all duration-200 ${
                         priorityFilter === 'all'
                           ? 'bg-white text-gray-800 shadow-lg scale-105'
-                          : 'bg-gray-700/60 text-gray-300 hover:bg-gray-600/60 hover:scale-105'
+                          : (isDarkMode ? 'bg-gray-600/60 text-gray-300 hover:bg-gray-500/60' : 'bg-gray-200/80 text-gray-600 hover:bg-gray-300/80') + ' hover:scale-105'
                       }`}
                     >
                       ALL
@@ -1226,7 +1227,7 @@ export function PinsView() {
                       <button
                         key={key}
                         onClick={() => setPriorityFilter(key)}
-                        className={`h-8 rounded-md text-xs font-bold transition-all duration-200 ${
+                        className={`h-8 px-2 rounded-md text-xs font-bold transition-all duration-200 ${
                           priorityFilter === key
                             ? 'text-white shadow-lg scale-105'
                             : 'text-white/80 hover:text-white hover:scale-105'
@@ -1266,9 +1267,12 @@ export function PinsView() {
                           className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all duration-200 ${
                             isActive
                               ? 'text-white shadow-sm scale-105'
-                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                              : (isDarkMode ? 'bg-gray-600/60 text-gray-300 hover:bg-gray-500/60' : 'bg-gray-200/80 text-gray-700 hover:bg-gray-300/80') + ' hover:scale-105'
                           }`}
-                          style={isActive ? { backgroundColor: tag.color || state.preferences.accentColor } : {}}
+                          style={isActive ? { 
+                            backgroundColor: tag.color || state.preferences.accentColor,
+                            boxShadow: `0 0 8px ${tag.color || state.preferences.accentColor}40`
+                          } : {}}
                         >
                           {tag.name}
                         </button>

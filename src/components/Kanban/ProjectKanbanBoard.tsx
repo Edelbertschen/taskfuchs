@@ -25,7 +25,7 @@ import {
   arrayMove
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { FolderOpen, Plus, Settings, Edit2, Sparkles, X, MoreHorizontal, MoreVertical, Columns, Focus, ChevronUp, ChevronDown, Filter, Hash, AlertCircle, Circle, CheckCircle, Archive, Clock, Trash2, Check, FileText, Info, Pin, BarChart3 } from 'lucide-react';
+import { FolderOpen, Plus, Settings, Edit2, Sparkles, X, MoreHorizontal, MoreVertical, Columns, Focus, ChevronUp, ChevronDown, Filter, Hash, AlertCircle, Circle, CheckCircle, Archive, Clock, Trash2, Check, FileText, Info, Pin, BarChart3, Tag } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { TaskCard } from '../Tasks/TaskCard';
 import { TaskColumn } from '../Tasks/TaskColumn';
@@ -2111,10 +2111,10 @@ export function ProjectKanbanBoard() {
               >
                 {/* Filter Slider - Below Controls - Matching TaskBoard styling */}
                 {selectedProject && showFilterDropdown && (
-                    <div className={`overflow-hidden transition-all duration-300 max-h-96 opacity-100 mt-3 mx-4 rounded-lg backdrop-blur-sm border ${
+                    <div className={`overflow-hidden transition-all duration-300 max-h-96 opacity-100 mt-3 mx-4 rounded-lg backdrop-blur-md border ${
                       isMinimalDesign
                         ? 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
-                        : (isDarkMode ? 'bg-black/20 border-gray-600/30' : 'bg-white/30 border-gray-300/30')
+                        : (isDarkMode ? 'bg-black/70 border-gray-600/50' : 'bg-white/90 border-gray-300/50')
                     }`}>
                     <div className="p-4">
                       <div className="flex items-center justify-between mb-3">
@@ -2149,7 +2149,7 @@ export function ProjectKanbanBoard() {
                       </div>
 
                       <div className="space-y-4">
-                        {/* Priority Filters - Grid layout like TaskBoard */}
+                        {/* Priority Filters - Compact buttons */}
                         <div>
                           <label className={`block text-xs font-medium mb-2 flex items-center space-x-2 ${
                             isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? 'text-gray-300' : 'text-gray-900')
@@ -2157,26 +2157,34 @@ export function ProjectKanbanBoard() {
                             <AlertCircle className="w-3 h-3" />
                             <span>Prioritäten</span>
                           </label>
-                          <div className="grid grid-cols-5 gap-1">
+                          <div className="flex gap-1">
                             {priorities.map((priority) => {
                               const isActive = state.viewState.projectKanban.priorityFilters.includes(priority.value as any);
                               const taskCount = getTaskCountForProjectPriority(priority.value);
+                              const priorityColors: Record<string, string> = {
+                                'high': '#ef4444',
+                                'medium': '#f59e0b', 
+                                'low': '#10b981',
+                                'none': '#9ca3af'
+                              };
+                              const color = priorityColors[priority.value] || state.preferences.accentColor;
                               
                               return (
                                 <button
                                   key={priority.value}
                                   onClick={() => handleToggleProjectPriority(priority.value)}
-                                  className={`px-3 py-1.5 text-sm rounded-full transition-all duration-200 ${
+                                  className={`h-8 px-2 text-xs font-bold rounded-md transition-all duration-200 ${
                                     isActive
-                                      ? 'text-white shadow-sm'
-                                      : (isMinimalDesign ? 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700' : (isDarkMode ? 'bg-gray-700/40 text-gray-300 hover:bg-gray-600/40' : 'bg-white/40 text-gray-900 hover:bg-white/50'))
+                                      ? 'text-white shadow-lg scale-105'
+                                      : 'text-white/80 hover:text-white hover:scale-105'
                                   }`}
-                                  style={isActive ? { backgroundColor: state.preferences.accentColor } : {}}
+                                  style={{
+                                    backgroundColor: isActive ? color : `${color}60`,
+                                    boxShadow: isActive ? `0 0 12px ${color}40` : 'none'
+                                  }}
+                                  title={`${priority.label} (${taskCount})`}
                                 >
-                                  <span>{priority.label}</span>
-                                  <span className="ml-1 text-xs bg-black/10 dark:bg-white/10 px-1.5 py-0.5 rounded-full">
-                                    {taskCount}
-                                  </span>
+                                  {priority.label.charAt(0)}
                                 </button>
                               );
                             })}
@@ -2184,11 +2192,14 @@ export function ProjectKanbanBoard() {
                         </div>
 
                         {/* Tag Filters */}
-                        <div className="flex items-center space-x-4">
-                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-0 flex-shrink-0">
-                            Tags:
-                          </span>
-                          <div className="flex flex-wrap gap-2">
+                        <div>
+                          <label className={`block text-xs font-medium mb-2 flex items-center space-x-2 ${
+                            isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? 'text-gray-300' : 'text-gray-900')
+                          }`}>
+                            <Tag className="w-3 h-3" />
+                            <span>Tags</span>
+                          </label>
+                          <div className="flex flex-wrap gap-1.5">
                             {(() => {
                               const availableTags = state.tags.filter(tag => {
                                 const actualTaskCount = filteredTasks.filter(task => task.tags.includes(tag.name)).length;
@@ -2196,30 +2207,30 @@ export function ProjectKanbanBoard() {
                               });
                               
                               return availableTags.length > 0 ? (
-                                availableTags.sort((a, b) => b.count - a.count).map((tag) => {
+                                availableTags.sort((a, b) => b.count - a.count).slice(0, 8).map((tag) => {
                                   const isActive = state.viewState.projectKanban.tagFilters.includes(tag.name);
-                                  const itemCount = getTaskCountForProjectTag(tag.name);
                                   
                                   return (
                                     <button
                                       key={tag.id}
                                       onClick={() => handleToggleProjectTag(tag.name)}
-                                      className={`px-3 py-1.5 text-sm rounded-full transition-all duration-200 ${
+                                      className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all duration-200 ${
                                         isActive
-                                          ? 'text-white shadow-sm'
-                                          : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                                          ? 'text-white shadow-sm scale-105'
+                                          : (isDarkMode ? 'bg-gray-600/60 text-gray-300 hover:bg-gray-500/60' : 'bg-gray-200/80 text-gray-700 hover:bg-gray-300/80') + ' hover:scale-105'
                                       }`}
-                                      style={isActive ? { backgroundColor: state.preferences.accentColor } : {}}
+                                      style={isActive ? { 
+                                        backgroundColor: tag.color || state.preferences.accentColor,
+                                        boxShadow: `0 0 8px ${tag.color || state.preferences.accentColor}40`
+                                      } : {}}
+                                      title={`${tag.name} (${getTaskCountForProjectTag(tag.name)})`}
                                     >
-                                      <span>{tag.name}</span>
-                                      <span className="ml-1 text-xs bg-black/10 dark:bg-white/10 px-1.5 py-0.5 rounded-full">
-                                        {itemCount}
-                                      </span>
+                                      {tag.name}
                                     </button>
                                   );
                                 })
                               ) : (
-                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                <span className={`text-xs italic ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
                                   {t('no_tags_available')}
                                 </span>
                               );
