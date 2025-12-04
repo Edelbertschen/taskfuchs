@@ -195,15 +195,14 @@ export function MobileShell() {
   // Get current column name for display (sub-column within Pins)
   const currentPinColumnName = currentPinColumn?.title || '';
 
-  // Column swipe handlers (for Pins and Projects)
+  // Column swipe handlers (for Planner Heute/Inbox and Pins)
   const handleColumnSwipeStart = (e: React.TouchEvent) => {
-    if (mainView === 'planner') return; // No horizontal swipe for planner
     columnSwipeStartX.current = e.touches[0].clientX;
     isColumnSwiping.current = false;
   };
   
   const handleColumnSwipeMove = (e: React.TouchEvent) => {
-    if (mainView === 'planner' || columnSwipeStartX.current === null) return;
+    if (columnSwipeStartX.current === null) return;
     const deltaX = e.touches[0].clientX - columnSwipeStartX.current;
     
     // Only activate column swiping after 10px horizontal movement
@@ -214,7 +213,7 @@ export function MobileShell() {
   };
   
   const handleColumnSwipeEnd = () => {
-    if (mainView === 'planner' || !isColumnSwiping.current) {
+    if (!isColumnSwiping.current) {
       columnSwipeStartX.current = null;
       setColumnSwipeOffset(0);
       return;
@@ -222,7 +221,18 @@ export function MobileShell() {
     
     const threshold = 80; // Swipe threshold in pixels
     
-    if (mainView === 'pins') {
+    if (mainView === 'planner') {
+      // Swipe between Heute and Inbox
+      if (columnSwipeOffset > threshold && plannerSubView === 'inbox') {
+        // Swipe right -> go to Heute
+        setPlannerSubView('today');
+        if ('vibrate' in navigator) navigator.vibrate(10);
+      } else if (columnSwipeOffset < -threshold && plannerSubView === 'today') {
+        // Swipe left -> go to Inbox
+        setPlannerSubView('inbox');
+        if ('vibrate' in navigator) navigator.vibrate(10);
+      }
+    } else if (mainView === 'pins') {
       if (columnSwipeOffset > threshold && pinsColumnIndex > 0) {
         // Swipe right -> previous column
         setPinsColumnIndex(prev => prev - 1);
@@ -469,28 +479,98 @@ export function MobileShell() {
 
       {/* Header - with proper iOS safe area */}
       <header className="relative z-10 flex-shrink-0" style={{ paddingTop: 'max(env(safe-area-inset-top, 20px), 44px)', transform: `translateY(${pullDistance * 0.3}px)` }}>
+        {/* Row 1: Tabs + Logout (ganz oben) */}
         <div className="px-4 pt-2 pb-1">
+          <div className="flex items-center gap-2">
+            {/* Tabs */}
+            <div className="flex-1 min-w-0">
+              <div 
+                className="flex rounded-xl p-1 gap-1 overflow-x-auto no-scrollbar" 
+                style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)' }}
+              >
+                {mainView === 'planner' ? (
+                  // Planner: Heute / Inbox tabs
+                  <>
+                    {(['today', 'inbox'] as const).map(v => (
+                      <button
+                        key={v}
+                        onClick={() => setPlannerSubView(v)}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-sm font-semibold transition-all"
+                        style={{
+                          backgroundColor: plannerSubView === v ? accent : 'transparent',
+                          color: plannerSubView === v ? '#fff' : (isDarkMode ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.7)'),
+                        }}
+                      >
+                        {v === 'today' ? <Sun className="w-4 h-4" /> : <Inbox className="w-4 h-4" />}
+                        <span>{v === 'today' ? t('mobile.today', 'Heute') : t('mobile.inbox', 'Inbox')}</span>
+                        {(v === 'today' ? todayCount : inboxCount) > 0 && (
+                          <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ backgroundColor: plannerSubView === v ? 'rgba(255,255,255,0.25)' : `${accent}30`, color: plannerSubView === v ? '#fff' : accent }}>
+                            {v === 'today' ? todayCount : inboxCount}
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </>
+                ) : pinColumns.length > 0 ? (
+                  // Pins: Column tabs
+                  <>
+                    {pinColumns.map((col, i) => (
+                      <button
+                        key={col.id}
+                        onClick={() => {
+                          setPinsColumnIndex(i);
+                          if ('vibrate' in navigator) navigator.vibrate(10);
+                        }}
+                        className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-sm font-semibold transition-all whitespace-nowrap flex-shrink-0"
+                        style={{
+                          backgroundColor: pinsColumnIndex === i ? accent : 'transparent',
+                          color: pinsColumnIndex === i ? '#fff' : (isDarkMode ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.7)'),
+                        }}
+                      >
+                        {col.color && (
+                          <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: col.color }} />
+                        )}
+                        <span className="truncate max-w-[100px]">{col.title}</span>
+                      </button>
+                    ))}
+                  </>
+                ) : (
+                  // Pins: No columns - show placeholder
+                  <div className="flex-1 flex items-center justify-center py-2 px-3 text-sm" style={{ color: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)' }}>
+                    {t('mobile.noPins', 'Keine Pins')}
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* Logout Button */}
+            <button 
+              onClick={() => setShowLogoutConfirm(true)} 
+              className="p-2 rounded-xl flex-shrink-0" 
+              style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }}
+            >
+              <LogOut className="w-4 h-4" style={{ color: isDarkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.5)' }} />
+            </button>
+          </div>
+        </div>
+        
+        {/* Row 2: Title + Filter buttons */}
+        <div className="px-4 py-1">
           <div className="flex items-center justify-between gap-2">
-            {/* Left: Title and info */}
-            <div className="flex items-baseline gap-2 min-w-0 flex-1">
-              <h1 className="text-xl font-bold truncate" style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}>
-                {mainView === 'planner' 
-                  ? (plannerSubView === 'today' ? t('mobile.today', 'Heute') : t('mobile.inbox', 'Inbox'))
-                  : t('mobile.pins', 'Pins')
-                }
+            {/* Left: Title and date/count */}
+            <div className="flex items-baseline gap-2 min-w-0">
+              <h1 className="text-lg font-bold" style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}>
+                {mainView === 'planner' ? t('mobile.planner', 'Planer') : t('mobile.pins', 'Pins')}
               </h1>
               {mainView === 'planner' && plannerSubView === 'today' && (
-                <span className="text-sm font-medium flex-shrink-0" style={{ color: accent }}>
+                <span className="text-sm font-medium" style={{ color: accent }}>
                   {format(new Date(), 'EEE, d. MMM', { locale: dateLocale })}
                 </span>
               )}
-              {mainView === 'planner' && plannerSubView === 'inbox' && inboxCount > 0 && (
-                <span className="text-sm font-medium flex-shrink-0" style={{ color: accent }}>{inboxCount}</span>
-              )}
             </div>
             
-            {/* Right: Action buttons */}
-            <div className="flex items-center gap-1 flex-shrink-0">
+            {/* Right: Filter buttons */}
+            <div className="flex items-center gap-1">
               {/* Tag filter */}
               <button 
                 onClick={() => setShowTagFilter(!showTagFilter)} 
@@ -516,14 +596,6 @@ export function MobileShell() {
                   <EyeOff className="w-4 h-4" style={{ color: isDarkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.3)' }} />
                 )}
               </button>
-              {/* Logout */}
-              <button 
-                onClick={() => setShowLogoutConfirm(true)} 
-                className="p-1.5 rounded-lg" 
-                style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }}
-              >
-                <LogOut className="w-4 h-4" style={{ color: isDarkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.5)' }} />
-              </button>
             </div>
           </div>
           {hasActiveFilters && (
@@ -533,63 +605,6 @@ export function MobileShell() {
             </div>
           )}
         </div>
-
-        {/* Tabs - only for Planner view */}
-        {mainView === 'planner' && (
-          <div className="px-4 py-2">
-            <div className="flex rounded-xl p-1 gap-1" style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)' }}>
-              {(['today', 'inbox'] as const).map(v => (
-                <button
-                  key={v}
-                  onClick={() => setPlannerSubView(v)}
-                  className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-sm font-semibold transition-all"
-                  style={{
-                    backgroundColor: plannerSubView === v ? accent : 'transparent',
-                    color: plannerSubView === v ? '#fff' : (isDarkMode ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.7)'),
-                  }}
-                >
-                  {v === 'today' ? <Sun className="w-4 h-4" /> : <Inbox className="w-4 h-4" />}
-                  <span>{v === 'today' ? t('mobile.today', 'Heute') : t('mobile.inbox', 'Inbox')}</span>
-                  {(v === 'today' ? todayCount : inboxCount) > 0 && (
-                    <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ backgroundColor: plannerSubView === v ? 'rgba(255,255,255,0.25)' : `${accent}30`, color: plannerSubView === v ? '#fff' : accent }}>
-                      {v === 'today' ? todayCount : inboxCount}
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-        
-        {/* Pin columns tabs */}
-        {mainView === 'pins' && pinColumns.length > 0 && (
-          <div className="px-4 py-2">
-            <div 
-              className="flex rounded-xl p-1 gap-1 overflow-x-auto no-scrollbar" 
-              style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)' }}
-            >
-              {pinColumns.map((col, i) => (
-                <button
-                  key={col.id}
-                  onClick={() => {
-                    setPinsColumnIndex(i);
-                    if ('vibrate' in navigator) navigator.vibrate(10);
-                  }}
-                  className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-sm font-semibold transition-all whitespace-nowrap flex-shrink-0"
-                  style={{
-                    backgroundColor: pinsColumnIndex === i ? accent : 'transparent',
-                    color: pinsColumnIndex === i ? '#fff' : (isDarkMode ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.7)'),
-                  }}
-                >
-                  {col.color && (
-                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: col.color }} />
-                  )}
-                  <span className="truncate max-w-[100px]">{col.title}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
       </header>
 
       {/* Task List with Pull-to-Refresh and Column Swipe */}
