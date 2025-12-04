@@ -13,7 +13,7 @@ async function fetchAPI<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const token = sessionStorage.getItem('taskfuchs_jwt');
+  const token = localStorage.getItem('taskfuchs_jwt');
   
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
@@ -28,7 +28,7 @@ async function fetchAPI<T>(
 
   if (response.status === 401) {
     // Token expired or invalid, trigger logout
-    sessionStorage.removeItem('taskfuchs_jwt');
+    localStorage.removeItem('taskfuchs_jwt');
     window.dispatchEvent(new CustomEvent('auth:logout'));
     throw new Error('Authentication required');
   }

@@ -138,8 +138,16 @@ const authReducer = (state: ExtendedAuthState, action: AuthAction): ExtendedAuth
   }
 };
 
+// Token storage key
+const TOKEN_KEY = 'taskfuchs_jwt';
+
+// Use localStorage for PWA compatibility (sessionStorage is not shared between browser and PWA)
+const getToken = () => typeof window !== 'undefined' ? localStorage.getItem(TOKEN_KEY) : null;
+const setToken = (token: string) => localStorage.setItem(TOKEN_KEY, token);
+const removeToken = () => localStorage.removeItem(TOKEN_KEY);
+
 // Check if there's a stored JWT on initial load
-const hasStoredToken = typeof window !== 'undefined' && !!sessionStorage.getItem('taskfuchs_jwt');
+const hasStoredToken = typeof window !== 'undefined' && !!getToken();
 
 // Initial State
 const initialState: ExtendedAuthState = {
@@ -183,7 +191,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Try to restore session from stored JWT on mount
   useEffect(() => {
     const restoreSession = async () => {
-      const token = sessionStorage.getItem('taskfuchs_jwt');
+      const token = getToken();
       if (!token) {
         // No token to restore, clear restoring state
         dispatch({ type: 'SESSION_RESTORE_FAILED' });
@@ -206,12 +214,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           });
         } else {
           // Token invalid, clear it
-          sessionStorage.removeItem('taskfuchs_jwt');
+          removeToken();
           dispatch({ type: 'SESSION_RESTORE_FAILED' });
         }
       } catch (error) {
         console.error('Failed to restore session:', error);
-        sessionStorage.removeItem('taskfuchs_jwt');
+        removeToken();
         dispatch({ type: 'SESSION_RESTORE_FAILED' });
       }
     };
@@ -252,8 +260,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
           const data = await response.json();
           
-          // Store JWT in sessionStorage (more secure than localStorage)
-          sessionStorage.setItem('taskfuchs_jwt', data.token);
+          // Store JWT in localStorage for PWA compatibility
+          setToken(data.token);
           
           dispatch({
             type: 'LOGIN_SUCCESS',
@@ -320,7 +328,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const logout = useCallback(() => {
-    sessionStorage.removeItem('taskfuchs_jwt');
+    removeToken();
     localStorage.removeItem('taskfuchs-guest-mode'); // Clear guest mode flag
     dispatch({ type: 'LOGOUT' });
     // Fire event so App.tsx can show login page
@@ -337,7 +345,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Allow setting online mode from external auth (e.g., guest to online migration)
   const setOnlineMode = useCallback((token: string, user: User) => {
-    sessionStorage.setItem('taskfuchs_jwt', token);
+    setToken(token);
     dispatch({ type: 'LOGIN_SUCCESS', payload: { user, token } });
   }, []);
 

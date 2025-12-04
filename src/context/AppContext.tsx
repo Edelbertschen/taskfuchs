@@ -12,7 +12,7 @@ import { showGlobalError } from './ToastContext';
 
 // Check if we're in online mode (has JWT token)
 function isOnlineMode(): boolean {
-  return !!sessionStorage.getItem('taskfuchs_jwt');
+  return !!localStorage.getItem('taskfuchs_jwt');
 }
 
 

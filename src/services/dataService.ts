@@ -24,7 +24,7 @@ const STORAGE_KEYS = {
 
 // Check if we're in online mode
 export function isOnlineMode(): boolean {
-  return !!sessionStorage.getItem('taskfuchs_jwt');
+  return !!localStorage.getItem('taskfuchs_jwt');
 }
 
 // ==================

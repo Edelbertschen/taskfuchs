@@ -1272,7 +1272,7 @@ function MainApp() {
           };
           const handleOpenBackupSetup = () => {
             // Only open backup setup in guest mode (not online mode)
-            const jwt = sessionStorage.getItem('taskfuchs_jwt');
+            const jwt = localStorage.getItem('taskfuchs_jwt');
             if (!jwt) {
               setShowBackupSetup(true);
             }
