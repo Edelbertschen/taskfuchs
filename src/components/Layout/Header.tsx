@@ -1032,7 +1032,16 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
                   title={t('header.filter')}
                 >
                   <div className="relative">
-                    <Filter className="w-5 h-5" />
+                    <Filter 
+                      className="w-5 h-5" 
+                      style={{
+                        color: (
+                          (currentView === 'tasks' && activeFiltersCount > 0) ||
+                          (currentView === 'notes' && state.notes.selectedTags.length > 0) ||
+                          (currentView === 'kanban' && (state.viewState.projectKanban.priorityFilters.length > 0 || state.viewState.projectKanban.tagFilters.length > 0))
+                        ) ? '#fff' : undefined
+                      }}
+                    />
                     {((currentView === 'tasks' && activeFiltersCount > 0) || 
                       (currentView === 'notes' && state.notes.selectedTags.length > 0) ||
                       (currentView === 'kanban' && (state.viewState.projectKanban.priorityFilters.length > 0 || state.viewState.projectKanban.tagFilters.length > 0))) && (

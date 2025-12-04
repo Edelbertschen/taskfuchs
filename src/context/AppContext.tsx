@@ -3179,6 +3179,35 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             justLoadedFromDB.current = false;
             console.log('[AppContext] DB load complete, sync effects enabled');
             
+            // Load filter settings from localStorage (these are local, not synced to DB)
+            try {
+              const savedShowCompleted = localStorage.getItem('taskfuchs-show-completed');
+              if (savedShowCompleted) {
+                const showCompleted = JSON.parse(savedShowCompleted);
+                if (!showCompleted) {
+                  dispatch({ type: 'TOGGLE_SHOW_COMPLETED_TASKS' });
+                }
+              }
+              
+              const savedTagFilters = localStorage.getItem('taskfuchs-tag-filters');
+              if (savedTagFilters) {
+                const tagFilters = JSON.parse(savedTagFilters);
+                if (Array.isArray(tagFilters) && tagFilters.length > 0) {
+                  dispatch({ type: 'SET_TAG_FILTERS', payload: tagFilters });
+                }
+              }
+              
+              const savedPriorityFilters = localStorage.getItem('taskfuchs-priority-filters');
+              if (savedPriorityFilters) {
+                const priorityFilters = JSON.parse(savedPriorityFilters);
+                if (Array.isArray(priorityFilters) && priorityFilters.length > 0) {
+                  dispatch({ type: 'SET_PRIORITY_FILTERS', payload: priorityFilters });
+                }
+              }
+            } catch (err) {
+              console.error('[AppContext] Error loading filter settings from localStorage:', err);
+            }
+            
             // Signal to AuthContext that data is loaded
             window.dispatchEvent(new Event('app:data-loaded'));
           }, 500);
@@ -3290,6 +3319,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         const showCompleted = JSON.parse(savedShowCompleted);
         if (!showCompleted) {
           dispatch({ type: 'TOGGLE_SHOW_COMPLETED_TASKS' });
+        }
+      }
+
+      // Load saved tag filters
+      const savedTagFilters = localStorage.getItem('taskfuchs-tag-filters');
+      if (savedTagFilters) {
+        const tagFilters = JSON.parse(savedTagFilters);
+        if (Array.isArray(tagFilters) && tagFilters.length > 0) {
+          dispatch({ type: 'SET_TAG_FILTERS', payload: tagFilters });
+        }
+      }
+
+      // Load saved priority filters
+      const savedPriorityFilters = localStorage.getItem('taskfuchs-priority-filters');
+      if (savedPriorityFilters) {
+        const priorityFilters = JSON.parse(savedPriorityFilters);
+        if (Array.isArray(priorityFilters) && priorityFilters.length > 0) {
+          dispatch({ type: 'SET_PRIORITY_FILTERS', payload: priorityFilters });
         }
       }
 
@@ -3585,6 +3632,28 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       console.error('Error saving show completed setting to localStorage:', error);
     }
   }, [state.showCompletedTasks]);
+
+  // Save tag filters to localStorage (persistent across sessions)
+  useEffect(() => {
+    if (!initialLoadComplete.current) return;
+    
+    try {
+      localStorage.setItem('taskfuchs-tag-filters', JSON.stringify(state.activeTagFilters));
+    } catch (error) {
+      console.error('Error saving tag filters to localStorage:', error);
+    }
+  }, [state.activeTagFilters]);
+
+  // Save priority filters to localStorage (persistent across sessions)
+  useEffect(() => {
+    if (!initialLoadComplete.current) return;
+    
+    try {
+      localStorage.setItem('taskfuchs-priority-filters', JSON.stringify(state.activePriorityFilters));
+    } catch (error) {
+      console.error('Error saving priority filters to localStorage:', error);
+    }
+  }, [state.activePriorityFilters]);
 
   useEffect(() => {
     if (!initialLoadComplete.current) return;

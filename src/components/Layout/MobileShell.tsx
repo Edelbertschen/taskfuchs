@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { 
   Plus, Check, Archive, Inbox, Sun, Sparkles, Filter, Undo2,
   GripVertical, LogOut, RefreshCw, X, ChevronRight,
-  FileText, ListChecks, Zap, Heart, Eye, EyeOff
+  FileText, ListChecks, Zap, Heart, Eye, EyeOff, Tag
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
@@ -37,6 +37,7 @@ export function MobileShell() {
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [showTagFilter, setShowTagFilter] = useState(false);
   
   // Onboarding
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -395,6 +396,19 @@ export function MobileShell() {
               </span>
             </div>
             <div className="flex items-center gap-1">
+              {/* Tag filter */}
+              <button 
+                onClick={() => setShowTagFilter(!showTagFilter)} 
+                className="p-1.5 rounded-lg relative"
+                style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }}
+              >
+                <Tag className="w-4 h-4" style={{ color: activeTagFilters.length > 0 ? accent : (isDarkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.3)') }} />
+                {activeTagFilters.length > 0 && (
+                  <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full text-[9px] font-bold flex items-center justify-center text-white" style={{ backgroundColor: accent }}>
+                    {activeTagFilters.length}
+                  </span>
+                )}
+              </button>
               {/* Toggle completed tasks */}
               <button 
                 onClick={() => dispatch({ type: 'TOGGLE_SHOW_COMPLETED_TASKS' })} 
@@ -543,6 +557,76 @@ export function MobileShell() {
             <button onClick={handleUndo} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold" style={{ backgroundColor: `${accent}15`, color: accent }}>
               <Undo2 className="w-4 h-4" />{t('mobile.undo', 'Rückgängig')}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Tag Filter Dropdown */}
+      {showTagFilter && (
+        <div 
+          className="fixed inset-0 flex items-start justify-end p-4"
+          style={{ zIndex: 9998, paddingTop: 'calc(max(env(safe-area-inset-top, 20px), 44px) + 50px)' }}
+          onClick={() => setShowTagFilter(false)}
+        >
+          <div 
+            className="w-64 max-h-80 overflow-y-auto rounded-2xl shadow-2xl"
+            style={{ 
+              backgroundColor: isDarkMode ? '#1c1c1e' : '#fff',
+              border: isDarkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)'
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="p-3 border-b" style={{ borderColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold" style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}>
+                  {t('mobile.filterByTag', 'Nach Tag filtern')}
+                </span>
+                {activeTagFilters.length > 0 && (
+                  <button 
+                    onClick={() => dispatch({ type: 'CLEAR_TAG_FILTERS' })}
+                    className="text-xs px-2 py-1 rounded-lg"
+                    style={{ backgroundColor: `${accent}20`, color: accent }}
+                  >
+                    {t('mobile.clearAll', 'Alle löschen')}
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className="p-2">
+              {state.tags.length === 0 ? (
+                <p className="text-sm text-center py-4" style={{ color: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)' }}>
+                  {t('mobile.noTags', 'Keine Tags vorhanden')}
+                </p>
+              ) : (
+                state.tags.map(tag => {
+                  const isActive = activeTagFilters.includes(tag.name);
+                  return (
+                    <button
+                      key={tag.id}
+                      onClick={() => dispatch({ type: 'TOGGLE_TAG_FILTER', payload: tag.name })}
+                      className="w-full flex items-center gap-2 px-3 py-2 rounded-xl mb-1 transition-all"
+                      style={{ 
+                        backgroundColor: isActive ? `${accent}20` : 'transparent',
+                      }}
+                    >
+                      <span 
+                        className="w-3 h-3 rounded-full flex-shrink-0" 
+                        style={{ backgroundColor: tag.color || accent }} 
+                      />
+                      <span 
+                        className="flex-1 text-left text-sm font-medium truncate"
+                        style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}
+                      >
+                        {tag.name}
+                      </span>
+                      {isActive && (
+                        <Check className="w-4 h-4" style={{ color: accent }} />
+                      )}
+                    </button>
+                  );
+                })
+              )}
+            </div>
           </div>
         </div>
       )}
