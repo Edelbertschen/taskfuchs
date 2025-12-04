@@ -491,7 +491,7 @@ export function MobileShell() {
       <div 
         className="absolute left-0 right-0 flex justify-center z-20 transition-all duration-200"
         style={{ 
-          top: `calc(max(env(safe-area-inset-top, 20px), 44px) + ${Math.min(pullDistance, 60)}px)`,
+          top: `calc(max(env(safe-area-inset-top, 20px), 48px) + ${Math.min(pullDistance, 60)}px)`,
           opacity: pullDistance > 20 ? 1 : 0,
           transform: `scale(${Math.min(pullDistance / 60, 1)})`,
         }}
@@ -501,10 +501,10 @@ export function MobileShell() {
         </div>
       </div>
 
-      {/* Header - with proper iOS safe area */}
-      <header className="relative z-10 flex-shrink-0" style={{ paddingTop: 'max(env(safe-area-inset-top, 20px), 44px)', transform: `translateY(${pullDistance * 0.3}px)` }}>
-        {/* Row 1: Action buttons (ganz oben) */}
-        <div className="px-4 pt-1 pb-1">
+      {/* Header - with proper iOS safe area for notch/dynamic island */}
+      <header className="relative z-10 flex-shrink-0" style={{ paddingTop: 'max(env(safe-area-inset-top, 20px), 48px)', transform: `translateY(${pullDistance * 0.3}px)` }}>
+        {/* Row 1: Title + Action buttons */}
+        <div className="px-4 pt-2 pb-1">
           <div className="flex items-center justify-between">
             {/* Left: Title + Date */}
             <div className="flex items-baseline gap-2">
@@ -758,7 +758,7 @@ export function MobileShell() {
       {showTagFilter && (
         <div 
           className="fixed inset-0 flex items-start justify-end p-4"
-          style={{ zIndex: 9998, paddingTop: 'calc(max(env(safe-area-inset-top, 20px), 44px) + 50px)' }}
+          style={{ zIndex: 9998, paddingTop: 'calc(max(env(safe-area-inset-top, 20px), 48px) + 50px)' }}
           onClick={() => setShowTagFilter(false)}
         >
           <div 
@@ -1111,7 +1111,7 @@ function TaskDetailView({ task, onClose, accent, isDarkMode, onComplete, isOffli
   return (
     <div className="fixed inset-0 z-50 flex flex-col" style={{ backgroundColor: isDarkMode ? '#0a0a0a' : '#fafafa' }}>
       {/* Header */}
-      <header className="flex-shrink-0 flex items-center justify-between px-4 py-3" style={{ paddingTop: 'calc(max(env(safe-area-inset-top, 20px), 44px) + 8px)' }}>
+      <header className="flex-shrink-0 flex items-center justify-between px-4 py-3" style={{ paddingTop: 'calc(max(env(safe-area-inset-top, 20px), 48px) + 8px)' }}>
         <button onClick={onClose} className="p-2 -ml-2 rounded-full" style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }}>
           <X className="w-5 h-5" style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }} />
         </button>
@@ -1206,8 +1206,9 @@ interface OnboardingScreenProps {
 
 function OnboardingScreen({ step, setStep, onFinish, accent, isDarkMode }: OnboardingScreenProps) {
   const steps = [
-    { icon: Zap, title: 'Willkommen!', subtitle: 'TaskFuchs Companion', description: 'Deine Aufgaben immer dabei. Schnell, elegant und synchronisiert mit der Desktop-App.' },
-    { icon: ListChecks, title: 'Einfach & Schnell', subtitle: 'Swipe-Gesten', description: 'Wische nach rechts zum Erledigen, nach links zum Archivieren. Tippe für Details.' },
+    { icon: Zap, title: 'Willkommen!', subtitle: 'TaskFuchs Companion', description: 'Deine Aufgaben immer dabei. Synchronisiert mit der Desktop-App, optimiert für unterwegs.' },
+    { icon: ListChecks, title: 'Swipe-Gesten', subtitle: 'Schnell & Intuitiv', description: 'Wische rechts → Erledigt & archiviert. Wische links → Löscht die Aufgabe. Tippe für Details & Unteraufgaben.' },
+    { icon: Pin, title: 'Planer & Pins', subtitle: 'Alles im Blick', description: 'Wechsle zwischen Planer (Heute/Inbox) und deinen Pins. Ziehe nach unten zum Aktualisieren.' },
     { icon: Heart, title: 'Los geht\'s!', subtitle: 'Bereit', description: 'Deine Aufgaben warten. Viel Erfolg beim Produktivsein! 🦊' },
   ];
 
