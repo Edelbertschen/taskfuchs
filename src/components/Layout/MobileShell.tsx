@@ -45,8 +45,10 @@ export function MobileShell() {
   
   // Column swipe state
   const [columnSwipeOffset, setColumnSwipeOffset] = useState(0);
+  const [swipeThresholdReached, setSwipeThresholdReached] = useState(false);
   const columnSwipeStartX = useRef<number | null>(null);
   const isColumnSwiping = useRef(false);
+  const hasVibratedThreshold = useRef(false);
   
   // Onboarding
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -57,6 +59,23 @@ export function MobileShell() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isPulling, setIsPulling] = useState(false);
   const pullStartY = useRef<number | null>(null);
+  
+  // Landscape detection
+  const [isLandscape, setIsLandscape] = useState(
+    typeof window !== 'undefined' ? window.innerWidth > window.innerHeight : false
+  );
+  
+  useEffect(() => {
+    const handleResize = () => {
+      setIsLandscape(window.innerWidth > window.innerHeight);
+    };
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+    };
+  }, []);
   const scrollRef = useRef<HTMLDivElement>(null);
   
   // Animations
@@ -196,9 +215,13 @@ export function MobileShell() {
   const currentPinColumnName = currentPinColumn?.title || '';
 
   // Column swipe handlers (for Planner Heute/Inbox and Pins)
+  const SWIPE_THRESHOLD = 80; // Swipe threshold in pixels
+  
   const handleColumnSwipeStart = (e: React.TouchEvent) => {
     columnSwipeStartX.current = e.touches[0].clientX;
     isColumnSwiping.current = false;
+    hasVibratedThreshold.current = false;
+    setSwipeThresholdReached(false);
   };
   
   const handleColumnSwipeMove = (e: React.TouchEvent) => {
@@ -209,6 +232,25 @@ export function MobileShell() {
     if (Math.abs(deltaX) > 10) {
       isColumnSwiping.current = true;
       setColumnSwipeOffset(deltaX);
+      
+      // Check if we can swipe in this direction
+      const canSwipeRight = (mainView === 'planner' && plannerSubView === 'inbox') || 
+                            (mainView === 'pins' && pinsColumnIndex > 0);
+      const canSwipeLeft = (mainView === 'planner' && plannerSubView === 'today') || 
+                           (mainView === 'pins' && pinsColumnIndex < pinColumns.length - 1);
+      
+      // Threshold reached - haptic feedback once
+      const thresholdReached = (deltaX > SWIPE_THRESHOLD && canSwipeRight) || 
+                               (deltaX < -SWIPE_THRESHOLD && canSwipeLeft);
+      
+      if (thresholdReached && !hasVibratedThreshold.current) {
+        hasVibratedThreshold.current = true;
+        setSwipeThresholdReached(true);
+        if ('vibrate' in navigator) navigator.vibrate(15); // Light haptic when threshold reached
+      } else if (!thresholdReached && hasVibratedThreshold.current) {
+        hasVibratedThreshold.current = false;
+        setSwipeThresholdReached(false);
+      }
     }
   };
   
@@ -216,37 +258,41 @@ export function MobileShell() {
     if (!isColumnSwiping.current) {
       columnSwipeStartX.current = null;
       setColumnSwipeOffset(0);
+      setSwipeThresholdReached(false);
       return;
     }
     
-    const threshold = 80; // Swipe threshold in pixels
+    let didSwitch = false;
     
     if (mainView === 'planner') {
       // Swipe between Heute and Inbox
-      if (columnSwipeOffset > threshold && plannerSubView === 'inbox') {
-        // Swipe right -> go to Heute
+      if (columnSwipeOffset > SWIPE_THRESHOLD && plannerSubView === 'inbox') {
         setPlannerSubView('today');
-        if ('vibrate' in navigator) navigator.vibrate(10);
-      } else if (columnSwipeOffset < -threshold && plannerSubView === 'today') {
-        // Swipe left -> go to Inbox
+        didSwitch = true;
+      } else if (columnSwipeOffset < -SWIPE_THRESHOLD && plannerSubView === 'today') {
         setPlannerSubView('inbox');
-        if ('vibrate' in navigator) navigator.vibrate(10);
+        didSwitch = true;
       }
     } else if (mainView === 'pins') {
-      if (columnSwipeOffset > threshold && pinsColumnIndex > 0) {
-        // Swipe right -> previous column
+      if (columnSwipeOffset > SWIPE_THRESHOLD && pinsColumnIndex > 0) {
         setPinsColumnIndex(prev => prev - 1);
-        if ('vibrate' in navigator) navigator.vibrate(10);
-      } else if (columnSwipeOffset < -threshold && pinsColumnIndex < pinColumns.length - 1) {
-        // Swipe left -> next column
+        didSwitch = true;
+      } else if (columnSwipeOffset < -SWIPE_THRESHOLD && pinsColumnIndex < pinColumns.length - 1) {
         setPinsColumnIndex(prev => prev + 1);
-        if ('vibrate' in navigator) navigator.vibrate(10);
+        didSwitch = true;
       }
+    }
+    
+    // Strong haptic feedback on successful column switch
+    if (didSwitch && 'vibrate' in navigator) {
+      navigator.vibrate([20, 30, 20]); // Double pulse
     }
     
     columnSwipeStartX.current = null;
     isColumnSwiping.current = false;
+    hasVibratedThreshold.current = false;
     setColumnSwipeOffset(0);
+    setSwipeThresholdReached(false);
   };
 
   // Pull-to-refresh handlers
@@ -502,18 +548,24 @@ export function MobileShell() {
       </div>
 
       {/* Header - with proper iOS safe area for notch/dynamic island */}
-      <header className="relative z-10 flex-shrink-0" style={{ paddingTop: 'max(env(safe-area-inset-top, 20px), 48px)', transform: `translateY(${pullDistance * 0.3}px)` }}>
+      <header 
+        className="relative z-10 flex-shrink-0" 
+        style={{ 
+          paddingTop: isLandscape ? 'max(env(safe-area-inset-top, 8px), 16px)' : 'max(env(safe-area-inset-top, 20px), 48px)', 
+          transform: `translateY(${pullDistance * 0.3}px)` 
+        }}
+      >
         {/* Row 1: Title + Action buttons */}
-        <div className="px-4 pt-2 pb-1">
+        <div className={`px-4 ${isLandscape ? 'pt-1 pb-0.5' : 'pt-2 pb-1'}`}>
           <div className="flex items-center justify-between">
             {/* Left: Title + Date */}
             <div className="flex items-baseline gap-2">
-              <h1 className="text-lg font-bold" style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}>
+              <h1 className={`${isLandscape ? 'text-base' : 'text-lg'} font-bold`} style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}>
                 {mainView === 'planner' ? t('mobile.planner', 'Planer') : t('mobile.pins', 'Pins')}
               </h1>
               {mainView === 'planner' && plannerSubView === 'today' && (
                 <span className="text-xs font-medium" style={{ color: accent }}>
-                  {format(new Date(), 'EEE, d. MMM', { locale: dateLocale })}
+                  {format(new Date(), isLandscape ? 'd. MMM' : 'EEE, d. MMM', { locale: dateLocale })}
                 </span>
               )}
             </div>
@@ -564,18 +616,18 @@ export function MobileShell() {
         </div>
         
         {/* Row 2: Tabs */}
-        <div className="px-4 py-1">
+        <div className={`px-4 ${isLandscape ? 'py-0.5' : 'py-1'}`}>
           {mainView === 'planner' ? (
             // Planner: Heute / Inbox tabs
             <div 
-              className="flex rounded-xl p-1 gap-1" 
+              className={`flex rounded-xl p-1 gap-1 ${isLandscape ? 'max-w-xs' : ''}`}
               style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)' }}
             >
               {(['today', 'inbox'] as const).map(v => (
                 <button
                   key={v}
                   onClick={() => setPlannerSubView(v)}
-                  className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-sm font-semibold transition-all"
+                  className={`flex-1 flex items-center justify-center gap-1.5 ${isLandscape ? 'py-1.5 px-2 text-xs' : 'py-2 px-3 text-sm'} rounded-lg font-semibold transition-all`}
                   style={{
                     backgroundColor: plannerSubView === v ? accent : 'transparent',
                     color: plannerSubView === v ? '#fff' : (isDarkMode ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.7)'),
@@ -637,16 +689,16 @@ export function MobileShell() {
       {/* Task List with Pull-to-Refresh (NO Column Swipe here - that's in the swipe zone below) */}
       <div 
         ref={scrollRef}
-        className="relative z-10 flex-1 overflow-y-auto px-4"
+        className={`relative z-10 flex-1 overflow-y-auto ${isLandscape ? 'px-6' : 'px-4'}`}
         style={{ 
           transform: `translateY(${pullDistance * 0.3}px)`,
-          paddingBottom: 'calc(140px + env(safe-area-inset-bottom, 16px))', // Extra space for swipe zone
+          paddingBottom: isLandscape ? 'calc(100px + env(safe-area-inset-bottom, 8px))' : 'calc(140px + env(safe-area-inset-bottom, 16px))',
         }}
         onTouchStart={handlePullStart}
         onTouchMove={handlePullMove}
         onTouchEnd={handlePullEnd}
       >
-        <div className="space-y-2 pt-1">
+        <div className={`${isLandscape ? 'space-y-1.5 max-w-2xl mx-auto' : 'space-y-2'} pt-1`}>
           {currentTasks.map((task) => (
             <div key={task.id}>
               {/* Drop indicator ABOVE this task */}
@@ -891,8 +943,8 @@ export function MobileShell() {
       <div 
         className="fixed left-0 right-0 z-25"
         style={{ 
-          bottom: 'calc(56px + env(safe-area-inset-bottom, 0px))',
-          height: '60px',
+          bottom: isLandscape ? 'calc(44px + env(safe-area-inset-bottom, 0px))' : 'calc(56px + env(safe-area-inset-bottom, 0px))',
+          height: isLandscape ? '40px' : '60px',
           background: isDarkMode 
             ? 'linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.6), transparent)'
             : 'linear-gradient(to top, rgba(255,255,255,0.9), rgba(255,255,255,0.6), transparent)',
@@ -901,6 +953,18 @@ export function MobileShell() {
         onTouchMove={handleColumnSwipeMove}
         onTouchEnd={handleColumnSwipeEnd}
       >
+        {/* Threshold indicator glow */}
+        {swipeThresholdReached && (
+          <div 
+            className="absolute inset-x-0 bottom-0 h-1 transition-opacity"
+            style={{ 
+              background: `linear-gradient(90deg, transparent, ${accent}, transparent)`,
+              opacity: 0.8,
+              boxShadow: `0 0 20px ${accent}`,
+            }}
+          />
+        )}
+        
         {/* Swipe Zone Content */}
         <div 
           className="h-full flex flex-col items-center justify-end pb-2 px-4"
@@ -912,13 +976,23 @@ export function MobileShell() {
           {/* Swipe hint arrows + dots */}
           <div className="flex items-center gap-3">
             {/* Left arrow hint */}
-            <ChevronLeft 
-              className="w-4 h-4 transition-opacity" 
+            <div 
+              className="transition-all duration-150"
               style={{ 
-                color: accent,
-                opacity: (mainView === 'planner' && plannerSubView === 'inbox') || (mainView === 'pins' && pinsColumnIndex > 0) ? 0.6 : 0.15 
-              }} 
-            />
+                transform: swipeThresholdReached && columnSwipeOffset > 0 ? 'scale(1.3) translateX(-2px)' : 'scale(1)',
+                opacity: (mainView === 'planner' && plannerSubView === 'inbox') || (mainView === 'pins' && pinsColumnIndex > 0) 
+                  ? (swipeThresholdReached && columnSwipeOffset > 0 ? 1 : 0.6) 
+                  : 0.15,
+              }}
+            >
+              <ChevronLeft 
+                className="w-4 h-4" 
+                style={{ 
+                  color: accent,
+                  filter: swipeThresholdReached && columnSwipeOffset > 0 ? `drop-shadow(0 0 4px ${accent})` : 'none',
+                }} 
+              />
+            </div>
             
             {/* Pagination dots */}
             <div className="flex items-center gap-1.5">
@@ -927,12 +1001,14 @@ export function MobileShell() {
                 (['today', 'inbox'] as const).map((v) => (
                   <div 
                     key={v}
-                    className="transition-all duration-300"
+                    className="transition-all duration-200"
                     style={{ 
                       width: plannerSubView === v ? '16px' : '6px',
                       height: '6px',
                       borderRadius: '3px',
                       backgroundColor: plannerSubView === v ? accent : (isDarkMode ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.15)'),
+                      boxShadow: swipeThresholdReached && plannerSubView === v ? `0 0 8px ${accent}` : 'none',
+                      transform: swipeThresholdReached ? 'scale(1.1)' : 'scale(1)',
                     }}
                   />
                 ))
@@ -946,12 +1022,14 @@ export function MobileShell() {
                   return (
                     <div 
                       key={col.id}
-                      className="transition-all duration-300"
+                      className="transition-all duration-200"
                       style={{ 
                         width: pinsColumnIndex === actualIndex ? '16px' : '6px',
                         height: '6px',
                         borderRadius: '3px',
                         backgroundColor: pinsColumnIndex === actualIndex ? accent : (isDarkMode ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.15)'),
+                        boxShadow: swipeThresholdReached && pinsColumnIndex === actualIndex ? `0 0 8px ${accent}` : 'none',
+                        transform: swipeThresholdReached ? 'scale(1.1)' : 'scale(1)',
                       }}
                     />
                   );
@@ -960,13 +1038,23 @@ export function MobileShell() {
             </div>
             
             {/* Right arrow hint */}
-            <ChevronRight 
-              className="w-4 h-4 transition-opacity" 
+            <div 
+              className="transition-all duration-150"
               style={{ 
-                color: accent,
-                opacity: (mainView === 'planner' && plannerSubView === 'today') || (mainView === 'pins' && pinsColumnIndex < pinColumns.length - 1) ? 0.6 : 0.15 
-              }} 
-            />
+                transform: swipeThresholdReached && columnSwipeOffset < 0 ? 'scale(1.3) translateX(2px)' : 'scale(1)',
+                opacity: (mainView === 'planner' && plannerSubView === 'today') || (mainView === 'pins' && pinsColumnIndex < pinColumns.length - 1) 
+                  ? (swipeThresholdReached && columnSwipeOffset < 0 ? 1 : 0.6) 
+                  : 0.15,
+              }}
+            >
+              <ChevronRight 
+                className="w-4 h-4" 
+                style={{ 
+                  color: accent,
+                  filter: swipeThresholdReached && columnSwipeOffset < 0 ? `drop-shadow(0 0 4px ${accent})` : 'none',
+                }} 
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -983,17 +1071,17 @@ export function MobileShell() {
           borderTop: isDarkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)',
         }}
       >
-        <div className="flex items-center justify-around py-2">
+        <div className={`flex items-center justify-around ${isLandscape ? 'py-1' : 'py-2'}`}>
           {/* Planner Tab */}
           <button
             onClick={() => setMainView('planner')}
-            className="flex flex-col items-center gap-0.5 px-6 py-1 rounded-xl transition-all"
+            className={`flex ${isLandscape ? 'flex-row gap-1.5 px-4' : 'flex-col gap-0.5 px-6'} items-center py-1 rounded-xl transition-all`}
             style={{ 
               backgroundColor: mainView === 'planner' ? `${accent}15` : 'transparent',
             }}
           >
-            <Sun className="w-5 h-5" style={{ color: mainView === 'planner' ? accent : (isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)') }} />
-            <span className="text-[10px] font-medium" style={{ color: mainView === 'planner' ? accent : (isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)') }}>
+            <Sun className={`${isLandscape ? 'w-4 h-4' : 'w-5 h-5'}`} style={{ color: mainView === 'planner' ? accent : (isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)') }} />
+            <span className={`${isLandscape ? 'text-xs' : 'text-[10px]'} font-medium`} style={{ color: mainView === 'planner' ? accent : (isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)') }}>
               {t('mobile.planner', 'Planer')}
             </span>
           </button>
@@ -1002,24 +1090,24 @@ export function MobileShell() {
           {mainView === 'planner' && (
             <button 
               onClick={() => setIsAddingTask(true)}
-              className="w-12 h-12 rounded-full shadow-xl flex items-center justify-center active:scale-95 -mt-6"
+              className={`${isLandscape ? 'w-10 h-10 -mt-3' : 'w-12 h-12 -mt-6'} rounded-full shadow-xl flex items-center justify-center active:scale-95`}
               style={{ backgroundColor: accent }}
             >
-              <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />
+              <Plus className={`${isLandscape ? 'w-5 h-5' : 'w-6 h-6'} text-white`} strokeWidth={2.5} />
             </button>
           )}
-          {mainView !== 'planner' && <div className="w-12" />}
+          {mainView !== 'planner' && <div className={`${isLandscape ? 'w-10' : 'w-12'}`} />}
           
           {/* Pins Tab */}
           <button
             onClick={() => setMainView('pins')}
-            className="flex flex-col items-center gap-0.5 px-6 py-1 rounded-xl transition-all"
+            className={`flex ${isLandscape ? 'flex-row gap-1.5 px-4' : 'flex-col gap-0.5 px-6'} items-center py-1 rounded-xl transition-all`}
             style={{ 
               backgroundColor: mainView === 'pins' ? `${accent}15` : 'transparent',
             }}
           >
-            <Pin className="w-5 h-5" style={{ color: mainView === 'pins' ? accent : (isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)') }} />
-            <span className="text-[10px] font-medium" style={{ color: mainView === 'pins' ? accent : (isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)') }}>
+            <Pin className={`${isLandscape ? 'w-4 h-4' : 'w-5 h-5'}`} style={{ color: mainView === 'pins' ? accent : (isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)') }} />
+            <span className={`${isLandscape ? 'text-xs' : 'text-[10px]'} font-medium`} style={{ color: mainView === 'pins' ? accent : (isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)') }}>
               {t('mobile.pins', 'Pins')}
             </span>
           </button>
