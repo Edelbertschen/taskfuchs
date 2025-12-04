@@ -49,6 +49,7 @@ export function MobileShell() {
   const columnSwipeStartX = useRef<number | null>(null);
   const isColumnSwiping = useRef(false);
   const hasVibratedThreshold = useRef(false);
+  const pinsTabsRef = useRef<HTMLDivElement>(null);
   
   // Onboarding
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -76,6 +77,17 @@ export function MobileShell() {
       window.removeEventListener('orientationchange', handleResize);
     };
   }, []);
+  
+  // Auto-scroll pins tabs to show active column
+  useEffect(() => {
+    if (mainView === 'pins' && pinsTabsRef.current && pinColumns.length > 0) {
+      const container = pinsTabsRef.current;
+      const tabWidth = container.scrollWidth / pinColumns.length;
+      const scrollTo = Math.max(0, (pinsColumnIndex - 0.5) * tabWidth);
+      container.scrollTo({ left: scrollTo, behavior: 'smooth' });
+    }
+  }, [pinsColumnIndex, mainView, pinColumns.length]);
+  
   const scrollRef = useRef<HTMLDivElement>(null);
   
   // Animations
@@ -232,6 +244,16 @@ export function MobileShell() {
     if (Math.abs(deltaX) > 10) {
       isColumnSwiping.current = true;
       setColumnSwipeOffset(deltaX);
+      
+      // Scroll pins tabs during swipe to preview next/previous column
+      if (mainView === 'pins' && pinsTabsRef.current && pinColumns.length > 0) {
+        const container = pinsTabsRef.current;
+        const tabWidth = container.scrollWidth / pinColumns.length;
+        const baseScroll = Math.max(0, (pinsColumnIndex - 0.5) * tabWidth);
+        // Invert deltaX because swiping right means showing previous column (scroll left)
+        const swipeScroll = baseScroll - (deltaX * 0.5);
+        container.scrollLeft = Math.max(0, Math.min(container.scrollWidth - container.clientWidth, swipeScroll));
+      }
       
       // Check if we can swipe in this direction
       const canSwipeRight = (mainView === 'planner' && plannerSubView === 'inbox') || 
@@ -646,11 +668,16 @@ export function MobileShell() {
           ) : pinColumns.length > 0 ? (
             // Pins: Column tabs - 2 visible, horizontal scroll, moves with swipe
             <div 
-              className="flex rounded-xl p-1 gap-1 overflow-x-auto no-scrollbar" 
+              ref={pinsTabsRef}
+              className="flex rounded-xl p-1 gap-1 overflow-x-auto no-scrollbar scroll-smooth" 
               style={{ 
                 backgroundColor: isDarkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)',
-                transform: `translateX(${columnSwipeOffset * 0.3}px)`,
-                transition: isColumnSwiping.current ? 'none' : 'transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+              }}
+              onScroll={(e) => {
+                // Prevent default scroll behavior during swipe
+                if (isColumnSwiping.current) {
+                  e.preventDefault();
+                }
               }}
             >
               {pinColumns.map((col, i) => (
