@@ -396,28 +396,49 @@ export function MobileShell() {
       >
         <div className="space-y-2 pt-1">
           {currentTasks.map((task) => (
-            <TaskCard
-              key={task.id}
-              task={task}
-              accent={accent}
-              isDarkMode={isDarkMode}
-              disabled={isOffline}
-              onTap={() => setSelectedTask(task)}
-              onComplete={(e) => handleCompleteTask(task.id, e)}
-              onArchive={() => handleArchiveTask(task.id)}
-              isCompletingAnimation={completedAnimation === task.id}
-              isArchivingAnimation={archivedAnimation === task.id}
-              isDragging={draggedTaskId === task.id}
-              isDragOver={dragOverTaskId === task.id}
-              onDragStart={(touchY) => handleDragStart(task.id, touchY)}
-              onDragMove={handleDragMove}
-              onDragEnd={handleDragEnd}
-              getPriorityColor={getPriorityColor}
-              registerRef={(el) => {
-                if (el) taskRefs.current.set(task.id, el);
-                else taskRefs.current.delete(task.id);
-              }}
-            />
+            <div key={task.id}>
+              {/* Drop indicator ABOVE this task */}
+              {dragOverTaskId === task.id && draggedTaskId && (
+                <div className="flex items-center gap-2 mb-2 px-1">
+                  <div 
+                    className="w-2.5 h-2.5 rounded-full shadow-lg" 
+                    style={{ backgroundColor: accent, boxShadow: `0 0 8px ${accent}` }} 
+                  />
+                  <div 
+                    className="flex-1 h-0.5 rounded-full" 
+                    style={{ 
+                      background: `linear-gradient(90deg, ${accent}, ${accent}80, ${accent})`,
+                      boxShadow: `0 0 6px ${accent}60`
+                    }} 
+                  />
+                  <div 
+                    className="w-2.5 h-2.5 rounded-full shadow-lg" 
+                    style={{ backgroundColor: accent, boxShadow: `0 0 8px ${accent}` }} 
+                  />
+                </div>
+              )}
+              <TaskCard
+                task={task}
+                accent={accent}
+                isDarkMode={isDarkMode}
+                disabled={isOffline}
+                onTap={() => setSelectedTask(task)}
+                onComplete={(e) => handleCompleteTask(task.id, e)}
+                onArchive={() => handleArchiveTask(task.id)}
+                isCompletingAnimation={completedAnimation === task.id}
+                isArchivingAnimation={archivedAnimation === task.id}
+                isDragging={draggedTaskId === task.id}
+                isDragOver={dragOverTaskId === task.id}
+                onDragStart={(touchY) => handleDragStart(task.id, touchY)}
+                onDragMove={handleDragMove}
+                onDragEnd={handleDragEnd}
+                getPriorityColor={getPriorityColor}
+                registerRef={(el) => {
+                  if (el) taskRefs.current.set(task.id, el);
+                  else taskRefs.current.delete(task.id);
+                }}
+              />
+            </div>
           ))}
         </div>
 
