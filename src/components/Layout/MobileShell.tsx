@@ -2,22 +2,22 @@ import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { MarkdownRenderer } from '../Common/MarkdownRenderer';
 import { 
   Plus, Check, Archive, Inbox, Sun, Sparkles, Filter, Undo2,
-  GripVertical, LogOut, RefreshCw, X, ChevronRight, ChevronLeft,
-  FileText, ListChecks, Zap, Heart, Eye, EyeOff, Tag, Pin, FolderOpen
+  GripVertical, LogOut, RefreshCw, X, ChevronRight,
+  FileText, ListChecks, Zap, Heart, Eye, EyeOff, Tag, Pin
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { LoginPage } from '../Auth/LoginPage';
 import { syncAPI } from '../../services/apiService';
-import type { Task, PinColumn, Column } from '../../types';
+import type { Task } from '../../types';
 import { format } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
 
 // Auto-refresh interval in milliseconds (30 seconds)
 const AUTO_REFRESH_INTERVAL = 30000;
 
-type MainView = 'planner' | 'pins' | 'projects';
+type MainView = 'planner' | 'pins';
 type PlannerSubView = 'today' | 'inbox';
 
 const ONBOARDING_KEY = 'taskfuchs_mobile_onboarding_done';
@@ -37,7 +37,6 @@ export function MobileShell() {
   const [mainView, setMainView] = useState<MainView>('planner');
   const [plannerSubView, setPlannerSubView] = useState<PlannerSubView>('today');
   const [pinsColumnIndex, setPinsColumnIndex] = useState(0);
-  const [projectsColumnIndex, setProjectsColumnIndex] = useState(0);
   const [newTaskText, setNewTaskText] = useState('');
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -184,39 +183,17 @@ export function MobileShell() {
       .sort((a, b) => (a.completed !== b.completed ? (a.completed ? 1 : -1) : (a.position || 0) - (b.position || 0)));
   }, [currentPinColumn, tasks, applyFilters]);
   
-  // Projects and tasks
-  const projects = useMemo(() => 
-    state.columns.filter(col => col.type === 'project').sort((a, b) => (a.order || 0) - (b.order || 0)),
-    [state.columns]
-  );
-  const currentProject = projects[projectsColumnIndex];
-  const projectTasks = useMemo(() => {
-    if (!currentProject) return [];
-    return applyFilters(tasks.filter(t => t.projectId === currentProject.id && !t.pinColumnId))
-      .sort((a, b) => (a.completed !== b.completed ? (a.completed ? 1 : -1) : (a.position || 0) - (b.position || 0)));
-  }, [currentProject, tasks, applyFilters]);
-  
   // Current tasks based on active view
   const currentTasks = useMemo(() => {
     if (mainView === 'planner') {
       return plannerSubView === 'today' ? todayTasks : inboxTasks;
-    } else if (mainView === 'pins') {
+    } else {
       return pinTasks;
-    } else {
-      return projectTasks;
     }
-  }, [mainView, plannerSubView, todayTasks, inboxTasks, pinTasks, projectTasks]);
+  }, [mainView, plannerSubView, todayTasks, inboxTasks, pinTasks]);
   
-  // Get current column name for display
-  const currentColumnName = useMemo(() => {
-    if (mainView === 'planner') {
-      return plannerSubView === 'today' ? t('mobile.today', 'Heute') : t('mobile.inbox', 'Inbox');
-    } else if (mainView === 'pins') {
-      return currentPinColumn?.title || t('mobile.noPins', 'Keine Pins');
-    } else {
-      return currentProject?.title || t('mobile.noProjects', 'Keine Projekte');
-    }
-  }, [mainView, plannerSubView, currentPinColumn, currentProject, t]);
+  // Get current column name for display (sub-column within Pins)
+  const currentPinColumnName = currentPinColumn?.title || '';
 
   // Column swipe handlers (for Pins and Projects)
   const handleColumnSwipeStart = (e: React.TouchEvent) => {
@@ -253,16 +230,6 @@ export function MobileShell() {
       } else if (columnSwipeOffset < -threshold && pinsColumnIndex < pinColumns.length - 1) {
         // Swipe left -> next column
         setPinsColumnIndex(prev => prev + 1);
-        if ('vibrate' in navigator) navigator.vibrate(10);
-      }
-    } else if (mainView === 'projects') {
-      if (columnSwipeOffset > threshold && projectsColumnIndex > 0) {
-        // Swipe right -> previous project
-        setProjectsColumnIndex(prev => prev - 1);
-        if ('vibrate' in navigator) navigator.vibrate(10);
-      } else if (columnSwipeOffset < -threshold && projectsColumnIndex < projects.length - 1) {
-        // Swipe left -> next project
-        setProjectsColumnIndex(prev => prev + 1);
         if ('vibrate' in navigator) navigator.vibrate(10);
       }
     }
@@ -457,27 +424,12 @@ export function MobileShell() {
   const bgPosition = useMemo(() => {
     if (mainView === 'planner') {
       return plannerSubView === 'today' ? 'left center' : 'right center';
-    } else if (mainView === 'pins') {
+    } else {
       const total = Math.max(pinColumns.length - 1, 1);
       const percent = (pinsColumnIndex / total) * 100;
       return `${percent}% center`;
-    } else {
-      const total = Math.max(projects.length - 1, 1);
-      const percent = (projectsColumnIndex / total) * 100;
-      return `${percent}% center`;
     }
-  }, [mainView, plannerSubView, pinsColumnIndex, pinColumns.length, projectsColumnIndex, projects.length]);
-  
-  // Get column count for navigation indicators
-  const getColumnNavInfo = () => {
-    if (mainView === 'pins') {
-      return { current: pinsColumnIndex + 1, total: pinColumns.length, hasPrev: pinsColumnIndex > 0, hasNext: pinsColumnIndex < pinColumns.length - 1 };
-    } else if (mainView === 'projects') {
-      return { current: projectsColumnIndex + 1, total: projects.length, hasPrev: projectsColumnIndex > 0, hasNext: projectsColumnIndex < projects.length - 1 };
-    }
-    return { current: 0, total: 0, hasPrev: false, hasNext: false };
-  };
-  const columnNav = getColumnNavInfo();
+  }, [mainView, plannerSubView, pinsColumnIndex, pinColumns.length]);
 
   // Onboarding Screen
   if (showOnboarding) {
@@ -519,51 +471,21 @@ export function MobileShell() {
       <header className="relative z-10 flex-shrink-0" style={{ paddingTop: 'max(env(safe-area-inset-top, 20px), 44px)', transform: `translateY(${pullDistance * 0.3}px)` }}>
         <div className="px-4 pt-2 pb-1">
           <div className="flex items-center justify-between gap-2">
-            {/* Left: Column name with navigation arrows for Pins/Projects */}
-            <div className="flex items-center gap-2 min-w-0 flex-1">
-              {(mainView === 'pins' || mainView === 'projects') && columnNav.hasPrev && (
-                <button
-                  onClick={() => {
-                    if (mainView === 'pins') setPinsColumnIndex(prev => prev - 1);
-                    else setProjectsColumnIndex(prev => prev - 1);
-                    if ('vibrate' in navigator) navigator.vibrate(10);
-                  }}
-                  className="p-1 rounded-lg"
-                  style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }}
-                >
-                  <ChevronLeft className="w-5 h-5" style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }} />
-                </button>
+            {/* Left: Title and info */}
+            <div className="flex items-baseline gap-2 min-w-0 flex-1">
+              <h1 className="text-xl font-bold truncate" style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}>
+                {mainView === 'planner' 
+                  ? (plannerSubView === 'today' ? t('mobile.today', 'Heute') : t('mobile.inbox', 'Inbox'))
+                  : t('mobile.pins', 'Pins')
+                }
+              </h1>
+              {mainView === 'planner' && plannerSubView === 'today' && (
+                <span className="text-sm font-medium flex-shrink-0" style={{ color: accent }}>
+                  {format(new Date(), 'EEE, d. MMM', { locale: dateLocale })}
+                </span>
               )}
-              <div className="flex items-baseline gap-2 min-w-0 flex-1">
-                <h1 className="text-xl font-bold truncate" style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}>
-                  {currentColumnName}
-                </h1>
-                {mainView === 'planner' && plannerSubView === 'today' && (
-                  <span className="text-sm font-medium flex-shrink-0" style={{ color: accent }}>
-                    {format(new Date(), 'EEE, d. MMM', { locale: dateLocale })}
-                  </span>
-                )}
-                {mainView === 'planner' && plannerSubView === 'inbox' && inboxCount > 0 && (
-                  <span className="text-sm font-medium flex-shrink-0" style={{ color: accent }}>{inboxCount}</span>
-                )}
-                {(mainView === 'pins' || mainView === 'projects') && columnNav.total > 1 && (
-                  <span className="text-xs font-medium flex-shrink-0 px-1.5 py-0.5 rounded-full" style={{ backgroundColor: `${accent}20`, color: accent }}>
-                    {columnNav.current}/{columnNav.total}
-                  </span>
-                )}
-              </div>
-              {(mainView === 'pins' || mainView === 'projects') && columnNav.hasNext && (
-                <button
-                  onClick={() => {
-                    if (mainView === 'pins') setPinsColumnIndex(prev => prev + 1);
-                    else setProjectsColumnIndex(prev => prev + 1);
-                    if ('vibrate' in navigator) navigator.vibrate(10);
-                  }}
-                  className="p-1 rounded-lg"
-                  style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }}
-                >
-                  <ChevronRight className="w-5 h-5" style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }} />
-                </button>
+              {mainView === 'planner' && plannerSubView === 'inbox' && inboxCount > 0 && (
+                <span className="text-sm font-medium flex-shrink-0" style={{ color: accent }}>{inboxCount}</span>
               )}
             </div>
             
@@ -639,19 +561,31 @@ export function MobileShell() {
           </div>
         )}
         
-        {/* Swipe hint for Pins/Projects */}
-        {(mainView === 'pins' || mainView === 'projects') && columnNav.total > 1 && (
-          <div className="px-4 pb-2">
-            <div className="flex items-center justify-center gap-1">
-              {Array.from({ length: columnNav.total }).map((_, i) => (
-                <div
-                  key={i}
-                  className="h-1.5 rounded-full transition-all duration-300"
-                  style={{
-                    width: i === (mainView === 'pins' ? pinsColumnIndex : projectsColumnIndex) ? '16px' : '6px',
-                    backgroundColor: i === (mainView === 'pins' ? pinsColumnIndex : projectsColumnIndex) ? accent : (isDarkMode ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.2)'),
+        {/* Pin columns tabs */}
+        {mainView === 'pins' && pinColumns.length > 0 && (
+          <div className="px-4 py-2">
+            <div 
+              className="flex rounded-xl p-1 gap-1 overflow-x-auto no-scrollbar" 
+              style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)' }}
+            >
+              {pinColumns.map((col, i) => (
+                <button
+                  key={col.id}
+                  onClick={() => {
+                    setPinsColumnIndex(i);
+                    if ('vibrate' in navigator) navigator.vibrate(10);
                   }}
-                />
+                  className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-sm font-semibold transition-all whitespace-nowrap flex-shrink-0"
+                  style={{
+                    backgroundColor: pinsColumnIndex === i ? accent : 'transparent',
+                    color: pinsColumnIndex === i ? '#fff' : (isDarkMode ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.7)'),
+                  }}
+                >
+                  {col.color && (
+                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: col.color }} />
+                  )}
+                  <span className="truncate max-w-[100px]">{col.title}</span>
+                </button>
               ))}
             </div>
           </div>
@@ -746,22 +680,15 @@ export function MobileShell() {
                   {mainView === 'planner' && plannerSubView === 'today' && <Sparkles className="w-7 h-7" style={{ color: accent }} />}
                   {mainView === 'planner' && plannerSubView === 'inbox' && <Inbox className="w-7 h-7" style={{ color: accent }} />}
                   {mainView === 'pins' && <Pin className="w-7 h-7" style={{ color: accent }} />}
-                  {mainView === 'projects' && <FolderOpen className="w-7 h-7" style={{ color: accent }} />}
                 </div>
                 <p className="text-sm font-semibold" style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}>
                   {mainView === 'planner' && plannerSubView === 'today' && t('mobile.allDone', 'Alles erledigt!')}
                   {mainView === 'planner' && plannerSubView === 'inbox' && t('mobile.inboxEmpty', 'Inbox ist leer')}
                   {mainView === 'pins' && (pinColumns.length === 0 ? t('mobile.noPins', 'Keine Pins') : t('mobile.columnEmpty', 'Spalte ist leer'))}
-                  {mainView === 'projects' && (projects.length === 0 ? t('mobile.noProjects', 'Keine Projekte') : t('mobile.columnEmpty', 'Spalte ist leer'))}
                 </p>
                 {mainView === 'pins' && pinColumns.length === 0 && (
                   <p className="text-xs mt-1" style={{ color: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)' }}>
                     {t('mobile.createPinsDesktop', 'Erstelle Pins am Desktop')}
-                  </p>
-                )}
-                {mainView === 'projects' && projects.length === 0 && (
-                  <p className="text-xs mt-1" style={{ color: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)' }}>
-                    {t('mobile.createProjectsDesktop', 'Erstelle Projekte am Desktop')}
                   </p>
                 )}
               </>
@@ -942,7 +869,7 @@ export function MobileShell() {
           {/* Planner Tab */}
           <button
             onClick={() => setMainView('planner')}
-            className="flex flex-col items-center gap-0.5 px-4 py-1 rounded-xl transition-all"
+            className="flex flex-col items-center gap-0.5 px-6 py-1 rounded-xl transition-all"
             style={{ 
               backgroundColor: mainView === 'planner' ? `${accent}15` : 'transparent',
             }}
@@ -950,20 +877,6 @@ export function MobileShell() {
             <Sun className="w-5 h-5" style={{ color: mainView === 'planner' ? accent : (isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)') }} />
             <span className="text-[10px] font-medium" style={{ color: mainView === 'planner' ? accent : (isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)') }}>
               {t('mobile.planner', 'Planer')}
-            </span>
-          </button>
-          
-          {/* Pins Tab */}
-          <button
-            onClick={() => setMainView('pins')}
-            className="flex flex-col items-center gap-0.5 px-4 py-1 rounded-xl transition-all"
-            style={{ 
-              backgroundColor: mainView === 'pins' ? `${accent}15` : 'transparent',
-            }}
-          >
-            <Pin className="w-5 h-5" style={{ color: mainView === 'pins' ? accent : (isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)') }} />
-            <span className="text-[10px] font-medium" style={{ color: mainView === 'pins' ? accent : (isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)') }}>
-              {t('mobile.pins', 'Pins')}
             </span>
           </button>
           
@@ -979,17 +892,17 @@ export function MobileShell() {
           )}
           {mainView !== 'planner' && <div className="w-12" />}
           
-          {/* Projects Tab */}
+          {/* Pins Tab */}
           <button
-            onClick={() => setMainView('projects')}
-            className="flex flex-col items-center gap-0.5 px-4 py-1 rounded-xl transition-all"
+            onClick={() => setMainView('pins')}
+            className="flex flex-col items-center gap-0.5 px-6 py-1 rounded-xl transition-all"
             style={{ 
-              backgroundColor: mainView === 'projects' ? `${accent}15` : 'transparent',
+              backgroundColor: mainView === 'pins' ? `${accent}15` : 'transparent',
             }}
           >
-            <FolderOpen className="w-5 h-5" style={{ color: mainView === 'projects' ? accent : (isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)') }} />
-            <span className="text-[10px] font-medium" style={{ color: mainView === 'projects' ? accent : (isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)') }}>
-              {t('mobile.projects', 'Projekte')}
+            <Pin className="w-5 h-5" style={{ color: mainView === 'pins' ? accent : (isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)') }} />
+            <span className="text-[10px] font-medium" style={{ color: mainView === 'pins' ? accent : (isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)') }}>
+              {t('mobile.pins', 'Pins')}
             </span>
           </button>
         </div>
