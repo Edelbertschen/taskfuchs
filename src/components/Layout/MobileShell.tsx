@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { 
-  Plus, Check, Archive, Inbox, Sun, Sparkles, Filter, WifiOff, Undo2,
+  Plus, Check, Archive, Inbox, Sun, Sparkles, Filter, Undo2,
   GripVertical, LogOut, RefreshCw, X, ChevronRight,
   FileText, ListChecks, Zap, Heart
 } from 'lucide-react';
@@ -11,10 +11,6 @@ import { LoginPage } from '../Auth/LoginPage';
 import type { Task } from '../../types';
 import { format } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
-import {
-  initOfflineDB, cacheTasks, getCachedTasks, getCacheMeta,
-  formatCacheAge, isOnline, subscribeToNetworkStatus
-} from '../../services/mobileOfflineStorage';
 
 type View = 'today' | 'inbox';
 
@@ -58,11 +54,6 @@ export function MobileShell() {
   const [undoState, setUndoState] = useState<UndoState | null>(null);
   const [undoProgress, setUndoProgress] = useState(100);
 
-  // Offline State
-  const [isOffline, setIsOffline] = useState(!isOnline());
-  const [cachedTasks, setCachedTasks] = useState<Task[]>([]);
-  const [cacheTimestamp, setCacheTimestamp] = useState<number | null>(null);
-
   // DnD State
   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
   const [dragOverTaskId, setDragOverTaskId] = useState<string | null>(null);
@@ -88,29 +79,6 @@ export function MobileShell() {
   }, [language, i18n]);
 
   useEffect(() => {
-    const init = async () => {
-      await initOfflineDB();
-      const cached = await getCachedTasks();
-      const meta = await getCacheMeta();
-      setCachedTasks(cached);
-      if (meta) setCacheTimestamp(meta.timestamp);
-    };
-    init();
-  }, []);
-
-  useEffect(() => {
-    if (!isOffline && state.tasks.length > 0) {
-      cacheTasks(state.tasks).then(() => setCacheTimestamp(Date.now()));
-    }
-  }, [state.tasks, isOffline]);
-
-  useEffect(() => {
-    const handleOnline = () => { setIsOffline(false); if ('vibrate' in navigator) navigator.vibrate([50, 100, 50]); };
-    const handleOffline = () => { setIsOffline(true); if ('vibrate' in navigator) navigator.vibrate(200); };
-    return subscribeToNetworkStatus(handleOnline, handleOffline);
-  }, []);
-
-  useEffect(() => {
     if (!undoState) { setUndoProgress(100); return; }
     const startTime = Date.now();
     const interval = setInterval(() => {
@@ -125,10 +93,14 @@ export function MobileShell() {
     if (isAddingTask && inputRef.current) inputRef.current.focus();
   }, [isAddingTask]);
 
-  // Data - Mobile Shell REQUIRES online authentication (JWT)
-  const tasks = state.tasks.length > 0 ? state.tasks : (isOffline ? cachedTasks : state.tasks);
+  // Data - ALWAYS use state.tasks from AppContext (same as Desktop)
+  // This ensures Mobile and Desktop always show identical data
+  const tasks = state.tasks;
   const hasToken = !!localStorage.getItem('taskfuchs_jwt');
   const isLoggedIn = authState.isOnlineMode || hasToken;
+  
+  // No offline mode - always use live data from server
+  const isOffline = false;
   const todayId = `date-${format(new Date(), 'yyyy-MM-dd')}`;
   const activeTagFilters = state.activeTagFilters || [];
   const activePriorityFilters = state.activePriorityFilters || [];
@@ -173,8 +145,9 @@ export function MobileShell() {
     if (pullDistance > 60 && !isRefreshing) {
       setIsRefreshing(true);
       if ('vibrate' in navigator) navigator.vibrate(20);
-      await new Promise(r => setTimeout(r, 800));
-      setIsRefreshing(false);
+      // Reload page to fetch fresh data from server
+      window.location.reload();
+      return;
     }
     setPullDistance(0);
     setIsPulling(false);
@@ -337,16 +310,9 @@ export function MobileShell() {
                 {activeView === 'today' ? format(new Date(), 'EEE, d. MMM', { locale: dateLocale }) : `${inboxCount}`}
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              {isOffline && (
-                <div className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ backgroundColor: 'rgba(245, 158, 11, 0.15)' }}>
-                  <WifiOff className="w-3 h-3" style={{ color: '#f59e0b' }} />
-                </div>
-              )}
-              <button onClick={() => setShowLogoutConfirm(true)} className="p-1.5 rounded-lg" style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }}>
-                <LogOut className="w-4 h-4" style={{ color: isDarkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.5)' }} />
-              </button>
-            </div>
+            <button onClick={() => setShowLogoutConfirm(true)} className="p-1.5 rounded-lg" style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }}>
+              <LogOut className="w-4 h-4" style={{ color: isDarkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.5)' }} />
+            </button>
           </div>
           {hasActiveFilters && (
             <div className="flex items-center gap-1.5 mt-1">
@@ -526,11 +492,13 @@ export function MobileShell() {
         </div>
       )}
 
-      {/* FAB */}
-      <button onClick={() => !isOffline && setIsAddingTask(true)} disabled={isOffline}
-        className="fixed z-40 w-12 h-12 rounded-full shadow-xl flex items-center justify-center active:scale-95 disabled:opacity-50"
-        style={{ right: '16px', bottom: 'calc(env(safe-area-inset-bottom, 16px) + 16px)', backgroundColor: isOffline ? '#9ca3af' : accent }}>
-        {isOffline ? <WifiOff className="w-5 h-5 text-white" /> : <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />}
+      {/* FAB - Add Task */}
+      <button 
+        onClick={() => setIsAddingTask(true)}
+        className="fixed z-40 w-12 h-12 rounded-full shadow-xl flex items-center justify-center active:scale-95"
+        style={{ right: '16px', bottom: 'calc(env(safe-area-inset-bottom, 16px) + 16px)', backgroundColor: accent }}
+      >
+        <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />
       </button>
 
       <style>{`
