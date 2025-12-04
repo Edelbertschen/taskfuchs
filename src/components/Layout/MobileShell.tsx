@@ -84,34 +84,35 @@ export function MobileShell() {
     if (i18n.language !== language) i18n.changeLanguage(language);
   }, [language, i18n]);
 
+  // Shared refresh function for pull-to-refresh and auto-refresh
+  const refreshFromServer = useCallback(async () => {
+    try {
+      const data = await syncAPI.getFullData();
+      
+      if (data.tasks) {
+        dispatch({ type: 'SET_TASKS', payload: data.tasks });
+      }
+      if (data.preferences) {
+        dispatch({ type: 'UPDATE_PREFERENCES', payload: data.preferences });
+      }
+      return true;
+    } catch (error) {
+      console.error('[MobileShell] Refresh failed:', error);
+      return false;
+    }
+  }, [dispatch]);
+
   // Auto-refresh: Fetch fresh data from server every 30 seconds
   // This ensures Mobile stays in sync with Desktop changes
   useEffect(() => {
     const hasToken = !!localStorage.getItem('taskfuchs_jwt');
     if (!hasToken) return; // Only refresh if logged in
     
-    const refreshData = async () => {
-      try {
-        console.log('[MobileShell] Auto-refreshing data from server...');
-        const data = await syncAPI.getFullData();
-        
-        if (data.tasks) {
-          dispatch({ type: 'SET_TASKS', payload: data.tasks });
-        }
-        if (data.preferences) {
-          dispatch({ type: 'UPDATE_PREFERENCES', payload: data.preferences });
-        }
-        console.log('[MobileShell] Auto-refresh complete, tasks:', data.tasks?.length);
-      } catch (error) {
-        console.error('[MobileShell] Auto-refresh failed:', error);
-      }
-    };
-
     // Periodic refresh every 30 seconds
-    const interval = setInterval(refreshData, AUTO_REFRESH_INTERVAL);
+    const interval = setInterval(refreshFromServer, AUTO_REFRESH_INTERVAL);
     
     return () => clearInterval(interval);
-  }, [dispatch]);
+  }, [refreshFromServer]);
 
   useEffect(() => {
     if (!undoState) { setUndoProgress(100); return; }
@@ -181,25 +182,11 @@ export function MobileShell() {
       setIsRefreshing(true);
       if ('vibrate' in navigator) navigator.vibrate(20);
       
-      // Fetch fresh data from server instead of full page reload
-      try {
-        console.log('[MobileShell] Pull-to-refresh: fetching data...');
-        const data = await syncAPI.getFullData();
-        
-        if (data.tasks) {
-          dispatch({ type: 'SET_TASKS', payload: data.tasks });
-        }
-        if (data.archivedTasks) {
-          dispatch({ type: 'SET_ARCHIVED_TASKS', payload: data.archivedTasks });
-        }
-        if (data.preferences) {
-          dispatch({ type: 'UPDATE_PREFERENCES', payload: data.preferences });
-        }
-        console.log('[MobileShell] Pull-to-refresh complete');
-      } catch (error) {
-        console.error('[MobileShell] Pull-to-refresh failed:', error);
-      }
+      // Refresh data - activeView stays the same (local state)
+      await refreshFromServer();
       
+      // Brief delay for smooth animation
+      await new Promise(r => setTimeout(r, 300));
       setIsRefreshing(false);
     }
     setPullDistance(0);
