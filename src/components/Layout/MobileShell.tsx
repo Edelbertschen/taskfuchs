@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { MarkdownRenderer } from '../Common/MarkdownRenderer';
 import { 
   Plus, Check, Archive, Inbox, Sun, Sparkles, Filter, Undo2,
   GripVertical, LogOut, RefreshCw, X, ChevronRight,
@@ -226,7 +227,7 @@ export function MobileShell() {
       reminderDate: isToday ? todayDate : undefined,
       tags: [],
       subtasks: [],
-      priority: 'medium',
+      // No priority when creating tasks from mobile
       position: Date.now(),
     };
     
@@ -901,9 +902,9 @@ function TaskDetailView({ task, onClose, accent, isDarkMode, onComplete, isOffli
               Beschreibung
             </h2>
             <div className="rounded-2xl p-4" style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' }}>
-              <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: isDarkMode ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.7)' }}>
-                {task.description}
-              </p>
+              <div className="text-sm leading-relaxed prose prose-sm max-w-none dark:prose-invert" style={{ color: isDarkMode ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.7)' }}>
+                <MarkdownRenderer content={task.description} />
+              </div>
             </div>
           </div>
         )}

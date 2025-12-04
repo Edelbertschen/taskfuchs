@@ -561,7 +561,8 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
       priority: formData.priority,
       estimatedTime: formData.estimatedTime || 0,
       tags: formData.tags,
-      subtasks: formData.subtasks,
+      // Filter out empty subtasks (those with no title)
+      subtasks: formData.subtasks.filter(s => s.title.trim().length > 0),
       linkedNotes: formData.linkedNotes,
       reminderDate: formData.reminderDate,
       reminderTime: formData.reminderTime,
@@ -953,7 +954,14 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
   const handleSubtaskKeyPress = (e: React.KeyboardEvent, subtaskId: string) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      addSubtask();
+      
+      // Find the current subtask
+      const currentSubtask = formData.subtasks.find(s => s.id === subtaskId);
+      
+      // Only add a new subtask if the current one has at least 1 character
+      if (currentSubtask && currentSubtask.title.trim().length > 0) {
+        addSubtask();
+      }
     }
   };
 

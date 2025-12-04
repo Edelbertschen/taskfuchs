@@ -18,6 +18,37 @@ import { de, enUS } from 'date-fns/locale';
 import { useApp } from '../../context/AppContext';
 import { OptimizedTaskList } from './OptimizedTaskList';
 
+// Top Drop Zone component for inserting tasks at position 0
+function TopDropZone({ columnId, accentColor }: { columnId: string; accentColor: string }) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: `${columnId}-top`,
+    data: { type: 'column-top', columnId }
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={`transition-all duration-200 rounded-lg mb-2 ${
+        isOver 
+          ? 'h-16 border-2 border-dashed' 
+          : 'h-2'
+      }`}
+      style={{ 
+        borderColor: isOver ? `${accentColor}60` : 'transparent',
+        backgroundColor: isOver ? `${accentColor}10` : 'transparent',
+      }}
+    >
+      {isOver && (
+        <div className="h-full flex items-center justify-center">
+          <span className="text-xs font-medium" style={{ color: accentColor }}>
+            An oberster Position einfügen
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 interface TaskColumnProps {
   column: Column;
   tasks: Task[];
@@ -871,6 +902,11 @@ const TaskColumn = React.memo(({
                 );
               })}
             </div>
+          )}
+          
+          {/* Top Drop Zone for Planner columns */}
+          {!isProjectColumn && activeTask && (
+            <TopDropZone columnId={column.id} accentColor={state.preferences.accentColor} />
           )}
           
           {isProjectColumn ? (
