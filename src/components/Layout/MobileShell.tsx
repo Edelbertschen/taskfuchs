@@ -644,10 +644,14 @@ export function MobileShell() {
               ))}
             </div>
           ) : pinColumns.length > 0 ? (
-            // Pins: Column tabs - 2 visible, horizontal scroll
+            // Pins: Column tabs - 2 visible, horizontal scroll, moves with swipe
             <div 
               className="flex rounded-xl p-1 gap-1 overflow-x-auto no-scrollbar" 
-              style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)' }}
+              style={{ 
+                backgroundColor: isDarkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)',
+                transform: `translateX(${columnSwipeOffset * 0.3}px)`,
+                transition: isColumnSwiping.current ? 'none' : 'transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+              }}
             >
               {pinColumns.map((col, i) => (
                 <button
@@ -686,7 +690,7 @@ export function MobileShell() {
         </div>
       </header>
 
-      {/* Task List with Pull-to-Refresh (NO Column Swipe here - that's in the swipe zone below) */}
+      {/* Task List with Pull-to-Refresh and Column Swipe in empty areas */}
       <div 
         ref={scrollRef}
         className={`relative z-10 flex-1 overflow-y-auto ${isLandscape ? 'px-6' : 'px-4'}`}
@@ -694,9 +698,25 @@ export function MobileShell() {
           transform: `translateY(${pullDistance * 0.3}px)`,
           paddingBottom: isLandscape ? 'calc(100px + env(safe-area-inset-bottom, 8px))' : 'calc(140px + env(safe-area-inset-bottom, 16px))',
         }}
-        onTouchStart={handlePullStart}
-        onTouchMove={handlePullMove}
-        onTouchEnd={handlePullEnd}
+        onTouchStart={(e) => {
+          handlePullStart(e);
+          // Only start column swipe if NOT touching a task card
+          const target = e.target as HTMLElement;
+          if (!target.closest('[data-task-card]')) {
+            handleColumnSwipeStart(e);
+          }
+        }}
+        onTouchMove={(e) => {
+          handlePullMove(e);
+          // Continue column swipe if it was started
+          if (isColumnSwiping.current || columnSwipeStartX.current !== null) {
+            handleColumnSwipeMove(e);
+          }
+        }}
+        onTouchEnd={() => {
+          handlePullEnd();
+          handleColumnSwipeEnd();
+        }}
       >
         <div className={`${isLandscape ? 'space-y-1.5 max-w-2xl mx-auto' : 'space-y-2'} pt-1`}>
           {currentTasks.map((task) => (
@@ -967,7 +987,7 @@ export function MobileShell() {
         
         {/* Swipe Zone Content */}
         <div 
-          className="h-full flex flex-col items-center justify-end pb-2 px-4"
+          className="h-full flex flex-col items-center justify-center px-4"
           style={{
             transform: `translateX(${columnSwipeOffset * 0.5}px)`,
             transition: isColumnSwiping.current ? 'none' : 'transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
@@ -1213,6 +1233,7 @@ function TaskCard({ task, accent, isDarkMode, disabled, onTap, onComplete, onDel
   return (
     <div 
       ref={registerRef}
+      data-task-card="true"
       className={`relative overflow-hidden rounded-xl ${animationClass}`} 
       style={{ 
         opacity: isDragging ? 0.5 : 1, 
