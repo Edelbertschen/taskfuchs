@@ -1294,14 +1294,13 @@ function TaskCard({ task, accent, isDarkMode, disabled, onTap, onComplete, onDel
           <GripVertical className="w-3.5 h-3.5 flex-shrink-0 opacity-25" style={{ color: isDarkMode ? '#fff' : '#000' }} />
           <div className="flex-1 min-w-0">
             <p className={`text-sm font-medium leading-tight truncate ${task.completed ? 'line-through opacity-50' : ''}`} style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}>{task.title}</p>
-            {(hasSubtasks || task.description) && (
-              <div className="flex items-center gap-2 mt-0.5">
-                {hasSubtasks && <span className="text-xs" style={{ color: accent }}>{completedSubtasks}/{task.subtasks!.length}</span>}
-                {task.description && <FileText className="w-3 h-3 opacity-40" />}
-              </div>
-            )}
           </div>
-          <ChevronRight className="w-4 h-4 opacity-30" style={{ color: isDarkMode ? '#fff' : '#000' }} />
+          {/* Right side icons - consistent height */}
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            {hasSubtasks && <span className="text-xs" style={{ color: accent }}>{completedSubtasks}/{task.subtasks!.length}</span>}
+            {task.description && <FileText className="w-3.5 h-3.5 opacity-40" style={{ color: isDarkMode ? '#fff' : '#000' }} />}
+            <ChevronRight className="w-4 h-4 opacity-30" style={{ color: isDarkMode ? '#fff' : '#000' }} />
+          </div>
         </div>
       </div>
     </div>
