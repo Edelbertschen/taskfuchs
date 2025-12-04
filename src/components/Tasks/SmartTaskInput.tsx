@@ -113,15 +113,25 @@ export function SmartTaskInput({ placeholder, autoFocus = false, onTaskCreated, 
       finalColumnId = 'inbox';
     }
 
+    // Apply active filters to new task
+    // Merge parsed tags with active tag filters (remove duplicates)
+    const parsedTags = task.tags || [];
+    const filterTags = state.activeTagFilters || [];
+    const mergedTags = [...new Set([...parsedTags, ...filterTags])];
+    
+    // Apply priority filter if exactly one is active and task has no explicit priority
+    const filterPriorities = state.activePriorityFilters || [];
+    const finalPriority = task.priority || (filterPriorities.length === 1 ? filterPriorities[0] : undefined);
+
     // Create the task using dispatch
     const newTask = {
       id: crypto.randomUUID(),
       title: task.title,
       description: task.description || '',
       completed: false,
-      priority: task.priority, // Don't set default priority
+      priority: finalPriority, // Apply filter priority if no explicit priority
       estimatedTime: task.estimatedTime,
-      tags: task.tags,
+      tags: mergedTags, // Merged tags from parser and active filters
       subtasks: [],
       columnId: finalProjectId ? undefined : finalColumnId, // Für Projekt-Aufgaben kein columnId, sonst final column
       projectId: finalProjectId, // Automatische Zuordnung zum Projekt (from parser or prop or selector)

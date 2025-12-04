@@ -158,9 +158,9 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
     const raw = quickAddValue.trim();
     if (!raw) { setShowQuickAdd(false); return; }
     // Parse tags (#tag) and priority (!h/!m/!l) and time (e.g., 30m, 1h)
-    const tags = Array.from(new Set((raw.match(/#[\w-]+/g) || []).map(t => t.replace(/^#/, ''))));
-    let priority: 'high'|'medium'|'low'|'none' = 'none';
-    if (/!h\b/i.test(raw)) priority = 'high'; else if (/!m\b/i.test(raw)) priority = 'medium'; else if (/!l\b/i.test(raw)) priority = 'low';
+    const parsedTags = Array.from(new Set((raw.match(/#[\w-]+/g) || []).map(t => t.replace(/^#/, ''))));
+    let parsedPriority: 'high'|'medium'|'low'|'none' = 'none';
+    if (/!h\b/i.test(raw)) parsedPriority = 'high'; else if (/!m\b/i.test(raw)) parsedPriority = 'medium'; else if (/!l\b/i.test(raw)) parsedPriority = 'low';
     let estimatedTime = 0;
     const timeMatch = raw.match(/(\d+)(h|m)\b/i);
     if (timeMatch) {
@@ -172,13 +172,20 @@ export function TopTimerBar({ onOpenTask }: TopTimerBarProps) {
       .replace(/!([hml])\b/gi, '')
       .replace(/(\d+)(h|m)\b/i, '')
       .trim() || 'Neue Aufgabe';
+    
+    // Apply active filters to new task
+    const filterTags = state.activeTagFilters || [];
+    const mergedTags = [...new Set([...parsedTags, ...filterTags])];
+    const filterPriorities = state.activePriorityFilters || [];
+    const finalPriority = parsedPriority !== 'none' ? parsedPriority : (filterPriorities.length === 1 ? filterPriorities[0] as any : 'none');
+    
     const newTask = {
       id: `task-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
       title,
       description: '',
-      priority,
+      priority: finalPriority,
       estimatedTime: estimatedTime || undefined,
-      tags,
+      tags: mergedTags,
       completed: false,
       archived: false,
       createdAt: new Date().toISOString(),

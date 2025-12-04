@@ -367,6 +367,11 @@ export function MobileShell() {
     const todayDate = format(new Date(), 'yyyy-MM-dd');
     const isToday = plannerSubView === 'today';
     
+    // Apply active filters to new task
+    const filterTags = activeTagFilters || [];
+    const filterPriorities = activePriorityFilters || [];
+    const finalPriority = filterPriorities.length === 1 ? filterPriorities[0] : undefined;
+    
     const newTask: Task = {
       id: `mobile-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       title: newTaskText.trim(),
@@ -377,9 +382,9 @@ export function MobileShell() {
       columnId: isToday ? `date-${todayDate}` : 'inbox',
       // Set reminderDate for "Today" tasks so they show the date
       reminderDate: isToday ? todayDate : undefined,
-      tags: [],
+      tags: filterTags, // Apply active tag filters
       subtasks: [],
-      // No priority when creating tasks from mobile
+      priority: finalPriority, // Apply priority filter if exactly one is active
       position: Date.now(),
     };
     
@@ -390,7 +395,7 @@ export function MobileShell() {
     setNewTaskText('');
     setIsAddingTask(false);
     if ('vibrate' in navigator) navigator.vibrate(10);
-  }, [newTaskText, plannerSubView, dispatch, isOffline]);
+  }, [newTaskText, plannerSubView, dispatch, isOffline, activeTagFilters, activePriorityFilters]);
 
   // Swipe right: Complete + Archive with 5s undo
   const handleCompleteTask = useCallback((taskId: string, e?: React.MouseEvent) => {

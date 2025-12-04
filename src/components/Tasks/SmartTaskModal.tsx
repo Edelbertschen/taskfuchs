@@ -192,15 +192,25 @@ export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, pro
       finalColumnId = targetColumn?.id || 'inbox';
     }
 
+    // Apply active filters to new task
+    // Merge parsed tags with active tag filters (remove duplicates)
+    const parsedTags = task.tags || [];
+    const filterTags = state.activeTagFilters || [];
+    const mergedTags = [...new Set([...parsedTags, ...filterTags])];
+    
+    // Apply priority filter if exactly one is active and task has no explicit priority
+    const filterPriorities = state.activePriorityFilters || [];
+    const finalPriority = task.priority || (filterPriorities.length === 1 ? filterPriorities[0] : undefined);
+
     // Create the task
     const newTask = {
       id: generateUUID(),
       title: task.title,
       description: task.description || '',
       completed: false,
-      priority: task.priority, // Don't set default priority
+      priority: finalPriority, // Apply filter priority if no explicit priority
       estimatedTime: task.estimatedTime && task.estimatedTime > 0 ? task.estimatedTime : undefined,
-      tags: task.tags,
+      tags: mergedTags, // Merged tags from parser and active filters
       subtasks: [],
       columnId: finalColumnId, // Use determined column (only for planner/inbox)
       projectId: projectId, // Project context
