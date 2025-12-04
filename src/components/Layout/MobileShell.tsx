@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { 
   Plus, Check, Archive, Inbox, Sun, Sparkles, Filter, Undo2,
   GripVertical, LogOut, RefreshCw, X, ChevronRight,
-  FileText, ListChecks, Zap, Heart
+  FileText, ListChecks, Zap, Heart, Eye, EyeOff
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
@@ -385,9 +385,28 @@ export function MobileShell() {
                 {activeView === 'today' ? format(new Date(), 'EEE, d. MMM', { locale: dateLocale }) : `${inboxCount}`}
               </span>
             </div>
-            <button onClick={() => setShowLogoutConfirm(true)} className="p-1.5 rounded-lg" style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }}>
-              <LogOut className="w-4 h-4" style={{ color: isDarkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.5)' }} />
-            </button>
+            <div className="flex items-center gap-1">
+              {/* Toggle completed tasks */}
+              <button 
+                onClick={() => dispatch({ type: 'TOGGLE_SHOW_COMPLETED_TASKS' })} 
+                className="p-1.5 rounded-lg"
+                style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }}
+              >
+                {showCompletedTasks ? (
+                  <Eye className="w-4 h-4" style={{ color: accent }} />
+                ) : (
+                  <EyeOff className="w-4 h-4" style={{ color: isDarkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.3)' }} />
+                )}
+              </button>
+              {/* Logout */}
+              <button 
+                onClick={() => setShowLogoutConfirm(true)} 
+                className="p-1.5 rounded-lg" 
+                style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }}
+              >
+                <LogOut className="w-4 h-4" style={{ color: isDarkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.5)' }} />
+              </button>
+            </div>
           </div>
           {hasActiveFilters && (
             <div className="flex items-center gap-1.5 mt-1">
@@ -640,6 +659,8 @@ function TaskCard({ task, accent, isDarkMode, disabled, onTap, onComplete, onArc
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (disabled) return;
+    // Prevent text selection on long press
+    e.preventDefault();
     touchStartX.current = e.touches[0].clientX;
     touchStartY.current = e.touches[0].clientY;
     isVerticalScroll.current = false;
@@ -716,12 +737,15 @@ function TaskCard({ task, accent, isDarkMode, disabled, onTap, onComplete, onArc
         </div>
       </div>
 
-      {/* Card */}
+      {/* Card - userSelect: none prevents text selection during long-press */}
       <div className="relative rounded-xl overflow-hidden" style={{
         backgroundColor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.9)',
         border: isDarkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.06)',
         transform: `translateX(${swipeOffset}px)`,
         transition: isDraggingSwipe ? 'none' : 'transform 200ms',
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
+        WebkitTouchCallout: 'none',
       }} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
         {priorityColor !== 'transparent' && <div className="absolute left-0 top-0 bottom-0 w-1" style={{ backgroundColor: priorityColor }} />}
         <div className="flex items-center gap-2 p-2.5 pl-3">
