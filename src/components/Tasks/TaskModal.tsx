@@ -4123,24 +4123,19 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
             
             {/* Two-Column Layout */}
             <div className="flex-1 flex overflow-hidden">
-              {/* Left Column - Markdown Editor */}
+              {/* Left Column - Markdown Editor with Toolbar */}
               <div className="w-1/2 flex flex-col border-r border-gray-200 dark:border-gray-700">
-                <div className="px-4 py-2 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center space-x-2">
-                    <Pencil className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Markdown</span>
-                  </div>
-                </div>
-                <div className="flex-1 p-4 overflow-hidden">
-                  <textarea
+                <div className="flex-1 overflow-hidden">
+                  <WysiwygEditor
                     value={formData.description}
-                    onChange={(e) => {
-                      setFormData(prev => ({ ...prev, description: e.target.value }));
+                    onChange={(value) => {
+                      setFormData(prev => ({ ...prev, description: value }));
                       setHasUnsavedChanges(true);
                     }}
-                    className="w-full h-full resize-none bg-transparent text-gray-900 dark:text-white font-mono text-sm leading-relaxed focus:outline-none"
                     placeholder="Beschreibung in Markdown eingeben..."
-                    style={{ fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace' }}
+                    className="h-full"
+                    useFullHeight={true}
+                    showToolbar={true}
                   />
                 </div>
               </div>
