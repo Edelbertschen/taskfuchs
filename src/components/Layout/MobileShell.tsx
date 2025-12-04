@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { MarkdownRenderer } from '../Common/MarkdownRenderer';
 import { 
   Plus, Check, Archive, Inbox, Sun, Sparkles, Filter, Undo2,
-  GripVertical, LogOut, RefreshCw, X, ChevronRight,
+  GripVertical, LogOut, RefreshCw, X, ChevronRight, ChevronLeft,
   FileText, ListChecks, Zap, Heart, Eye, EyeOff, Tag, Pin
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
@@ -634,27 +634,17 @@ export function MobileShell() {
         </div>
       </header>
 
-      {/* Task List with Pull-to-Refresh and Column Swipe */}
+      {/* Task List with Pull-to-Refresh (NO Column Swipe here - that's in the swipe zone below) */}
       <div 
         ref={scrollRef}
         className="relative z-10 flex-1 overflow-y-auto px-4"
         style={{ 
-          transform: `translateY(${pullDistance * 0.3}px) translateX(${columnSwipeOffset * 0.3}px)`,
-          paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 16px))',
-          transition: isColumnSwiping.current ? 'none' : 'transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+          transform: `translateY(${pullDistance * 0.3}px)`,
+          paddingBottom: 'calc(140px + env(safe-area-inset-bottom, 16px))', // Extra space for swipe zone
         }}
-        onTouchStart={(e) => {
-          handlePullStart(e);
-          handleColumnSwipeStart(e);
-        }}
-        onTouchMove={(e) => {
-          handlePullMove(e);
-          handleColumnSwipeMove(e);
-        }}
-        onTouchEnd={() => {
-          handlePullEnd();
-          handleColumnSwipeEnd();
-        }}
+        onTouchStart={handlePullStart}
+        onTouchMove={handlePullMove}
+        onTouchEnd={handlePullEnd}
       >
         <div className="space-y-2 pt-1">
           {currentTasks.map((task) => (
@@ -896,6 +886,90 @@ export function MobileShell() {
           </div>
         </div>
       )}
+
+      {/* Swipe Zone for Column Navigation */}
+      <div 
+        className="fixed left-0 right-0 z-25"
+        style={{ 
+          bottom: 'calc(56px + env(safe-area-inset-bottom, 0px))',
+          height: '60px',
+          background: isDarkMode 
+            ? 'linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.6), transparent)'
+            : 'linear-gradient(to top, rgba(255,255,255,0.9), rgba(255,255,255,0.6), transparent)',
+        }}
+        onTouchStart={handleColumnSwipeStart}
+        onTouchMove={handleColumnSwipeMove}
+        onTouchEnd={handleColumnSwipeEnd}
+      >
+        {/* Swipe Zone Content */}
+        <div 
+          className="h-full flex flex-col items-center justify-end pb-2 px-4"
+          style={{
+            transform: `translateX(${columnSwipeOffset * 0.5}px)`,
+            transition: isColumnSwiping.current ? 'none' : 'transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+          }}
+        >
+          {/* Swipe hint arrows + dots */}
+          <div className="flex items-center gap-3">
+            {/* Left arrow hint */}
+            <ChevronLeft 
+              className="w-4 h-4 transition-opacity" 
+              style={{ 
+                color: accent,
+                opacity: (mainView === 'planner' && plannerSubView === 'inbox') || (mainView === 'pins' && pinsColumnIndex > 0) ? 0.6 : 0.15 
+              }} 
+            />
+            
+            {/* Pagination dots */}
+            <div className="flex items-center gap-1.5">
+              {mainView === 'planner' ? (
+                // Planner: 2 dots (Heute, Inbox)
+                (['today', 'inbox'] as const).map((v) => (
+                  <div 
+                    key={v}
+                    className="transition-all duration-300"
+                    style={{ 
+                      width: plannerSubView === v ? '16px' : '6px',
+                      height: '6px',
+                      borderRadius: '3px',
+                      backgroundColor: plannerSubView === v ? accent : (isDarkMode ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.15)'),
+                    }}
+                  />
+                ))
+              ) : (
+                // Pins: dots for each column (max 7 visible)
+                pinColumns.length > 0 && pinColumns.slice(
+                  Math.max(0, pinsColumnIndex - 3),
+                  Math.min(pinColumns.length, pinsColumnIndex + 4)
+                ).map((col, displayIndex) => {
+                  const actualIndex = Math.max(0, pinsColumnIndex - 3) + displayIndex;
+                  return (
+                    <div 
+                      key={col.id}
+                      className="transition-all duration-300"
+                      style={{ 
+                        width: pinsColumnIndex === actualIndex ? '16px' : '6px',
+                        height: '6px',
+                        borderRadius: '3px',
+                        backgroundColor: pinsColumnIndex === actualIndex ? accent : (isDarkMode ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.15)'),
+                      }}
+                    />
+                  );
+                })
+              )}
+            </div>
+            
+            {/* Right arrow hint */}
+            <ChevronRight 
+              className="w-4 h-4 transition-opacity" 
+              style={{ 
+                color: accent,
+                opacity: (mainView === 'planner' && plannerSubView === 'today') || (mainView === 'pins' && pinsColumnIndex < pinColumns.length - 1) ? 0.6 : 0.15 
+              }} 
+            />
+          </div>
+        </div>
+      </div>
 
       {/* Bottom Navigation */}
       <div 
@@ -1207,8 +1281,8 @@ interface OnboardingScreenProps {
 function OnboardingScreen({ step, setStep, onFinish, accent, isDarkMode }: OnboardingScreenProps) {
   const steps = [
     { icon: Zap, title: 'Willkommen!', subtitle: 'TaskFuchs Companion', description: 'Deine Aufgaben immer dabei. Synchronisiert mit der Desktop-App, optimiert für unterwegs.' },
-    { icon: ListChecks, title: 'Swipe-Gesten', subtitle: 'Schnell & Intuitiv', description: 'Wische rechts → Erledigt & archiviert. Wische links → Löscht die Aufgabe. Tippe für Details & Unteraufgaben.' },
-    { icon: Pin, title: 'Planer & Pins', subtitle: 'Alles im Blick', description: 'Wechsle zwischen Planer (Heute/Inbox) und deinen Pins. Ziehe nach unten zum Aktualisieren.' },
+    { icon: ListChecks, title: 'Aufgaben-Gesten', subtitle: 'Schnell & Intuitiv', description: 'Wische auf Aufgaben: Rechts → Erledigt. Links → Löscht. Tippe für Details & Unteraufgaben.' },
+    { icon: Pin, title: 'Spalten wechseln', subtitle: 'Swipe-Zone unten', description: 'Im unteren Bereich wischen, um zwischen Spalten zu navigieren. Punkte zeigen deine Position.' },
     { icon: Heart, title: 'Los geht\'s!', subtitle: 'Bereit', description: 'Deine Aufgaben warten. Viel Erfolg beim Produktivsein! 🦊' },
   ];
 
