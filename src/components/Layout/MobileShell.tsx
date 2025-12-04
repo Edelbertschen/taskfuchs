@@ -1,23 +1,24 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { MarkdownRenderer } from '../Common/MarkdownRenderer';
 import { 
   Plus, Check, Archive, Inbox, Sun, Sparkles, Filter, Undo2,
-  GripVertical, LogOut, RefreshCw, X, ChevronRight,
-  FileText, ListChecks, Zap, Heart, Eye, EyeOff, Tag
+  GripVertical, LogOut, RefreshCw, X, ChevronRight, ChevronLeft,
+  FileText, ListChecks, Zap, Heart, Eye, EyeOff, Tag, Pin, FolderOpen
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { LoginPage } from '../Auth/LoginPage';
 import { syncAPI } from '../../services/apiService';
-import type { Task } from '../../types';
+import type { Task, PinColumn, Column } from '../../types';
 import { format } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
 
 // Auto-refresh interval in milliseconds (30 seconds)
 const AUTO_REFRESH_INTERVAL = 30000;
 
-type View = 'today' | 'inbox';
+type MainView = 'planner' | 'pins' | 'projects';
+type PlannerSubView = 'today' | 'inbox';
 
 const ONBOARDING_KEY = 'taskfuchs_mobile_onboarding_done';
 
@@ -33,12 +34,20 @@ export function MobileShell() {
   const { t, i18n } = useTranslation();
   
   // Core state
-  const [activeView, setActiveView] = useState<View>('today');
+  const [mainView, setMainView] = useState<MainView>('planner');
+  const [plannerSubView, setPlannerSubView] = useState<PlannerSubView>('today');
+  const [pinsColumnIndex, setPinsColumnIndex] = useState(0);
+  const [projectsColumnIndex, setProjectsColumnIndex] = useState(0);
   const [newTaskText, setNewTaskText] = useState('');
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showTagFilter, setShowTagFilter] = useState(false);
+  
+  // Column swipe state
+  const [columnSwipeOffset, setColumnSwipeOffset] = useState(0);
+  const columnSwipeStartX = useRef<number | null>(null);
+  const isColumnSwiping = useRef(false);
   
   // Onboarding
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -155,13 +164,113 @@ export function MobileShell() {
     });
   }, [activeTagFilters, activePriorityFilters, showCompletedTasks]);
 
+  // Planner tasks
   const todayTasks = applyFilters(tasks.filter(t => t.columnId === todayId))
     .sort((a, b) => (a.completed !== b.completed ? (a.completed ? 1 : -1) : (a.position || 0) - (b.position || 0)));
   const inboxTasks = applyFilters(tasks.filter(t => t.columnId === 'inbox'))
     .sort((a, b) => (a.completed !== b.completed ? (a.completed ? 1 : -1) : (a.position || 0) - (b.position || 0)));
-  const currentTasks = activeView === 'today' ? todayTasks : inboxTasks;
   const todayCount = todayTasks.filter(t => !t.completed).length;
   const inboxCount = inboxTasks.filter(t => !t.completed).length;
+  
+  // Pin columns and tasks
+  const pinColumns = useMemo(() => 
+    [...(state.pinColumns || [])].sort((a, b) => (a.order || 0) - (b.order || 0)),
+    [state.pinColumns]
+  );
+  const currentPinColumn = pinColumns[pinsColumnIndex];
+  const pinTasks = useMemo(() => {
+    if (!currentPinColumn) return [];
+    return applyFilters(tasks.filter(t => t.pinColumnId === currentPinColumn.id))
+      .sort((a, b) => (a.completed !== b.completed ? (a.completed ? 1 : -1) : (a.position || 0) - (b.position || 0)));
+  }, [currentPinColumn, tasks, applyFilters]);
+  
+  // Projects and tasks
+  const projects = useMemo(() => 
+    state.columns.filter(col => col.type === 'project').sort((a, b) => (a.order || 0) - (b.order || 0)),
+    [state.columns]
+  );
+  const currentProject = projects[projectsColumnIndex];
+  const projectTasks = useMemo(() => {
+    if (!currentProject) return [];
+    return applyFilters(tasks.filter(t => t.projectId === currentProject.id && !t.pinColumnId))
+      .sort((a, b) => (a.completed !== b.completed ? (a.completed ? 1 : -1) : (a.position || 0) - (b.position || 0)));
+  }, [currentProject, tasks, applyFilters]);
+  
+  // Current tasks based on active view
+  const currentTasks = useMemo(() => {
+    if (mainView === 'planner') {
+      return plannerSubView === 'today' ? todayTasks : inboxTasks;
+    } else if (mainView === 'pins') {
+      return pinTasks;
+    } else {
+      return projectTasks;
+    }
+  }, [mainView, plannerSubView, todayTasks, inboxTasks, pinTasks, projectTasks]);
+  
+  // Get current column name for display
+  const currentColumnName = useMemo(() => {
+    if (mainView === 'planner') {
+      return plannerSubView === 'today' ? t('mobile.today', 'Heute') : t('mobile.inbox', 'Inbox');
+    } else if (mainView === 'pins') {
+      return currentPinColumn?.title || t('mobile.noPins', 'Keine Pins');
+    } else {
+      return currentProject?.title || t('mobile.noProjects', 'Keine Projekte');
+    }
+  }, [mainView, plannerSubView, currentPinColumn, currentProject, t]);
+
+  // Column swipe handlers (for Pins and Projects)
+  const handleColumnSwipeStart = (e: React.TouchEvent) => {
+    if (mainView === 'planner') return; // No horizontal swipe for planner
+    columnSwipeStartX.current = e.touches[0].clientX;
+    isColumnSwiping.current = false;
+  };
+  
+  const handleColumnSwipeMove = (e: React.TouchEvent) => {
+    if (mainView === 'planner' || columnSwipeStartX.current === null) return;
+    const deltaX = e.touches[0].clientX - columnSwipeStartX.current;
+    
+    // Only activate column swiping after 10px horizontal movement
+    if (Math.abs(deltaX) > 10) {
+      isColumnSwiping.current = true;
+      setColumnSwipeOffset(deltaX);
+    }
+  };
+  
+  const handleColumnSwipeEnd = () => {
+    if (mainView === 'planner' || !isColumnSwiping.current) {
+      columnSwipeStartX.current = null;
+      setColumnSwipeOffset(0);
+      return;
+    }
+    
+    const threshold = 80; // Swipe threshold in pixels
+    
+    if (mainView === 'pins') {
+      if (columnSwipeOffset > threshold && pinsColumnIndex > 0) {
+        // Swipe right -> previous column
+        setPinsColumnIndex(prev => prev - 1);
+        if ('vibrate' in navigator) navigator.vibrate(10);
+      } else if (columnSwipeOffset < -threshold && pinsColumnIndex < pinColumns.length - 1) {
+        // Swipe left -> next column
+        setPinsColumnIndex(prev => prev + 1);
+        if ('vibrate' in navigator) navigator.vibrate(10);
+      }
+    } else if (mainView === 'projects') {
+      if (columnSwipeOffset > threshold && projectsColumnIndex > 0) {
+        // Swipe right -> previous project
+        setProjectsColumnIndex(prev => prev - 1);
+        if ('vibrate' in navigator) navigator.vibrate(10);
+      } else if (columnSwipeOffset < -threshold && projectsColumnIndex < projects.length - 1) {
+        // Swipe left -> next project
+        setProjectsColumnIndex(prev => prev + 1);
+        if ('vibrate' in navigator) navigator.vibrate(10);
+      }
+    }
+    
+    columnSwipeStartX.current = null;
+    isColumnSwiping.current = false;
+    setColumnSwipeOffset(0);
+  };
 
   // Pull-to-refresh handlers
   const handlePullStart = (e: React.TouchEvent) => {
@@ -200,8 +309,6 @@ export function MobileShell() {
   const handleLogout = useCallback(() => {
     if ('vibrate' in navigator) navigator.vibrate(20);
     logout();
-    setCachedTasks([]);
-    setCacheTimestamp(null);
     setShowLogoutConfirm(false);
     // Reload to show login screen
     setTimeout(() => {
@@ -213,7 +320,7 @@ export function MobileShell() {
     if (!newTaskText.trim() || isOffline) return;
     
     const todayDate = format(new Date(), 'yyyy-MM-dd');
-    const isToday = activeView === 'today';
+    const isToday = plannerSubView === 'today';
     
     const newTask: Task = {
       id: `mobile-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -238,7 +345,7 @@ export function MobileShell() {
     setNewTaskText('');
     setIsAddingTask(false);
     if ('vibrate' in navigator) navigator.vibrate(10);
-  }, [newTaskText, activeView, dispatch, isOffline]);
+  }, [newTaskText, plannerSubView, dispatch, isOffline]);
 
   const handleCompleteTask = useCallback((taskId: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
@@ -346,7 +453,31 @@ export function MobileShell() {
     switch (priority) { case 'high': return '#ef4444'; case 'medium': return '#f59e0b'; case 'low': return '#3b82f6'; default: return 'transparent'; }
   };
 
-  const bgPosition = activeView === 'today' ? 'left center' : 'right center';
+  // Background position based on view
+  const bgPosition = useMemo(() => {
+    if (mainView === 'planner') {
+      return plannerSubView === 'today' ? 'left center' : 'right center';
+    } else if (mainView === 'pins') {
+      const total = Math.max(pinColumns.length - 1, 1);
+      const percent = (pinsColumnIndex / total) * 100;
+      return `${percent}% center`;
+    } else {
+      const total = Math.max(projects.length - 1, 1);
+      const percent = (projectsColumnIndex / total) * 100;
+      return `${percent}% center`;
+    }
+  }, [mainView, plannerSubView, pinsColumnIndex, pinColumns.length, projectsColumnIndex, projects.length]);
+  
+  // Get column count for navigation indicators
+  const getColumnNavInfo = () => {
+    if (mainView === 'pins') {
+      return { current: pinsColumnIndex + 1, total: pinColumns.length, hasPrev: pinsColumnIndex > 0, hasNext: pinsColumnIndex < pinColumns.length - 1 };
+    } else if (mainView === 'projects') {
+      return { current: projectsColumnIndex + 1, total: projects.length, hasPrev: projectsColumnIndex > 0, hasNext: projectsColumnIndex < projects.length - 1 };
+    }
+    return { current: 0, total: 0, hasPrev: false, hasNext: false };
+  };
+  const columnNav = getColumnNavInfo();
 
   // Onboarding Screen
   if (showOnboarding) {
@@ -388,15 +519,56 @@ export function MobileShell() {
       <header className="relative z-10 flex-shrink-0" style={{ paddingTop: 'max(env(safe-area-inset-top, 20px), 44px)', transform: `translateY(${pullDistance * 0.3}px)` }}>
         <div className="px-4 pt-2 pb-1">
           <div className="flex items-center justify-between gap-2">
-            <div className="flex items-baseline gap-2 min-w-0">
-              <h1 className="text-xl font-bold" style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}>
-                {activeView === 'today' ? t('mobile.today', 'Heute') : t('mobile.inbox', 'Inbox')}
-              </h1>
-              <span className="text-sm font-medium" style={{ color: accent }}>
-                {activeView === 'today' ? format(new Date(), 'EEE, d. MMM', { locale: dateLocale }) : `${inboxCount}`}
-              </span>
+            {/* Left: Column name with navigation arrows for Pins/Projects */}
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              {(mainView === 'pins' || mainView === 'projects') && columnNav.hasPrev && (
+                <button
+                  onClick={() => {
+                    if (mainView === 'pins') setPinsColumnIndex(prev => prev - 1);
+                    else setProjectsColumnIndex(prev => prev - 1);
+                    if ('vibrate' in navigator) navigator.vibrate(10);
+                  }}
+                  className="p-1 rounded-lg"
+                  style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }}
+                >
+                  <ChevronLeft className="w-5 h-5" style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }} />
+                </button>
+              )}
+              <div className="flex items-baseline gap-2 min-w-0 flex-1">
+                <h1 className="text-xl font-bold truncate" style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}>
+                  {currentColumnName}
+                </h1>
+                {mainView === 'planner' && plannerSubView === 'today' && (
+                  <span className="text-sm font-medium flex-shrink-0" style={{ color: accent }}>
+                    {format(new Date(), 'EEE, d. MMM', { locale: dateLocale })}
+                  </span>
+                )}
+                {mainView === 'planner' && plannerSubView === 'inbox' && inboxCount > 0 && (
+                  <span className="text-sm font-medium flex-shrink-0" style={{ color: accent }}>{inboxCount}</span>
+                )}
+                {(mainView === 'pins' || mainView === 'projects') && columnNav.total > 1 && (
+                  <span className="text-xs font-medium flex-shrink-0 px-1.5 py-0.5 rounded-full" style={{ backgroundColor: `${accent}20`, color: accent }}>
+                    {columnNav.current}/{columnNav.total}
+                  </span>
+                )}
+              </div>
+              {(mainView === 'pins' || mainView === 'projects') && columnNav.hasNext && (
+                <button
+                  onClick={() => {
+                    if (mainView === 'pins') setPinsColumnIndex(prev => prev + 1);
+                    else setProjectsColumnIndex(prev => prev + 1);
+                    if ('vibrate' in navigator) navigator.vibrate(10);
+                  }}
+                  className="p-1 rounded-lg"
+                  style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }}
+                >
+                  <ChevronRight className="w-5 h-5" style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }} />
+                </button>
+              )}
             </div>
-            <div className="flex items-center gap-1">
+            
+            {/* Right: Action buttons */}
+            <div className="flex items-center gap-1 flex-shrink-0">
               {/* Tag filter */}
               <button 
                 onClick={() => setShowTagFilter(!showTagFilter)} 
@@ -440,40 +612,73 @@ export function MobileShell() {
           )}
         </div>
 
-        {/* Tabs */}
-        <div className="px-4 py-2">
-          <div className="flex rounded-xl p-1 gap-1" style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)' }}>
-            {(['today', 'inbox'] as const).map(v => (
-              <button
-                key={v}
-                onClick={() => setActiveView(v)}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-sm font-semibold transition-all"
-                style={{
-                  backgroundColor: activeView === v ? accent : 'transparent',
-                  color: activeView === v ? '#fff' : (isDarkMode ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.7)'),
-                }}
-              >
-                {v === 'today' ? <Sun className="w-4 h-4" /> : <Inbox className="w-4 h-4" />}
-                <span>{v === 'today' ? t('mobile.today', 'Heute') : t('mobile.inbox', 'Inbox')}</span>
-                {(v === 'today' ? todayCount : inboxCount) > 0 && (
-                  <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ backgroundColor: activeView === v ? 'rgba(255,255,255,0.25)' : `${accent}30`, color: activeView === v ? '#fff' : accent }}>
-                    {v === 'today' ? todayCount : inboxCount}
-                  </span>
-                )}
-              </button>
-            ))}
+        {/* Tabs - only for Planner view */}
+        {mainView === 'planner' && (
+          <div className="px-4 py-2">
+            <div className="flex rounded-xl p-1 gap-1" style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)' }}>
+              {(['today', 'inbox'] as const).map(v => (
+                <button
+                  key={v}
+                  onClick={() => setPlannerSubView(v)}
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-sm font-semibold transition-all"
+                  style={{
+                    backgroundColor: plannerSubView === v ? accent : 'transparent',
+                    color: plannerSubView === v ? '#fff' : (isDarkMode ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.7)'),
+                  }}
+                >
+                  {v === 'today' ? <Sun className="w-4 h-4" /> : <Inbox className="w-4 h-4" />}
+                  <span>{v === 'today' ? t('mobile.today', 'Heute') : t('mobile.inbox', 'Inbox')}</span>
+                  {(v === 'today' ? todayCount : inboxCount) > 0 && (
+                    <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ backgroundColor: plannerSubView === v ? 'rgba(255,255,255,0.25)' : `${accent}30`, color: plannerSubView === v ? '#fff' : accent }}>
+                      {v === 'today' ? todayCount : inboxCount}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
+        
+        {/* Swipe hint for Pins/Projects */}
+        {(mainView === 'pins' || mainView === 'projects') && columnNav.total > 1 && (
+          <div className="px-4 pb-2">
+            <div className="flex items-center justify-center gap-1">
+              {Array.from({ length: columnNav.total }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-1.5 rounded-full transition-all duration-300"
+                  style={{
+                    width: i === (mainView === 'pins' ? pinsColumnIndex : projectsColumnIndex) ? '16px' : '6px',
+                    backgroundColor: i === (mainView === 'pins' ? pinsColumnIndex : projectsColumnIndex) ? accent : (isDarkMode ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.2)'),
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        )}
       </header>
 
-      {/* Task List with Pull-to-Refresh */}
+      {/* Task List with Pull-to-Refresh and Column Swipe */}
       <div 
         ref={scrollRef}
-        className="relative z-10 flex-1 overflow-y-auto px-4 pb-24"
-        style={{ transform: `translateY(${pullDistance * 0.3}px)` }}
-        onTouchStart={handlePullStart}
-        onTouchMove={handlePullMove}
-        onTouchEnd={handlePullEnd}
+        className="relative z-10 flex-1 overflow-y-auto px-4"
+        style={{ 
+          transform: `translateY(${pullDistance * 0.3}px) translateX(${columnSwipeOffset * 0.3}px)`,
+          paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 16px))',
+          transition: isColumnSwiping.current ? 'none' : 'transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+        }}
+        onTouchStart={(e) => {
+          handlePullStart(e);
+          handleColumnSwipeStart(e);
+        }}
+        onTouchMove={(e) => {
+          handlePullMove(e);
+          handleColumnSwipeMove(e);
+        }}
+        onTouchEnd={() => {
+          handlePullEnd();
+          handleColumnSwipeEnd();
+        }}
       >
         <div className="space-y-2 pt-1">
           {currentTasks.map((task) => (
@@ -526,7 +731,7 @@ export function MobileShell() {
         {/* Empty State */}
         {currentTasks.length === 0 && (
           <div className="flex flex-col items-center justify-center h-48 text-center">
-            {!isOffline && activeView === 'today' && state.preferences.enableCelebration ? (
+            {!isOffline && mainView === 'planner' && plannerSubView === 'today' && state.preferences.enableCelebration ? (
               <>
                 <div className="w-28 h-28 mb-2" style={{ filter: `drop-shadow(0 0 12px ${accent}30)` }}>
                   <img src="/salto.png" alt="Done!" className="w-full h-full object-contain" style={{ animation: 'gentle-bounce 2s ease-in-out infinite' }} />
@@ -538,11 +743,27 @@ export function MobileShell() {
             ) : (
               <>
                 <div className="w-14 h-14 rounded-full flex items-center justify-center mb-2" style={{ backgroundColor: `${accent}15` }}>
-                  {activeView === 'today' ? <Sparkles className="w-7 h-7" style={{ color: accent }} /> : <Inbox className="w-7 h-7" style={{ color: accent }} />}
+                  {mainView === 'planner' && plannerSubView === 'today' && <Sparkles className="w-7 h-7" style={{ color: accent }} />}
+                  {mainView === 'planner' && plannerSubView === 'inbox' && <Inbox className="w-7 h-7" style={{ color: accent }} />}
+                  {mainView === 'pins' && <Pin className="w-7 h-7" style={{ color: accent }} />}
+                  {mainView === 'projects' && <FolderOpen className="w-7 h-7" style={{ color: accent }} />}
                 </div>
                 <p className="text-sm font-semibold" style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}>
-                  {activeView === 'today' ? t('mobile.allDone', 'Alles erledigt!') : t('mobile.inboxEmpty', 'Inbox ist leer')}
+                  {mainView === 'planner' && plannerSubView === 'today' && t('mobile.allDone', 'Alles erledigt!')}
+                  {mainView === 'planner' && plannerSubView === 'inbox' && t('mobile.inboxEmpty', 'Inbox ist leer')}
+                  {mainView === 'pins' && (pinColumns.length === 0 ? t('mobile.noPins', 'Keine Pins') : t('mobile.columnEmpty', 'Spalte ist leer'))}
+                  {mainView === 'projects' && (projects.length === 0 ? t('mobile.noProjects', 'Keine Projekte') : t('mobile.columnEmpty', 'Spalte ist leer'))}
                 </p>
+                {mainView === 'pins' && pinColumns.length === 0 && (
+                  <p className="text-xs mt-1" style={{ color: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)' }}>
+                    {t('mobile.createPinsDesktop', 'Erstelle Pins am Desktop')}
+                  </p>
+                )}
+                {mainView === 'projects' && projects.length === 0 && (
+                  <p className="text-xs mt-1" style={{ color: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)' }}>
+                    {t('mobile.createProjectsDesktop', 'Erstelle Projekte am Desktop')}
+                  </p>
+                )}
               </>
             )}
           </div>
@@ -689,12 +910,12 @@ export function MobileShell() {
                 <div className="w-5 h-5 rounded-full border-2 flex-shrink-0" style={{ borderColor: accent }} />
                 <input ref={inputRef} type="text" value={newTaskText} onChange={(e) => setNewTaskText(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleAddTask(); if (e.key === 'Escape') { setIsAddingTask(false); setNewTaskText(''); } }}
-                  placeholder={activeView === 'today' ? t('mobile.whatToday', 'Was steht heute an?') : t('mobile.newTask', 'Neue Aufgabe...')}
+                  placeholder={plannerSubView === 'today' ? t('mobile.whatToday', 'Was steht heute an?') : t('mobile.newTask', 'Neue Aufgabe...')}
                   className="flex-1 text-base bg-transparent border-none outline-none" style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }} autoFocus />
               </div>
               <div className="flex items-center justify-between mt-3">
                 <span className="text-xs px-2 py-1 rounded-md" style={{ backgroundColor: `${accent}15`, color: accent }}>
-                  {activeView === 'today' ? `📅 ${t('mobile.today', 'Heute')}` : `📥 ${t('mobile.inbox', 'Inbox')}`}
+                  {plannerSubView === 'today' ? `📅 ${t('mobile.today', 'Heute')}` : `📥 ${t('mobile.inbox', 'Inbox')}`}
                 </span>
                 <button onClick={handleAddTask} disabled={!newTaskText.trim()} className="px-4 py-1.5 rounded-lg text-sm font-semibold disabled:opacity-40" style={{ backgroundColor: accent, color: '#fff' }}>
                   {t('mobile.add', 'Hinzufügen')}
@@ -705,14 +926,74 @@ export function MobileShell() {
         </div>
       )}
 
-      {/* FAB - Add Task */}
-      <button 
-        onClick={() => setIsAddingTask(true)}
-        className="fixed z-40 w-12 h-12 rounded-full shadow-xl flex items-center justify-center active:scale-95"
-        style={{ right: '16px', bottom: 'calc(env(safe-area-inset-bottom, 16px) + 16px)', backgroundColor: accent }}
+      {/* Bottom Navigation */}
+      <div 
+        className="fixed bottom-0 left-0 right-0 z-30"
+        style={{ 
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+          background: isDarkMode 
+            ? 'linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.8))'
+            : 'linear-gradient(to top, rgba(255,255,255,0.95), rgba(255,255,255,0.8))',
+          backdropFilter: 'blur(20px)',
+          borderTop: isDarkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)',
+        }}
       >
-        <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />
-      </button>
+        <div className="flex items-center justify-around py-2">
+          {/* Planner Tab */}
+          <button
+            onClick={() => setMainView('planner')}
+            className="flex flex-col items-center gap-0.5 px-4 py-1 rounded-xl transition-all"
+            style={{ 
+              backgroundColor: mainView === 'planner' ? `${accent}15` : 'transparent',
+            }}
+          >
+            <Sun className="w-5 h-5" style={{ color: mainView === 'planner' ? accent : (isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)') }} />
+            <span className="text-[10px] font-medium" style={{ color: mainView === 'planner' ? accent : (isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)') }}>
+              {t('mobile.planner', 'Planer')}
+            </span>
+          </button>
+          
+          {/* Pins Tab */}
+          <button
+            onClick={() => setMainView('pins')}
+            className="flex flex-col items-center gap-0.5 px-4 py-1 rounded-xl transition-all"
+            style={{ 
+              backgroundColor: mainView === 'pins' ? `${accent}15` : 'transparent',
+            }}
+          >
+            <Pin className="w-5 h-5" style={{ color: mainView === 'pins' ? accent : (isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)') }} />
+            <span className="text-[10px] font-medium" style={{ color: mainView === 'pins' ? accent : (isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)') }}>
+              {t('mobile.pins', 'Pins')}
+            </span>
+          </button>
+          
+          {/* FAB - Add Task (only in Planner) */}
+          {mainView === 'planner' && (
+            <button 
+              onClick={() => setIsAddingTask(true)}
+              className="w-12 h-12 rounded-full shadow-xl flex items-center justify-center active:scale-95 -mt-6"
+              style={{ backgroundColor: accent }}
+            >
+              <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />
+            </button>
+          )}
+          {mainView !== 'planner' && <div className="w-12" />}
+          
+          {/* Projects Tab */}
+          <button
+            onClick={() => setMainView('projects')}
+            className="flex flex-col items-center gap-0.5 px-4 py-1 rounded-xl transition-all"
+            style={{ 
+              backgroundColor: mainView === 'projects' ? `${accent}15` : 'transparent',
+            }}
+          >
+            <FolderOpen className="w-5 h-5" style={{ color: mainView === 'projects' ? accent : (isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)') }} />
+            <span className="text-[10px] font-medium" style={{ color: mainView === 'projects' ? accent : (isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)') }}>
+              {t('mobile.projects', 'Projekte')}
+            </span>
+          </button>
+        </div>
+      </div>
 
       <style>{`
         @keyframes slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
