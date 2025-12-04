@@ -24,7 +24,7 @@ const ONBOARDING_KEY = 'taskfuchs_mobile_onboarding_done';
 
 interface UndoState {
   task: Task;
-  action: 'archive' | 'complete';
+  action: 'complete-archive' | 'delete';
   timeoutId: NodeJS.Timeout;
 }
 
@@ -61,7 +61,7 @@ export function MobileShell() {
   
   // Animations
   const [completedAnimation, setCompletedAnimation] = useState<string | null>(null);
-  const [archivedAnimation, setArchivedAnimation] = useState<string | null>(null);
+  const [deletedAnimation, setDeletedAnimation] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   
   // Undo state
@@ -324,42 +324,54 @@ export function MobileShell() {
     if ('vibrate' in navigator) navigator.vibrate(10);
   }, [newTaskText, plannerSubView, dispatch, isOffline]);
 
+  // Swipe right: Complete + Archive with 5s undo
   const handleCompleteTask = useCallback((taskId: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
-    if (isOffline) return;
-    setCompletedAnimation(taskId);
-    if ('vibrate' in navigator) navigator.vibrate([10, 50, 20]);
-    setTimeout(() => {
-      const task = state.tasks.find(t => t.id === taskId);
-      if (task) {
-        dispatch({
-          type: 'UPDATE_TASK',
-          payload: { ...task, completed: !task.completed, completedAt: !task.completed ? new Date().toISOString() : undefined, updatedAt: new Date().toISOString() }
-        });
-      }
-      setCompletedAnimation(null);
-    }, 250);
-  }, [state.tasks, dispatch, isOffline]);
-
-  const handleArchiveTask = useCallback((taskId: string) => {
     if (isOffline) return;
     const task = state.tasks.find(t => t.id === taskId);
     if (!task) return;
     if (undoState) clearTimeout(undoState.timeoutId);
-    setArchivedAnimation(taskId);
+    setCompletedAnimation(taskId);
+    if ('vibrate' in navigator) navigator.vibrate([10, 50, 20]);
+    setTimeout(() => {
+      // Complete AND archive the task
+      dispatch({
+        type: 'UPDATE_TASK',
+        payload: { ...task, completed: true, archived: true, completedAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
+      });
+      const timeoutId = setTimeout(() => setUndoState(null), 5000);
+      setUndoState({ task, action: 'complete-archive', timeoutId });
+      setCompletedAnimation(null);
+    }, 250);
+  }, [state.tasks, dispatch, isOffline, undoState]);
+
+  // Swipe left: Delete without archiving, with 5s undo
+  const handleDeleteTask = useCallback((taskId: string) => {
+    if (isOffline) return;
+    const task = state.tasks.find(t => t.id === taskId);
+    if (!task) return;
+    if (undoState) clearTimeout(undoState.timeoutId);
+    setDeletedAnimation(taskId);
     if ('vibrate' in navigator) navigator.vibrate(15);
     setTimeout(() => {
-      dispatch({ type: 'UPDATE_TASK', payload: { ...task, archived: true, updatedAt: new Date().toISOString() } });
+      // Remove the task completely (not archive)
+      dispatch({ type: 'DELETE_TASK', payload: taskId });
       const timeoutId = setTimeout(() => setUndoState(null), 5000);
-      setUndoState({ task, action: 'archive', timeoutId });
-      setArchivedAnimation(null);
+      setUndoState({ task, action: 'delete', timeoutId });
+      setDeletedAnimation(null);
     }, 250);
   }, [state.tasks, dispatch, isOffline, undoState]);
 
   const handleUndo = useCallback(() => {
     if (!undoState) return;
     clearTimeout(undoState.timeoutId);
-    dispatch({ type: 'UPDATE_TASK', payload: { ...undoState.task, archived: false, updatedAt: new Date().toISOString() } });
+    if (undoState.action === 'complete-archive') {
+      // Restore: uncomplete and unarchive
+      dispatch({ type: 'UPDATE_TASK', payload: { ...undoState.task, completed: false, archived: false, completedAt: undefined, updatedAt: new Date().toISOString() } });
+    } else if (undoState.action === 'delete') {
+      // Restore: add the task back
+      dispatch({ type: 'ADD_TASK', payload: { ...undoState.task, updatedAt: new Date().toISOString() } });
+    }
     if ('vibrate' in navigator) navigator.vibrate(10);
     setUndoState(null);
   }, [undoState, dispatch]);
@@ -451,9 +463,21 @@ export function MobileShell() {
     return <LoginPage />;
   }
 
+  // Handler for toggling subtasks
+  const handleToggleSubtask = useCallback((subtaskId: string) => {
+    if (!selectedTask || isOffline) return;
+    const updatedSubtasks = selectedTask.subtasks?.map(s => 
+      s.id === subtaskId ? { ...s, completed: !s.completed, updatedAt: new Date().toISOString() } : s
+    );
+    const updatedTask = { ...selectedTask, subtasks: updatedSubtasks, updatedAt: new Date().toISOString() };
+    dispatch({ type: 'UPDATE_TASK', payload: updatedTask });
+    setSelectedTask(updatedTask); // Update local state so UI updates immediately
+    if ('vibrate' in navigator) navigator.vibrate(10);
+  }, [selectedTask, dispatch, isOffline]);
+
   // Task Detail View
   if (selectedTask) {
-    return <TaskDetailView task={selectedTask} onClose={() => setSelectedTask(null)} accent={accent} isDarkMode={isDarkMode} onComplete={() => handleCompleteTask(selectedTask.id)} isOffline={isOffline} />;
+    return <TaskDetailView task={selectedTask} onClose={() => setSelectedTask(null)} accent={accent} isDarkMode={isDarkMode} onComplete={() => handleCompleteTask(selectedTask.id)} isOffline={isOffline} onToggleSubtask={handleToggleSubtask} />;
   }
 
   return (
@@ -479,97 +503,22 @@ export function MobileShell() {
 
       {/* Header - with proper iOS safe area */}
       <header className="relative z-10 flex-shrink-0" style={{ paddingTop: 'max(env(safe-area-inset-top, 20px), 44px)', transform: `translateY(${pullDistance * 0.3}px)` }}>
-        {/* Row 1: Tabs + Logout (ganz oben) */}
-        <div className="px-4 pt-2 pb-1">
-          <div className="flex items-center gap-2">
-            {/* Tabs */}
-            <div className="flex-1 min-w-0">
-              <div 
-                className="flex rounded-xl p-1 gap-1 overflow-x-auto no-scrollbar" 
-                style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)' }}
-              >
-                {mainView === 'planner' ? (
-                  // Planner: Heute / Inbox tabs
-                  <>
-                    {(['today', 'inbox'] as const).map(v => (
-                      <button
-                        key={v}
-                        onClick={() => setPlannerSubView(v)}
-                        className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-sm font-semibold transition-all"
-                        style={{
-                          backgroundColor: plannerSubView === v ? accent : 'transparent',
-                          color: plannerSubView === v ? '#fff' : (isDarkMode ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.7)'),
-                        }}
-                      >
-                        {v === 'today' ? <Sun className="w-4 h-4" /> : <Inbox className="w-4 h-4" />}
-                        <span>{v === 'today' ? t('mobile.today', 'Heute') : t('mobile.inbox', 'Inbox')}</span>
-                        {(v === 'today' ? todayCount : inboxCount) > 0 && (
-                          <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ backgroundColor: plannerSubView === v ? 'rgba(255,255,255,0.25)' : `${accent}30`, color: plannerSubView === v ? '#fff' : accent }}>
-                            {v === 'today' ? todayCount : inboxCount}
-                          </span>
-                        )}
-                      </button>
-                    ))}
-                  </>
-                ) : pinColumns.length > 0 ? (
-                  // Pins: Column tabs
-                  <>
-                    {pinColumns.map((col, i) => (
-                      <button
-                        key={col.id}
-                        onClick={() => {
-                          setPinsColumnIndex(i);
-                          if ('vibrate' in navigator) navigator.vibrate(10);
-                        }}
-                        className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-sm font-semibold transition-all whitespace-nowrap flex-shrink-0"
-                        style={{
-                          backgroundColor: pinsColumnIndex === i ? accent : 'transparent',
-                          color: pinsColumnIndex === i ? '#fff' : (isDarkMode ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.7)'),
-                        }}
-                      >
-                        {col.color && (
-                          <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: col.color }} />
-                        )}
-                        <span className="truncate max-w-[100px]">{col.title}</span>
-                      </button>
-                    ))}
-                  </>
-                ) : (
-                  // Pins: No columns - show placeholder
-                  <div className="flex-1 flex items-center justify-center py-2 px-3 text-sm" style={{ color: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)' }}>
-                    {t('mobile.noPins', 'Keine Pins')}
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            {/* Logout Button */}
-            <button 
-              onClick={() => setShowLogoutConfirm(true)} 
-              className="p-2 rounded-xl flex-shrink-0" 
-              style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }}
-            >
-              <LogOut className="w-4 h-4" style={{ color: isDarkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.5)' }} />
-            </button>
-          </div>
-        </div>
-        
-        {/* Row 2: Title + Filter buttons */}
-        <div className="px-4 py-1">
-          <div className="flex items-center justify-between gap-2">
-            {/* Left: Title and date/count */}
-            <div className="flex items-baseline gap-2 min-w-0">
+        {/* Row 1: Action buttons (ganz oben) */}
+        <div className="px-4 pt-1 pb-1">
+          <div className="flex items-center justify-between">
+            {/* Left: Title + Date */}
+            <div className="flex items-baseline gap-2">
               <h1 className="text-lg font-bold" style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}>
                 {mainView === 'planner' ? t('mobile.planner', 'Planer') : t('mobile.pins', 'Pins')}
               </h1>
               {mainView === 'planner' && plannerSubView === 'today' && (
-                <span className="text-sm font-medium" style={{ color: accent }}>
+                <span className="text-xs font-medium" style={{ color: accent }}>
                   {format(new Date(), 'EEE, d. MMM', { locale: dateLocale })}
                 </span>
               )}
             </div>
             
-            {/* Right: Filter buttons */}
+            {/* Right: All action buttons */}
             <div className="flex items-center gap-1">
               {/* Tag filter */}
               <button 
@@ -596,12 +545,90 @@ export function MobileShell() {
                   <EyeOff className="w-4 h-4" style={{ color: isDarkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.3)' }} />
                 )}
               </button>
+              {/* Logout */}
+              <button 
+                onClick={() => setShowLogoutConfirm(true)} 
+                className="p-1.5 rounded-lg"
+                style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }}
+              >
+                <LogOut className="w-4 h-4" style={{ color: isDarkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.5)' }} />
+              </button>
             </div>
           </div>
           {hasActiveFilters && (
-            <div className="flex items-center gap-1.5 mt-1">
+            <div className="flex items-center gap-1.5 mt-0.5">
               <Filter className="w-3 h-3" style={{ color: accent }} />
               {activePriorityFilters.map(p => <span key={p} className="w-2 h-2 rounded-full" style={{ backgroundColor: getPriorityColor(p) }} />)}
+            </div>
+          )}
+        </div>
+        
+        {/* Row 2: Tabs */}
+        <div className="px-4 py-1">
+          {mainView === 'planner' ? (
+            // Planner: Heute / Inbox tabs
+            <div 
+              className="flex rounded-xl p-1 gap-1" 
+              style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)' }}
+            >
+              {(['today', 'inbox'] as const).map(v => (
+                <button
+                  key={v}
+                  onClick={() => setPlannerSubView(v)}
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-sm font-semibold transition-all"
+                  style={{
+                    backgroundColor: plannerSubView === v ? accent : 'transparent',
+                    color: plannerSubView === v ? '#fff' : (isDarkMode ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.7)'),
+                  }}
+                >
+                  {v === 'today' ? <Sun className="w-4 h-4" /> : <Inbox className="w-4 h-4" />}
+                  <span>{v === 'today' ? t('mobile.today', 'Heute') : t('mobile.inbox', 'Inbox')}</span>
+                  {(v === 'today' ? todayCount : inboxCount) > 0 && (
+                    <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ backgroundColor: plannerSubView === v ? 'rgba(255,255,255,0.25)' : `${accent}30`, color: plannerSubView === v ? '#fff' : accent }}>
+                      {v === 'today' ? todayCount : inboxCount}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          ) : pinColumns.length > 0 ? (
+            // Pins: Column tabs - 2 visible, horizontal scroll
+            <div 
+              className="flex rounded-xl p-1 gap-1 overflow-x-auto no-scrollbar" 
+              style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)' }}
+            >
+              {pinColumns.map((col, i) => (
+                <button
+                  key={col.id}
+                  onClick={() => {
+                    setPinsColumnIndex(i);
+                    if ('vibrate' in navigator) navigator.vibrate(10);
+                  }}
+                  className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-sm font-semibold transition-all"
+                  style={{
+                    // Each tab takes 50% width minus padding (for 2 visible tabs)
+                    flex: '0 0 calc(50% - 2px)',
+                    minWidth: 'calc(50% - 2px)',
+                    backgroundColor: pinsColumnIndex === i ? accent : 'transparent',
+                    color: pinsColumnIndex === i ? '#fff' : (isDarkMode ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.7)'),
+                  }}
+                >
+                  {col.color && (
+                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: col.color }} />
+                  )}
+                  <span className="truncate">{col.title}</span>
+                </button>
+              ))}
+            </div>
+          ) : (
+            // Pins: No columns
+            <div 
+              className="flex rounded-xl p-1" 
+              style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)' }}
+            >
+              <div className="flex-1 flex items-center justify-center py-2 px-3 text-sm" style={{ color: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)' }}>
+                {t('mobile.noPins', 'Keine Pins')}
+              </div>
             </div>
           )}
         </div>
@@ -659,9 +686,9 @@ export function MobileShell() {
                 disabled={isOffline}
                 onTap={() => setSelectedTask(task)}
                 onComplete={(e) => handleCompleteTask(task.id, e)}
-                onArchive={() => handleArchiveTask(task.id)}
+                onDelete={() => handleDeleteTask(task.id)}
                 isCompletingAnimation={completedAnimation === task.id}
-                isArchivingAnimation={archivedAnimation === task.id}
+                isDeletingAnimation={deletedAnimation === task.id}
                 isDragging={draggedTaskId === task.id}
                 isDragOver={dragOverTaskId === task.id}
                 onDragStart={(touchY) => handleDragStart(task.id, touchY)}
@@ -715,9 +742,11 @@ export function MobileShell() {
       {/* Undo Toast */}
       {undoState && (
         <div className="fixed bottom-24 left-4 right-4 z-50 rounded-xl overflow-hidden shadow-2xl" style={{ backgroundColor: isDarkMode ? '#1c1c1e' : '#fff', border: isDarkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)' }}>
-          <div className="h-1" style={{ width: `${undoProgress}%`, backgroundColor: accent, transition: 'width 100ms' }} />
+          <div className="h-1" style={{ width: `${undoProgress}%`, backgroundColor: undoState.action === 'delete' ? '#ef4444' : accent, transition: 'width 100ms' }} />
           <div className="flex items-center justify-between px-4 py-3">
-            <span className="text-sm font-medium" style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}>{t('mobile.taskArchived', 'Archiviert')}</span>
+            <span className="text-sm font-medium" style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}>
+              {undoState.action === 'delete' ? t('mobile.taskDeleted', 'Gelöscht') : t('mobile.taskCompleted', 'Erledigt & archiviert')}
+            </span>
             <button onClick={handleUndo} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold" style={{ backgroundColor: `${accent}15`, color: accent }}>
               <Undo2 className="w-4 h-4" />{t('mobile.undo', 'Rückgängig')}
             </button>
@@ -939,8 +968,8 @@ export function MobileShell() {
 // ===== TASK CARD =====
 interface TaskCardProps {
   task: Task; accent: string; isDarkMode: boolean; disabled: boolean;
-  onTap: () => void; onComplete: (e?: React.MouseEvent) => void; onArchive: () => void;
-  isCompletingAnimation: boolean; isArchivingAnimation: boolean;
+  onTap: () => void; onComplete: (e?: React.MouseEvent) => void; onDelete: () => void;
+  isCompletingAnimation: boolean; isDeletingAnimation: boolean;
   isDragging: boolean; isDragOver: boolean;
   onDragStart: (touchY: number) => void; 
   onDragMove: (touchY: number) => void; 
@@ -949,7 +978,7 @@ interface TaskCardProps {
   registerRef: (el: HTMLDivElement | null) => void;
 }
 
-function TaskCard({ task, accent, isDarkMode, disabled, onTap, onComplete, onArchive, isCompletingAnimation, isArchivingAnimation, isDragging, isDragOver, onDragStart, onDragMove, onDragEnd, getPriorityColor, registerRef }: TaskCardProps) {
+function TaskCard({ task, accent, isDarkMode, disabled, onTap, onComplete, onDelete, isCompletingAnimation, isDeletingAnimation, isDragging, isDragOver, onDragStart, onDragMove, onDragEnd, getPriorityColor, registerRef }: TaskCardProps) {
   const [swipeOffset, setSwipeOffset] = useState(0);
   const [isDraggingSwipe, setIsDraggingSwipe] = useState(false);
   const touchStartX = useRef<number | null>(null);
@@ -1005,8 +1034,8 @@ function TaskCard({ task, accent, isDarkMode, disabled, onTap, onComplete, onArc
     }
     else {
       setIsDraggingSwipe(false);
-      if (swipeOffset > SWIPE_THRESHOLD) onComplete();
-      else if (swipeOffset < -SWIPE_THRESHOLD) onArchive();
+      if (swipeOffset > SWIPE_THRESHOLD) onComplete(); // Swipe right = complete + archive
+      else if (swipeOffset < -SWIPE_THRESHOLD) onDelete(); // Swipe left = delete
       else if (!hasMoved.current && Math.abs(swipeOffset) < 10) onTap();
     }
     setSwipeOffset(0);
@@ -1015,7 +1044,7 @@ function TaskCard({ task, accent, isDarkMode, disabled, onTap, onComplete, onArc
   };
 
   const priorityColor = getPriorityColor(task.priority);
-  const animationClass = isCompletingAnimation ? 'animate-slide-out-right' : isArchivingAnimation ? 'animate-slide-out-left' : '';
+  const animationClass = isCompletingAnimation ? 'animate-slide-out-right' : isDeletingAnimation ? 'animate-slide-out-left' : '';
   const hasSubtasks = task.subtasks && task.subtasks.length > 0;
   const completedSubtasks = task.subtasks?.filter(s => s.completed).length || 0;
 
@@ -1030,13 +1059,13 @@ function TaskCard({ task, accent, isDarkMode, disabled, onTap, onComplete, onArc
         boxShadow: isDragOver ? `0 4px 12px ${accent}40` : 'none'
       }}
     >
-      {/* Swipe backgrounds */}
+      {/* Swipe backgrounds - Right: Complete+Archive (green), Left: Delete (red) */}
       <div className="absolute inset-0 flex">
         <div className="absolute inset-y-0 left-0 flex items-center pl-4" style={{ opacity: Math.min(swipeOffset / SWIPE_THRESHOLD, 1), backgroundColor: '#22c55e', width: Math.max(swipeOffset, 0) }}>
           <Check className="w-5 h-5 text-white" />
         </div>
         <div className="absolute inset-y-0 right-0 flex items-center justify-end pr-4" style={{ opacity: Math.min(-swipeOffset / SWIPE_THRESHOLD, 1), backgroundColor: '#ef4444', width: Math.max(-swipeOffset, 0) }}>
-          <Archive className="w-5 h-5 text-white" />
+          <X className="w-5 h-5 text-white" />
         </div>
       </div>
 
@@ -1053,11 +1082,6 @@ function TaskCard({ task, accent, isDarkMode, disabled, onTap, onComplete, onArc
         {priorityColor !== 'transparent' && <div className="absolute left-0 top-0 bottom-0 w-1" style={{ backgroundColor: priorityColor }} />}
         <div className="flex items-center gap-2 p-2.5 pl-3">
           <GripVertical className="w-3.5 h-3.5 flex-shrink-0 opacity-25" style={{ color: isDarkMode ? '#fff' : '#000' }} />
-          <button onClick={(e) => { e.stopPropagation(); onComplete(e); }} disabled={disabled} className="flex-shrink-0">
-            <div className="w-5 h-5 rounded-full border-2 flex items-center justify-center" style={{ borderColor: task.completed ? '#22c55e' : (disabled ? '#9ca3af' : accent), backgroundColor: task.completed ? '#22c55e' : 'transparent' }}>
-              {task.completed && <Check className="w-3 h-3 text-white" />}
-            </div>
-          </button>
           <div className="flex-1 min-w-0">
             <p className={`text-sm font-medium leading-tight truncate ${task.completed ? 'line-through opacity-50' : ''}`} style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}>{task.title}</p>
             {(hasSubtasks || task.description) && (
@@ -1077,9 +1101,10 @@ function TaskCard({ task, accent, isDarkMode, disabled, onTap, onComplete, onArc
 // ===== TASK DETAIL VIEW =====
 interface TaskDetailViewProps {
   task: Task; onClose: () => void; accent: string; isDarkMode: boolean; onComplete: () => void; isOffline: boolean;
+  onToggleSubtask: (subtaskId: string) => void;
 }
 
-function TaskDetailView({ task, onClose, accent, isDarkMode, onComplete, isOffline }: TaskDetailViewProps) {
+function TaskDetailView({ task, onClose, accent, isDarkMode, onComplete, isOffline, onToggleSubtask }: TaskDetailViewProps) {
   const hasSubtasks = task.subtasks && task.subtasks.length > 0;
   const completedSubtasks = task.subtasks?.filter(s => s.completed).length || 0;
 
@@ -1138,15 +1163,21 @@ function TaskDetailView({ task, onClose, accent, isDarkMode, onComplete, isOffli
             {/* Subtask list */}
             <div className="space-y-2">
               {task.subtasks!.map((subtask, index) => (
-                <div key={subtask.id || index} className="flex items-start gap-3 p-3 rounded-xl" style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' }}>
-                  <div className="w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5"
-                    style={{ borderColor: subtask.completed ? '#22c55e' : (isDarkMode ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.2)'), backgroundColor: subtask.completed ? '#22c55e' : 'transparent' }}>
+                <button 
+                  key={subtask.id || index} 
+                  onClick={() => subtask.id && onToggleSubtask(subtask.id)}
+                  disabled={isOffline || !subtask.id}
+                  className="w-full flex items-start gap-3 p-3 rounded-xl text-left transition-all active:scale-[0.98]" 
+                  style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' }}
+                >
+                  <div className="w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all"
+                    style={{ borderColor: subtask.completed ? '#22c55e' : accent, backgroundColor: subtask.completed ? '#22c55e' : 'transparent' }}>
                     {subtask.completed && <Check className="w-3 h-3 text-white" />}
                   </div>
                   <span className={`text-sm ${subtask.completed ? 'line-through opacity-50' : ''}`} style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}>
                     {subtask.title}
                   </span>
-                </div>
+                </button>
               ))}
             </div>
           </div>
