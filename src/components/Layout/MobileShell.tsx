@@ -209,6 +209,10 @@ export function MobileShell() {
 
   const handleAddTask = useCallback(() => {
     if (!newTaskText.trim() || isOffline) return;
+    
+    const todayDate = format(new Date(), 'yyyy-MM-dd');
+    const isToday = activeView === 'today';
+    
     const newTask: Task = {
       id: `mobile-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       title: newTaskText.trim(),
@@ -216,18 +220,23 @@ export function MobileShell() {
       completed: false,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      columnId: activeView === 'today' ? todayId : 'inbox',
+      columnId: isToday ? `date-${todayDate}` : 'inbox',
+      // Set reminderDate for "Today" tasks so they show the date
+      reminderDate: isToday ? todayDate : undefined,
       tags: [],
       subtasks: [],
       priority: 'medium',
       position: Date.now(),
     };
+    
     dispatch({ type: 'ADD_TASK', payload: newTask });
-    if (activeView === 'today') dispatch({ type: 'ENSURE_DATE_COLUMN', payload: format(new Date(), 'yyyy-MM-dd') });
+    if (isToday) {
+      dispatch({ type: 'ENSURE_DATE_COLUMN', payload: todayDate });
+    }
     setNewTaskText('');
     setIsAddingTask(false);
     if ('vibrate' in navigator) navigator.vibrate(10);
-  }, [newTaskText, activeView, todayId, dispatch, isOffline]);
+  }, [newTaskText, activeView, dispatch, isOffline]);
 
   const handleCompleteTask = useCallback((taskId: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
