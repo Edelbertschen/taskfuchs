@@ -54,9 +54,11 @@ export function MobileShell() {
   const [undoState, setUndoState] = useState<UndoState | null>(null);
   const [undoProgress, setUndoProgress] = useState(100);
 
-  // DnD State
+  // DnD State - Global drag tracking
   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
   const [dragOverTaskId, setDragOverTaskId] = useState<string | null>(null);
+  const taskRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const dragTouchY = useRef<number>(0);
 
   // Language & Design
   const language = state.preferences.language || 'de';
@@ -229,27 +231,62 @@ export function MobileShell() {
     setUndoState(null);
   }, [undoState, dispatch]);
 
-  const handleDragStart = useCallback((taskId: string) => {
-    if (isOffline) return;
-    setDraggedTaskId(taskId);
-    if ('vibrate' in navigator) navigator.vibrate(20);
-  }, [isOffline]);
+  // Find which task is under the touch point
+  const findTaskAtPosition = useCallback((y: number): string | null => {
+    for (const [taskId, element] of taskRefs.current.entries()) {
+      const rect = element.getBoundingClientRect();
+      if (y >= rect.top && y <= rect.bottom) {
+        return taskId;
+      }
+    }
+    return null;
+  }, []);
 
-  const handleDragOver = useCallback((taskId: string) => {
-    if (draggedTaskId && draggedTaskId !== taskId) setDragOverTaskId(taskId);
-  }, [draggedTaskId]);
+  const handleDragStart = useCallback((taskId: string, touchY: number) => {
+    setDraggedTaskId(taskId);
+    dragTouchY.current = touchY;
+    if ('vibrate' in navigator) navigator.vibrate(20);
+  }, []);
+
+  const handleDragMove = useCallback((touchY: number) => {
+    if (!draggedTaskId) return;
+    dragTouchY.current = touchY;
+    const taskUnderFinger = findTaskAtPosition(touchY);
+    if (taskUnderFinger && taskUnderFinger !== draggedTaskId) {
+      setDragOverTaskId(taskUnderFinger);
+    }
+  }, [draggedTaskId, findTaskAtPosition]);
 
   const handleDragEnd = useCallback(() => {
-    if (!draggedTaskId || !dragOverTaskId || isOffline) { setDraggedTaskId(null); setDragOverTaskId(null); return; }
+    if (!draggedTaskId || !dragOverTaskId) { 
+      setDraggedTaskId(null); 
+      setDragOverTaskId(null); 
+      return; 
+    }
+    
     const draggedTask = state.tasks.find(t => t.id === draggedTaskId);
     const targetTask = state.tasks.find(t => t.id === dragOverTaskId);
+    
     if (draggedTask && targetTask) {
-      dispatch({ type: 'UPDATE_TASK', payload: { ...draggedTask, position: targetTask.position, updatedAt: new Date().toISOString() } });
-      dispatch({ type: 'UPDATE_TASK', payload: { ...targetTask, position: draggedTask.position || Date.now(), updatedAt: new Date().toISOString() } });
+      // Swap positions
+      const draggedPos = draggedTask.position || 0;
+      const targetPos = targetTask.position || 0;
+      
+      dispatch({ 
+        type: 'UPDATE_TASK', 
+        payload: { ...draggedTask, position: targetPos, updatedAt: new Date().toISOString() } 
+      });
+      dispatch({ 
+        type: 'UPDATE_TASK', 
+        payload: { ...targetTask, position: draggedPos, updatedAt: new Date().toISOString() } 
+      });
+      
+      if ('vibrate' in navigator) navigator.vibrate(10);
     }
+    
     setDraggedTaskId(null);
     setDragOverTaskId(null);
-  }, [draggedTaskId, dragOverTaskId, state.tasks, dispatch, isOffline]);
+  }, [draggedTaskId, dragOverTaskId, state.tasks, dispatch]);
 
   const finishOnboarding = () => {
     localStorage.setItem(ONBOARDING_KEY, 'true');
@@ -288,7 +325,7 @@ export function MobileShell() {
       <div 
         className="absolute left-0 right-0 flex justify-center z-20 transition-all duration-200"
         style={{ 
-          top: `calc(env(safe-area-inset-top, 12px) + ${Math.min(pullDistance, 60)}px)`,
+          top: `calc(max(env(safe-area-inset-top, 20px), 44px) + ${Math.min(pullDistance, 60)}px)`,
           opacity: pullDistance > 20 ? 1 : 0,
           transform: `scale(${Math.min(pullDistance / 60, 1)})`,
         }}
@@ -298,8 +335,8 @@ export function MobileShell() {
         </div>
       </div>
 
-      {/* Header */}
-      <header className="relative z-10 flex-shrink-0" style={{ paddingTop: 'env(safe-area-inset-top, 12px)', transform: `translateY(${pullDistance * 0.3}px)` }}>
+      {/* Header - with proper iOS safe area */}
+      <header className="relative z-10 flex-shrink-0" style={{ paddingTop: 'max(env(safe-area-inset-top, 20px), 44px)', transform: `translateY(${pullDistance * 0.3}px)` }}>
         <div className="px-4 pt-2 pb-1">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-baseline gap-2 min-w-0">
@@ -372,10 +409,14 @@ export function MobileShell() {
               isArchivingAnimation={archivedAnimation === task.id}
               isDragging={draggedTaskId === task.id}
               isDragOver={dragOverTaskId === task.id}
-              onDragStart={() => handleDragStart(task.id)}
-              onDragOver={() => handleDragOver(task.id)}
+              onDragStart={(touchY) => handleDragStart(task.id, touchY)}
+              onDragMove={handleDragMove}
               onDragEnd={handleDragEnd}
               getPriorityColor={getPriorityColor}
+              registerRef={(el) => {
+                if (el) taskRefs.current.set(task.id, el);
+                else taskRefs.current.delete(task.id);
+              }}
             />
           ))}
         </div>
@@ -520,11 +561,14 @@ interface TaskCardProps {
   onTap: () => void; onComplete: (e?: React.MouseEvent) => void; onArchive: () => void;
   isCompletingAnimation: boolean; isArchivingAnimation: boolean;
   isDragging: boolean; isDragOver: boolean;
-  onDragStart: () => void; onDragOver: () => void; onDragEnd: () => void;
+  onDragStart: (touchY: number) => void; 
+  onDragMove: (touchY: number) => void; 
+  onDragEnd: () => void;
   getPriorityColor: (p: string | undefined) => string;
+  registerRef: (el: HTMLDivElement | null) => void;
 }
 
-function TaskCard({ task, accent, isDarkMode, disabled, onTap, onComplete, onArchive, isCompletingAnimation, isArchivingAnimation, isDragging, isDragOver, onDragStart, onDragOver, onDragEnd, getPriorityColor }: TaskCardProps) {
+function TaskCard({ task, accent, isDarkMode, disabled, onTap, onComplete, onArchive, isCompletingAnimation, isArchivingAnimation, isDragging, isDragOver, onDragStart, onDragMove, onDragEnd, getPriorityColor, registerRef }: TaskCardProps) {
   const [swipeOffset, setSwipeOffset] = useState(0);
   const [isDraggingSwipe, setIsDraggingSwipe] = useState(false);
   const touchStartX = useRef<number | null>(null);
@@ -542,14 +586,26 @@ function TaskCard({ task, accent, isDarkMode, disabled, onTap, onComplete, onArc
     isVerticalScroll.current = false;
     hasMoved.current = false;
     setIsDraggingSwipe(true);
-    longPressTimer.current = setTimeout(() => { setIsLongPress(true); onDragStart(); if ('vibrate' in navigator) navigator.vibrate(30); }, 500);
+    const startY = e.touches[0].clientY;
+    longPressTimer.current = setTimeout(() => { 
+      setIsLongPress(true); 
+      onDragStart(startY); 
+      if ('vibrate' in navigator) navigator.vibrate(30); 
+    }, 500);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (disabled || touchStartX.current === null || touchStartY.current === null) return;
     hasMoved.current = true;
+    
+    // If in long-press drag mode, track position globally
+    if (isLongPress) {
+      onDragMove(e.touches[0].clientY);
+      return;
+    }
+    
     if (longPressTimer.current) { clearTimeout(longPressTimer.current); longPressTimer.current = null; }
-    if (isLongPress) return;
+    
     const deltaX = e.touches[0].clientX - touchStartX.current;
     const deltaY = e.touches[0].clientY - touchStartY.current;
     if (!isVerticalScroll.current && Math.abs(deltaY) > Math.abs(deltaX) * 0.5) { isVerticalScroll.current = true; return; }
@@ -560,7 +616,10 @@ function TaskCard({ task, accent, isDarkMode, disabled, onTap, onComplete, onArc
 
   const handleTouchEnd = () => {
     if (longPressTimer.current) { clearTimeout(longPressTimer.current); longPressTimer.current = null; }
-    if (isLongPress) { onDragEnd(); setIsLongPress(false); }
+    if (isLongPress) { 
+      onDragEnd(); 
+      setIsLongPress(false); 
+    }
     else {
       setIsDraggingSwipe(false);
       if (swipeOffset > SWIPE_THRESHOLD) onComplete();
@@ -578,8 +637,16 @@ function TaskCard({ task, accent, isDarkMode, disabled, onTap, onComplete, onArc
   const completedSubtasks = task.subtasks?.filter(s => s.completed).length || 0;
 
   return (
-    <div className={`relative overflow-hidden rounded-xl ${animationClass}`} style={{ opacity: isDragging ? 0.5 : 1, transform: isDragOver ? 'scale(1.02)' : 'scale(1)', transition: 'transform 150ms' }}
-      onTouchMove={() => isLongPress && onDragOver()}>
+    <div 
+      ref={registerRef}
+      className={`relative overflow-hidden rounded-xl ${animationClass}`} 
+      style={{ 
+        opacity: isDragging ? 0.5 : 1, 
+        transform: isDragOver ? 'scale(1.02) translateY(-2px)' : 'scale(1)', 
+        transition: 'transform 150ms, box-shadow 150ms',
+        boxShadow: isDragOver ? `0 4px 12px ${accent}40` : 'none'
+      }}
+    >
       {/* Swipe backgrounds */}
       <div className="absolute inset-0 flex">
         <div className="absolute inset-y-0 left-0 flex items-center pl-4" style={{ opacity: Math.min(swipeOffset / SWIPE_THRESHOLD, 1), backgroundColor: '#22c55e', width: Math.max(swipeOffset, 0) }}>
@@ -633,7 +700,7 @@ function TaskDetailView({ task, onClose, accent, isDarkMode, onComplete, isOffli
   return (
     <div className="fixed inset-0 z-50 flex flex-col" style={{ backgroundColor: isDarkMode ? '#0a0a0a' : '#fafafa' }}>
       {/* Header */}
-      <header className="flex-shrink-0 flex items-center justify-between px-4 py-3" style={{ paddingTop: 'calc(env(safe-area-inset-top, 12px) + 12px)' }}>
+      <header className="flex-shrink-0 flex items-center justify-between px-4 py-3" style={{ paddingTop: 'calc(max(env(safe-area-inset-top, 20px), 44px) + 8px)' }}>
         <button onClick={onClose} className="p-2 -ml-2 rounded-full" style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }}>
           <X className="w-5 h-5" style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }} />
         </button>
