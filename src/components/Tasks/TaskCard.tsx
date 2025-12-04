@@ -18,7 +18,8 @@ import {
   FolderOpen,
   Minus,
   AlertCircle,
-  Pin
+  Pin,
+  Tag
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
@@ -916,10 +917,10 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
           </div>
         </div>
 
-        {/* Bottom area - Time, Subtasks and Context Badge */}
-        {!isFocusMode && ((hasAnyTimeEstimate || totalSubtasks > 0) || (taskProjectDisplay || taskDateDisplay)) && (
-          <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-            <div className="flex items-center space-x-1.5">
+        {/* Bottom area - Time, Subtasks, Tags and Context Badge */}
+        {!isFocusMode && ((hasAnyTimeEstimate || totalSubtasks > 0) || (taskProjectDisplay || taskDateDisplay) || (task.tags && task.tags.length > 0)) && (
+          <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mt-1 gap-2">
+            <div className="flex items-center space-x-1.5 flex-shrink-0">
               {/* Time display - show if task has time estimate OR tracked time */}
               {(() => {
                 const estimatedTimeStr = formatTime(totalEstimatedTime);
@@ -949,10 +950,43 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
                 </div>
               )}
             </div>
+            
+            {/* Tags - elegant small pills */}
+            {task.tags && task.tags.length > 0 && (
+              <div className="flex items-center gap-1 flex-1 min-w-0 overflow-hidden">
+                <Tag className="w-2.5 h-2.5 flex-shrink-0 opacity-60" />
+                <div className="flex items-center gap-1 overflow-hidden">
+                  {task.tags.slice(0, 3).map((tag, index) => (
+                    <span
+                      key={index}
+                      className={`inline-flex items-center px-1.5 py-0 text-[10px] font-medium rounded-full truncate max-w-[60px] transition-opacity ${
+                        task.completed ? 'opacity-60' : 'opacity-80 hover:opacity-100'
+                      }`}
+                      style={{
+                        backgroundColor: task.completed ? '#E5E7EB' : `${accentColor}20`,
+                        color: task.completed ? '#6B7280' : accentColor,
+                      }}
+                      title={tag}
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                  {task.tags.length > 3 && (
+                    <span 
+                      className="text-[10px] opacity-60"
+                      title={task.tags.slice(3).join(', ')}
+                    >
+                      +{task.tags.length - 3}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+            
             {/* Context Badge - moved here to align with time row */}
             {(taskProjectDisplay || taskDateDisplay) && (
               <span 
-                className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-md transition-opacity ${
+                className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-md transition-opacity flex-shrink-0 ${
                   task.completed ? 'opacity-70' : 'opacity-80 hover:opacity-100'
                 }`}
                 style={{
