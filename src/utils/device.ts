@@ -23,12 +23,25 @@ export function isMobileViewport(): boolean {
 }
 
 export function isMobilePWAEnvironment(): boolean {
-  // Only allow MobileShell when:
-  // - running standalone PWA on a mobile UA, or
-  // - mobile UA with narrow viewport
-  const ua = (navigator.userAgent || '').toLowerCase();
-  const isMobileUA = /android|iphone|ipad|ipod|mobile|windows phone/.test(ua);
-  return (isStandalonePWA() && isMobileUA) || isMobileViewport();
+  // Debug: Allow forcing mobile view with ?mobile=true query param (dev only)
+  if (typeof window !== 'undefined') {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('mobile') === 'true') {
+      return true;
+    }
+  }
+  
+  // Mobile companion app - only in browser on mobile devices
+  // NO standalone PWA mode to ensure proper sync with online app
+  // Only show mobile view when accessing via mobile browser (not installed PWA)
+  if (isStandalonePWA()) {
+    // If running as installed PWA, don't use mobile shell
+    // This avoids sync issues - users should use the browser version
+    return false;
+  }
+  
+  // Only allow MobileShell for mobile browsers with narrow viewport
+  return isMobileViewport();
 }
 
 

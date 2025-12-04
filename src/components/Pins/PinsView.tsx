@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef, useLayoutEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { createPortal } from 'react-dom';
 import { useAppTranslation } from '../../utils/i18nHelpers';
@@ -133,6 +133,11 @@ export function PinsView() {
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [activeColumn, setActiveColumn] = useState<PinColumnType | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
+  
+  // ✨ ANTI-JITTER: Stabilized overId with debounce to prevent rapid updates
+  const [stableOverId, setStableOverId] = useState<string | null>(null);
+  const overIdStabilizeRef = useRef<NodeJS.Timeout | null>(null);
+  const lastOverIdRef = useRef<string | null>(null);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [editingColumnId, setEditingColumnId] = useState<string | null>(null);
@@ -159,6 +164,15 @@ export function PinsView() {
   
   useEffect(() => {
     setMounted(true);
+  }, []);
+  
+  // ✨ ANTI-JITTER: Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (overIdStabilizeRef.current) {
+        clearTimeout(overIdStabilizeRef.current);
+      }
+    };
   }, []);
   
   // Listen for filter toggle event from Header
@@ -480,8 +494,26 @@ export function PinsView() {
   };
 
   const handleDragOver = (event: DragOverEvent) => {
-    const { active, over } = event;
-    setOverId(over ? over.id as string : null);
+    const { over } = event;
+    const newOverId = over ? over.id as string : null;
+    
+    // ✨ ANTI-JITTER: Only update if overId actually changed
+    if (newOverId === lastOverIdRef.current) return;
+    lastOverIdRef.current = newOverId;
+    
+    // Clear any pending stabilization
+    if (overIdStabilizeRef.current) {
+      clearTimeout(overIdStabilizeRef.current);
+    }
+    
+    // Set raw overId immediately for responsive feedback
+    setOverId(newOverId);
+    
+    // ✨ STABILIZED: Debounce the stable overId to prevent rapid flickering
+    // This prevents the drop indicator from flickering when moving between elements
+    overIdStabilizeRef.current = setTimeout(() => {
+      setStableOverId(newOverId);
+    }, 16); // ~1 frame delay for stability without noticeable lag
   };
 
   // Helper function to normalize task positions in pin columns
@@ -515,6 +547,14 @@ export function PinsView() {
     setActiveTask(null);
     setActiveColumn(null);
     setOverId(null);
+    setStableOverId(null);
+    lastOverIdRef.current = null;
+    
+    // Clear any pending stabilization timer
+    if (overIdStabilizeRef.current) {
+      clearTimeout(overIdStabilizeRef.current);
+      overIdStabilizeRef.current = null;
+    }
 
     if (!over) return;
 
@@ -833,12 +873,12 @@ export function PinsView() {
           <TaskColumn
             column={columnForTaskColumn}
             tasks={tasks}
-            overId={overId}
+            overId={stableOverId} // ✨ Use stabilized overId to prevent jitter
             activeTask={activeTask}
             activeColumn={activeColumn}
             onSmartTaskAdd={undefined} // Disabled for pins
             showCompletedTasks={state.showCompletedTasks}
-            isProjectColumn={false}
+            isProjectColumn={true} // ✨ Treat pins like projects for immediate updates
             isEditing={editingColumnId === column.id}
             editingTitle={editingColumnTitle}
             onStartEdit={handleStartEditColumn}

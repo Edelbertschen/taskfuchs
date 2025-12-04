@@ -302,9 +302,9 @@ function MainApp() {
     window.dispatchEvent(new CustomEvent('column-navigate', { detail: { direction } }));
   }, []);
 
-  // Mobile: Show coming soon page until mobile version is ready
+  // Mobile: Show elegant mobile companion app
   if (isMobilePWAEnvironment()) {
-    return <MobileComingSoon />;
+    return <MobileShell />;
   }
 
   // Quick navigation with subtle fade/morph effect

@@ -10,38 +10,47 @@ export function DropIndicator({ isVisible, position }: DropIndicatorProps) {
   const { state } = useApp();
   const accentColor = state.preferences.accentColor || '#0ea5e9';
   
-  if (!isVisible) return null;
-
+  // ✨ ANTI-JITTER FIX: Always render the container with fixed height
+  // Only toggle visibility of inner content to prevent layout shifts
   return (
     <div 
       className="w-full"
       style={{
-        height: isVisible ? '74px' : '0px', // Dynamic height to prevent column extension
-        opacity: isVisible ? 1 : 0,
-        transition: 'none', // No transitions for instant response
+        // ✨ Fixed height container - prevents layout shifts when toggling visibility
+        height: '8px', // Small fixed height that doesn't disrupt layout
+        minHeight: '8px',
+        maxHeight: isVisible ? '74px' : '8px',
+        opacity: 1,
+        // ✨ Smooth height transition only when becoming visible
+        transition: isVisible ? 'max-height 150ms ease-out' : 'max-height 100ms ease-in',
         overflow: 'hidden',
         transform: 'translateZ(0)',
-        willChange: 'auto', // Let browser optimize
-        pointerEvents: 'none', // Never interfere with interactions
-        // Anti-flicker: Force immediate layout update
-        contain: 'layout size style',
+        willChange: 'max-height',
+        pointerEvents: 'none',
+        contain: 'layout style',
       }}
     >
-      {/* ✨ Elegant Drop Space - Like iOS */}
+      {/* ✨ Inner content - only visible when dropping */}
       <div 
-        className="w-full h-full rounded-lg border-2 border-dashed flex items-center justify-center"
+        className="w-full rounded-lg border-2 border-dashed flex items-center justify-center"
         style={{
-          borderColor: `${accentColor}60`,
-          backgroundColor: `${accentColor}08`,
-          transition: 'none', // No transitions on inner element
-          transform: 'translateZ(0)', // GPU acceleration
-          contain: 'layout style', // Optimize rendering
+          height: '74px',
+          borderColor: isVisible ? `${accentColor}60` : 'transparent',
+          backgroundColor: isVisible ? `${accentColor}08` : 'transparent',
+          opacity: isVisible ? 1 : 0,
+          transition: 'opacity 100ms ease-out, border-color 100ms ease-out, background-color 100ms ease-out',
+          transform: 'translateZ(0)',
+          contain: 'layout style',
         }}
       >
         {/* Simple, elegant drop hint */}
         <div 
-          className="text-sm font-medium opacity-60"
-          style={{ color: accentColor }}
+          className="text-sm font-medium"
+          style={{ 
+            color: accentColor,
+            opacity: isVisible ? 0.6 : 0,
+            transition: 'opacity 100ms ease-out',
+          }}
         >
           Drop here
         </div>

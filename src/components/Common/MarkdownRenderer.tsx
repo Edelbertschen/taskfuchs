@@ -163,6 +163,9 @@ export function MarkdownRenderer({ content, className = '', onCheckboxChange, em
     const isCollapsed = collapsedSections.has(section.id);
     const HeadingTag = `h${section.level}` as keyof JSX.IntrinsicElements;
     
+    // Track if user is selecting text to prevent toggle on text selection
+    const mouseDownPosRef = React.useRef<{ x: number; y: number } | null>(null);
+    
     const headingClasses = {
       1: "text-3xl font-bold mb-6 mt-12 first:mt-0 pb-3 border-b-2 border-gray-200 dark:border-gray-700",
       2: "text-2xl font-semibold mb-4 mt-10 first:mt-0 pb-2 border-b border-gray-200 dark:border-gray-700",
@@ -172,14 +175,38 @@ export function MarkdownRenderer({ content, className = '', onCheckboxChange, em
       6: "text-sm font-medium mb-2 mt-4 first:mt-0"
     };
     
+    // Only toggle if it was a genuine click, not a text selection
+    const handleClick = (e: React.MouseEvent) => {
+      // Check if text is selected - if so, don't toggle
+      const selection = window.getSelection();
+      if (selection && selection.toString().length > 0) {
+        return;
+      }
+      
+      // Check if mouse moved significantly (indicating drag/selection)
+      if (mouseDownPosRef.current) {
+        const dx = Math.abs(e.clientX - mouseDownPosRef.current.x);
+        const dy = Math.abs(e.clientY - mouseDownPosRef.current.y);
+        if (dx > 5 || dy > 5) {
+          // Mouse moved too much - likely a selection attempt
+          return;
+        }
+      }
+      
+      toggleSection(section.id);
+    };
+    
     return (
-      <div className="collapsible-section">
+      <div className="collapsible-section" style={{ userSelect: 'text', WebkitUserSelect: 'text' }}>
         <HeadingTag 
           className={`${headingClasses[section.level as keyof typeof headingClasses]} cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-2 group`}
-          style={{ color: section.level === 1 ? getAccentColorStyles().text.color : undefined }}
-          onClick={() => toggleSection(section.id)}
+          style={{ color: section.level === 1 ? getAccentColorStyles().text.color : undefined, userSelect: 'text', WebkitUserSelect: 'text' }}
+          onMouseDown={(e) => {
+            mouseDownPosRef.current = { x: e.clientX, y: e.clientY };
+          }}
+          onClick={handleClick}
         >
-          <span className="transition-transform duration-200">
+          <span className="transition-transform duration-200 flex-shrink-0 select-none" style={{ userSelect: 'none' }}>
             {isCollapsed ? (
               <ChevronRight className="w-5 h-5 text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300" />
             ) : (
@@ -187,15 +214,18 @@ export function MarkdownRenderer({ content, className = '', onCheckboxChange, em
             )}
           </span>
           <span className="flex-1">{section.title}</span>
-          <span className="text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
+          <span className="text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity select-none" style={{ userSelect: 'none' }}>
             {isCollapsed ? 'Aufklappen' : 'Einklappen'}
           </span>
         </HeadingTag>
         
-        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
-          isCollapsed ? 'max-h-0 opacity-0' : 'max-h-none opacity-100'
-        }`}>
-          <div className={isCollapsed ? 'pointer-events-none' : ''}>
+        <div 
+          className={`overflow-hidden transition-all duration-300 ease-in-out ${
+            isCollapsed ? 'max-h-0 opacity-0' : 'max-h-none opacity-100'
+          }`}
+          style={{ userSelect: 'text', WebkitUserSelect: 'text' }}
+        >
+          <div className={isCollapsed ? 'pointer-events-none' : ''} style={{ userSelect: 'text', WebkitUserSelect: 'text' }}>
             {children}
           </div>
         </div>
@@ -759,7 +789,7 @@ export function MarkdownRenderer({ content, className = '', onCheckboxChange, em
     const processedContent = preprocessContentForImages(content);
     
     return (
-      <div className={`markdown-renderer ${className}`}>
+      <div className={`markdown-renderer ${className}`} style={{ userSelect: 'text', WebkitUserSelect: 'text' }}>
         <ReactMarkdown 
           remarkPlugins={[remarkGfm]}
           components={{
@@ -1116,7 +1146,7 @@ export function MarkdownRenderer({ content, className = '', onCheckboxChange, em
 
   // Render collapsible sections
   return (
-    <div className={`markdown-renderer ${className}`}>
+    <div className={`markdown-renderer ${className}`} style={{ userSelect: 'text', WebkitUserSelect: 'text' }}>
       {sections.map((section) => {
         const sectionContent = preprocessContentForImages(section.content);
         

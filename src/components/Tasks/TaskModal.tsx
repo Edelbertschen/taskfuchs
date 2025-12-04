@@ -2822,7 +2822,14 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
 
                     {/* Preview content */}
                     {isDescriptionPreviewMode && (
-                      <div className="text-gray-900 dark:text-white text-sm leading-relaxed p-4 wysiwyg-content overflow-y-auto max-h-44">
+                      <div 
+                        className="text-gray-900 dark:text-white text-sm leading-relaxed p-4 wysiwyg-content overflow-y-auto max-h-44"
+                        style={{ 
+                          userSelect: 'text',
+                          WebkitUserSelect: 'text',
+                          cursor: 'text'
+                        }}
+                      >
                         {!formData.description?.trim() && (
                           <span className="text-gray-400 dark:text-gray-500 text-sm italic opacity-60">
                             Keine Beschreibung

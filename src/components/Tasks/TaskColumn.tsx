@@ -122,14 +122,15 @@ const TaskColumn = React.memo(({
   const [stableOverId, setStableOverId] = useState<string | null>(null);
   const stabilizeTimeoutRef = useRef<NodeJS.Timeout>();
 
-  // ✨ ULTRA-ANTI-FLICKER: Immediate updates for projects
+  // ✨ ULTRA-ANTI-FLICKER: Immediate updates for projects and pins
   useEffect(() => {
     if (stabilizeTimeoutRef.current) {
       clearTimeout(stabilizeTimeoutRef.current);
     }
     
-    // For project columns: immediate updates to prevent any flicker
-    if (isProjectColumn) {
+    // For project columns and pin columns: immediate updates to prevent any flicker
+    // Pin columns already provide stabilized overId from PinsView
+    if (isProjectColumn || isPinColumn) {
       setStableOverId(overId);
       return;
     }
@@ -144,7 +145,7 @@ const TaskColumn = React.memo(({
         clearTimeout(stabilizeTimeoutRef.current);
       }
     };
-  }, [overId, isProjectColumn]);
+  }, [overId, isProjectColumn, isPinColumn]);
 
   const { 
     setNodeRef, 
@@ -830,7 +831,7 @@ const TaskColumn = React.memo(({
 
         {/* Tasks Drop Zone */}
         <div 
-          className={`px-2 pt-2 pb-2 ${isProjectColumn ? '' : 'transition-all duration-300'} flex-1 hidden-scrollbar ${
+          className={`px-2 pt-2 pb-2 ${(isProjectColumn || isPinColumn) ? '' : 'transition-all duration-300'} flex-1 hidden-scrollbar ${
             isValidDropTarget 
               ? 'bg-gradient-to-b from-accent/10 to-accent/5 border-2 border-accent/30 border-dashed rounded-lg mx-1' 
               : ''
@@ -844,8 +845,8 @@ const TaskColumn = React.memo(({
             maxHeight: 'calc(100vh - 200px)',
             overflowY: 'auto',
             contain: 'layout style', // Optimize browser rendering
-            // ✨ ULTRA-STABLE: Force immediate rendering for projects
-            willChange: isProjectColumn ? 'auto' : 'transform',
+            // ✨ ULTRA-STABLE: Force immediate rendering for projects and pins
+            willChange: (isProjectColumn || isPinColumn) ? 'auto' : 'transform',
           }}
         >
           

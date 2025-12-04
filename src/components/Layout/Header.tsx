@@ -1210,8 +1210,8 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
                 
                 {/* Profile Button (removed for planner - moved to sidebar header) */}
                 
-                {/* Dreipunkt-Menu - Hide in views without menu items (e.g., inbox) */}
-                {currentView !== 'inbox' && (
+                {/* Dreipunkt-Menu - Only show in views with menu items (kanban, tasks) */}
+                {(currentView === 'kanban' || currentView === 'tasks') && (
                 <div ref={moreMenuRef} className="relative">
                   <button
                     onClick={() => setShowMoreMenu(!showMoreMenu)}
@@ -1399,9 +1399,9 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
               </>
             )}
             
-            {isGuest() && (
+            {isGuest() && (currentView === 'kanban' || currentView === 'tasks') && (
               <>
-                {/* Dreipunkt-Menu for Guests */}
+                {/* Dreipunkt-Menu for Guests - Only show in views with menu items */}
                 <div ref={moreMenuRef} className="relative">
                   <button
                     onClick={() => setShowMoreMenu(!showMoreMenu)}
