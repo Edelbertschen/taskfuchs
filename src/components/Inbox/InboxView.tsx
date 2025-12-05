@@ -1482,9 +1482,9 @@ export function InboxView() {
             }`}
             style={isEmailDragOver ? { 
               borderColor: accentColor,
-              ringColor: accentColor,
+              '--tw-ring-color': accentColor,
               backgroundColor: `${accentColor}10`
-            } : undefined}
+            } as React.CSSProperties : undefined}
             onDragOver={handleEmailDragOver}
             onDragLeave={handleEmailDragLeave}
             onDrop={handleEmailDrop}
