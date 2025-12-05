@@ -2831,7 +2831,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                     {/* Preview content */}
                     {isDescriptionPreviewMode && (
                       <div 
-                        className="text-gray-900 dark:text-white leading-relaxed p-4 wysiwyg-content overflow-y-auto max-h-44"
+                        className="text-gray-900 dark:text-white leading-relaxed p-4 wysiwyg-content overflow-y-auto max-h-64"
                         style={{ 
                           userSelect: 'text',
                           WebkitUserSelect: 'text',

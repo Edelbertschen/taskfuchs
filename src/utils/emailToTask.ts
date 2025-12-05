@@ -15,7 +15,7 @@ function getOutlookLink(email: OutlookEmail): string {
 /**
  * Creates a task from an Outlook email.
  * - Title: Email subject
- * - Description: From, To, Subject, Date metadata + Outlook deep link (NO body content)
+ * - Description: From + Date metadata + Outlook deep link (NO body content)
  * - If dropped on date column: sets dueDate to that date
  * - If dropped on inbox/other: no date
  */
@@ -26,18 +26,16 @@ export function createTaskFromEmail(
   // Get the Outlook link (note: may break if email is moved/archived)
   const outlookLink = getOutlookLink(email);
   
-  // Format recipients
-  const toList = email.toRecipients
-    .map(r => r.emailAddress.name || r.emailAddress.address)
-    .join(', ');
+  // Format sender
+  const senderName = email.from.emailAddress.name || email.from.emailAddress.address;
+  const senderEmail = email.from.emailAddress.address;
   
   // Format date
   const receivedDate = new Date(email.receivedDateTime).toLocaleString();
   
   // Build description with metadata (NO body content)
-  const description = `**From:** ${email.from.emailAddress.name || email.from.emailAddress.address} <${email.from.emailAddress.address}>
-**To:** ${toList}
-**Subject:** ${email.subject}
+  // Removed 'To' (it's always the user) and 'Subject' (it's the task title)
+  const description = `**From:** ${senderName} <${senderEmail}>
 **Date:** ${receivedDate}
 
 ---
