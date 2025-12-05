@@ -14,15 +14,17 @@ function getPermanentOutlookLink(email: OutlookEmail): string {
   // The internetMessageId is the RFC 2822 Message-ID header - truly immutable
   // Format: <unique-id@domain.com>
   if (email.internetMessageId) {
-    // Use Outlook's search to find the email by its Message-ID
-    // This works regardless of which folder the email is in
-    const searchQuery = `messageid:${email.internetMessageId}`;
-    return `https://outlook.office.com/mail/search?q=${encodeURIComponent(searchQuery)}`;
+    // Use Outlook's deep search link format
+    // The 0 in the path refers to the default mailbox
+    // Quote the message ID for exact match
+    const quotedId = `"${email.internetMessageId}"`;
+    return `https://outlook.office.com/mail/0/search?q=messageid:${encodeURIComponent(quotedId)}`;
   }
   
-  // Fallback: use conversationId for a conversation-based link
-  if (email.conversationId) {
-    return `https://outlook.office.com/mail/search?q=conversationid:${encodeURIComponent(email.conversationId)}`;
+  // Fallback: search by subject (more reliable than conversationId)
+  if (email.subject) {
+    const subjectSearch = `subject:"${email.subject}"`;
+    return `https://outlook.office.com/mail/0/search?q=${encodeURIComponent(subjectSearch)}`;
   }
   
   // Last resort: use the webLink (will break if email is moved)
