@@ -7,18 +7,18 @@ import type { Task, Column } from '../types';
  * The problem: Microsoft Graph API's message `id` changes when an email is moved between folders.
  * The `webLink` also breaks because it contains the folder path.
  * 
- * The solution: Use the `internetMessageId` (RFC 2822 Message-ID header) in the OWA ItemID parameter.
- * According to Microsoft, this format opens the email directly regardless of folder location.
- * Reference: https://learn.microsoft.com/en-us/answers/questions/2872a6ea-4775-4d30-8226-fc613d115505/
+ * The solution: Use the Outlook deeplink/read format with internetMessageId.
+ * Format: outlook.office.com/mail/deeplink/read/{internetMessageId}?ItemID={internetMessageId}&exvsurl=1
+ * This opens the email directly and works even after the email is moved/archived.
  */
 function getPermanentOutlookLink(email: OutlookEmail): string {
   // The internetMessageId is the RFC 2822 Message-ID header - truly immutable
   // Format: <unique-id@domain.com>
   if (email.internetMessageId) {
-    // Use OWA direct item access with internetMessageId
-    // This format opens the email directly without searching
+    // Use Outlook's deeplink/read format which works with internetMessageId
+    // This opens the email directly regardless of which folder it's in
     const encodedId = encodeURIComponent(email.internetMessageId);
-    return `https://outlook.office.com/owa/?ItemID=${encodedId}&exvsurl=1&viewmodel=ReadMessageItem`;
+    return `https://outlook.office.com/mail/deeplink/read/${encodedId}?ItemID=${encodedId}&exvsurl=1`;
   }
   
   // Fallback: use the webLink (will break if email is moved, but better than nothing)
