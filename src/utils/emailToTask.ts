@@ -3,21 +3,30 @@ import type { Task, Column } from '../types';
 
 /**
  * Constructs a permanent Outlook link that works regardless of which folder the email is in.
- * The webLink from Graph API is folder-dependent and breaks when emails are moved/archived.
- * This format uses the OWA direct ItemID lookup which is folder-independent.
+ * 
+ * The problem: Microsoft Graph API's message `id` changes when an email is moved between folders.
+ * The `webLink` also breaks because it contains the folder path.
+ * 
+ * The solution: Use the `internetMessageId` (RFC 2822 Message-ID header) which is truly immutable.
+ * We create a search-based link that finds the email by its Message-ID regardless of folder.
  */
 function getPermanentOutlookLink(email: OutlookEmail): string {
-  // Extract the message ID from webLink or use the raw id
-  // The webLink format is: https://outlook.office.com/mail/{folder}/id/{messageId}
-  // We extract the ID and use the OWA direct lookup format which is folder-independent
-  const messageId = email.id;
+  // The internetMessageId is the RFC 2822 Message-ID header - truly immutable
+  // Format: <unique-id@domain.com>
+  if (email.internetMessageId) {
+    // Use Outlook's search to find the email by its Message-ID
+    // This works regardless of which folder the email is in
+    const searchQuery = `messageid:${email.internetMessageId}`;
+    return `https://outlook.office.com/mail/search?q=${encodeURIComponent(searchQuery)}`;
+  }
   
-  // URL-encode the message ID for the OWA link
-  const encodedId = encodeURIComponent(messageId);
+  // Fallback: use conversationId for a conversation-based link
+  if (email.conversationId) {
+    return `https://outlook.office.com/mail/search?q=conversationid:${encodeURIComponent(email.conversationId)}`;
+  }
   
-  // OWA format that works regardless of folder location
-  // This format directly looks up the item by ID without needing folder context
-  return `https://outlook.office.com/owa/?ItemID=${encodedId}&exvsurl=1&viewmodel=ReadMessageItem`;
+  // Last resort: use the webLink (will break if email is moved)
+  return email.webLink;
 }
 
 /**
