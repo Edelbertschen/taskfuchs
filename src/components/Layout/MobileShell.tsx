@@ -77,6 +77,12 @@ export function MobileShell() {
       window.removeEventListener('orientationchange', handleResize);
     };
   }, []);
+
+  // Pin columns - moved up to avoid TDZ (temporal dead zone) error
+  const pinColumns = useMemo(() => 
+    [...(state.pinColumns || [])].sort((a, b) => (a.order || 0) - (b.order || 0)),
+    [state.pinColumns]
+  );
   
   // Auto-scroll pins tabs to show active column
   useEffect(() => {
@@ -236,11 +242,7 @@ export function MobileShell() {
   const todayCount = todayTasks.filter(t => !t.completed).length;
   const inboxCount = inboxTasks.filter(t => !t.completed).length;
   
-  // Pin columns and tasks
-  const pinColumns = useMemo(() => 
-    [...(state.pinColumns || [])].sort((a, b) => (a.order || 0) - (b.order || 0)),
-    [state.pinColumns]
-  );
+  // Pin columns tasks
   const currentPinColumn = pinColumns[pinsColumnIndex];
   const pinTasks = useMemo(() => {
     if (!currentPinColumn) return [];
@@ -404,7 +406,7 @@ export function MobileShell() {
     // Apply active filters to new task
     const filterTags = activeTagFilters || [];
     const filterPriorities = activePriorityFilters || [];
-    const finalPriority = filterPriorities.length === 1 ? filterPriorities[0] : undefined;
+    const finalPriority = filterPriorities.length === 1 ? filterPriorities[0] as Task['priority'] : undefined;
     
     const newTask: Task = {
       id: `mobile-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -560,17 +562,7 @@ export function MobileShell() {
     }
   }, [mainView, plannerSubView, pinsColumnIndex, pinColumns.length]);
 
-  // Onboarding Screen
-  if (showOnboarding) {
-    return <OnboardingScreen step={onboardingStep} setStep={setOnboardingStep} onFinish={finishOnboarding} accent={accent} isDarkMode={isDarkMode} />;
-  }
-
-  // Not logged in - show the same login page as desktop
-  if (!isLoggedIn && !isOffline) {
-    return <LoginPage />;
-  }
-
-  // Handler for toggling subtasks
+  // Handler for toggling subtasks - must be before early returns
   const handleToggleSubtask = useCallback((subtaskId: string) => {
     if (!selectedTask || isOffline) return;
     const updatedSubtasks = selectedTask.subtasks?.map(s => 
@@ -581,6 +573,16 @@ export function MobileShell() {
     setSelectedTask(updatedTask); // Update local state so UI updates immediately
     if ('vibrate' in navigator) navigator.vibrate(10);
   }, [selectedTask, dispatch, isOffline]);
+
+  // Onboarding Screen
+  if (showOnboarding) {
+    return <OnboardingScreen step={onboardingStep} setStep={setOnboardingStep} onFinish={finishOnboarding} accent={accent} isDarkMode={isDarkMode} />;
+  }
+
+  // Not logged in - show the same login page as desktop
+  if (!isLoggedIn && !isOffline) {
+    return <LoginPage />;
+  }
 
   // Task Detail View
   if (selectedTask) {
