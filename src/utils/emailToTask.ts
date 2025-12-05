@@ -7,27 +7,21 @@ import type { Task, Column } from '../types';
  * The problem: Microsoft Graph API's message `id` changes when an email is moved between folders.
  * The `webLink` also breaks because it contains the folder path.
  * 
- * The solution: Use the `internetMessageId` (RFC 2822 Message-ID header) which is truly immutable.
- * We create a search-based link that finds the email by its Message-ID regardless of folder.
+ * The solution: Use the `internetMessageId` (RFC 2822 Message-ID header) in the OWA ItemID parameter.
+ * According to Microsoft, this format opens the email directly regardless of folder location.
+ * Reference: https://learn.microsoft.com/en-us/answers/questions/2872a6ea-4775-4d30-8226-fc613d115505/
  */
 function getPermanentOutlookLink(email: OutlookEmail): string {
   // The internetMessageId is the RFC 2822 Message-ID header - truly immutable
   // Format: <unique-id@domain.com>
   if (email.internetMessageId) {
-    // Use Outlook's deep search link format
-    // The 0 in the path refers to the default mailbox
-    // Quote the message ID for exact match
-    const quotedId = `"${email.internetMessageId}"`;
-    return `https://outlook.office.com/mail/0/search?q=messageid:${encodeURIComponent(quotedId)}`;
+    // Use OWA direct item access with internetMessageId
+    // This format opens the email directly without searching
+    const encodedId = encodeURIComponent(email.internetMessageId);
+    return `https://outlook.office.com/owa/?ItemID=${encodedId}&exvsurl=1&viewmodel=ReadMessageItem`;
   }
   
-  // Fallback: search by subject (more reliable than conversationId)
-  if (email.subject) {
-    const subjectSearch = `subject:"${email.subject}"`;
-    return `https://outlook.office.com/mail/0/search?q=${encodeURIComponent(subjectSearch)}`;
-  }
-  
-  // Last resort: use the webLink (will break if email is moved)
+  // Fallback: use the webLink (will break if email is moved, but better than nothing)
   return email.webLink;
 }
 
