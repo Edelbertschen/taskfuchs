@@ -87,8 +87,8 @@ interface TaskColumnProps {
   isPinColumn?: boolean;
   // Column manager handler
   onColumnManager?: () => void;
-  // Email drag-and-drop handler
-  onEmailDrop?: (email: OutlookEmail, column: Column) => void;
+  // Email drag-and-drop handler (position is the index where the task should be inserted)
+  onEmailDrop?: (email: OutlookEmail, column: Column, position: number) => void;
 }
 
 const TaskColumn = React.memo(({
@@ -157,32 +157,57 @@ const TaskColumn = React.memo(({
   
   // Email drag-and-drop state
   const [isEmailDragOver, setIsEmailDragOver] = useState(false);
+  const [emailDropIndex, setEmailDropIndex] = useState<number>(-1);
+  const taskListRef = useRef<HTMLDivElement>(null);
 
-  // Email drag-and-drop handlers
+  // Email drag-and-drop handlers with position tracking
   const handleEmailDragOver = (e: React.DragEvent) => {
     if (e.dataTransfer.types.includes(EMAIL_DRAG_TYPE)) {
       e.preventDefault();
       e.dataTransfer.dropEffect = 'copy';
       setIsEmailDragOver(true);
+      
+      // Calculate drop position based on cursor Y position
+      if (taskListRef.current) {
+        const taskElements = taskListRef.current.querySelectorAll('[data-task-index]');
+        const cursorY = e.clientY;
+        let insertIndex = tasks.length; // Default to end
+        
+        for (let i = 0; i < taskElements.length; i++) {
+          const taskEl = taskElements[i] as HTMLElement;
+          const rect = taskEl.getBoundingClientRect();
+          const taskMiddle = rect.top + rect.height / 2;
+          
+          if (cursorY < taskMiddle) {
+            insertIndex = parseInt(taskEl.dataset.taskIndex || '0', 10);
+            break;
+          }
+        }
+        
+        setEmailDropIndex(insertIndex);
+      }
     }
   };
 
   const handleEmailDragLeave = (e: React.DragEvent) => {
     if (!e.currentTarget.contains(e.relatedTarget as Node)) {
       setIsEmailDragOver(false);
+      setEmailDropIndex(-1);
     }
   };
 
   const handleEmailDrop = (e: React.DragEvent) => {
     e.preventDefault();
+    const dropPosition = emailDropIndex >= 0 ? emailDropIndex : tasks.length;
     setIsEmailDragOver(false);
+    setEmailDropIndex(-1);
     
     const emailData = e.dataTransfer.getData(EMAIL_DRAG_TYPE);
     if (!emailData || !onEmailDrop) return;
     
     try {
       const email: OutlookEmail = JSON.parse(emailData);
-      onEmailDrop(email, column);
+      onEmailDrop(email, column, dropPosition);
     } catch (error) {
       console.error('Failed to parse email data for drop:', error);
     }
@@ -957,9 +982,15 @@ const TaskColumn = React.memo(({
             <TopDropZone columnId={column.id} accentColor={state.preferences.accentColor} />
           )}
           
+          {/* Email drop indicator at top when hovering at position 0 */}
+          {isEmailDragOver && emailDropIndex === 0 && (
+            <DropIndicator isVisible={true} position="top" />
+          )}
+          
           {isProjectColumn ? (
             // 🎯 PROJECTS: No SortableContext to avoid double context
-            tasks
+            <div ref={taskListRef}>
+            {tasks
               .filter(task => {
                 return showCompletedTasks || !task.completed;
               })
@@ -977,13 +1008,18 @@ const TaskColumn = React.memo(({
                 const isThisTaskBeingDragged = activeTask?.id === task.id;
                 
                 return (
-                  <div key={task.id}>
+                  <div key={task.id} data-task-index={index}>
                     {/* ✨ Drop Space - Only show if this task is NOT being dragged */}
                     {!isThisTaskBeingDragged && (
                       <DropIndicator 
                         isVisible={showDropIndicatorAbove}
                         position="top"
                       />
+                    )}
+                    
+                    {/* Email drop indicator between tasks */}
+                    {isEmailDragOver && emailDropIndex === index + 1 && (
+                      <DropIndicator isVisible={true} position="between" />
                     )}
                     
                     {/* Task Card */}
@@ -999,7 +1035,8 @@ const TaskColumn = React.memo(({
                     />
                   </div>
                 );
-              })
+              })}
+            </div>
           ) : (
             // 🎯 PLANNER: With SortableContext for existing functionality
             <SortableContext items={tasks.map(task => task.id)} strategy={verticalListSortingStrategy}>
@@ -1019,7 +1056,8 @@ const TaskColumn = React.memo(({
                 />
               ) : (
                 // 🎯 PLANNER: DropIndicators with SortableContext
-                tasks
+                <div ref={taskListRef}>
+                {tasks
                   .filter(task => {
                     return showCompletedTasks || !task.completed;
                   })
@@ -1038,13 +1076,18 @@ const TaskColumn = React.memo(({
                     const isThisTaskBeingDragged = activeTask?.id === task.id;
                     
                     return (
-                      <div key={task.id}>
+                      <div key={task.id} data-task-index={index}>
                         {/* ✨ Drop Space - Only show if this task is NOT being dragged */}
                         {!isThisTaskBeingDragged && (
                           <DropIndicator 
                             isVisible={showDropIndicatorAbove}
                             position="top"
                           />
+                        )}
+                        
+                        {/* Email drop indicator between tasks */}
+                        {isEmailDragOver && emailDropIndex === index + 1 && (
+                          <DropIndicator isVisible={true} position="between" />
                         )}
                         
                         {/* Task Card */}
@@ -1060,7 +1103,8 @@ const TaskColumn = React.memo(({
                         />
                       </div>
                     );
-                  })
+                  })}
+                </div>
               )}
             </SortableContext>
           )}

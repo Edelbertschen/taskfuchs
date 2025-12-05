@@ -75,7 +75,8 @@ app.get('/messages', async (c) => {
   try {
     let url = `${MS_GRAPH_URL}/me/mailFolders/${folderId}/messages`;
     url += `?$top=${top}&$skip=${skip}`;
-    url += `&$select=id,subject,bodyPreview,from,toRecipients,receivedDateTime,isRead,hasAttachments,importance,webLink`;
+    // Include internetMessageId for permanent link construction
+    url += `&$select=id,subject,bodyPreview,from,toRecipients,receivedDateTime,isRead,hasAttachments,importance,webLink,internetMessageId,conversationId`;
     url += `&$orderby=receivedDateTime desc`;
     
     if (search) {
@@ -109,7 +110,10 @@ app.get('/messages', async (c) => {
       isRead: msg.isRead,
       hasAttachments: msg.hasAttachments,
       importance: msg.importance,
-      webLink: msg.webLink
+      webLink: msg.webLink,
+      // Additional IDs for permanent link construction
+      internetMessageId: msg.internetMessageId,
+      conversationId: msg.conversationId
     }));
 
     return c.json({ 

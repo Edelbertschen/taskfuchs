@@ -2,6 +2,25 @@ import type { OutlookEmail } from '../types/email';
 import type { Task, Column } from '../types';
 
 /**
+ * Constructs a permanent Outlook link that works regardless of which folder the email is in.
+ * The webLink from Graph API is folder-dependent and breaks when emails are moved/archived.
+ * This format uses the OWA direct ItemID lookup which is folder-independent.
+ */
+function getPermanentOutlookLink(email: OutlookEmail): string {
+  // Extract the message ID from webLink or use the raw id
+  // The webLink format is: https://outlook.office.com/mail/{folder}/id/{messageId}
+  // We extract the ID and use the OWA direct lookup format which is folder-independent
+  const messageId = email.id;
+  
+  // URL-encode the message ID for the OWA link
+  const encodedId = encodeURIComponent(messageId);
+  
+  // OWA format that works regardless of folder location
+  // This format directly looks up the item by ID without needing folder context
+  return `https://outlook.office.com/owa/?ItemID=${encodedId}&exvsurl=1&viewmodel=ReadMessageItem`;
+}
+
+/**
  * Creates a task from an Outlook email.
  * - Title: Email subject
  * - Description: From, To, Subject, Date metadata + Outlook deep link (NO body content)
@@ -12,8 +31,8 @@ export function createTaskFromEmail(
   email: OutlookEmail, 
   targetColumn?: Column
 ): Task {
-  // Use webLink property from Microsoft Graph API (official deep link)
-  const outlookLink = email.webLink;
+  // Use permanent link format that works even after archiving
+  const outlookLink = getPermanentOutlookLink(email);
   
   // Format recipients
   const toList = email.toRecipients

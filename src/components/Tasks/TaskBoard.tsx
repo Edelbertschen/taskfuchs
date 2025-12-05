@@ -743,8 +743,8 @@ export function TaskBoard() {
     }
   };
 
-  // Email drop handler for TaskColumn
-  const handleEmailDropOnColumn = async (email: OutlookEmail, column: Column) => {
+  // Email drop handler for TaskColumn with position support
+  const handleEmailDropOnColumn = async (email: OutlookEmail, column: Column, position: number) => {
     try {
       const task = createTaskFromEmail(email, column);
       
@@ -754,6 +754,26 @@ export function TaskBoard() {
         task.dueDate = column.date;
       } else {
         task.columnId = column.id;
+      }
+      
+      // Get existing tasks in the column and calculate position
+      const columnTasks = state.tasks
+        .filter(t => t.columnId === column.id && !t.completed)
+        .sort((a, b) => (a.position || 0) - (b.position || 0));
+      
+      // Calculate the new position based on insert index
+      if (columnTasks.length === 0 || position >= columnTasks.length) {
+        // Insert at end
+        task.position = Date.now();
+      } else if (position === 0) {
+        // Insert at beginning - use position before first task
+        const firstTaskPosition = columnTasks[0]?.position || Date.now();
+        task.position = Number(firstTaskPosition) - 1000;
+      } else {
+        // Insert between tasks - use midpoint
+        const prevPosition = Number(columnTasks[position - 1]?.position || 0);
+        const nextPosition = Number(columnTasks[position]?.position || Date.now());
+        task.position = Math.floor((prevPosition + nextPosition) / 2);
       }
       
       dispatch({

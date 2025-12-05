@@ -29,6 +29,8 @@ export interface OutlookEmail {
   importance: 'low' | 'normal' | 'high';
   webLink: string;
   conversationId?: string;
+  // Internet Message ID (RFC 2822) - permanent identifier that doesn't change when email is moved
+  internetMessageId?: string;
 }
 
 export interface EmailFolder {
