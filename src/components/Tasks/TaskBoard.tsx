@@ -29,11 +29,14 @@ import { TaskModal } from './TaskModal';
 import { SmartTaskModal } from './SmartTaskModal';
 
 import type { Task, Column } from '../../types';
+import type { OutlookEmail } from '../../types/email';
 import { format, addDays, startOfDay, isAfter, isBefore, isToday, parseISO, isSameDay } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { getBackgroundStyles, getDarkModeBackgroundStyles, getBackgroundOverlayStyles } from '../../utils/backgroundUtils';
 import { Header } from '../Layout/Header';
 import { MobilePullToRefresh } from '../Common/MobilePullToRefresh';
+import { useEmail } from '../../context/EmailContext';
+import { createTaskFromEmail } from '../../utils/emailToTask';
 
 // Project Column Selection Modal
 function ProjectColumnSelectionModal({ 
@@ -313,6 +316,7 @@ function DroppableProjectHeader({ project, tasks, isExpanded, onToggle, accentCo
 export function TaskBoard() {
   const { state, dispatch } = useApp();
   const { t, i18n } = useTranslation();
+  const { performEmailToTaskAction } = useEmail();
   
   // ✨ CRITICAL FIX: Precise sensors to prevent 100px springing on click
   // Mobile-friendly DnD activation: avoid accidental drags on tap/scroll
@@ -736,6 +740,44 @@ export function TaskBoard() {
       });
     
     setOverId(newOverId);
+    }
+  };
+
+  // Email drop handler for TaskColumn
+  const handleEmailDropOnColumn = async (email: OutlookEmail, column: Column) => {
+    try {
+      const task = createTaskFromEmail(email, column);
+      
+      // Set columnId based on column type
+      if (column.type === 'date') {
+        task.columnId = column.id;
+        task.dueDate = column.date;
+      } else {
+        task.columnId = column.id;
+      }
+      
+      dispatch({
+        type: 'ADD_TASK',
+        payload: task
+      });
+
+      // Perform configured action on the email (mark read, archive, etc.)
+      await performEmailToTaskAction(email.id);
+
+      // Show success notification
+      dispatch({
+        type: 'ADD_NOTIFICATION',
+        payload: {
+          id: `email-task-${Date.now()}`,
+          title: t('email.taskCreated', 'Task created'),
+          message: t('email.taskCreatedFromEmail', 'Task created from email: {{title}}', { title: email.subject }),
+          timestamp: new Date().toISOString(),
+          type: 'success' as const,
+          read: false
+        }
+      });
+    } catch (error) {
+      console.error('Failed to create task from dropped email:', error);
     }
   };
 
@@ -1545,6 +1587,7 @@ export function TaskBoard() {
             onToggleEventCollapse={handleToggleEventCollapse}
             isProjectColumn={false}
             deadlineReminderTaskIds={deadlineReminderTaskIds}
+            onEmailDrop={handleEmailDropOnColumn}
           />
         </SortableContext>
       );
@@ -1702,6 +1745,7 @@ export function TaskBoard() {
                           showCompletedTasks={state.showCompletedTasks}
                           isProjectColumn={false}
                           deadlineReminderTaskIds={focusDeadlineReminderTaskIds}
+                          onEmailDrop={handleEmailDropOnColumn}
                         />
                       </SortableContext>
                     );

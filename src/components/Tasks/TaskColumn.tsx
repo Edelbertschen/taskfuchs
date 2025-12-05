@@ -6,6 +6,7 @@ import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { Calendar, Clock, Edit2, Check, X, Sparkles, Trash2, Focus, Archive, Download, FileText, FileDown, Settings, GripVertical, Plus, MoreHorizontal } from 'lucide-react';
 import type { Column, Task } from '../../types';
+import type { OutlookEmail } from '../../types/email';
 import { TaskCard } from './TaskCard';
 import { EventCard, getEventDurationMinutes } from './EventCard';
 import { DropIndicator } from './DropIndicator';
@@ -17,6 +18,7 @@ import { format, isToday } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
 import { useApp } from '../../context/AppContext';
 import { OptimizedTaskList } from './OptimizedTaskList';
+import { EMAIL_DRAG_TYPE } from '../Email/EmailItem';
 
 // Top Drop Zone component for inserting tasks at position 0
 function TopDropZone({ columnId, accentColor }: { columnId: string; accentColor: string }) {
@@ -85,6 +87,8 @@ interface TaskColumnProps {
   isPinColumn?: boolean;
   // Column manager handler
   onColumnManager?: () => void;
+  // Email drag-and-drop handler
+  onEmailDrop?: (email: OutlookEmail, column: Column) => void;
 }
 
 const TaskColumn = React.memo(({
@@ -121,7 +125,9 @@ const TaskColumn = React.memo(({
   // Pin column flag
   isPinColumn = false,
   // Column manager handler
-  onColumnManager
+  onColumnManager,
+  // Email drag-and-drop handler
+  onEmailDrop
 }: TaskColumnProps) => {
   const { state, dispatch } = useApp();
   const { actions, forms, titles, messages, taskColumn } = useAppTranslation();
@@ -148,6 +154,39 @@ const TaskColumn = React.memo(({
   const [showContextMenu, setShowContextMenu] = useState(false);
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
   // Removed header day progress bar
+  
+  // Email drag-and-drop state
+  const [isEmailDragOver, setIsEmailDragOver] = useState(false);
+
+  // Email drag-and-drop handlers
+  const handleEmailDragOver = (e: React.DragEvent) => {
+    if (e.dataTransfer.types.includes(EMAIL_DRAG_TYPE)) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'copy';
+      setIsEmailDragOver(true);
+    }
+  };
+
+  const handleEmailDragLeave = (e: React.DragEvent) => {
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      setIsEmailDragOver(false);
+    }
+  };
+
+  const handleEmailDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsEmailDragOver(false);
+    
+    const emailData = e.dataTransfer.getData(EMAIL_DRAG_TYPE);
+    if (!emailData || !onEmailDrop) return;
+    
+    try {
+      const email: OutlookEmail = JSON.parse(emailData);
+      onEmailDrop(email, column);
+    } catch (error) {
+      console.error('Failed to parse email data for drop:', error);
+    }
+  };
   
   // ✨ ANTI-JITTER: Stabilized overId that doesn't change rapidly when over drop zones
   const [stableOverId, setStableOverId] = useState<string | null>(null);
@@ -656,6 +695,9 @@ const TaskColumn = React.memo(({
       <div 
         ref={setNodeRef}
         onContextMenu={handleContextMenu}
+        onDragOver={handleEmailDragOver}
+        onDragLeave={handleEmailDragLeave}
+        onDrop={handleEmailDrop}
         className={`group flex-1 min-w-0 h-auto flex flex-col relative ${
           isMinimalDesign
                 ? 'px-4'
@@ -666,12 +708,18 @@ const TaskColumn = React.memo(({
             : isMinimalDesign
               ? ''
               : 'border border-white/20 dark:border-gray-600/20'
-        }`}
+        } ${isEmailDragOver ? 'ring-2 ring-dashed' : ''}`}
                   style={{
             // ✨ Column background - use style instead of className for guaranteed color
             backgroundColor: isMinimalDesign
               ? (isDarkMode ? '#111827' : '#FFFFFF')
               : undefined,
+            // Email drag highlight
+            ...(isEmailDragOver && {
+              borderColor: state.preferences.accentColor,
+              ringColor: state.preferences.accentColor,
+              boxShadow: `0 0 0 2px ${state.preferences.accentColor}40`
+            }),
             // ✨ ULTRA-STABLE: No transitions during any drag for projects
             transition: (activeTask && isProjectColumn) ? 'none' : activeTask ? 'none' : 'border-color 200ms cubic-bezier(0.16, 1, 0.3, 1)',
             transform: 'translateZ(0)', // GPU acceleration

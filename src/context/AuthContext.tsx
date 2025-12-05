@@ -309,7 +309,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Build authorization URL
     const redirectUri = `${window.location.origin}/auth/callback`;
-    const scope = 'openid profile email User.Read';
+    // Include Mail.Read, Mail.ReadWrite for Outlook email integration, offline_access for refresh tokens
+    const scope = 'openid profile email User.Read Mail.Read Mail.ReadWrite offline_access';
     
     // Use tenant ID for single-tenant apps
     const tenantId = import.meta.env.VITE_MS_TENANT_ID || 'common';

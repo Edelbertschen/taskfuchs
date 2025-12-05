@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
+import { useEmail } from '../../context/EmailContext';
 import { 
   Search, 
   LogOut, 
@@ -42,7 +43,8 @@ import {
   Printer,
   Edit3,
   Trash2,
-  Pin
+  Pin,
+  Mail
 } from 'lucide-react';
 import { ProfileModal } from '../Common/ProfileModal';
 import { DatePickerSlider } from '../Common/DatePickerSlider';
@@ -64,6 +66,7 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
   const { t, i18n } = useTranslation();
   const { state, dispatch } = useApp();
   const { logout, state: authState, isGuest } = useAuth();
+  const { state: emailState, toggleSidebar: toggleEmailSidebar } = useEmail();
   
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -1209,6 +1212,19 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
                 document.body
               )}
             </div>
+
+            {/* Email Sidebar Toggle */}
+            {authState.isOnlineMode && (
+              <button
+                onClick={toggleEmailSidebar}
+                className={`group p-2.5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 h-[44px] w-[44px] flex items-center justify-center ${
+                  emailState.isOpen ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : ''
+                }`}
+                title={t('email.toggleSidebar', 'Toggle Email Sidebar')}
+              >
+                <Mail className="w-5 h-5" />
+              </button>
+            )}
 
             {/* User Actions */}
             {authState.user && !isGuest() && (

@@ -575,7 +575,7 @@
     "no_overdue_tasks": "Keine überfälligen Aufgaben",
     "all_tasks_current": "Alle Aufgaben sind aktuell.",
     "tasks_moved": "Aufgaben verschoben",
-    "overdue_moved_message": "{count} überfällige Aufgaben wurden in den heutigen Tag verschoben.",
+    "overdue_moved_message": "{{count}} überfällige Aufgaben wurden in den heutigen Tag verschoben.",
     "today": "Heute",
     "date_select": "Datum auswählen",
     "notes_show_details": "Notizen-Details anzeigen",
@@ -2072,10 +2072,11 @@
       "createFirst": "Erste Aufgabe erstellen"
     },
     "tooltips": {
+      "deleteTask": "Aufgabe löschen",
       "deleteTasks": "Aufgaben löschen"
     },
     "delete_confirmation": {
-      "multiple": "Möchten Sie {count} ausgewählte Aufgaben wirklich löschen?"
+      "multiple": "Möchten Sie {{count}} ausgewählte Aufgaben wirklich löschen?"
     }
   },
   "tagManager": {
@@ -2384,5 +2385,43 @@
     "update_available": "Neue Version verfügbar",
     "update_now": "Jetzt aktualisieren",
     "update_later": "Später"
+  },
+  "email": {
+    "title": "E-Mail",
+    "inbox": "Posteingang",
+    "toggleSidebar": "E-Mail-Seitenleiste umschalten",
+    "search": "E-Mails durchsuchen...",
+    "refresh": "Aktualisieren",
+    "loading": "E-Mails werden geladen...",
+    "noEmails": "Keine E-Mails gefunden",
+    "noSubject": "(Kein Betreff)",
+    "dragHint": "E-Mails ziehen um Aufgaben zu erstellen, oder Aktionsbuttons nutzen",
+    "dragToCreateTask": "Hier ablegen für neue Aufgabe",
+    "dropHere": "E-Mail hier ablegen um Aufgabe zu erstellen",
+    "openInOutlook": "In Outlook öffnen",
+    "markRead": "Als gelesen markieren",
+    "markUnread": "Als ungelesen markieren",
+    "archive": "Archivieren",
+    "delete": "Löschen",
+    "addToToday": "Zu Heute hinzufügen",
+    "addToInbox": "Zum Posteingang hinzufügen",
+    "taskCreated": "Aufgabe erstellt",
+    "taskCreatedFromEmail": "Aufgabe aus E-Mail erstellt: {{title}}",
+    "taskCreatedInInbox": "Aufgabe zum Posteingang hinzugefügt: {{title}}",
+    "settings": "E-Mail-Einstellungen",
+    "onAddAsTask": "Beim Hinzufügen als Aufgabe",
+    "onAddAsTaskDesc": "Aktion für die E-Mail",
+    "actionNone": "Nichts tun",
+    "actionMarkRead": "Als gelesen markieren",
+    "actionArchive": "Archivieren",
+    "actionArchiveAndRead": "Archivieren & als gelesen markieren",
+    "folders": {
+      "inbox": "Posteingang",
+      "sent": "Gesendet",
+      "drafts": "Entwürfe",
+      "archive": "Archiv",
+      "trash": "Papierkorb",
+      "junk": "Junk"
+    }
   }
 }

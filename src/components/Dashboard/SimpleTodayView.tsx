@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useApp } from '../../context/AppContext';
 import { useCelebration } from '../../context/CelebrationContext';
+import { useAuth } from '../../context/AuthContext';
+import { useEmail } from '../../context/EmailContext';
 import { format, isToday, isYesterday, isTomorrow, isPast, subDays } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
 import { MaterialIcon } from '../Common/MaterialIcon';
@@ -43,6 +45,7 @@ import { SmartTaskModal } from '../Tasks/SmartTaskModal';
 import { TaskCard } from '../Tasks/TaskCard';
 import { EndOfDayModal } from '../Common/EndOfDayModal';
 import type { Task } from '../../types';
+import type { OutlookEmail } from '../../types/email';
 import { notificationService } from '../../utils/notificationService';
 import { ChecklistReminderModal } from '../Common/ChecklistReminderModal';
 import { PinnedTasksWidget } from './PinnedTasksWidget';
@@ -50,6 +53,8 @@ import { SyncStatusWidget } from './SyncStatusWidget';
 import { MobilePullToRefresh } from '../Common/MobilePullToRefresh';
 import { SwipeableTaskCard } from '../Inbox/SwipeableTaskCard';
 import { MobileSnackbar } from '../Common/MobileSnackbar';
+import { createTaskFromEmail } from '../../utils/emailToTask';
+import { EMAIL_DRAG_TYPE } from '../Email/EmailItem';
 
 interface TodayViewProps {
   onNavigate?: (view: string) => void;
@@ -146,7 +151,11 @@ const StandardWidget = ({
   children, 
   isMinimalDesign,
   footerAction,
-  headerAction
+  headerAction,
+  onDragOver,
+  onDragLeave,
+  onDrop,
+  isDragOver
 }: {
   icon: string;
   title: string;
@@ -155,12 +164,26 @@ const StandardWidget = ({
   isMinimalDesign: boolean;
   footerAction?: React.ReactNode;
   headerAction?: React.ReactNode;
+  onDragOver?: (e: React.DragEvent) => void;
+  onDragLeave?: (e: React.DragEvent) => void;
+  onDrop?: (e: React.DragEvent) => void;
+  isDragOver?: boolean;
 }) => (
-  <div className={`${WIDGET_STYLES.container} ${
-    isMinimalDesign 
-      ? 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg'
-      : 'glass-effect'
-  }`}>
+  <div 
+    className={`${WIDGET_STYLES.container} ${
+      isMinimalDesign 
+        ? 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg'
+        : 'glass-effect'
+    } ${isDragOver ? 'ring-2 ring-dashed' : ''}`}
+    style={isDragOver ? { 
+      borderColor: accentColor,
+      ringColor: accentColor,
+      backgroundColor: isMinimalDesign ? `${accentColor}10` : undefined
+    } : undefined}
+    onDragOver={onDragOver}
+    onDragLeave={onDragLeave}
+    onDrop={onDrop}
+  >
     <div className={WIDGET_STYLES.header}>
       <div 
         className={`${WIDGET_STYLES.iconContainer} ${
@@ -274,6 +297,11 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
   const { triggerCelebration } = useCelebration();
   const { t, i18n } = useTranslation();
   const { simpleTodayView, header, forms } = useAppTranslation();
+  const { state: authState } = useAuth();
+  const { state: emailState, toggleSidebar: toggleEmailSidebar, performEmailToTaskAction } = useEmail();
+  
+  // Email drag-and-drop state
+  const [isEmailDragOver, setIsEmailDragOver] = useState(false);
   
   // Check if minimal design is enabled
   const isMinimalDesign = state.preferences.minimalDesign;
@@ -1223,6 +1251,63 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
     setShowSmartTaskModal(false);
   };
 
+  // Email drag-and-drop handlers
+  const handleEmailDragOver = (e: React.DragEvent) => {
+    if (e.dataTransfer.types.includes(EMAIL_DRAG_TYPE)) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'copy';
+      setIsEmailDragOver(true);
+    }
+  };
+
+  const handleEmailDragLeave = (e: React.DragEvent) => {
+    // Only set to false if we're leaving the container (not entering a child)
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      setIsEmailDragOver(false);
+    }
+  };
+
+  const handleEmailDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsEmailDragOver(false);
+    
+    const emailData = e.dataTransfer.getData(EMAIL_DRAG_TYPE);
+    if (!emailData) return;
+    
+    try {
+      const email: OutlookEmail = JSON.parse(emailData);
+      const todayDate = format(new Date(), 'yyyy-MM-dd');
+      const todayColumn = state.columns.find(col => col.type === 'date' && col.date === todayDate);
+      
+      const task = createTaskFromEmail(email, todayColumn);
+      task.columnId = todayColumn?.id || `date-${todayDate}`;
+      task.dueDate = todayDate;
+      
+      dispatch({
+        type: 'ADD_TASK',
+        payload: task
+      });
+
+      // Perform configured action on the email (mark read, archive, etc.)
+      await performEmailToTaskAction(email.id);
+
+      // Show success notification
+      dispatch({
+        type: 'ADD_NOTIFICATION',
+        payload: {
+          id: `email-task-${Date.now()}`,
+          title: t('email.taskCreated', 'Task created'),
+          message: t('email.taskCreatedFromEmail', 'Task created from email: {{title}}', { title: email.subject }),
+          timestamp: new Date().toISOString(),
+          type: 'success' as const,
+          read: false
+        }
+      });
+    } catch (error) {
+      console.error('Failed to create task from dropped email:', error);
+    }
+  };
+
   // Handle create new note
   const handleCreateNewNote = () => {
     const newNote = {
@@ -1620,7 +1705,10 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
 
 
             {/* Fixed Top Controls - Only Icons */}
-      <div className="fixed top-6 right-6 z-50 flex space-x-3">
+      <div 
+        className="fixed top-6 z-50 flex space-x-3 transition-all duration-300"
+        style={{ right: emailState.isOpen ? 'calc(350px + 1.5rem)' : '1.5rem' }}
+      >
             {/* Customize Button */}
             <button
               data-customize-button
@@ -1660,16 +1748,38 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
               )}
             </button>
 
+            {/* Email Toggle - Only in online mode */}
+            {authState.isOnlineMode && (
+              <button
+                onClick={toggleEmailSidebar}
+                className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 backdrop-blur-lg ${
+                  emailState.isOpen
+                    ? 'text-white'
+                    : isMinimalDesign
+                      ? 'bg-white/90 dark:bg-gray-50/90 border border-white/50 dark:border-gray-200/50 hover:bg-white/95 dark:hover:bg-gray-50/95'
+                      : 'bg-white/85 dark:bg-gray-800/85 border border-white/40 dark:border-gray-600/40 hover:bg-white/90 dark:hover:bg-gray-800/90'
+                }`}
+                style={{
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08)',
+                  backgroundColor: emailState.isOpen ? state.preferences.accentColor : undefined
+                }}
+                title={t('email.toggleSidebar', 'Toggle Email')}
+              >
+                <MaterialIcon name="mail" size={20} style={{ color: emailState.isOpen ? 'white' : state.preferences.accentColor }} />
+              </button>
+            )}
+
           </div>
           
           {/* Customization Panel - Full Settings Layout */}
           <div 
             ref={customizePanelRef}
-            className={`fixed top-20 right-6 z-40 transition-all duration-300 ease-out max-h-[calc(100vh-120px)] overflow-y-auto ${
+            className={`fixed top-20 z-40 transition-all duration-300 ease-out max-h-[calc(100vh-120px)] overflow-y-auto ${
               showCustomizePanel 
                 ? 'opacity-100 translate-y-0' 
                 : 'opacity-0 -translate-y-4 pointer-events-none'
             }`}
+            style={{ right: emailState.isOpen ? 'calc(350px + 1.5rem)' : '1.5rem' }}
           >
             <div className={`rounded-2xl p-6 backdrop-blur-xl border shadow-2xl w-[420px] ${
               isMinimalDesign
@@ -2168,6 +2278,10 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
             title={t('dashboard.todays_tasks')}
             accentColor={state.preferences.accentColor}
             isMinimalDesign={isMinimalDesign}
+            onDragOver={handleEmailDragOver}
+            onDragLeave={handleEmailDragLeave}
+            onDrop={handleEmailDrop}
+            isDragOver={isEmailDragOver}
             headerAction={
               <div className="flex items-center gap-2">
                 {/* Filter Button */}

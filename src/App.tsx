@@ -4,6 +4,7 @@ import { AppProvider, useApp } from './context/AppContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CelebrationProvider } from './context/CelebrationContext';
 import { ToastProvider } from './context/ToastContext';
+import { EmailProvider, useEmail } from './context/EmailContext';
 import { WelcomeScreen } from './components/Auth/WelcomeScreen';
 import { LoginPage } from './components/Auth/LoginPage';
 import { UserManagement } from './components/Admin/UserManagement';
@@ -44,6 +45,7 @@ import { ImageTest } from './components/Common/ImageTest';
 import { FloatingAddButton } from './components/Common/FloatingAddButton';
 import { LoadingSpinner } from './components/Common/LoadingSpinner';
 import { AppLoadingScreen } from './components/Common/AppLoadingScreen';
+import { EmailSidebar } from './components/Email';
 import { Plus, Home, Inbox, CheckSquare, Columns, FileText, MoreHorizontal, X } from 'lucide-react';
 import { MaterialIcon } from './components/Common/MaterialIcon';
 import './App.css';
@@ -242,6 +244,20 @@ function ColumnSwitcher({
         {/* Right arrow - separate from column selector */}
         <ArrowButton direction="next" disabled={!canNavigateNext} />
       </div>
+    </div>
+  );
+}
+
+// Email Layout Wrapper - Handles sidebar push layout
+function EmailLayoutWrapper() {
+  const { state: emailState } = useEmail();
+  
+  return (
+    <div className="flex h-screen w-screen overflow-hidden">
+      <div className={`flex-1 min-w-0 transition-all duration-300 ${emailState.isOpen ? 'mr-[350px]' : ''}`}>
+        <MainApp />
+      </div>
+      <EmailSidebar />
     </div>
   );
 }
@@ -1592,7 +1608,9 @@ function AppRouter() {
     return (
       <AppProvider>
         <CelebrationProvider>
-          <MainApp />
+          <EmailProvider>
+            <EmailLayoutWrapper />
+          </EmailProvider>
         </CelebrationProvider>
       </AppProvider>
     );

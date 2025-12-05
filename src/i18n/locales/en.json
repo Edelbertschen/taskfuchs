@@ -1574,10 +1574,11 @@
       "createFirst": "Create first task"
     },
     "tooltips": {
+      "deleteTask": "Delete task",
       "deleteTasks": "Delete tasks"
     },
     "delete_confirmation": {
-      "multiple": "Are you sure you want to delete {count} selected tasks?"
+      "multiple": "Are you sure you want to delete {{count}} selected tasks?"
     }
   },
   "backup_modal": {
@@ -1774,7 +1775,7 @@
     "no_overdue_tasks": "No overdue tasks",
     "all_tasks_current": "All tasks are up to date.",
     "tasks_moved": "Tasks moved",
-    "overdue_moved_message": "{count} overdue tasks have been moved to today.",
+    "overdue_moved_message": "{{count}} overdue tasks have been moved to today.",
     "today": "Today",
     "date_select": "Select date",
     "notes_show_details": "Show note details",
@@ -1915,6 +1916,44 @@
       "divider": "Divider",
       "link": "Link",
       "help": "Markdown Help"
+    }
+  },
+  "email": {
+    "title": "Email",
+    "inbox": "Inbox",
+    "toggleSidebar": "Toggle Email Sidebar",
+    "search": "Search emails...",
+    "refresh": "Refresh",
+    "loading": "Loading emails...",
+    "noEmails": "No emails found",
+    "noSubject": "(No Subject)",
+    "dragHint": "Drag emails to create tasks, or use the action buttons",
+    "dragToCreateTask": "Drop to create task",
+    "dropHere": "Drop email here to create task",
+    "openInOutlook": "Open in Outlook",
+    "markRead": "Mark as read",
+    "markUnread": "Mark as unread",
+    "archive": "Archive",
+    "delete": "Delete",
+    "addToToday": "Add to Today",
+    "addToInbox": "Add to Inbox",
+    "taskCreated": "Task created",
+    "taskCreatedFromEmail": "Task created from email: {{title}}",
+    "taskCreatedInInbox": "Task added to inbox: {{title}}",
+    "settings": "Email settings",
+    "onAddAsTask": "When adding as task",
+    "onAddAsTaskDesc": "Action to perform on the email",
+    "actionNone": "Do nothing",
+    "actionMarkRead": "Mark as read",
+    "actionArchive": "Archive",
+    "actionArchiveAndRead": "Archive & mark read",
+    "folders": {
+      "inbox": "Inbox",
+      "sent": "Sent",
+      "drafts": "Drafts",
+      "archive": "Archive",
+      "trash": "Trash",
+      "junk": "Junk"
     }
   }
 } 

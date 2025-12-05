@@ -44,14 +44,22 @@ import { getBackgroundStyles, getDarkModeBackgroundStyles } from '../../utils/ba
 import { MobilePullToRefresh } from '../Common/MobilePullToRefresh';
 import { SwipeableTaskCard } from './SwipeableTaskCard';
 import { MobileSnackbar } from '../Common/MobileSnackbar';
+import { useEmail } from '../../context/EmailContext';
+import type { OutlookEmail } from '../../types/email';
+import { createTaskFromEmail } from '../../utils/emailToTask';
+import { EMAIL_DRAG_TYPE } from '../Email/EmailItem';
 
 export function InboxView() {
   const { state, dispatch } = useApp();
   const { t, i18n } = useTranslation();
   const { actions, forms, titles, messages, inboxView } = useAppTranslation();
+  const { performEmailToTaskAction } = useEmail();
   const isMinimalDesign = state.preferences.minimalDesign;
   const dateLocale = i18n.language === 'de' ? de : enUS;
   const [showSmartTaskModal, setShowSmartTaskModal] = useState(false);
+  
+  // Email drag-and-drop state
+  const [isEmailDragOver, setIsEmailDragOver] = useState(false);
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
   const [showBulkActions, setShowBulkActions] = useState(false);
   const [multiSelectMode, setMultiSelectMode] = useState(false);
@@ -110,6 +118,59 @@ export function InboxView() {
       const nextIdx = modalTaskIndex + 1;
       setModalNavDirection('next');
       openInboxTaskAt(nextIdx);
+    }
+  };
+
+  // Email drag-and-drop handlers
+  const handleEmailDragOver = (e: React.DragEvent) => {
+    if (e.dataTransfer.types.includes(EMAIL_DRAG_TYPE)) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'copy';
+      setIsEmailDragOver(true);
+    }
+  };
+
+  const handleEmailDragLeave = (e: React.DragEvent) => {
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      setIsEmailDragOver(false);
+    }
+  };
+
+  const handleEmailDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsEmailDragOver(false);
+    
+    const emailData = e.dataTransfer.getData(EMAIL_DRAG_TYPE);
+    if (!emailData) return;
+    
+    try {
+      const email: OutlookEmail = JSON.parse(emailData);
+      const task = createTaskFromEmail(email);
+      task.columnId = 'inbox';
+      task.dueDate = undefined;
+      
+      dispatch({
+        type: 'ADD_TASK',
+        payload: task
+      });
+
+      // Perform configured action on the email (mark read, archive, etc.)
+      await performEmailToTaskAction(email.id);
+
+      // Show success notification
+      dispatch({
+        type: 'ADD_NOTIFICATION',
+        payload: {
+          id: `email-task-${Date.now()}`,
+          title: t('email.taskCreated', 'Task created'),
+          message: t('email.taskCreatedInInbox', 'Task added to inbox: {{title}}', { title: email.subject }),
+          timestamp: new Date().toISOString(),
+          type: 'success' as const,
+          read: false
+        }
+      });
+    } catch (error) {
+      console.error('Failed to create task from dropped email:', error);
     }
   };
 
@@ -1415,7 +1476,19 @@ export function InboxView() {
           )}
 
           {/* Task List */}
-          <div className="flex-1 overflow-y-auto">
+          <div 
+            className={`flex-1 overflow-y-auto transition-all duration-200 ${
+              isEmailDragOver ? 'ring-2 ring-dashed rounded-xl' : ''
+            }`}
+            style={isEmailDragOver ? { 
+              borderColor: accentColor,
+              ringColor: accentColor,
+              backgroundColor: `${accentColor}10`
+            } : undefined}
+            onDragOver={handleEmailDragOver}
+            onDragLeave={handleEmailDragLeave}
+            onDrop={handleEmailDrop}
+          >
             {inboxTasks.length === 0 ? (
               <div className="h-full flex items-center justify-center">
                 <div className={`flex flex-col items-center justify-center text-center p-8 rounded-3xl max-w-md mx-4 ${

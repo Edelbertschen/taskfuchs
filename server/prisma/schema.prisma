@@ -22,6 +22,11 @@ model User {
   updatedAt   DateTime @updatedAt
   lastLoginAt DateTime @default(now())
 
+  // Microsoft OAuth tokens for email integration
+  msAccessToken  String?   // Microsoft access token for Graph API
+  msRefreshToken String?   // Microsoft refresh token
+  msTokenExpiry  DateTime? // Token expiration time
+
   // Relations
   tasks           Task[]
   columns         Column[]

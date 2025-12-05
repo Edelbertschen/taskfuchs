@@ -9,6 +9,7 @@ export type User = {
 export type Env = {
   Variables: {
     user: User;
+    msAccessToken?: string; // Microsoft Graph API access token (set by ensureMsToken middleware)
   };
 };
 

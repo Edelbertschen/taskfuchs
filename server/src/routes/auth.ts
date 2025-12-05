@@ -39,6 +39,9 @@ app.post('/microsoft', async (c) => {
     // Get email (prefer mail, fall back to userPrincipalName)
     const email = profile.mail || profile.userPrincipalName;
 
+    // Calculate token expiry time
+    const msTokenExpiry = new Date(Date.now() + tokenResponse.expires_in * 1000);
+
     // Find or create user in database
     let user = await prisma.user.findUnique({
       where: { microsoftId: profile.id }
@@ -46,13 +49,18 @@ app.post('/microsoft', async (c) => {
 
     if (user) {
       // Update existing user - preserve existing isAdmin status from database
+      // Also store Microsoft tokens for email integration
       user = await prisma.user.update({
         where: { id: user.id },
         data: {
           email,
           name: profile.displayName,
           lastLoginAt: new Date(),
-          updatedAt: new Date()
+          updatedAt: new Date(),
+          // Store Microsoft tokens for Graph API access (email integration)
+          msAccessToken: tokenResponse.access_token,
+          msRefreshToken: tokenResponse.refresh_token || null,
+          msTokenExpiry
         }
       });
     } else {
@@ -66,7 +74,11 @@ app.post('/microsoft', async (c) => {
           name: profile.displayName,
           isAdmin,
           language: 'de',
-          lastLoginAt: new Date()
+          lastLoginAt: new Date(),
+          // Store Microsoft tokens for Graph API access (email integration)
+          msAccessToken: tokenResponse.access_token,
+          msRefreshToken: tokenResponse.refresh_token || null,
+          msTokenExpiry
         }
       });
 
