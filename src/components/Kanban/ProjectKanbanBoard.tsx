@@ -40,13 +40,17 @@ import { SmartTaskModal } from '../Tasks/SmartTaskModal';
 import { TaskModal } from '../Tasks/TaskModal';
 import { Header } from '../Layout/Header';
 import type { Task, Column, ProjectKanbanColumn } from '../../types';
+import type { OutlookEmail } from '../../types/email';
 import { format, addDays, startOfDay } from 'date-fns';
 import { de } from 'date-fns/locale';
+import { useEmail } from '../../context/EmailContext';
+import { createTaskFromEmail } from '../../utils/emailToTask';
 
 export function ProjectKanbanBoard() {
   const { state, dispatch } = useApp();
   const { t } = useTranslation();
   const { actions, forms, titles, messages, kanban } = useAppTranslation();
+  const { performEmailToTaskAction } = useEmail();
   
   // ✨ CRITICAL FIX: Precise sensors to prevent springing (same as TaskBoard)
   // Mobile-friendly DnD activation
@@ -1336,6 +1340,60 @@ export function ProjectKanbanBoard() {
     dispatch({ type: 'SET_FOCUSED_COLUMN', payload: columnId });
   };
 
+  // Email drop handler for project kanban columns
+  const handleEmailDropOnColumn = async (email: OutlookEmail, column: Column, position: number) => {
+    if (!selectedProject) return;
+    
+    try {
+      const task = createTaskFromEmail(email, column);
+      
+      // Set project-specific fields
+      task.projectId = selectedProject.id;
+      task.kanbanColumnId = column.id;
+      task.columnId = selectedProject.id; // Column ID is the project ID for project tasks
+      
+      // Get existing tasks in the column and calculate position
+      const columnTasks = state.tasks
+        .filter(t => t.projectId === selectedProject.id && t.kanbanColumnId === column.id && !t.completed)
+        .sort((a, b) => (a.position || 0) - (b.position || 0));
+      
+      // Calculate the new position based on insert index
+      if (columnTasks.length === 0 || position >= columnTasks.length) {
+        task.position = Date.now();
+      } else if (position === 0) {
+        const firstTaskPosition = columnTasks[0]?.position || Date.now();
+        task.position = Number(firstTaskPosition) - 1000;
+      } else {
+        const prevPosition = Number(columnTasks[position - 1]?.position || 0);
+        const nextPosition = Number(columnTasks[position]?.position || Date.now());
+        task.position = Math.floor((prevPosition + nextPosition) / 2);
+      }
+      
+      dispatch({
+        type: 'ADD_TASK',
+        payload: task
+      });
+
+      // Perform configured action on the email (mark read, archive, etc.)
+      await performEmailToTaskAction(email.id);
+
+      // Show success notification
+      dispatch({
+        type: 'ADD_NOTIFICATION',
+        payload: {
+          id: `email-task-${Date.now()}`,
+          title: t('email.taskCreated', 'Task created'),
+          message: t('email.taskCreatedFromEmail', 'Task created from email: {{title}}', { title: email.subject }),
+          timestamp: new Date().toISOString(),
+          type: 'success' as const,
+          read: false
+        }
+      });
+    } catch (error) {
+      console.error('Failed to create task from dropped email:', error);
+    }
+  };
+
   const handleArchiveCompletedTasks = (columnId: string) => {
     const columnTasks = filteredTasks.filter(task => task.kanbanColumnId === columnId);
     const completedTasksCount = columnTasks.filter(task => task.completed).length;
@@ -1546,6 +1604,7 @@ export function ProjectKanbanBoard() {
           projectId={selectedProject?.id}
           kanbanColumnId={column.id}
           onColumnManager={handleOpenColumnManager}
+          onEmailDrop={handleEmailDropOnColumn}
           // No dragListeners or isDragging - columns are not draggable anymore
         />
       </div>
