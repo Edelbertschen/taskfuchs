@@ -36,6 +36,7 @@ export const EmailItem = memo(function EmailItem({
   const { t } = useTranslation();
   const { state, dispatch } = useApp();
   const { performEmailToTaskAction } = useEmail();
+  const accentColor = state.preferences.accentColor || '#0ea5e9';
   const [isHovered, setIsHovered] = useState(false);
   const [isActioning, setIsActioning] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -184,13 +185,17 @@ export const EmailItem = memo(function EmailItem({
         group relative p-3 border-b border-gray-100 dark:border-gray-800 
         transition-all duration-150 cursor-grab
         ${isDragging ? 'opacity-50 cursor-grabbing' : ''}
-        ${!email.isRead ? 'bg-blue-50/50 dark:bg-blue-950/20' : 'bg-white dark:bg-gray-900'}
+        ${!email.isRead ? '' : 'bg-white dark:bg-gray-900'}
         hover:bg-gray-50 dark:hover:bg-gray-800/50
       `}
+      style={!email.isRead ? { backgroundColor: `${accentColor}08` } : undefined}
     >
       {/* Unread indicator */}
       {!email.isRead && (
-        <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 rounded-r" />
+        <div 
+          className="absolute left-0 top-0 bottom-0 w-1 rounded-r" 
+          style={{ backgroundColor: accentColor }}
+        />
       )}
 
       {/* Main content */}
@@ -211,7 +216,8 @@ export const EmailItem = memo(function EmailItem({
             <AlertCircle className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />
           )}
           <span 
-            className={`text-sm truncate ${!email.isRead ? 'font-medium text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}
+            className={`text-sm truncate ${!email.isRead ? 'font-medium' : 'text-gray-600 dark:text-gray-400'}`}
+            style={!email.isRead ? { color: accentColor } : undefined}
             title={email.subject}
           >
             {email.subject || t('email.noSubject', '(No Subject)')}
@@ -234,7 +240,19 @@ export const EmailItem = memo(function EmailItem({
           <button
             onClick={handleAddToToday}
             disabled={isActioning}
-            className="p-1.5 rounded hover:bg-blue-100 dark:hover:bg-blue-900/30 text-gray-600 dark:text-gray-400 hover:text-blue-600 disabled:opacity-50"
+            className="p-1.5 rounded text-gray-600 dark:text-gray-400 disabled:opacity-50 transition-colors"
+            style={{ 
+              ['--hover-bg' as string]: `${accentColor}20`,
+              ['--hover-color' as string]: accentColor
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = `${accentColor}20`;
+              e.currentTarget.style.color = accentColor;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '';
+              e.currentTarget.style.color = '';
+            }}
             title={t('email.addToToday', 'Add to Today')}
           >
             <CalendarPlus className="w-4 h-4" />
@@ -243,7 +261,15 @@ export const EmailItem = memo(function EmailItem({
           <button
             onClick={handleAddToInbox}
             disabled={isActioning}
-            className="p-1.5 rounded hover:bg-green-100 dark:hover:bg-green-900/30 text-gray-600 dark:text-gray-400 hover:text-green-600 disabled:opacity-50"
+            className="p-1.5 rounded text-gray-600 dark:text-gray-400 disabled:opacity-50 transition-colors"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = `${accentColor}20`;
+              e.currentTarget.style.color = accentColor;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '';
+              e.currentTarget.style.color = '';
+            }}
             title={t('email.addToInbox', 'Add to Inbox')}
           >
             <Inbox className="w-4 h-4" />

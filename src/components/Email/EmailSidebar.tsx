@@ -16,6 +16,7 @@ import {
   Check
 } from 'lucide-react';
 import { useEmail } from '../../context/EmailContext';
+import { useApp } from '../../context/AppContext';
 import { EmailItem } from './EmailItem';
 import type { EmailFolder, EmailToTaskAction } from '../../types/email';
 
@@ -31,6 +32,8 @@ const getFolderIcon = (folderName: string) => {
 
 export const EmailSidebar = memo(function EmailSidebar() {
   const { t } = useTranslation();
+  const { state: appState } = useApp();
+  const accentColor = appState.preferences.accentColor || '#0ea5e9';
   const { 
     state, 
     closeSidebar, 
@@ -114,7 +117,7 @@ export const EmailSidebar = memo(function EmailSidebar() {
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-2">
-          <Mail className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <Mail className="w-5 h-5" style={{ color: accentColor }} />
           <span className="font-semibold text-gray-900 dark:text-white">
             {t('email.title', 'Email')}
           </span>
@@ -150,9 +153,13 @@ export const EmailSidebar = memo(function EmailSidebar() {
                       }}
                       className={`w-full flex items-center justify-between px-3 py-2 text-sm rounded-md transition-colors ${
                         state.emailToTaskAction === action.value 
-                          ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' 
+                          ? '' 
                           : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                       }`}
+                      style={state.emailToTaskAction === action.value ? {
+                        backgroundColor: `${accentColor}15`,
+                        color: accentColor
+                      } : undefined}
                     >
                       <span>{action.label}</span>
                       {state.emailToTaskAction === action.value && (
@@ -189,7 +196,13 @@ export const EmailSidebar = memo(function EmailSidebar() {
                 {selectedFolder.displayName}
               </span>
               {selectedFolder.unreadItemCount > 0 && (
-                <span className="px-1.5 py-0.5 text-xs font-medium bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-full">
+                <span 
+                  className="px-1.5 py-0.5 text-xs font-medium rounded-full"
+                  style={{ 
+                    backgroundColor: `${accentColor}20`,
+                    color: accentColor 
+                  }}
+                >
                   {selectedFolder.unreadItemCount}
                 </span>
               )}
@@ -209,9 +222,10 @@ export const EmailSidebar = memo(function EmailSidebar() {
                       selectFolder(folder.id);
                       setShowFolderDropdown(false);
                     }}
-                    className={`w-full flex items-center justify-between px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
-                      folder.id === state.selectedFolderId ? 'bg-blue-50 dark:bg-blue-900/20' : ''
-                    }`}
+                    className="w-full flex items-center justify-between px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                    style={folder.id === state.selectedFolderId ? { 
+                      backgroundColor: `${accentColor}15` 
+                    } : undefined}
                   >
                     <div className="flex items-center gap-2">
                       <FolderIcon className="w-4 h-4 text-gray-500 dark:text-gray-400" />
@@ -237,7 +251,8 @@ export const EmailSidebar = memo(function EmailSidebar() {
             value={localSearch}
             onChange={handleSearchChange}
             placeholder={t('email.search', 'Search emails...')}
-            className="w-full pl-9 pr-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 dark:text-white placeholder-gray-400"
+            className="w-full pl-9 pr-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 rounded-lg border-0 focus:ring-2 dark:text-white placeholder-gray-400"
+            style={{ '--tw-ring-color': accentColor } as React.CSSProperties}
           />
         </div>
         <button
