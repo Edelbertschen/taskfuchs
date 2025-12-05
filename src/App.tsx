@@ -1624,11 +1624,15 @@ function AppRouter() {
 
   // Show main app in guest mode (localStorage only) with "Go Online" context
   // Note: In offline-only mode, the "Go Online" button is disabled/hidden
+  // EmailProvider is included even in guest mode to prevent useEmail hook errors
+  // (email features simply won't be functional without authentication)
   return (
     <GuestModeContext.Provider value={{ goOnline: handleGoOnline, isOfflineOnly: isOfflineOnlyMode }}>
       <AppProvider>
         <CelebrationProvider>
-          <MainApp />
+          <EmailProvider>
+            <MainApp />
+          </EmailProvider>
         </CelebrationProvider>
       </AppProvider>
     </GuestModeContext.Provider>

@@ -746,34 +746,19 @@ export function TaskBoard() {
   // Email drop handler for TaskColumn with position support
   const handleEmailDropOnColumn = async (email: OutlookEmail, column: Column, position: number) => {
     try {
-      console.log('Email drop on column:', { 
-        columnId: column.id, 
-        columnType: column.type, 
-        columnDate: column.date,
-        hasDate: 'date' in column
-      });
+      const baseTask = createTaskFromEmail(email, column);
       
-      const task = createTaskFromEmail(email, column);
-      console.log('Task after createTaskFromEmail:', {
-        columnId: task.columnId,
-        dueDate: task.dueDate
-      });
+      // Extract date from column - check type first, then try to get date from column.date or column.id
+      const isDateColumn = column.type === 'date';
+      let dateStr: string | undefined = undefined;
       
-      // Set columnId based on column type - explicitly set dueDate for date columns
-      if (column.type === 'date' && column.date) {
-        task.columnId = column.id;
-        task.dueDate = column.date;
-        console.log('Setting dueDate explicitly:', task.dueDate);
-      } else {
-        task.columnId = column.id;
-        // Clear dueDate for non-date columns
-        task.dueDate = undefined;
+      if (isDateColumn) {
+        // Try column.date first, then parse from column ID
+        dateStr = column.date;
+        if (!dateStr && column.id.startsWith('date-')) {
+          dateStr = column.id.replace('date-', '');
+        }
       }
-      
-      console.log('Task final before dispatch:', {
-        columnId: task.columnId,
-        dueDate: task.dueDate
-      });
       
       // Get existing tasks in the column and calculate position
       const columnTasks = state.tasks
@@ -781,19 +766,27 @@ export function TaskBoard() {
         .sort((a, b) => (a.position || 0) - (b.position || 0));
       
       // Calculate the new position based on insert index
+      let newPosition: number;
       if (columnTasks.length === 0 || position >= columnTasks.length) {
-        // Insert at end
-        task.position = Date.now();
+        newPosition = Date.now();
       } else if (position === 0) {
-        // Insert at beginning - use position before first task
         const firstTaskPosition = columnTasks[0]?.position || Date.now();
-        task.position = Number(firstTaskPosition) - 1000;
+        newPosition = Number(firstTaskPosition) - 1000;
       } else {
-        // Insert between tasks - use midpoint
         const prevPosition = Number(columnTasks[position - 1]?.position || 0);
         const nextPosition = Number(columnTasks[position]?.position || Date.now());
-        task.position = Math.floor((prevPosition + nextPosition) / 2);
+        newPosition = Math.floor((prevPosition + nextPosition) / 2);
       }
+      
+      // Create final task with correct columnId, dueDate and reminderDate
+      // Note: The app uses reminderDate to determine which date column a task appears in
+      const task: Task = {
+        ...baseTask,
+        columnId: column.id,
+        dueDate: dateStr,
+        reminderDate: dateStr, // This is what determines column placement!
+        position: newPosition
+      };
       
       dispatch({
         type: 'ADD_TASK',

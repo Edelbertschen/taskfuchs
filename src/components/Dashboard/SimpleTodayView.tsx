@@ -1282,6 +1282,7 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
       const task = createTaskFromEmail(email, todayColumn);
       task.columnId = todayColumn?.id || `date-${todayDate}`;
       task.dueDate = todayDate;
+      task.reminderDate = todayDate; // This determines column placement!
       
       dispatch({
         type: 'ADD_TASK',
