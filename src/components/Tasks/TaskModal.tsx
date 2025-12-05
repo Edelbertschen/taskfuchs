@@ -2807,7 +2807,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                         ? 'bg-gray-50/50 dark:bg-gray-800/30 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/30' 
                         : 'bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 focus-within:border-accent shadow-sm'
                     } ${
-                      isDescriptionExpanded ? 'h-[calc(100vh-300px)] resize-y' : 'min-h-[180px] max-h-[320px]'
+                      isDescriptionExpanded ? 'h-[calc(100vh-300px)] resize-y' : 'h-auto min-h-20 max-h-48'
                     }`}
                     onKeyDown={(e) => {
                       if (e.key === 'Escape' && !isDescriptionPreviewMode) {
@@ -2831,7 +2831,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                     {/* Preview content */}
                     {isDescriptionPreviewMode && (
                       <div 
-                        className="text-gray-900 dark:text-white leading-relaxed p-4 wysiwyg-content overflow-y-auto max-h-[312px]"
+                        className="text-gray-900 dark:text-white leading-relaxed p-4 wysiwyg-content overflow-y-auto max-h-64"
                         style={{ 
                           userSelect: 'text',
                           WebkitUserSelect: 'text',
