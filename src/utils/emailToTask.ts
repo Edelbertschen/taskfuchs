@@ -2,26 +2,13 @@ import type { OutlookEmail } from '../types/email';
 import type { Task, Column } from '../types';
 
 /**
- * Constructs a permanent Outlook link that works regardless of which folder the email is in.
+ * Returns the Outlook link for an email.
  * 
- * The problem: Microsoft Graph API's message `id` changes when an email is moved between folders.
- * The `webLink` also breaks because it contains the folder path.
- * 
- * The solution: Use the Outlook deeplink/read format with internetMessageId.
- * Format: outlook.office.com/mail/deeplink/read/{internetMessageId}?ItemID={internetMessageId}&exvsurl=1
- * This opens the email directly and works even after the email is moved/archived.
+ * Note: Microsoft's webLink is folder-dependent and may break if the email is moved/archived.
+ * Unfortunately, there's no reliable permanent Outlook email link format that survives
+ * folder moves. The webLink works immediately but may need manual searching if moved.
  */
-function getPermanentOutlookLink(email: OutlookEmail): string {
-  // The internetMessageId is the RFC 2822 Message-ID header - truly immutable
-  // Format: <unique-id@domain.com>
-  if (email.internetMessageId) {
-    // Use Outlook's deeplink/read format which works with internetMessageId
-    // This opens the email directly regardless of which folder it's in
-    const encodedId = encodeURIComponent(email.internetMessageId);
-    return `https://outlook.office.com/mail/deeplink/read/${encodedId}?ItemID=${encodedId}&exvsurl=1`;
-  }
-  
-  // Fallback: use the webLink (will break if email is moved, but better than nothing)
+function getOutlookLink(email: OutlookEmail): string {
   return email.webLink;
 }
 
@@ -36,8 +23,8 @@ export function createTaskFromEmail(
   email: OutlookEmail, 
   targetColumn?: Column
 ): Task {
-  // Use permanent link format that works even after archiving
-  const outlookLink = getPermanentOutlookLink(email);
+  // Get the Outlook link (note: may break if email is moved/archived)
+  const outlookLink = getOutlookLink(email);
   
   // Format recipients
   const toList = email.toRecipients
