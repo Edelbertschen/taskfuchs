@@ -746,15 +746,34 @@ export function TaskBoard() {
   // Email drop handler for TaskColumn with position support
   const handleEmailDropOnColumn = async (email: OutlookEmail, column: Column, position: number) => {
     try {
-      const task = createTaskFromEmail(email, column);
+      console.log('Email drop on column:', { 
+        columnId: column.id, 
+        columnType: column.type, 
+        columnDate: column.date,
+        hasDate: 'date' in column
+      });
       
-      // Set columnId based on column type
-      if (column.type === 'date') {
+      const task = createTaskFromEmail(email, column);
+      console.log('Task after createTaskFromEmail:', {
+        columnId: task.columnId,
+        dueDate: task.dueDate
+      });
+      
+      // Set columnId based on column type - explicitly set dueDate for date columns
+      if (column.type === 'date' && column.date) {
         task.columnId = column.id;
         task.dueDate = column.date;
+        console.log('Setting dueDate explicitly:', task.dueDate);
       } else {
         task.columnId = column.id;
+        // Clear dueDate for non-date columns
+        task.dueDate = undefined;
       }
+      
+      console.log('Task final before dispatch:', {
+        columnId: task.columnId,
+        dueDate: task.dueDate
+      });
       
       // Get existing tasks in the column and calculate position
       const columnTasks = state.tasks
