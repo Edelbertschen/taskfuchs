@@ -1017,11 +1017,6 @@ const TaskColumn = React.memo(({
                       />
                     )}
                     
-                    {/* Email drop indicator between tasks */}
-                    {isEmailDragOver && emailDropIndex === index + 1 && (
-                      <DropIndicator isVisible={true} position="between" />
-                    )}
-                    
                     {/* Task Card */}
                     <TaskCard 
                       task={task} 
@@ -1033,6 +1028,11 @@ const TaskColumn = React.memo(({
                       currentColumn={column}
                       isDeadlineReminder={deadlineReminderTaskIds.includes(task.id)}
                     />
+                    
+                    {/* Email drop indicator AFTER this task (between this and next) */}
+                    {isEmailDragOver && emailDropIndex === index + 1 && (
+                      <DropIndicator isVisible={true} position="between" />
+                    )}
                   </div>
                 );
               })}
@@ -1085,11 +1085,6 @@ const TaskColumn = React.memo(({
                           />
                         )}
                         
-                        {/* Email drop indicator between tasks */}
-                        {isEmailDragOver && emailDropIndex === index + 1 && (
-                          <DropIndicator isVisible={true} position="between" />
-                        )}
-                        
                         {/* Task Card */}
                         <TaskCard 
                           task={task} 
@@ -1101,6 +1096,11 @@ const TaskColumn = React.memo(({
                           currentColumn={column}
                           isDeadlineReminder={deadlineReminderTaskIds.includes(task.id)}
                         />
+                        
+                        {/* Email drop indicator AFTER this task (between this and next) */}
+                        {isEmailDragOver && emailDropIndex === index + 1 && (
+                          <DropIndicator isVisible={true} position="between" />
+                        )}
                       </div>
                     );
                   })}

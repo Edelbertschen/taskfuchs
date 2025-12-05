@@ -10,46 +10,40 @@ export function DropIndicator({ isVisible, position }: DropIndicatorProps) {
   const { state } = useApp();
   const accentColor = state.preferences.accentColor || '#0ea5e9';
   
-  // ✨ ANTI-JITTER FIX: Always render the container with fixed height
-  // Only toggle visibility of inner content to prevent layout shifts
+  // ✨ GAP EFFECT: Smoothly expand to push tasks apart when visible
   return (
     <div 
-      className="w-full"
+      className="w-full overflow-hidden"
       style={{
-        // ✨ Fixed height container - prevents layout shifts when toggling visibility
-        height: '8px', // Small fixed height that doesn't disrupt layout
-        minHeight: '8px',
-        maxHeight: isVisible ? '74px' : '8px',
+        // ✨ Animate height to create actual gap that pushes content
+        height: isVisible ? '80px' : '0px',
         opacity: 1,
-        // ✨ Smooth height transition only when becoming visible
-        transition: isVisible ? 'max-height 150ms ease-out' : 'max-height 100ms ease-in',
-        overflow: 'hidden',
+        transition: 'height 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
         transform: 'translateZ(0)',
-        willChange: 'max-height',
+        willChange: 'height',
         pointerEvents: 'none',
-        contain: 'layout style',
       }}
     >
-      {/* ✨ Inner content - only visible when dropping */}
+      {/* ✨ Inner content - the visual drop zone */}
       <div 
-        className="w-full rounded-lg border-2 border-dashed flex items-center justify-center"
+        className="w-full h-full rounded-xl border-2 border-dashed flex items-center justify-center mx-auto"
         style={{
-          height: '74px',
-          borderColor: isVisible ? `${accentColor}60` : 'transparent',
-          backgroundColor: isVisible ? `${accentColor}08` : 'transparent',
+          borderColor: isVisible ? `${accentColor}70` : 'transparent',
+          backgroundColor: isVisible ? `${accentColor}15` : 'transparent',
           opacity: isVisible ? 1 : 0,
-          transition: 'opacity 100ms ease-out, border-color 100ms ease-out, background-color 100ms ease-out',
+          transition: 'opacity 150ms ease-out, border-color 150ms ease-out, background-color 150ms ease-out',
           transform: 'translateZ(0)',
-          contain: 'layout style',
+          margin: '4px 0',
+          height: 'calc(100% - 8px)',
         }}
       >
-        {/* Simple, elegant drop hint */}
+        {/* Drop hint text */}
         <div 
           className="text-sm font-medium"
           style={{ 
             color: accentColor,
-            opacity: isVisible ? 0.6 : 0,
-            transition: 'opacity 100ms ease-out',
+            opacity: isVisible ? 0.8 : 0,
+            transition: 'opacity 150ms ease-out',
           }}
         >
           Drop here
