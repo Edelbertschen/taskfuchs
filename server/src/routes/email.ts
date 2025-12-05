@@ -87,7 +87,8 @@ app.get('/messages', async (c) => {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
-        'Prefer': 'outlook.body-content-type="text"'
+        // Use immutable IDs so webLink works even after email is moved to another folder
+        'Prefer': 'IdType="ImmutableId", outlook.body-content-type="text"'
       }
     });
 
@@ -146,7 +147,8 @@ app.get('/messages/:id', async (c) => {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
-        'Prefer': 'outlook.body-content-type="html"'
+        // Use immutable IDs so webLink works even after email is moved to another folder
+        'Prefer': 'IdType="ImmutableId", outlook.body-content-type="html"'
       }
     });
 
