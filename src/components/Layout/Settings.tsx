@@ -3924,29 +3924,29 @@ const Settings = React.memo(() => {
                   : 'Choose a predefined theme or create your own with the settings below.'}
               </p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {/* Default Theme */}
+                {/* Petrol & Light Theme - NEW DEFAULT */}
                 <button
                   onClick={() => {
                     dispatch({
                       type: 'UPDATE_PREFERENCES',
                       payload: {
                         theme: 'light',
-                        accentColor: '#f97316',
-                        backgroundImage: '/backgrounds/bg12.webp',
+                        accentColor: '#006d8f',
+                        backgroundImage: '/backgrounds/bg11.jpg',
                         backgroundType: 'image'
                       }
                     });
                     document.documentElement.classList.remove('dark');
                   }}
-                  className="group relative p-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-orange-400 dark:hover:border-orange-400 transition-all duration-200 bg-white dark:bg-gray-800"
+                  className="group relative p-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-teal-500 dark:hover:border-teal-400 transition-all duration-200 bg-white dark:bg-gray-800"
                 >
                   <div className="aspect-[4/3] rounded-lg overflow-hidden mb-2 relative">
                     <img 
-                      src="/backgrounds/thumbs/bg12_thumb.webp" 
-                      alt="Default Theme"
+                      src="/backgrounds/thumbs/bg11_thumb.webp" 
+                      alt="Petrol Theme"
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute top-1 right-1 w-4 h-4 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: '#f97316' }} />
+                    <div className="absolute top-1 right-1 w-4 h-4 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: '#006d8f' }} />
                     <div className="absolute bottom-1 left-1 bg-white/90 rounded px-1.5 py-0.5 flex items-center gap-1">
                       <Sun className="w-3 h-3 text-amber-500" />
                     </div>
@@ -4020,35 +4020,35 @@ const Settings = React.memo(() => {
                   </span>
                 </button>
 
-                {/* Teal & Light Theme */}
+                {/* Fox Orange & Light Theme - OLD DEFAULT */}
                 <button
                   onClick={() => {
                     dispatch({
                       type: 'UPDATE_PREFERENCES',
                       payload: {
                         theme: 'light',
-                        accentColor: '#006d8f',
-                        backgroundImage: '/backgrounds/bg11.jpg',
+                        accentColor: '#f97316',
+                        backgroundImage: '/backgrounds/bg12.webp',
                         backgroundType: 'image'
                       }
                     });
                     document.documentElement.classList.remove('dark');
                   }}
-                  className="group relative p-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-teal-500 dark:hover:border-teal-400 transition-all duration-200 bg-white dark:bg-gray-800"
+                  className="group relative p-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-orange-400 dark:hover:border-orange-400 transition-all duration-200 bg-white dark:bg-gray-800"
                 >
                   <div className="aspect-[4/3] rounded-lg overflow-hidden mb-2 relative">
                     <img 
-                      src="/backgrounds/thumbs/bg11_thumb.webp" 
-                      alt="Teal & Light Theme"
+                      src="/backgrounds/thumbs/bg12_thumb.webp" 
+                      alt="Fox Theme"
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute top-1 right-1 w-4 h-4 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: '#006d8f' }} />
+                    <div className="absolute top-1 right-1 w-4 h-4 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: '#f97316' }} />
                     <div className="absolute bottom-1 left-1 bg-white/90 rounded px-1.5 py-0.5 flex items-center gap-1">
                       <Sun className="w-3 h-3 text-amber-500" />
                     </div>
                   </div>
                   <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
-                    {state.preferences.language === 'de' ? 'Petrol & Hell' : 'Teal & Light'}
+                    {state.preferences.language === 'de' ? 'Fuchs' : 'Fox'}
                   </span>
                 </button>
               </div>

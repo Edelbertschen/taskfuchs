@@ -285,8 +285,8 @@ const initialState: AppState = {
   preferences: {
     theme: 'light',
     language: 'de',
-    accentColor: '#f97316',
-    backgroundImage: '/backgrounds/bg12.webp',
+    accentColor: '#006d8f',
+    backgroundImage: '/backgrounds/bg11.jpg',
     backgroundType: 'image',
     dateFormat: 'dd.MM.yyyy',
     recentBackgroundImages: [],

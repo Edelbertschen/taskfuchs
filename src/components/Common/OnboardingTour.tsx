@@ -196,6 +196,18 @@ const tourSections: TourSection[] = [
         stylingDemo: true
       },
       {
+        title: { de: 'Style: Petrol & Hell', en: 'Style: Teal & Light' },
+        text: { de: 'Das Standard-Theme: Lightmode mit edlem Petrol-Akzent und hellem, freundlichem Hintergrund.', en: 'The default theme: Light mode with elegant teal accent and bright, friendly background.' },
+        position: 'center',
+        stylingDemo: true,
+        applyStyling: {
+          theme: 'light',
+          accentColor: '#006d8f',
+          backgroundImage: '/backgrounds/bg11.jpg',
+          label: { de: 'Petrol & Hell', en: 'Teal & Light' }
+        }
+      },
+      {
         title: { de: 'Style: Cyan & Dunkel', en: 'Style: Cyan & Dark' },
         text: { de: 'Darkmode mit coolem Cyan-Akzent und atmosphärischem Hintergrund.', en: 'Dark mode with cool cyan accent and atmospheric background.' },
         position: 'center',
@@ -220,15 +232,15 @@ const tourSections: TourSection[] = [
         }
       },
       {
-        title: { de: 'Style: Petrol & Hell', en: 'Style: Teal & Light' },
-        text: { de: 'Lightmode mit edlem Petrol-Akzent und hellem, freundlichem Hintergrund.', en: 'Light mode with elegant teal accent and bright, friendly background.' },
+        title: { de: 'Style: Fuchs', en: 'Style: Fox' },
+        text: { de: 'Lightmode mit warmem Orange-Akzent und dem Fuchs-Motiv.', en: 'Light mode with warm orange accent and the fox motif.' },
         position: 'center',
         stylingDemo: true,
         applyStyling: {
           theme: 'light',
-          accentColor: '#006d8f',
-          backgroundImage: '/backgrounds/bg11.jpg',
-          label: { de: 'Petrol & Hell', en: 'Teal & Light' }
+          accentColor: '#f97316',
+          backgroundImage: '/backgrounds/bg12.webp',
+          label: { de: 'Fuchs', en: 'Fox' }
         }
       },
       {
