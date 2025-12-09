@@ -152,19 +152,16 @@ export function createTaskFromEmail(
     bodyMarkdown = getFirstLines(email.bodyPreview, 20);
   }
   
-  // Build description: Outlook link FIRST, then metadata on separate lines, then body
+  // Build description: Compact header with Outlook link, metadata, then body
   let description = `[📧 Open in Outlook](${outlookLink})
 
----
-
 **From:** ${senderName} [${senderEmail}](mailto:${senderEmail})
+**Date:** ${receivedDate}
 
-**Date:** ${receivedDate}`;
+---`;
 
   if (bodyMarkdown) {
     description += `
-
----
 
 ${bodyMarkdown}`;
   }

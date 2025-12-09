@@ -2901,7 +2901,14 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                           maxHeight: '200px',
                           overflowY: 'auto'
                         }}
-                        onClick={() => setIsDescriptionPreviewMode(false)}
+                        onClick={(e) => {
+                          // Don't enter edit mode if clicking on a link or button
+                          const target = e.target as HTMLElement;
+                          if (target.closest('a') || target.closest('button') || target.tagName === 'A' || target.tagName === 'BUTTON') {
+                            return;
+                          }
+                          setIsDescriptionPreviewMode(false);
+                        }}
                       >
                         {!formData.description?.trim() && (
                           <span className="text-gray-400 dark:text-gray-500 text-sm italic">
