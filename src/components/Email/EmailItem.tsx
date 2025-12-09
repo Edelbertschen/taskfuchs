@@ -177,6 +177,13 @@ export const EmailItem = memo(function EmailItem({
   const senderName = getEmailSenderDisplay(email);
   const timeDisplay = formatEmailTime(email.receivedDateTime);
 
+  // Handle click on email item to open preview
+  const handleClick = () => {
+    if (!isDragging) {
+      setShowPreview(true);
+    }
+  };
+
   return (
     <div
       draggable
@@ -184,9 +191,10 @@ export const EmailItem = memo(function EmailItem({
       onDragEnd={handleDragEnd}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={handleClick}
       className={`
         group relative p-3 border-b border-gray-100 dark:border-gray-800 
-        transition-all duration-150 cursor-grab
+        transition-all duration-150 cursor-pointer
         ${isDragging ? 'opacity-50 cursor-grabbing' : ''}
         ${!email.isRead ? '' : 'bg-white dark:bg-gray-900'}
         hover:bg-gray-50 dark:hover:bg-gray-800/50

@@ -24,6 +24,12 @@ function htmlToMarkdown(html: string): string {
   // Remove style and script tags completely
   text = text.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
   text = text.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+  text = text.replace(/<head[^>]*>[\s\S]*?<\/head>/gi, '');
+  
+  // Handle table cells - add space/newline
+  text = text.replace(/<\/td>/gi, ' ');
+  text = text.replace(/<\/tr>/gi, '\n');
+  text = text.replace(/<\/th>/gi, ' ');
   
   // Convert common elements to markdown
   text = text.replace(/<br\s*\/?>/gi, '\n');
@@ -49,7 +55,7 @@ function htmlToMarkdown(html: string): string {
   text = text.replace(/<h2[^>]*>(.*?)<\/h2>/gi, '## $1\n');
   text = text.replace(/<h3[^>]*>(.*?)<\/h3>/gi, '### $1\n');
   
-  // Links
+  // Links - preserve href
   text = text.replace(/<a[^>]*href=["']([^"']*)["'][^>]*>(.*?)<\/a>/gi, '[$2]($1)');
   
   // Blockquotes
@@ -74,27 +80,44 @@ function htmlToMarkdown(html: string): string {
   text = text.replace(/&mdash;/gi, '—');
   text = text.replace(/&ndash;/gi, '–');
   text = text.replace(/&hellip;/gi, '...');
+  text = text.replace(/&#\d+;/gi, ''); // Remove numeric entities
   
-  // Clean up excessive whitespace
-  text = text.replace(/\n{3,}/g, '\n\n');
-  text = text.replace(/[ \t]+/g, ' ');
-  text = text.split('\n').map(line => line.trim()).join('\n');
+  // Clean up excessive whitespace but preserve line structure
+  text = text.replace(/\r\n/g, '\n'); // Normalize line endings
+  text = text.replace(/\n{3,}/g, '\n\n'); // Max 2 newlines
+  text = text.replace(/[ \t]+/g, ' '); // Collapse horizontal whitespace
+  text = text.split('\n').map(line => line.trim()).join('\n'); // Trim each line
+  text = text.replace(/\n{3,}/g, '\n\n'); // Clean again after trimming
   
   return text.trim();
 }
 
 /**
- * Gets the first N lines of text
+ * Gets the first N lines of text, preserving empty lines for readability
  */
 function getFirstLines(text: string, maxLines: number = 20): string {
-  const lines = text.split('\n').filter(line => line.trim());
-  const truncated = lines.slice(0, maxLines);
-  const result = truncated.join('\n');
+  // Split and keep structure, but limit non-empty lines
+  const allLines = text.split('\n');
+  const result: string[] = [];
+  let nonEmptyCount = 0;
   
-  if (lines.length > maxLines) {
-    return result + '\n\n*[...]*';
+  for (const line of allLines) {
+    if (line.trim()) {
+      if (nonEmptyCount >= maxLines) break;
+      nonEmptyCount++;
+    }
+    result.push(line);
+    
+    // Stop if we have enough content
+    if (nonEmptyCount >= maxLines) break;
   }
-  return result;
+  
+  const finalText = result.join('\n').trim();
+  
+  if (nonEmptyCount >= maxLines && allLines.length > result.length) {
+    return finalText + '\n\n*[...]*';
+  }
+  return finalText;
 }
 
 /**
@@ -129,16 +152,21 @@ export function createTaskFromEmail(
     bodyMarkdown = getFirstLines(email.bodyPreview, 20);
   }
   
-  // Build description: Outlook link FIRST, then metadata, then body content
+  // Build description: Outlook link FIRST, then metadata on separate lines, then body
   let description = `[📧 Open in Outlook](${outlookLink})
 
 ---
 
-**From:** ${senderName} <${senderEmail}>
+**From:** ${senderName} [${senderEmail}](mailto:${senderEmail})
+
 **Date:** ${receivedDate}`;
 
   if (bodyMarkdown) {
-    description += `\n\n---\n\n${bodyMarkdown}`;
+    description += `
+
+---
+
+${bodyMarkdown}`;
   }
 
   // Determine if this is a date column (planner) or inbox

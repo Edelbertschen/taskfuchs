@@ -91,6 +91,16 @@ function emailReducer(state: EmailSidebarState, action: EmailAction): EmailSideb
   }
 }
 
+// Attachment type
+export interface EmailAttachment {
+  id: string;
+  name: string;
+  contentType: string;
+  size: number;
+  isInline?: boolean;
+  contentBytes?: string;
+}
+
 // Context type
 interface EmailContextType {
   state: EmailSidebarState;
@@ -100,6 +110,8 @@ interface EmailContextType {
   fetchFolders: () => Promise<void>;
   fetchMessages: (folderId?: string, append?: boolean) => Promise<void>;
   fetchMessageBody: (messageId: string) => Promise<OutlookEmail | null>;
+  fetchAttachments: (messageId: string) => Promise<EmailAttachment[]>;
+  downloadAttachment: (messageId: string, attachmentId: string) => Promise<EmailAttachment | null>;
   selectFolder: (folderId: string) => void;
   markAsRead: (messageId: string, isRead: boolean) => Promise<void>;
   archiveMessage: (messageId: string) => Promise<void>;
@@ -273,6 +285,32 @@ export function EmailProvider({ children }: { children: React.ReactNode }) {
     }
   }, [authState.isAuthenticated]);
 
+  // Fetch attachments for a message
+  const fetchAttachments = useCallback(async (messageId: string): Promise<EmailAttachment[]> => {
+    if (!authState.isAuthenticated) return [];
+    
+    try {
+      const data = await emailAPI<{ attachments: EmailAttachment[] }>(`/api/email/messages/${messageId}/attachments`);
+      return data.attachments;
+    } catch (error: any) {
+      console.error('Failed to fetch attachments:', error);
+      return [];
+    }
+  }, [authState.isAuthenticated]);
+
+  // Download a specific attachment
+  const downloadAttachment = useCallback(async (messageId: string, attachmentId: string): Promise<EmailAttachment | null> => {
+    if (!authState.isAuthenticated) return null;
+    
+    try {
+      const data = await emailAPI<{ attachment: EmailAttachment }>(`/api/email/messages/${messageId}/attachments/${attachmentId}`);
+      return data.attachment;
+    } catch (error: any) {
+      console.error('Failed to download attachment:', error);
+      return null;
+    }
+  }, [authState.isAuthenticated]);
+
   // Set email-to-task action
   const setEmailToTaskAction = useCallback((action: EmailToTaskAction) => {
     dispatch({ type: 'SET_EMAIL_TO_TASK_ACTION', payload: action });
@@ -319,6 +357,8 @@ export function EmailProvider({ children }: { children: React.ReactNode }) {
     fetchFolders,
     fetchMessages,
     fetchMessageBody,
+    fetchAttachments,
+    downloadAttachment,
     selectFolder,
     markAsRead,
     archiveMessage,

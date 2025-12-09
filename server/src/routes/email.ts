@@ -318,5 +318,98 @@ app.delete('/messages/:id', async (c) => {
   }
 });
 
+/**
+ * GET /api/email/messages/:id/attachments
+ * List attachments for an email
+ */
+app.get('/messages/:id/attachments', async (c) => {
+  const accessToken = getMsAccessToken(c);
+  const messageId = c.req.param('id');
+  
+  if (!accessToken) {
+    return c.json({ error: 'Microsoft access token not available' }, 401);
+  }
+
+  try {
+    const response = await fetch(`${MS_GRAPH_URL}/me/messages/${messageId}/attachments`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('Graph API error (attachments):', error);
+      return c.json({ error: error.error?.message || 'Failed to fetch attachments' }, response.status as 400 | 401 | 403 | 404 | 500);
+    }
+
+    const data = await response.json();
+    
+    // Transform attachment data
+    const attachments = data.value.map((att: any) => ({
+      id: att.id,
+      name: att.name,
+      contentType: att.contentType,
+      size: att.size,
+      isInline: att.isInline,
+      // For file attachments, include content if small enough
+      contentBytes: att['@odata.type'] === '#microsoft.graph.fileAttachment' && att.size < 5000000 
+        ? att.contentBytes 
+        : undefined
+    }));
+
+    return c.json({ attachments });
+  } catch (error: any) {
+    console.error('Failed to fetch attachments:', error);
+    return c.json({ error: error.message || 'Failed to fetch attachments' }, 500);
+  }
+});
+
+/**
+ * GET /api/email/messages/:id/attachments/:attachmentId
+ * Download a specific attachment
+ */
+app.get('/messages/:id/attachments/:attachmentId', async (c) => {
+  const accessToken = getMsAccessToken(c);
+  const messageId = c.req.param('id');
+  const attachmentId = c.req.param('attachmentId');
+  
+  if (!accessToken) {
+    return c.json({ error: 'Microsoft access token not available' }, 401);
+  }
+
+  try {
+    const response = await fetch(`${MS_GRAPH_URL}/me/messages/${messageId}/attachments/${attachmentId}`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('Graph API error (attachment download):', error);
+      return c.json({ error: error.error?.message || 'Failed to download attachment' }, response.status as 400 | 401 | 403 | 404 | 500);
+    }
+
+    const attachment = await response.json();
+    
+    // Return attachment with content
+    return c.json({ 
+      attachment: {
+        id: attachment.id,
+        name: attachment.name,
+        contentType: attachment.contentType,
+        size: attachment.size,
+        contentBytes: attachment.contentBytes
+      }
+    });
+  } catch (error: any) {
+    console.error('Failed to download attachment:', error);
+    return c.json({ error: error.message || 'Failed to download attachment' }, 500);
+  }
+});
+
 export default app;
 
