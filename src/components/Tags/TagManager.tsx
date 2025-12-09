@@ -409,61 +409,33 @@ export function TagManager() {
 
         {/* Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className={`rounded-lg border p-4 ${
-          isMinimalDesign
-            ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
-            : 'bg-white border-gray-200'
-        }`}>
+        <div className="rounded-lg border p-4 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
           <div className="flex items-center space-x-3">
             <Hash 
               className="w-8 h-8" 
               style={{ color: state.preferences.accentColor }}
             />
             <div>
-              <p className={`text-sm ${
-                isMinimalDesign
-                  ? 'text-gray-600 dark:text-gray-300'
-                  : 'text-gray-600'
-              }`}>{tagManager.totalTags()}</p>
-              <p className={`text-2xl font-bold ${
-                isMinimalDesign
-                  ? 'text-gray-900 dark:text-white'
-                  : 'text-gray-900'
-              }`}>{totalTags}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{tagManager.totalTags()}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{totalTags}</p>
             </div>
           </div>
         </div>
 
-        <div className={`rounded-lg border p-4 ${
-          isMinimalDesign
-            ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
-            : 'bg-white border-gray-200'
-        }`}>
+        <div className="rounded-lg border p-4 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
           <div className="flex items-center space-x-3">
             <BarChart3 
               className="w-8 h-8" 
               style={{ color: state.preferences.accentColor }}
             />
             <div>
-              <p className={`text-sm ${
-                isMinimalDesign
-                  ? 'text-gray-600 dark:text-gray-300'
-                  : 'text-gray-600'
-              }`}>{tagManager.tagUsage()}</p>
-              <p className={`text-2xl font-bold ${
-                isMinimalDesign
-                  ? 'text-gray-900 dark:text-white'
-                  : 'text-gray-900'
-              }`}>{totalTagUsage}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{tagManager.tagUsage()}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{totalTagUsage}</p>
             </div>
           </div>
         </div>
 
-        <div className={`rounded-lg border p-4 ${
-          isMinimalDesign
-            ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
-            : 'bg-white border-gray-200'
-        }`}>
+        <div className="rounded-lg border p-4 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
           <div className="flex items-center space-x-3">
             <div 
               className="w-8 h-8 rounded-full flex items-center justify-center"
@@ -472,16 +444,8 @@ export function TagManager() {
               <Hash className="w-4 h-4 text-white" />
             </div>
             <div>
-              <p className={`text-sm ${
-                isMinimalDesign
-                  ? 'text-gray-600 dark:text-gray-300'
-                  : 'text-gray-600'
-              }`}>{tagManager.mostUsed()} ({activeTab === 'tasks' ? tagManager.tasks() : tagManager.notes()})</p>
-              <p className={`text-lg font-bold truncate ${
-                isMinimalDesign
-                  ? 'text-gray-900 dark:text-white'
-                  : 'text-gray-900'
-              }`}>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{tagManager.mostUsed()} ({activeTab === 'tasks' ? tagManager.tasks() : tagManager.notes()})</p>
+              <p className="text-lg font-bold truncate text-gray-900 dark:text-white">
                 {mostUsedTag.name || tagManager.noTags()}
               </p>
             </div>
@@ -490,57 +454,33 @@ export function TagManager() {
       </div>
 
       {/* Tags List */}
-      <div className={`rounded-lg border ${
-        isMinimalDesign
-          ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
-          : 'bg-white border-gray-200'
-      }`}>
-        <div className={`p-4 border-b ${
-          isMinimalDesign
-            ? 'border-gray-200 dark:border-gray-700'
-            : 'border-gray-200'
-        }`}>
-          <h2 className={`text-lg font-semibold ${
-            isMinimalDesign
-              ? 'text-gray-900 dark:text-white'
-              : 'text-gray-900'
-          }`}>{tagManager.allTags()}</h2>
+      <div className="rounded-lg border bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{tagManager.allTags()}</h2>
         </div>
 
         <div className="p-4">
           {/* Tab Navigation */}
-          <div className={`flex space-x-1 mb-6 rounded-lg p-1 ${
-            isMinimalDesign
-              ? 'bg-gray-100 dark:bg-gray-700'
-              : 'bg-gray-100'
-          }`}>
-                          <button
-                onClick={() => setActiveTab('tasks')}
-                className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                  activeTab === 'tasks'
-                    ? (isMinimalDesign
-                        ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
-                        : 'bg-white text-gray-900 shadow-sm')
-                    : (isMinimalDesign
-                        ? 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
-                        : 'text-gray-600 hover:text-gray-900')
-                }`}
-              >
-                <CheckSquare className="w-4 h-4" />
-                <span>{tagManager.taskTags(taskTags.length)}</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('notes')}
-                className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                  activeTab === 'notes'
-                    ? (isMinimalDesign
-                        ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
-                        : 'bg-white text-gray-900 shadow-sm')
-                    : (isMinimalDesign
-                        ? 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
-                        : 'text-gray-600 hover:text-gray-900')
-                }`}
-              >
+          <div className="flex space-x-1 mb-6 rounded-lg p-1 bg-gray-100 dark:bg-gray-700">
+            <button
+              onClick={() => setActiveTab('tasks')}
+              className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                activeTab === 'tasks'
+                  ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              <CheckSquare className="w-4 h-4" />
+              <span>{tagManager.taskTags(taskTags.length)}</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('notes')}
+              className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                activeTab === 'notes'
+                  ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
               <FileText className="w-4 h-4" />
               <span>{tagManager.noteTags(noteTags.length)}</span>
             </button>
@@ -562,10 +502,10 @@ export function TagManager() {
                   return (
                     <div
                       key={tag.id}
-                      className="relative inline-flex items-center space-x-3 px-4 py-2 rounded-full transition-all duration-200 bg-white border hover:shadow-lg min-w-[120px]"
+                      className="relative inline-flex items-center space-x-3 px-4 py-2 rounded-full transition-all duration-200 border hover:shadow-lg min-w-[120px]"
                       style={{ 
                         borderColor: `${state.preferences.accentColor}30`,
-                        backgroundColor: `${state.preferences.accentColor}08`
+                        backgroundColor: `${state.preferences.accentColor}10`
                       }}
                     >
                       {/* Tag Name */}
@@ -646,7 +586,7 @@ export function TagManager() {
                 : 'text-gray-900 dark:text-white'
             }`}>{tagManager.deleteTagTitle()}</h3>
             <p className="text-gray-600 dark:text-gray-300 mb-6">
-              {tagManager.deleteConfirmation({ name: tagToDelete?.name || '' })}
+              {t('tag_manager.delete_confirmation', { name: tagToDelete?.name || '' })}
             </p>
             <div className="flex justify-end space-x-3">
               <button

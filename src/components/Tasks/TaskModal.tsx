@@ -2017,7 +2017,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
           )}
 
           {/* Header with editable title, date, and project - Frosted Glass */}
-          <div className="task-modal-header relative p-4 sm:p-5 border-b border-white/40 dark:border-white/10"
+          <div className="task-modal-header relative px-4 py-3 sm:px-5 sm:py-3 border-b border-white/40 dark:border-white/10"
             style={{
               background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(250, 251, 252, 0.3) 100%)',
             }}
@@ -2027,124 +2027,155 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                 background: linear-gradient(180deg, rgba(51, 65, 85, 0.4) 0%, rgba(30, 41, 59, 0.2) 100%) !important;
               }
             `}</style>
-            {/* Close button - Subtle, elegant */}
-            <div className="absolute top-4 right-4 z-10">
+            {/* Close Button */}
+            <div className="absolute top-3 right-3 z-10">
               <button
                 onClick={handleClose}
-                className="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-all duration-200 hover:bg-gray-100/80 dark:hover:bg-gray-800/80 rounded-full hover:scale-105"
+                className="p-1.5 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-all duration-200 hover:bg-gray-100/80 dark:hover:bg-gray-800/80 rounded-full hover:scale-105"
                 title="Close modal"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Title with Date and Project */}
-            <div className="pr-12 flex items-center space-x-4">
-              {/* Pin Dropdown vor dem Titel - Elegant */}
-              <div className="relative flex-shrink-0">
-                <button
-                  onClick={() => setShowPinDropdown(!showPinDropdown)}
-                  className={`p-2.5 transition-all duration-200 rounded-xl ${
-                    task?.pinColumnId
-                      ? 'text-white shadow-md'
-                      : 'text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100/80 dark:hover:bg-gray-800/80'
-                  }`}
-                  style={task?.pinColumnId ? { ...getAccentColorStyles().bg, boxShadow: `0 4px 12px -2px ${state.preferences.accentColor}40` } : {}}
-                  title={task?.pinColumnId ? `Gepinnt in ${state.pinColumns.find(col => col.id === task.pinColumnId)?.title || 'Unbekannt'}` : 'An Pins anheften'}
-                >
-                  <Pin className="w-5 h-5" />
-                </button>
+            {/* Compact Header Layout */}
+            <div className="pr-10 space-y-2">
+              {/* Row 1: Pin + Title (single line, scrollable) */}
+              <div className="flex items-center space-x-2">
+                {/* Pin Dropdown - Compact */}
+                <div className="relative flex-shrink-0">
+                  <button
+                    onClick={() => setShowPinDropdown(!showPinDropdown)}
+                    className={`p-1.5 transition-all duration-200 rounded-lg ${
+                      task?.pinColumnId
+                        ? 'text-white shadow-md'
+                        : 'text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100/80 dark:hover:bg-gray-800/80'
+                    }`}
+                    style={task?.pinColumnId ? { ...getAccentColorStyles().bg, boxShadow: `0 4px 12px -2px ${state.preferences.accentColor}40` } : {}}
+                    title={task?.pinColumnId ? `Gepinnt in ${state.pinColumns.find(col => col.id === task.pinColumnId)?.title || 'Unbekannt'}` : 'An Pins anheften'}
+                  >
+                    <Pin className="w-4 h-4" />
+                  </button>
 
-                {/* Pin Dropdown */}
-                {showPinDropdown && (
-                  <div className="absolute top-full left-0 mt-1 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1 z-50">
-                    <div className="px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
-                      {pins.selectPinColumn()}
+                  {/* Pin Dropdown */}
+                  {showPinDropdown && (
+                    <div className="absolute top-full left-0 mt-1 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1 z-50">
+                      <div className="px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+                        {pins.selectPinColumn()}
+                      </div>
+                      
+                      {/* Remove pin option */}
+                      {task?.pinColumnId && (
+                        <button
+                          onClick={() => {
+                            if (task) {
+                              dispatch({
+                                type: 'UNPIN_TASK',
+                                payload: task.id
+                              });
+                            }
+                            setShowPinDropdown(false);
+                          }}
+                          className="w-full text-left px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center space-x-2"
+                        >
+                          <X className="w-4 h-4" />
+                          <span>{pins.removePin()}</span>
+                        </button>
+                      )}
+
+                      {/* Pin column options */}
+                      {state.pinColumns.map((column) => (
+                        <button
+                          key={column.id}
+                          onClick={() => {
+                            if (task) {
+                              dispatch({
+                                type: 'ASSIGN_TASK_TO_PIN',
+                                payload: { taskId: task.id, pinColumnId: column.id }
+                              });
+                            }
+                            setShowPinDropdown(false);
+                          }}
+                          className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2 ${
+                            task?.pinColumnId === column.id ? 'bg-gray-100 dark:bg-gray-700' : ''
+                          }`}
+                        >
+                          <div
+                            className="w-3 h-3 rounded-full border border-gray-300 dark:border-gray-500"
+                            style={{ backgroundColor: column.color || state.preferences.accentColor }}
+                          />
+                          <span className="text-gray-900 dark:text-white">{column.title}</span>
+                          {task?.pinColumnId === column.id && (
+                            <Pin className="w-3 h-3 ml-auto text-gray-400" />
+                          )}
+                        </button>
+                      ))}
                     </div>
-                    
-                    {/* Remove pin option */}
-                    {task?.pinColumnId && (
-                      <button
-                        onClick={() => {
-                          if (task) {
-                            dispatch({
-                              type: 'UNPIN_TASK',
-                              payload: task.id
-                            });
-                          }
-                          setShowPinDropdown(false);
-                        }}
-                        className="w-full text-left px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center space-x-2"
-                      >
-                        <X className="w-4 h-4" />
-                        <span>{pins.removePin()}</span>
-                      </button>
-                    )}
-
-                    {/* Pin column options */}
-                    {state.pinColumns.map((column) => (
-                      <button
-                        key={column.id}
-                        onClick={() => {
-                          if (task) {
-                            dispatch({
-                              type: 'ASSIGN_TASK_TO_PIN',
-                              payload: { taskId: task.id, pinColumnId: column.id }
-                            });
-                          }
-                          setShowPinDropdown(false);
-                        }}
-                        className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2 ${
-                          task?.pinColumnId === column.id ? 'bg-gray-100 dark:bg-gray-700' : ''
-                        }`}
-                      >
-                        <div
-                          className="w-3 h-3 rounded-full border border-gray-300 dark:border-gray-500"
-                          style={{ backgroundColor: column.color || state.preferences.accentColor }}
-                        />
-                        <span className="text-gray-900 dark:text-white">{column.title}</span>
-                        {task?.pinColumnId === column.id && (
-                          <Pin className="w-3 h-3 ml-auto text-gray-400" />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                )}
+                  )}
+                </div>
+                
+                {/* Title Input - Single line, horizontally scrollable */}
+                <input
+                  ref={titleInputRef}
+                  type="text"
+                  value={formData.title}
+                  onChange={handleTitleChange}
+                  onBlur={handleTitleBlur}
+                  onKeyDown={handleTitleKeyDown}
+                  placeholder="Aufgabentitel eingeben..."
+                  className={`text-lg font-semibold bg-transparent border-none p-0 flex-1 min-w-0 focus:outline-none focus:ring-0 placeholder-gray-300 dark:placeholder-gray-600 transition-all duration-200 tracking-tight ${
+                    task?.completed
+                      ? 'text-gray-400 dark:text-gray-500 line-through'
+                      : 'text-gray-800 dark:text-white'
+                  }`}
+                  autoFocus={false}
+                />
               </div>
               
-              <input
-                ref={titleInputRef}
-                type="text"
-                value={formData.title}
-                onChange={handleTitleChange}
-                onBlur={handleTitleBlur}
-                onKeyDown={handleTitleKeyDown}
-                placeholder="Aufgabentitel eingeben..."
-                className={`text-lg sm:text-xl font-semibold bg-transparent border-none p-0 flex-1 min-w-0 focus:outline-none focus:ring-0 placeholder-gray-300 dark:placeholder-gray-600 transition-all duration-200 tracking-tight ${
-                  task?.completed
-                    ? 'text-gray-400 dark:text-gray-500 line-through'
-                    : 'text-gray-800 dark:text-white'
-                }`}
-                autoFocus={false}
-              />
-              
-                {/* Date & Project in Header - Elegant Pills */}
-                <div className="flex items-center space-x-2 flex-shrink-0">
+              {/* Row 2: Date, Project & Timer - Compact Pills with highlight */}
+              <div className="flex items-center space-x-1.5 pl-7">
+                {/* Inbox Indicator - shown when no date and no project, highlighted like active selections */}
+                {!formData.reminderDate && !formData.projectId && (
+                  <div 
+                    className="flex items-center space-x-1.5 px-2.5 py-1.5 text-xs rounded-lg font-medium shadow-sm"
+                    style={{ 
+                      backgroundColor: state.preferences.accentColor + '20', 
+                      border: `1px solid ${state.preferences.accentColor}40`,
+                      color: state.preferences.accentColor
+                    }}
+                  >
+                    <Inbox className="w-3.5 h-3.5" />
+                    <span>Inbox</span>
+                  </div>
+                )}
+
                 {/* Date */}
                 <div className="relative dropdown-container">
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1">
                     <button
                       onClick={() => {
                         setShowInlineCalendar(!showInlineCalendar);
                         setShowInlineProjectSelector(false);
                         setExpandedProject(null);
                       }}
-                        className="flex items-center space-x-2 px-3.5 py-2 text-sm rounded-xl transition-all duration-200 bg-white/60 dark:bg-gray-800/60 hover:bg-white dark:hover:bg-gray-800 border border-gray-200/50 dark:border-gray-700/50 hover:shadow-sm font-medium backdrop-blur-sm"
+                      className={`flex items-center space-x-1.5 px-2.5 py-1.5 text-xs rounded-lg transition-all duration-200 font-medium backdrop-blur-sm ${
+                        formData.reminderDate 
+                          ? 'shadow-sm' 
+                          : 'bg-white/60 dark:bg-gray-800/60 hover:bg-white dark:hover:bg-gray-800 border border-gray-200/50 dark:border-gray-700/50 hover:shadow-sm'
+                      }`}
+                      style={formData.reminderDate ? { 
+                        backgroundColor: state.preferences.accentColor + '20', 
+                        borderColor: state.preferences.accentColor + '40',
+                        border: `1px solid ${state.preferences.accentColor}40`
+                      } : {}}
                     >
-                        <CalendarDays className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-700 dark:text-gray-200">
+                        <CalendarDays 
+                          className="w-3.5 h-3.5" 
+                          style={formData.reminderDate ? { color: state.preferences.accentColor } : { color: '#9ca3af' }}
+                        />
+                        <span style={formData.reminderDate ? { color: state.preferences.accentColor } : {}} className={formData.reminderDate ? '' : 'text-gray-700 dark:text-gray-200'}>
                         {formData.reminderDate 
-                          ? format(new Date(formData.reminderDate), 'dd.MM.yyyy', { locale: de })
+                          ? format(new Date(formData.reminderDate), 'dd.MM.yy', { locale: de })
                           : taskModal.dateSelect()
                         }
                       </span>
@@ -2154,18 +2185,18 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                     {formData.reminderDate && (
                       <button
                         onClick={handleRemoveDate}
-                        className="p-1.5 rounded transition-all flex items-center justify-center hover:scale-110 opacity-60 hover:opacity-100"
+                        className="p-1 rounded transition-all flex items-center justify-center hover:scale-110 opacity-60 hover:opacity-100"
                         title="Remove date assignment"
                       >
-                        <X className="w-3.5 h-3.5 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 transition-colors" />
+                        <X className="w-3 h-3 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 transition-colors" />
                       </button>
                     )}
                   </div>
 
                   {/* Kalender Pseudo-Overlay */}
                   {showInlineCalendar && (
-                    <div className="absolute -left-32 top-full mt-2 z-50 animate-in slide-in-from-top-2 duration-200">
-                      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden w-80">
+                    <div className="absolute left-0 top-full mt-2 z-50 animate-in slide-in-from-top-2 duration-200">
+                      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden w-72">
                         {/* Header */}
                         <div className="bg-gray-50 dark:bg-gray-800 px-3 py-2 border-b border-gray-200 dark:border-gray-700">
                           <div className="flex items-center justify-between">
@@ -2298,7 +2329,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
 
                 {/* Project */}
                 <div className="relative dropdown-container">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
                     <button
                       onClick={() => {
                         setShowInlineProjectSelector(!showInlineProjectSelector);
@@ -2312,29 +2343,27 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                           setNewColumnTitle('');
                         }
                       }}
-                      className="flex items-center space-x-2 px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors bg-white dark:bg-gray-700 font-medium"
+                      className={`flex items-center space-x-1.5 px-2.5 py-1.5 text-xs rounded-lg transition-all duration-200 font-medium backdrop-blur-sm ${
+                        formData.projectId 
+                          ? 'shadow-sm' 
+                          : 'bg-white/60 dark:bg-gray-800/60 hover:bg-white dark:hover:bg-gray-800 border border-gray-200/50 dark:border-gray-700/50 hover:shadow-sm'
+                      }`}
+                      style={formData.projectId ? { 
+                        backgroundColor: state.preferences.accentColor + '20', 
+                        border: `1px solid ${state.preferences.accentColor}40`
+                      } : {}}
                     >
-                      <FolderOpen className="w-4 h-4 text-gray-500" />
-                      <span className="text-gray-900 dark:text-white">
+                      <FolderOpen className="w-3.5 h-3.5" style={formData.projectId ? { color: state.preferences.accentColor } : { color: '#9ca3af' }} />
+                      <span className={formData.projectId ? '' : 'text-gray-700 dark:text-gray-200'} style={formData.projectId ? { color: state.preferences.accentColor } : {}}>
                         {(() => {
                           if (formData.projectId) {
                             const project = state.columns.find(col => col.id === formData.projectId && col.type === 'project');
-                            const projectTitle = project?.title || taskModal.projectUnknown();
-                            
-                            // Also show column if selected
-                            if (formData.kanbanColumnId) {
-                              const kanbanColumn = state.viewState.projectKanban.columns.find(col => col.id === formData.kanbanColumnId);
-                              if (kanbanColumn) {
-                                return `${projectTitle} → ${kanbanColumn.title}`;
-                              }
-                            }
-                            
-                            return projectTitle;
+                            return project?.title || taskModal.projectUnknown();
                           }
                           return taskModal.projectSelect();
                         })()}
                       </span>
-                      <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${
+                      <ChevronDown className={`w-3 h-3 text-gray-400 transition-transform ${
                         showInlineProjectSelector ? 'rotate-180' : ''
                       }`} />
                     </button>
@@ -2343,18 +2372,18 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                     {formData.projectId && (
                       <button
                         onClick={handleRemoveProject}
-                        className="p-1.5 rounded transition-all flex items-center justify-center hover:scale-110 opacity-60 hover:opacity-100"
+                        className="p-1 rounded transition-all flex items-center justify-center hover:scale-110 opacity-60 hover:opacity-100"
                         title="Remove project assignment"
                       >
-                        <X className="w-3.5 h-3.5 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 transition-colors" />
+                        <X className="w-3 h-3 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 transition-colors" />
                       </button>
                     )}
                   </div>
 
-                  {/* Projekt Pseudo-Overlay - Größer und nach links verschoben */}
+                  {/* Projekt Pseudo-Overlay */}
                   {showInlineProjectSelector && (
-                    <div className="absolute right-0 top-full mt-2 z-50 animate-in slide-in-from-top-2 duration-200">
-                      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden w-[480px] h-[600px]">
+                    <div className="absolute left-0 top-full mt-2 z-50 animate-in slide-in-from-top-2 duration-200">
+                      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden w-80 max-h-[500px]">
                         {/* Header */}
                         <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
                           <div className="flex items-center justify-between">
@@ -2413,7 +2442,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                             </div>
 
                             {/* Projects List */}
-                            <div className="h-[500px] overflow-y-auto">
+                            <div className="max-h-[380px] overflow-y-auto">
                               {/* No Project Option */}
                               <div 
                                 onClick={() => handleQuickProjectAssign('')}
@@ -2635,6 +2664,52 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                     </div>
                   )}
                 </div>
+
+                {/* Spacer to push timer to right */}
+                <div className="flex-1" />
+
+                {/* Timer Button - Right side */}
+                <button
+                  onClick={() => {
+                    if (task) {
+                      const isTimerRunning = state.activeTimer?.taskId === task.id && state.activeTimer?.isActive && !state.activeTimer?.isPaused;
+                      if (isTimerRunning) {
+                        dispatch({ type: 'STOP_TIMER' });
+                      } else {
+                        dispatch({
+                          type: 'START_TIMER',
+                          payload: { taskId: task.id }
+                        });
+                      }
+                    }
+                  }}
+                  className={`flex items-center space-x-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 ${
+                    state.activeTimer?.taskId === task?.id && state.activeTimer?.isActive && !state.activeTimer?.isPaused
+                      ? 'text-white shadow-sm'
+                      : 'bg-white/60 dark:bg-gray-800/60 hover:bg-white dark:hover:bg-gray-800 border border-gray-200/50 dark:border-gray-700/50 hover:shadow-sm'
+                  }`}
+                  style={
+                    state.activeTimer?.taskId === task?.id && state.activeTimer?.isActive && !state.activeTimer?.isPaused
+                      ? { backgroundColor: state.preferences.accentColor, border: `1px solid ${state.preferences.accentColor}` }
+                      : { color: state.preferences.accentColor }
+                  }
+                  title={
+                    state.activeTimer?.taskId === task?.id && state.activeTimer?.isActive && !state.activeTimer?.isPaused
+                      ? t('actions.stop_timer')
+                      : t('actions.start_timer')
+                  }
+                >
+                  {state.activeTimer?.taskId === task?.id && state.activeTimer?.isActive && !state.activeTimer?.isPaused ? (
+                    <Square className="w-3.5 h-3.5" />
+                  ) : (
+                    <Play className="w-3.5 h-3.5" />
+                  )}
+                  <span>
+                    {state.activeTimer?.taskId === task?.id && state.activeTimer?.isActive && !state.activeTimer?.isPaused
+                      ? t('actions.timer_running')
+                      : t('actions.start_timer')}
+                  </span>
+                </button>
               </div>
             </div>
             
@@ -2800,15 +2875,9 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                     </div>
                   </div>
 
-                  {/* Unified container for preview and edit - Glass Style */}
+                  {/* Unified container for preview and edit - Minimal Style, aligned with subtasks */}
                   <div 
-                    className={`relative w-full rounded-2xl overflow-hidden group transition-all duration-300 ${
-                      isDescriptionPreviewMode 
-                        ? 'bg-gray-50/50 dark:bg-gray-800/30 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/30' 
-                        : 'bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 focus-within:border-accent shadow-sm'
-                    } ${
-                      isDescriptionExpanded ? 'h-[calc(100vh-300px)] resize-y' : 'min-h-[270px] max-h-[480px]'
-                    }`}
+                    className="ml-4"
                     onKeyDown={(e) => {
                       if (e.key === 'Escape' && !isDescriptionPreviewMode) {
                         e.preventDefault();
@@ -2817,30 +2886,26 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                         setIsDescriptionExpanded(false);
                       }
                     }}
-                    style={{
-                      animation: !isDescriptionPreviewMode ? 'fadeInEditMode 0.3s ease-out' : 'none'
-                    }}
                   >
-                    {/* Resize handle for preview */}
-                    {isDescriptionPreviewMode && formData.description?.trim() && (
-                      <div className="absolute bottom-0 right-0 text-gray-300 dark:text-gray-600 cursor-se-resize p-2 opacity-50 hover:opacity-100 transition-opacity pointer-events-auto" title="Resize">
-                        <GripVertical className="w-4 h-4" />
-                      </div>
-                    )}
-
                     {/* Preview content */}
                     {isDescriptionPreviewMode && (
                       <div 
-                        className="text-gray-900 dark:text-white leading-relaxed p-4 wysiwyg-content overflow-y-auto max-h-[396px]"
+                        className={`leading-relaxed px-3 py-2 wysiwyg-content rounded-xl transition-colors cursor-text ${
+                          formData.description?.trim() 
+                            ? 'text-gray-900 dark:text-white bg-gray-50/50 dark:bg-gray-800/30 hover:bg-gray-100/50 dark:hover:bg-gray-800/50' 
+                            : 'hover:bg-gray-50/30 dark:hover:bg-gray-800/20'
+                        }`}
                         style={{ 
                           userSelect: 'text',
                           WebkitUserSelect: 'text',
-                          cursor: 'text'
+                          maxHeight: '200px',
+                          overflowY: 'auto'
                         }}
+                        onClick={() => setIsDescriptionPreviewMode(false)}
                       >
                         {!formData.description?.trim() && (
-                          <span className="text-gray-400 dark:text-gray-500 text-sm italic opacity-60">
-                            Keine Beschreibung
+                          <span className="text-gray-400 dark:text-gray-500 text-sm italic">
+                            Beschreibung hinzufügen...
                           </span>
                         )}
                         {formData.description?.trim() && (
@@ -2855,7 +2920,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                       </div>
                     )}
 
-                    {/* Editor */}
+                    {/* Editor - more height when editing */}
                     {!isDescriptionPreviewMode && (
                       <WysiwygEditor
                         value={formData.description}
@@ -2864,9 +2929,12 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                           setHasUnsavedChanges(true);
                         }}
                         placeholder={taskModal.descriptionPlaceholder()}
-                        className="h-full w-full p-4"
-                        useFullHeight={true}
+                        className=""
+                        useFullHeight={false}
                         showToolbar={true}
+                        minHeight={200}
+                        maxHeight={400}
+                        autoFocus={true}
                         onClickOutside={() => {
                           setIsDescriptionPreviewMode(true);
                           setIsDescriptionExpanded(false);
@@ -2876,7 +2944,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   </div>
                 </div>
 
-                {/* Subtasks - Collapsible - Elegant */}
+                {/* Subtasks - Always show with empty row at end */}
                 <div data-onboarding-subtasks="true" data-task-subtasks="true">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-2">
@@ -2896,53 +2964,72 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                         </button>
                       )}
                     </div>
+                    {/* Subtle add button - no accent color */}
                     <button
                       onClick={() => {
                         addSubtask();
                         setIsSubtasksExpanded(true);
                       }}
-                      className="flex items-center space-x-1 px-2.5 py-1.5 text-xs rounded-lg transition-all duration-200 hover:bg-gray-100/80 dark:hover:bg-gray-800/80 font-medium"
-                      style={getAccentColorStyles().text}
+                      className="flex items-center space-x-1 px-2.5 py-1.5 text-xs rounded-lg transition-all duration-200 hover:bg-gray-100/80 dark:hover:bg-gray-800/80 font-medium text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
                     >
                       <Plus className="w-3 h-3" />
                       <span>{actions.add()}</span>
                     </button>
                   </div>
 
-                  {isSubtasksExpanded && formData.subtasks.length > 0 && (
-                    <div className="space-y-1 ml-4">
-                      {formData.subtasks.map((subtask, index) => (
-                        <div key={subtask.id} className="flex items-center space-x-3 py-2 px-3 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl group transition-all duration-200 hover:bg-gray-100/50 dark:hover:bg-gray-800/50">
-                          <input
-                            type="checkbox"
-                            checked={subtask.completed}
-                            onChange={(e) => updateSubtask(subtask.id, { completed: e.target.checked })}
-                            className="w-4 h-4 border-gray-300 rounded-md"
-                            style={{ 
-                              accentColor: state.preferences.accentColor,
-                              ...getAccentColorStyles().text 
-                            }}
-                          />
-                          <input
-                            type="text"
-                            value={subtask.title}
-                            onChange={(e) => updateSubtask(subtask.id, { title: e.target.value })}
-                            onKeyPress={(e) => handleSubtaskKeyPress(e, subtask.id)}
-                            onPaste={(e) => handleSubtaskPaste(e, subtask.id)}
-                            placeholder={`Subtask ${index + 1}`}
-                            className="flex-1 px-2 py-1 text-sm border border-transparent focus:border-gray-200 dark:focus:border-gray-700 rounded-lg focus:outline-none bg-transparent text-gray-700 dark:text-gray-200"
-                            data-subtask-input
-                          />
-                          <button
-                            onClick={() => deleteSubtask(subtask.id)}
-                            className="p-1.5 text-gray-400 hover:text-red-500 transition-all duration-200 opacity-0 group-hover:opacity-100 rounded-lg hover:bg-red-50/50 dark:hover:bg-red-900/20"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      ))}
+                  {/* Subtasks list - always visible with empty row */}
+                  <div className="space-y-1 ml-4">
+                    {/* Existing subtasks */}
+                    {formData.subtasks.map((subtask, index) => (
+                      <div key={subtask.id} className="flex items-center space-x-3 py-2 px-3 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl group transition-all duration-200 hover:bg-gray-100/50 dark:hover:bg-gray-800/50">
+                        <input
+                          type="checkbox"
+                          checked={subtask.completed}
+                          onChange={(e) => updateSubtask(subtask.id, { completed: e.target.checked })}
+                          className="w-4 h-4 border-gray-300 rounded-md"
+                          style={{ 
+                            accentColor: state.preferences.accentColor
+                          }}
+                        />
+                        <input
+                          type="text"
+                          value={subtask.title}
+                          onChange={(e) => updateSubtask(subtask.id, { title: e.target.value })}
+                          onKeyPress={(e) => handleSubtaskKeyPress(e, subtask.id)}
+                          onPaste={(e) => handleSubtaskPaste(e, subtask.id)}
+                          placeholder={`Subtask ${index + 1}`}
+                          className="flex-1 px-2 py-1 text-sm border border-transparent focus:border-gray-200 dark:focus:border-gray-700 rounded-lg focus:outline-none bg-transparent text-gray-700 dark:text-gray-200"
+                          data-subtask-input
+                        />
+                        <button
+                          onClick={() => deleteSubtask(subtask.id)}
+                          className="p-1.5 text-gray-400 hover:text-red-500 transition-all duration-200 opacity-0 group-hover:opacity-100 rounded-lg hover:bg-red-50/50 dark:hover:bg-red-900/20"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                    
+                    {/* Empty row at end - always visible for adding new subtask */}
+                    <div 
+                      className="flex items-center space-x-3 py-2 px-3 rounded-xl transition-all duration-200 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 cursor-text group"
+                      onClick={() => {
+                        addSubtask();
+                        setIsSubtasksExpanded(true);
+                        // Focus the new input after a short delay
+                        setTimeout(() => {
+                          const inputs = document.querySelectorAll('[data-subtask-input]');
+                          const lastInput = inputs[inputs.length - 1] as HTMLInputElement;
+                          lastInput?.focus();
+                        }, 50);
+                      }}
+                    >
+                      <div className="w-4 h-4 border border-gray-300 dark:border-gray-600 rounded group-hover:border-gray-400 dark:group-hover:border-gray-500 transition-colors" />
+                      <span className="text-sm text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors italic">
+                        {t('tasks.add_subtask') || 'Unteraufgabe hinzufügen...'}
+                      </span>
                     </div>
-                  )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -3023,8 +3110,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                             setFormData(prev => ({ ...prev, estimatedTime: value > 0 ? value : undefined }));
                             setHasUnsavedChanges(true);
                           }}
-                          className="w-16 text-right px-2 py-1 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1"
-                          style={{ '--tw-ring-color': state.preferences.accentColor } as React.CSSProperties}
+                          className="w-16 text-right px-2 py-1 text-sm rounded-lg bg-transparent text-gray-900 dark:text-white focus:outline-none focus:bg-gray-100/50 dark:focus:bg-gray-800/50"
                           placeholder=""
                         />
                         <span className="text-xs text-gray-400">min</span>
@@ -3125,98 +3211,6 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   </div>
                 </div>
 
-                {/* Task Visibility Status Indicator */}
-                {(() => {
-                  const status = getTaskVisibilityStatus();
-                  const accentColor = state.preferences.accentColor;
-                  
-                  const getStatusConfig = () => {
-                    switch (status.type) {
-                      case 'both':
-                        return {
-                          text: taskModal.visibility.projectAndPlanner(),
-                          icon: 'ArrowLeftRight',
-                          description: taskModal.visibility.projectAndPlannerDesc(),
-                          color: accentColor
-                        };
-                      case 'project':
-                        return {
-                          text: taskModal.visibility.projectOnly(),
-                          icon: 'FolderOpen',
-                          description: taskModal.visibility.projectOnlyDesc(),
-                          color: accentColor
-                        };
-                      case 'planner':
-                        return {
-                          text: taskModal.placeholder_only_im_planer?.() || 'Planner only',
-                          icon: 'Calendar',
-                          description: taskModal.placeholder_only_im_planer?.() || 'This task is visible in planner only',
-                          color: accentColor
-                        };
-                      case 'inbox':
-                        return {
-                          text: taskModal.placeholder_im_eingang?.() || 'In Inbox',
-                          icon: 'Inbox',
-                          description: taskModal.placeholder_im_eingang?.() || 'This task is in inbox (no project or date assigned)',
-                          color: accentColor
-                        };
-                      default:
-                        return null;
-                    }
-                  };
-                  
-                  const config = getStatusConfig();
-                  if (!config) return null;
-                  
-                  return (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Status
-                      </label>
-                      <div 
-                        className="flex items-center space-x-2 p-3 rounded-lg border transition-all duration-200"
-                        style={{
-                          backgroundColor: `${config.color}15`,
-                          borderColor: `${config.color}30`,
-                          color: config.color
-                        }}
-                        title={config.description}
-                      >
-                        <div className="flex-shrink-0" style={{ color: config.color }}>
-                          {(() => {
-                            switch (config.icon) {
-                              case 'ArrowLeftRight':
-                                return <ArrowLeftRight className="w-5 h-5" />;
-                              case 'FolderOpen':
-                                return <FolderOpen className="w-5 h-5" />;
-                              case 'Calendar':
-                                return <Calendar className="w-5 h-5" />;
-                              case 'Inbox':
-                                return <Inbox className="w-5 h-5" />;
-                              default:
-                                return null;
-                            }
-                          })()}
-                        </div>
-                        <div className="flex-1">
-                          <span className="text-sm font-medium">{config.text}</span>
-                          {status.type === 'both' && (
-                            <div className="flex items-center space-x-1 mt-1">
-                              <div 
-                                className="w-1.5 h-1.5 rounded-full" 
-                                style={{ backgroundColor: config.color }}
-                              />
-                              <div 
-                                className="w-1.5 h-1.5 rounded-full" 
-                                style={{ backgroundColor: config.color }}
-                              />
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })()}
 
                 {/* Tags */}
                 <div>
@@ -3616,9 +3610,9 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                 background: linear-gradient(180deg, rgba(30, 41, 59, 0.85) 0%, rgba(15, 23, 42, 0.9) 100%) !important;
               }
             `}</style>
-            {/* Action Buttons */}
+            {/* Action Buttons - Reorganized */}
             <div className="flex items-center justify-between p-4">
-              {/* Delete Button - Left Side - Subtle */}
+              {/* Delete Button - Left Side */}
               <button
                 onClick={() => {
                   if (!task) return;
@@ -3641,63 +3635,27 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                 <span className="hidden sm:inline">{t('common.delete')}</span>
               </button>
 
-              {/* Timer Button - Center - Premium */}
+              {/* Mark Complete Button - Center */}
               <button
-                onClick={() => {
-                  if (task) {
-                    dispatch({
-                      type: 'START_TIMER',
-                      payload: {
-                        taskId: task.id
-                      }
-                    });
-                  }
-                }}
-                className={`flex items-center space-x-2 px-5 py-2.5 text-sm font-medium rounded-xl transition-all duration-300 ${
-                  state.activeTimer?.taskId === task?.id && state.activeTimer?.isActive && !state.activeTimer?.isPaused
-                    ? 'text-white shadow-lg shadow-accent/30'
-                    : 'bg-white/60 dark:bg-gray-800/60 hover:bg-white dark:hover:bg-gray-800 border border-gray-200/50 dark:border-gray-700/50 hover:shadow-md'
+                onClick={task?.completed ? handleToggleComplete : handleCompleteAndClose}
+                className={`flex items-center space-x-2 px-4 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${
+                  task?.completed 
+                    ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20' 
+                    : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20'
                 }`}
-                style={
-                  state.activeTimer?.taskId === task?.id && state.activeTimer?.isActive && !state.activeTimer?.isPaused
-                    ? { ...getAccentColorStyles().bg, boxShadow: `0 10px 25px -5px ${state.preferences.accentColor}40` }
-                    : { color: state.preferences.accentColor }
-                }
-                title={
-                  state.activeTimer?.taskId === task?.id && state.activeTimer?.isActive && !state.activeTimer?.isPaused
-                    ? t('actions.timer_running')
-                    : t('actions.start_timer')
-                }
+                title={task?.completed ? t('tasks.mark_incomplete') : t('tasks.mark_complete')}
               >
-                <Play className="w-4 h-4" />
-                <span>
-                  {state.activeTimer?.taskId === task?.id && state.activeTimer?.isActive && !state.activeTimer?.isPaused
-                    ? t('actions.timer_running')
-                    : t('actions.start_timer')}
-                </span>
+                <CheckSquare className="w-4 h-4" />
+                <span>{task?.completed ? t('tasks.mark_incomplete') : t('tasks.mark_complete')}</span>
               </button>
 
-              {/* Action Buttons - Right Side */}
+              {/* Cancel & Save - Right Side */}
               <div className="flex items-center space-x-2">
                 <button
                   onClick={handleClose}
                   className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100/50 dark:hover:bg-gray-800/50 rounded-xl transition-all duration-200"
                 >
                   {t('common.cancel')}
-                </button>
-                
-                {/* Mark Complete Button - Outline Style */}
-                <button
-                  onClick={task?.completed ? handleToggleComplete : handleCompleteAndClose}
-                  className={`flex items-center space-x-2 px-4 py-2 text-sm font-medium rounded-xl transition-all duration-200 border-2 ${
-                    task?.completed 
-                      ? 'border-amber-400 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20' 
-                      : 'border-emerald-400 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
-                  }`}
-                  title={task?.completed ? t('tasks.mark_incomplete') : t('tasks.mark_complete')}
-                >
-                  <CheckSquare className="w-4 h-4" />
-                  <span className="hidden sm:inline">{task?.completed ? t('tasks.mark_incomplete') : t('tasks.mark_complete')}</span>
                 </button>
                 
                 {/* Save Button - Primary */}

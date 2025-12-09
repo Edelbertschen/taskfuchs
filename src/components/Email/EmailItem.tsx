@@ -9,13 +9,15 @@ import {
   Paperclip,
   AlertCircle,
   CalendarPlus,
-  Inbox
+  Inbox,
+  Eye
 } from 'lucide-react';
 import type { OutlookEmail } from '../../types/email';
 import { getEmailSenderDisplay, formatEmailTime, createTaskFromEmail } from '../../utils/emailToTask';
 import { useApp } from '../../context/AppContext';
 import { useEmail } from '../../context/EmailContext';
 import { format } from 'date-fns';
+import { EmailPreviewModal } from './EmailPreviewModal';
 
 // Data transfer type for HTML5 native drag-and-drop
 export const EMAIL_DRAG_TYPE = 'application/email';
@@ -40,6 +42,7 @@ export const EmailItem = memo(function EmailItem({
   const [isHovered, setIsHovered] = useState(false);
   const [isActioning, setIsActioning] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   // HTML5 native drag handlers for cross-context drag-and-drop
   const handleDragStart = (e: React.DragEvent) => {
@@ -236,15 +239,28 @@ export const EmailItem = memo(function EmailItem({
       {/* Hover actions */}
       {isHovered && (
         <div className="absolute top-2 right-2 flex items-center gap-1 bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-1">
+          {/* Open in Outlook - First! */}
+          <button
+            onClick={handleOpenInOutlook}
+            className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400"
+            title={t('email.openInOutlook', 'Open in Outlook')}
+          >
+            <ExternalLink className="w-4 h-4" />
+          </button>
+          {/* Preview */}
+          <button
+            onClick={(e) => { e.stopPropagation(); setShowPreview(true); }}
+            className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400"
+            title={t('email.preview', 'Preview')}
+          >
+            <Eye className="w-4 h-4" />
+          </button>
+          <div className="w-px h-4 bg-gray-200 dark:bg-gray-700" />
           {/* Add to Today */}
           <button
             onClick={handleAddToToday}
             disabled={isActioning}
             className="p-1.5 rounded text-gray-600 dark:text-gray-400 disabled:opacity-50 transition-colors"
-            style={{ 
-              ['--hover-bg' as string]: `${accentColor}20`,
-              ['--hover-color' as string]: accentColor
-            }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = `${accentColor}20`;
               e.currentTarget.style.color = accentColor;
@@ -276,13 +292,6 @@ export const EmailItem = memo(function EmailItem({
           </button>
           <div className="w-px h-4 bg-gray-200 dark:bg-gray-700" />
           <button
-            onClick={handleOpenInOutlook}
-            className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400"
-            title={t('email.openInOutlook', 'Open in Outlook')}
-          >
-            <ExternalLink className="w-4 h-4" />
-          </button>
-          <button
             onClick={handleMarkAsRead}
             disabled={isActioning}
             className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 disabled:opacity-50"
@@ -307,6 +316,14 @@ export const EmailItem = memo(function EmailItem({
             <Trash2 className="w-4 h-4" />
           </button>
         </div>
+      )}
+
+      {/* Email Preview Modal */}
+      {showPreview && (
+        <EmailPreviewModal 
+          email={email} 
+          onClose={() => setShowPreview(false)} 
+        />
       )}
     </div>
   );

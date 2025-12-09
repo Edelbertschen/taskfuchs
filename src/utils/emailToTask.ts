@@ -13,9 +13,94 @@ function getOutlookLink(email: OutlookEmail): string {
 }
 
 /**
+ * Converts HTML content to Markdown (simple conversion)
+ * Handles common HTML elements while preserving readability
+ */
+function htmlToMarkdown(html: string): string {
+  if (!html) return '';
+  
+  let text = html;
+  
+  // Remove style and script tags completely
+  text = text.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+  text = text.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+  
+  // Convert common elements to markdown
+  text = text.replace(/<br\s*\/?>/gi, '\n');
+  text = text.replace(/<\/p>/gi, '\n\n');
+  text = text.replace(/<p[^>]*>/gi, '');
+  text = text.replace(/<\/div>/gi, '\n');
+  text = text.replace(/<div[^>]*>/gi, '');
+  text = text.replace(/<\/li>/gi, '\n');
+  text = text.replace(/<li[^>]*>/gi, '- ');
+  text = text.replace(/<\/ul>/gi, '\n');
+  text = text.replace(/<ul[^>]*>/gi, '');
+  text = text.replace(/<\/ol>/gi, '\n');
+  text = text.replace(/<ol[^>]*>/gi, '');
+  
+  // Bold and italic
+  text = text.replace(/<strong[^>]*>(.*?)<\/strong>/gi, '**$1**');
+  text = text.replace(/<b[^>]*>(.*?)<\/b>/gi, '**$1**');
+  text = text.replace(/<em[^>]*>(.*?)<\/em>/gi, '*$1*');
+  text = text.replace(/<i[^>]*>(.*?)<\/i>/gi, '*$1*');
+  
+  // Headers
+  text = text.replace(/<h1[^>]*>(.*?)<\/h1>/gi, '# $1\n');
+  text = text.replace(/<h2[^>]*>(.*?)<\/h2>/gi, '## $1\n');
+  text = text.replace(/<h3[^>]*>(.*?)<\/h3>/gi, '### $1\n');
+  
+  // Links
+  text = text.replace(/<a[^>]*href=["']([^"']*)["'][^>]*>(.*?)<\/a>/gi, '[$2]($1)');
+  
+  // Blockquotes
+  text = text.replace(/<blockquote[^>]*>([\s\S]*?)<\/blockquote>/gi, (_, content) => {
+    return content.split('\n').map((line: string) => `> ${line}`).join('\n');
+  });
+  
+  // Remove remaining HTML tags
+  text = text.replace(/<[^>]+>/g, '');
+  
+  // Decode HTML entities
+  text = text.replace(/&nbsp;/gi, ' ');
+  text = text.replace(/&amp;/gi, '&');
+  text = text.replace(/&lt;/gi, '<');
+  text = text.replace(/&gt;/gi, '>');
+  text = text.replace(/&quot;/gi, '"');
+  text = text.replace(/&#39;/gi, "'");
+  text = text.replace(/&rsquo;/gi, "'");
+  text = text.replace(/&lsquo;/gi, "'");
+  text = text.replace(/&rdquo;/gi, '"');
+  text = text.replace(/&ldquo;/gi, '"');
+  text = text.replace(/&mdash;/gi, '—');
+  text = text.replace(/&ndash;/gi, '–');
+  text = text.replace(/&hellip;/gi, '...');
+  
+  // Clean up excessive whitespace
+  text = text.replace(/\n{3,}/g, '\n\n');
+  text = text.replace(/[ \t]+/g, ' ');
+  text = text.split('\n').map(line => line.trim()).join('\n');
+  
+  return text.trim();
+}
+
+/**
+ * Gets the first N lines of text
+ */
+function getFirstLines(text: string, maxLines: number = 20): string {
+  const lines = text.split('\n').filter(line => line.trim());
+  const truncated = lines.slice(0, maxLines);
+  const result = truncated.join('\n');
+  
+  if (lines.length > maxLines) {
+    return result + '\n\n*[...]*';
+  }
+  return result;
+}
+
+/**
  * Creates a task from an Outlook email.
  * - Title: Email subject
- * - Description: From + Date metadata + Outlook deep link (NO body content)
+ * - Description: Outlook link (TOP) + From + Date + Email body preview (first 20 lines as Markdown)
  * - If dropped on date column: sets dueDate to that date
  * - If dropped on inbox/other: no date
  */
@@ -33,13 +118,28 @@ export function createTaskFromEmail(
   // Format date
   const receivedDate = new Date(email.receivedDateTime).toLocaleString();
   
-  // Build description with metadata (NO body content)
-  // Removed 'To' (it's always the user) and 'Subject' (it's the task title)
-  const description = `**From:** ${senderName} <${senderEmail}>
-**Date:** ${receivedDate}
+  // Convert email body to markdown (if available)
+  let bodyMarkdown = '';
+  if (email.body?.content) {
+    const rawContent = email.body.contentType === 'html' 
+      ? htmlToMarkdown(email.body.content)
+      : email.body.content;
+    bodyMarkdown = getFirstLines(rawContent, 20);
+  } else if (email.bodyPreview) {
+    bodyMarkdown = getFirstLines(email.bodyPreview, 20);
+  }
+  
+  // Build description: Outlook link FIRST, then metadata, then body content
+  let description = `[📧 Open in Outlook](${outlookLink})
 
 ---
-[📧 Open in Outlook](${outlookLink})`;
+
+**From:** ${senderName} <${senderEmail}>
+**Date:** ${receivedDate}`;
+
+  if (bodyMarkdown) {
+    description += `\n\n---\n\n${bodyMarkdown}`;
+  }
 
   // Determine if this is a date column (planner) or inbox
   const isDateColumn = targetColumn?.type === 'date';

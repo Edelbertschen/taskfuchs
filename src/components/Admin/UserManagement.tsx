@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { adminAPI } from '../../services/apiService';
@@ -15,7 +15,10 @@ import {
   TrendingUp,
   UserCheck,
   AlertTriangle,
-  X
+  X,
+  ArrowUp,
+  ArrowDown,
+  ArrowUpDown
 } from 'lucide-react';
 
 interface User {
@@ -41,6 +44,9 @@ interface Stats {
   activeUsersLast30Days: number;
 }
 
+type SortField = 'createdAt' | 'lastLoginAt' | 'tasks' | 'projects';
+type SortDirection = 'asc' | 'desc';
+
 export function UserManagement() {
   const { t } = useTranslation();
   const { state: authState } = useAuth();
@@ -51,6 +57,8 @@ export function UserManagement() {
   const [searchQuery, setSearchQuery] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [sortField, setSortField] = useState<SortField | null>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 
   // Fetch users and stats
   const fetchData = async () => {
@@ -88,6 +96,67 @@ export function UserManagement() {
     user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (user.name && user.name.toLowerCase().includes(searchQuery.toLowerCase()))
   );
+
+  // Sort users
+  const sortedUsers = useMemo(() => {
+    if (!sortField) return filteredUsers;
+    
+    return [...filteredUsers].sort((a, b) => {
+      let aValue: number;
+      let bValue: number;
+      
+      switch (sortField) {
+        case 'createdAt':
+          aValue = new Date(a.createdAt).getTime();
+          bValue = new Date(b.createdAt).getTime();
+          break;
+        case 'lastLoginAt':
+          aValue = new Date(a.lastLoginAt).getTime();
+          bValue = new Date(b.lastLoginAt).getTime();
+          break;
+        case 'tasks':
+          aValue = a._count?.tasks || 0;
+          bValue = b._count?.tasks || 0;
+          break;
+        case 'projects':
+          aValue = a._count?.projects || 0;
+          bValue = b._count?.projects || 0;
+          break;
+        default:
+          return 0;
+      }
+      
+      if (sortDirection === 'asc') {
+        return aValue - bValue;
+      }
+      return bValue - aValue;
+    });
+  }, [filteredUsers, sortField, sortDirection]);
+
+  // Handle sort toggle
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      // Toggle direction or clear
+      if (sortDirection === 'desc') {
+        setSortDirection('asc');
+      } else {
+        setSortField(null);
+      }
+    } else {
+      setSortField(field);
+      setSortDirection('desc');
+    }
+  };
+
+  // Sort icon component
+  const SortIcon = ({ field }: { field: SortField }) => {
+    if (sortField !== field) {
+      return <ArrowUpDown className="w-3.5 h-3.5 opacity-40" />;
+    }
+    return sortDirection === 'desc' 
+      ? <ArrowDown className="w-3.5 h-3.5" /> 
+      : <ArrowUp className="w-3.5 h-3.5" />;
+  };
 
   // Handle user deletion
   const handleDeleteUser = async (userId: string) => {
@@ -273,7 +342,7 @@ export function UserManagement() {
               <div className="w-12 h-12 mx-auto border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin" />
               <p className="mt-4 text-gray-500 dark:text-gray-400">{t('common.loading', 'Loading...')}</p>
             </div>
-          ) : filteredUsers.length === 0 ? (
+          ) : sortedUsers.length === 0 ? (
             <div className="p-12 text-center">
               <Users className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
               <p className="text-gray-500 dark:text-gray-400">
@@ -291,14 +360,43 @@ export function UserManagement() {
                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       {t('admin.user', 'User')}
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      {t('admin.stats', 'Statistics')}
+                    <th 
+                      className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:text-gray-700 dark:hover:text-gray-200 transition-colors select-none"
+                      onClick={() => handleSort('tasks')}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <CheckSquare className="w-3.5 h-3.5" />
+                        {t('admin.tasks', 'Tasks')}
+                        <SortIcon field="tasks" />
+                      </div>
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      {t('admin.created', 'Created')}
+                    <th 
+                      className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:text-gray-700 dark:hover:text-gray-200 transition-colors select-none"
+                      onClick={() => handleSort('projects')}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <FileText className="w-3.5 h-3.5" />
+                        {t('admin.projects', 'Projects')}
+                        <SortIcon field="projects" />
+                      </div>
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      {t('admin.lastLogin', 'Last Login')}
+                    <th 
+                      className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:text-gray-700 dark:hover:text-gray-200 transition-colors select-none"
+                      onClick={() => handleSort('createdAt')}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        {t('admin.created', 'Created')}
+                        <SortIcon field="createdAt" />
+                      </div>
+                    </th>
+                    <th 
+                      className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:text-gray-700 dark:hover:text-gray-200 transition-colors select-none"
+                      onClick={() => handleSort('lastLoginAt')}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        {t('admin.lastLogin', 'Last Login')}
+                        <SortIcon field="lastLoginAt" />
+                      </div>
                     </th>
                     <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       {t('admin.actions', 'Actions')}
@@ -306,7 +404,7 @@ export function UserManagement() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {filteredUsers.map((user) => (
+                  {sortedUsers.map((user) => (
                     <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-900/30 transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
@@ -328,17 +426,11 @@ export function UserManagement() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                          <span className="flex items-center gap-1">
-                            <CheckSquare className="w-4 h-4" />
-                            {user._count?.tasks || 0}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <FileText className="w-4 h-4" />
-                            {user._count?.projects || 0}
-                          </span>
-                        </div>
+                      <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300 font-medium">
+                        {user._count?.tasks || 0}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300 font-medium">
+                        {user._count?.projects || 0}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
                         {formatDate(user.createdAt)}

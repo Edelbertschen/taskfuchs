@@ -26,14 +26,8 @@ export function parseTaskInput(input: string): ParseResult {
 
     // ✨ MARKDOWN PRESERVED: Keep all markdown formatting as-is
 
-    // Extract tags
-    const tagMatches = [...title.matchAll(/(?:^|\s)#([a-zA-ZäöüßÄÖÜ0-9_-]+)(?=\s|$)/g)];
-    tags = tagMatches.map(match => match[1].toLowerCase());
-    
-    // Remove tags from title
-    title = title.replace(/(?:^|\s)#([a-zA-ZäöüßÄÖÜ0-9_-]+)(?=\s|$)/g, ' ').trim();
-
-    // Extract description EARLY (before other processing)
+    // Extract description FIRST (before tag extraction!)
+    // This ensures hashtags in the description (like URLs with #ticket/123) are NOT parsed as tags
     const descMatches = [...title.matchAll(/(?:^|\s)(n|note|beschreibung|desc)(?=\s|$)(.*)$/gm)];
     if (descMatches.length > 0) {
       const descMatch = descMatches[0];
@@ -45,6 +39,13 @@ export function parseTaskInput(input: string): ParseResult {
       // Remove description part from title
       title = title.replace(/(?:^|\s)(n|note|beschreibung|desc)(?=\s|$)(.*)$/gm, '').trim();
     }
+
+    // Extract tags ONLY from the title (NOT from description)
+    const tagMatches = [...title.matchAll(/(?:^|\s)#([a-zA-ZäöüßÄÖÜ0-9_-]+)(?=\s|$)/g)];
+    tags = tagMatches.map(match => match[1].toLowerCase());
+    
+    // Remove tags from title
+    title = title.replace(/(?:^|\s)#([a-zA-ZäöüßÄÖÜ0-9_-]+)(?=\s|$)/g, ' ').trim();
 
     // Extract time (match against current title to keep removal consistent)
     const timeMatches = [...title.matchAll(/(?:^|\s)(\d+(?:\.\d+)?)\s*(m|min|h|std|stunden?|minuten?)(?=\s|$)/g)];

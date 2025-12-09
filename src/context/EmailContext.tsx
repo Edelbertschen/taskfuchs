@@ -99,6 +99,7 @@ interface EmailContextType {
   closeSidebar: () => void;
   fetchFolders: () => Promise<void>;
   fetchMessages: (folderId?: string, append?: boolean) => Promise<void>;
+  fetchMessageBody: (messageId: string) => Promise<OutlookEmail | null>;
   selectFolder: (folderId: string) => void;
   markAsRead: (messageId: string, isRead: boolean) => Promise<void>;
   archiveMessage: (messageId: string) => Promise<void>;
@@ -259,6 +260,19 @@ export function EmailProvider({ children }: { children: React.ReactNode }) {
     await fetchMessages();
   }, [fetchMessages]);
 
+  // Fetch single message with full body
+  const fetchMessageBody = useCallback(async (messageId: string): Promise<OutlookEmail | null> => {
+    if (!authState.isAuthenticated) return null;
+    
+    try {
+      const data = await emailAPI<{ message: OutlookEmail }>(`/api/email/messages/${messageId}?includeBody=true`);
+      return data.message;
+    } catch (error: any) {
+      console.error('Failed to fetch message body:', error);
+      return null;
+    }
+  }, [authState.isAuthenticated]);
+
   // Set email-to-task action
   const setEmailToTaskAction = useCallback((action: EmailToTaskAction) => {
     dispatch({ type: 'SET_EMAIL_TO_TASK_ACTION', payload: action });
@@ -304,6 +318,7 @@ export function EmailProvider({ children }: { children: React.ReactNode }) {
     closeSidebar,
     fetchFolders,
     fetchMessages,
+    fetchMessageBody,
     selectFolder,
     markAsRead,
     archiveMessage,

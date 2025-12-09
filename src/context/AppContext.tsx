@@ -610,7 +610,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
             const updatedTask = { ...task, columnId: action.payload.columnId };
             
             // If moving to a date column, also set reminderDate for consistency
-            if (action.payload.columnId.startsWith('date-')) {
+            if (action.payload.columnId && action.payload.columnId.startsWith('date-')) {
               const dateStr = action.payload.columnId.replace('date-', '');
               updatedTask.reminderDate = dateStr;
             }

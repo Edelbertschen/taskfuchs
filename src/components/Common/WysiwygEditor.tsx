@@ -32,6 +32,7 @@ interface WysiwygEditorProps {
   showToolbar?: boolean;
   useFullHeight?: boolean; // New prop to force full height usage
   onClickOutside?: () => void; // New prop for click outside functionality
+  autoFocus?: boolean; // Auto focus textarea when mounted
 }
 
 export function WysiwygEditor({ 
@@ -43,7 +44,8 @@ export function WysiwygEditor({
   maxHeight = 800,
   showToolbar = true,
   useFullHeight = false,
-  onClickOutside
+  onClickOutside,
+  autoFocus = false
 }: WysiwygEditorProps) {
   const { state, dispatch } = useApp();
   const [isPreviewMode, setIsPreviewMode] = useState(false); // Immer im Edit-Modus, da kein Switch mehr vorhanden
@@ -1025,9 +1027,9 @@ export function WysiwygEditor({
   };
 
   return (
-    <div className={`${useFullHeight ? 'flex-1 flex flex-col h-full' : ''} ${className}`}>
+    <div ref={editorRef} className={`${useFullHeight ? 'flex-1 flex flex-col h-full' : ''} ${className}`}>
       {showToolbar && (
-        <div className="border border-gray-300 dark:border-gray-600 rounded-t-lg bg-gray-50 dark:bg-gray-800 p-2">
+        <div className="rounded-t-xl bg-gray-50/50 dark:bg-gray-800/50 px-3 py-1.5">
           <div className="flex items-center space-x-1 flex-wrap">
             {!isPreviewMode && (
               <>
@@ -1155,13 +1157,13 @@ export function WysiwygEditor({
       )}
 
       {/* Editor Content */}
-      <div className={`relative ${useFullHeight ? 'flex-1 flex flex-col' : ''}`}>
+      <div className={`relative ${useFullHeight ? 'flex-1 flex flex-col min-h-0' : ''}`}>
         {isPreviewMode ? (
           <div 
-            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-b-lg bg-white dark:bg-gray-700 cursor-text hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors overflow-y-auto"
+            className="w-full p-3 rounded-b-xl bg-gray-50/30 dark:bg-gray-800/30 cursor-text hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors overflow-y-auto"
             style={{ 
-              minHeight: useFullHeight ? '100%' : `${minHeight}px`, 
-              ...(useFullHeight || className.includes('flex-1') ? { height: '100%' } : { maxHeight: `${maxHeight}px` })
+              minHeight: `${minHeight}px`,
+              maxHeight: `${maxHeight}px`
             }}
             onClick={handleEdit}
             title="Klicken zum Bearbeiten"
@@ -1176,7 +1178,7 @@ export function WysiwygEditor({
                 dangerouslySetInnerHTML={{ __html: markdownToHtml(value) }}
               />
             ) : (
-              <div className="text-gray-500 dark:text-gray-400 italic">
+              <div className="text-gray-500 dark:text-gray-400 italic text-sm">
                 {placeholder}
               </div>
             )}
@@ -1189,13 +1191,13 @@ export function WysiwygEditor({
             onKeyDown={handleKeyDown}
             onPaste={handlePaste}
             onBlur={handleBlur}
-            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-b-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none overflow-y-auto font-mono text-sm leading-relaxed"
+            className="w-full p-3 rounded-b-xl focus:outline-none bg-gray-50/30 dark:bg-gray-800/30 text-gray-900 dark:text-white resize-vertical overflow-y-auto font-mono text-sm leading-relaxed"
             style={{ 
-              minHeight: useFullHeight ? '100%' : `${minHeight}px`, 
-              ...(useFullHeight || className.includes('flex-1') ? { height: '100%', resize: 'none' } : { maxHeight: `${maxHeight}px`, resize: 'vertical' })
+              minHeight: `${minHeight}px`,
+              maxHeight: `${maxHeight}px`
             }}
             placeholder={placeholder}
-            autoFocus={isEditing}
+            autoFocus={autoFocus || isEditing}
           />
         )}
         

@@ -1521,7 +1521,7 @@ export function TaskBoard() {
   const renderColumns = (columns: (typeof dateColumns[0] | null)[]) => {
     const elements: JSX.Element[] = [];
     const visibleCount = columns.filter(Boolean).length;
-    const isSingle = visibleCount === 1 && state.preferences.columns.visible === 1;
+    const isSingle = visibleCount === 1 && (state.preferences.columns.plannerVisible ?? state.preferences.columns.visible) === 1;
     
     columns.forEach((column, index) => {
       // Handle empty placeholder columns

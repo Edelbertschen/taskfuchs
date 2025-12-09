@@ -505,6 +505,9 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
     const overdueTasks = state.tasks.filter(task => {
       if (task.completed) return false;
       
+      // Skip tasks without columnId
+      if (!task.columnId) return false;
+      
       // Method 1: Check if task is in a currently visible past date column
       const taskColumn = state.columns.find(col => col.id === task.columnId);
       if (taskColumn && taskColumn.type === 'date' && taskColumn.date) {
