@@ -1580,6 +1580,9 @@ export function ProjectKanbanBoard() {
   // Render columns using TaskColumn component (exactly like TaskBoard)
   const renderColumns = (columns: (Column | null | undefined)[]) => {
     const result = [];
+    const realColumnsCount = columns.filter(c => c && c !== null && c !== undefined).length;
+    const visibleColumnsSetting = state.preferences.columns.projectsVisible ?? state.preferences.columns.visible;
+    const isSingle = realColumnsCount === 1 && visibleColumnsSetting === 1;
     
     for (let index = 0; index < columns.length; index++) {
       const column = columns[index];
@@ -1634,7 +1637,7 @@ export function ProjectKanbanBoard() {
           .filter(task => task.kanbanColumnId === column.id)
           .sort((a, b) => a.position - b.position);
         
-        result.push(
+        const columnNode = (
           <SortableContext
             key={column.id}
             items={columnTasks.map(task => task.id)}
@@ -1646,6 +1649,17 @@ export function ProjectKanbanBoard() {
             />
           </SortableContext>
         );
+        
+        // In single-column view, wrap with fixed width (500px like Pins)
+        if (isSingle) {
+          result.push(
+            <div key={`single-wrap-${column.id}`} style={{ flex: '0 0 500px', maxWidth: 500, width: 500, margin: '0 auto' }}>
+              {columnNode}
+            </div>
+          );
+        } else {
+          result.push(columnNode);
+        }
         
         // Add divider after column (except for the last column) in minimal design
         if (isMinimalDesign && index < columns.length - 1) {

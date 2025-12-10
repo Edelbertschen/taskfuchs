@@ -65,24 +65,49 @@ export function EndOfDayModal({ isOpen, onClose }: EndOfDayModalProps) {
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncResult, setSyncResult] = useState<{ success: boolean; message: string } | null>(null);
 
-  // Get today's tasks
+  // Get today's tasks - including all tasks due today, in today column, or worked on today
   const todaysTasks = useMemo(() => {
     const today = new Date();
     const todayString = format(today, 'yyyy-MM-dd');
     
     return state.tasks.filter(task => {
+      // Exclude already archived tasks
+      if (task.archived) return false;
+      
+      // Task is in the "Heute" column
       const isInTodayColumn = task.columnId === `date-${todayString}`;
-      // Exclude already archived tasks so that the "Erledigte Aufgaben" section disappears after archiving
-      const isNotArchived = !task.archived;
-      return isInTodayColumn && isNotArchived;
+      
+      // Task has dueDate set to today
+      const isDueToday = task.dueDate && format(new Date(task.dueDate), 'yyyy-MM-dd') === todayString;
+      
+      // Task was worked on today (has trackedTime and was updated today)
+      const wasWorkedOnToday = task.trackedTime && task.trackedTime > 0 && 
+        task.updatedAt && format(new Date(task.updatedAt), 'yyyy-MM-dd') === todayString;
+      
+      return isInTodayColumn || isDueToday || wasWorkedOnToday;
     });
+  }, [state.tasks]);
+
+  // Calculate total worked time from ALL tasks that were updated today (regardless of column)
+  const totalWorkedTimeToday = useMemo(() => {
+    const today = new Date();
+    const todayString = format(today, 'yyyy-MM-dd');
+    
+    return state.tasks
+      .filter(task => !task.archived && task.trackedTime && task.trackedTime > 0 &&
+        task.updatedAt && format(new Date(task.updatedAt), 'yyyy-MM-dd') === todayString)
+      .reduce((sum, task) => sum + (task.trackedTime || 0), 0);
   }, [state.tasks]);
 
   // Calculate statistics
   const completedTasks = todaysTasks.filter(task => task.completed);
   const incompleteTasks = todaysTasks.filter(task => !task.completed);
   const totalEstimatedTime = todaysTasks.reduce((sum, task) => sum + (task.estimatedTime || 0), 0);
-  const totalWorkedTime = todaysTasks.reduce((sum, task) => sum + (task.trackedTime || 0), 0); // Use tracked timer time from ALL tasks
+  // Use the higher value: either from today's tasks or from all tasks worked on today
+  const totalWorkedTime = Math.max(
+    todaysTasks.reduce((sum, task) => sum + (task.trackedTime || 0), 0),
+    totalWorkedTimeToday
+  );
   
   // Calculate work percentage for skill system
   const workPercentage = totalEstimatedTime > 0 ? (totalWorkedTime / totalEstimatedTime) * 100 : 0;
@@ -601,33 +626,6 @@ export function EndOfDayModal({ isOpen, onClose }: EndOfDayModalProps) {
               </div>
             )}
 
-            {/* Dropbox Upload small card (placed after local backup) */}
-            {canDropbox && (
-              <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200/50 dark:border-gray-700/50">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={getAccentColorStyles().bgLight}>
-                    <Upload className="w-4 h-4" style={getAccentColorStyles().text} />
-                  </div>
-                  <div>
-                    <div className="text-sm font-medium text-gray-900 dark:text-white">
-                      {i18n.language === 'en' ? 'Upload to Dropbox' : 'Zu Dropbox hochladen'}
-                    </div>
-                    {eodUploadMsg && (
-                      <div className="text-xs" style={getAccentColorStyles().text}>{eodUploadMsg}</div>
-                    )}
-                  </div>
-                </div>
-                <button
-                  onClick={handleDropboxUpload}
-                  disabled={eodUploading}
-                  className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-all hover:opacity-90 hover:shadow-md disabled:opacity-60"
-                  style={getAccentColorStyles().bg}
-                >
-                  <Upload className="w-4 h-4 mr-2 inline" />
-                  {eodUploading ? (i18n.language === 'en' ? 'Uploading…' : 'Hochladen…') : (i18n.language === 'en' ? 'Upload' : 'Hochladen')}
-                </button>
-              </div>
-            )}
 
             {/* Close Button */}
             <div className="flex justify-center pt-2">

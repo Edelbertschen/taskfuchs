@@ -79,7 +79,14 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [projectSidebarMinimized, setProjectSidebarMinimized] = useState(false);
   const [taskSidebarMinimized, setTaskSidebarMinimized] = useState(false);
-  const [pinsSidebarMinimized, setPinsSidebarMinimized] = useState(true);
+  const [pinsSidebarMinimized, setPinsSidebarMinimized] = useState(() => {
+    try {
+      const saved = localStorage.getItem('taskfuchs-pins-sidebar-minimized');
+      return saved === 'true';
+    } catch {
+      return true;
+    }
+  });
   const [notesSliderOpen, setNotesSliderOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   

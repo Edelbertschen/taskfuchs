@@ -926,7 +926,7 @@ export function PinsView() {
         );
         if (isSingle) {
           result.push(
-            <div key={`single-wrap-${column.id}`} style={{ flex: '0 0 702px', maxWidth: 702, width: 702, margin: '0 auto' }}>
+            <div key={`single-wrap-${column.id}`} style={{ flex: '0 0 500px', maxWidth: 500, width: 500, margin: '0 auto' }}>
               {node}
             </div>
           );
@@ -960,7 +960,8 @@ export function PinsView() {
           style={{ 
             boxShadow: isMinimalDesign ? '0 1px 3px 0 rgba(0, 0, 0, 0.1)' : '0 8px 32px rgba(0, 0, 0, 0.1)',
             width: sidebarMinimized ? '0px' : '320px',
-            marginLeft: sidebarMinimized ? '-320px' : '0px',
+            minWidth: sidebarMinimized ? '0px' : '320px',
+            overflow: 'hidden',
           }}
         >
           {/* Sidebar Header - solid, not glass */}

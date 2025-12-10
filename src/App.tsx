@@ -730,17 +730,7 @@ function MainApp() {
         setShowSmartTaskModal(true);
       }
 
-      // 🚀 New: Focus Mode (F)
-      if (e.key === 'f' || e.key === 'F') {
-        e.preventDefault();
-        if (currentView === 'focus') {
-          // Exit focus mode
-          handleViewChange('today');
-        } else {
-          // Enter focus mode
-          handleViewChange('focus');
-        }
-      }
+      // Focus Mode shortcut removed - was conflicting with browser search (Cmd/Ctrl+F)
 
       // 🚀 New: Timer Controls (Space)
       if (e.key === ' ') {

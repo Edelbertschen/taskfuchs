@@ -3061,20 +3061,21 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                   </label>
                   <div className="flex gap-2 items-center">
                     {[
-                      { value: 'low', label: taskModal.priorityLow(), colorBg: 'rgba(34, 197, 94, 0.12)', colorBorder: 'rgb(34, 197, 94)' },
-                      { value: 'medium', label: taskModal.priorityMedium(), colorBg: 'rgba(234, 179, 8, 0.12)', colorBorder: 'rgb(234, 179, 8)' },
-                      { value: 'high', label: taskModal.priorityHigh(), colorBg: 'rgba(239, 68, 68, 0.12)', colorBorder: 'rgb(239, 68, 68)' }
+                      { value: 'low', label: taskModal.priorityLow(), colorBg: 'rgba(34, 197, 94, 0.15)', colorBorder: 'rgb(34, 197, 94)', colorText: 'rgb(22, 163, 74)' },
+                      { value: 'medium', label: taskModal.priorityMedium(), colorBg: 'rgba(234, 179, 8, 0.15)', colorBorder: 'rgb(234, 179, 8)', colorText: 'rgb(180, 130, 0)' },
+                      { value: 'high', label: taskModal.priorityHigh(), colorBg: 'rgba(239, 68, 68, 0.15)', colorBorder: 'rgb(239, 68, 68)', colorText: 'rgb(220, 38, 38)' }
                     ].map((priority) => (
                       <button
                         key={priority.value}
                         onClick={() => setFormData(prev => ({ ...prev, priority: priority.value as any }))}
-                        className={`relative px-3 py-1.5 rounded-xl text-xs font-medium transition-all duration-300 cursor-pointer ${
-                          formData.priority === priority.value ? 'scale-105 shadow-sm' : 'opacity-50 hover:opacity-80'
+                        className={`relative px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-300 cursor-pointer ${
+                          formData.priority === priority.value ? 'scale-105 shadow-sm' : 'hover:scale-102'
                         }`}
                         style={{
                           backgroundColor: formData.priority === priority.value ? priority.colorBg : 'transparent',
-                          border: `1.5px solid ${formData.priority === priority.value ? priority.colorBorder : priority.colorBorder + '30'}`,
-                          color: priority.colorBorder,
+                          border: formData.priority === priority.value ? `1.5px solid ${priority.colorBorder}` : 'none',
+                          color: priority.colorText,
+                          opacity: formData.priority === priority.value ? 1 : 0.7,
                         }}
                         title={priority.label}
                       >
