@@ -26,6 +26,7 @@
     "stats": "Statistics",
     "created": "Created",
     "lastLogin": "Last Login",
+    "lastActivity": "Last Activity",
     "actions": "Actions",
     "noUsersFound": "No users found",
     "noUsers": "No users yet",

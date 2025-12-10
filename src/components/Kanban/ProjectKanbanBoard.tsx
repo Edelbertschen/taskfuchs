@@ -307,42 +307,8 @@ export function ProjectKanbanBoard() {
   }, [selectedProject]);
 
   // Horizontal scrolling & navigation:
-  // - SHIFT + wheel navigates columns (like Planner)
+  // - SHIFT + wheel navigates columns (handled globally in App.tsx)
   // - Arrow keys navigate columns
-  
-  // Using a ref callback approach to ensure the listener is attached when the container mounts
-  const wheelListenerRef = useRef<((e: WheelEvent) => void) | null>(null);
-  
-  // Create the wheel handler once
-  useEffect(() => {
-    wheelListenerRef.current = (e: WheelEvent) => {
-      // Only handle if SHIFT is pressed
-      if (!e.shiftKey) return;
-
-      const absX = Math.abs(e.deltaX || 0);
-      const absY = Math.abs(e.deltaY || 0);
-      const raw = absX > absY ? (e.deltaX || 0) : (e.deltaY || 0);
-      if (raw === 0) return;
-
-        e.preventDefault();
-        e.stopPropagation();
-        const direction = raw > 0 ? 'next' : 'prev';
-        dispatch({ type: 'NAVIGATE_PROJECTS', payload: direction });
-    };
-  }, [dispatch]);
-  
-  // Attach wheel listener to container when it mounts
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container || !wheelListenerRef.current) return;
-    
-    const handler = wheelListenerRef.current;
-    container.addEventListener('wheel', handler, { passive: false });
-    
-    return () => {
-      container.removeEventListener('wheel', handler);
-    };
-  });
 
   // Listen for column navigation from ColumnSwitcher arrows
   useEffect(() => {

@@ -565,10 +565,40 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
     return () => clearInterval(midnightInterval);
   }, []);
 
-  // Check current theme
+  // Check current theme and listen for system theme changes
   useEffect(() => {
-    const isDark = document.documentElement.classList.contains('dark');
-    setIsDarkMode(isDark);
+    const updateDarkMode = () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      setIsDarkMode(isDark);
+    };
+    
+    // Initial check
+    updateDarkMode();
+    
+    // Listen for system theme changes (relevant when theme === 'system')
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleSystemChange = () => {
+      // Small delay to ensure the dark class has been updated by AppContext
+      setTimeout(updateDarkMode, 50);
+    };
+    
+    mediaQuery.addEventListener('change', handleSystemChange);
+    
+    // Also observe DOM changes to the dark class (catches all theme changes)
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          updateDarkMode();
+        }
+      });
+    });
+    
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    
+    return () => {
+      mediaQuery.removeEventListener('change', handleSystemChange);
+      observer.disconnect();
+    };
   }, [state.preferences.theme]);
 
   // Close context menu when clicking outside

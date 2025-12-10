@@ -593,38 +593,7 @@ export function TaskBoard() {
   };
 
   // Horizontal scroll functionality with Shift + Mouse wheel
-  // Using a ref callback approach to ensure the listener is attached when the container mounts
-  const wheelListenerRef = useRef<((e: WheelEvent) => void) | null>(null);
-  
-  // Create the wheel handler once
-  useEffect(() => {
-    wheelListenerRef.current = (e: WheelEvent) => {
-      // Only handle if SHIFT is pressed
-      if (!e.shiftKey) return;
-      
-        e.preventDefault();
-        e.stopPropagation();
-        
-        // Scroll direction: negative deltaY = scroll up = go left, positive deltaY = scroll down = go right
-        const direction = e.deltaY > 0 ? 'next' : 'prev';
-        
-      // Dispatch navigation directly
-      dispatch({ type: 'NAVIGATE_DATE', payload: direction });
-    };
-  }, [dispatch]);
-
-  // Attach wheel listener to container when it mounts
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container || !wheelListenerRef.current) return;
-    
-    const handler = wheelListenerRef.current;
-    container.addEventListener('wheel', handler, { passive: false });
-    
-    return () => {
-      container.removeEventListener('wheel', handler);
-    };
-  });
+  // Handled globally in App.tsx for consistent behavior across all views
 
   // Listen for column navigation from ColumnSwitcher arrows
   useEffect(() => {
@@ -1625,9 +1594,9 @@ export function TaskBoard() {
       );
 
       if (isSingle) {
-        // In single-column view keep the column at a reasonable width like in multi-column layout
+        // In single-column view: same width as one column in 3-column layout (roughly 1/3 of container)
         elements.push(
-          <div key={`single-wrap-${column.id}`} style={{ flex: '0 0 702px', maxWidth: 702, width: 702, margin: '0 auto' }}>
+          <div key={`single-wrap-${column.id}`} style={{ flex: '0 0 500px', maxWidth: 500, width: 500, margin: '0 auto' }}>
             {columnNode}
           </div>
         );

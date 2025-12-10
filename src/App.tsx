@@ -818,21 +818,32 @@ function MainApp() {
   // Global SHIFT + Mouse wheel navigation for boards
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
-      if (e.shiftKey) {
-        const direction = e.deltaY > 0 ? 'next' : 'prev';
-        
-        if (currentView === 'tasks') {
-          e.preventDefault();
-          dispatch({ type: 'NAVIGATE_DATE', payload: direction });
-        } else if (currentView === 'kanban') {
-          e.preventDefault();
-          dispatch({ type: 'NAVIGATE_PROJECTS', payload: direction });
-        }
+      // Only handle SHIFT + wheel
+      if (!e.shiftKey) return;
+      
+      // Ignore if user is in an input field
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+        return;
+      }
+      
+      const direction = e.deltaY > 0 ? 'next' : 'prev';
+      
+      if (currentView === 'tasks') {
+        e.preventDefault();
+        dispatch({ type: 'NAVIGATE_DATE', payload: direction });
+      } else if (currentView === 'kanban') {
+        e.preventDefault();
+        dispatch({ type: 'NAVIGATE_PROJECTS', payload: direction });
+      } else if (currentView === 'pins') {
+        e.preventDefault();
+        window.dispatchEvent(new CustomEvent('pins-column-navigate', { detail: { direction } }));
       }
     };
 
-    document.addEventListener('wheel', handleWheel, { passive: false });
-    return () => document.removeEventListener('wheel', handleWheel);
+    // Use capture phase to ensure we get the event first
+    window.addEventListener('wheel', handleWheel, { passive: false, capture: true });
+    return () => window.removeEventListener('wheel', handleWheel, { capture: true });
   }, [currentView, dispatch]);
 
   // Generate dynamic colors based on accent color

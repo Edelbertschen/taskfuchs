@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { createPortal } from 'react-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { Plus, Lightbulb, Clock, Tag, Calendar, AlertCircle, CheckCircle, Zap, HelpCircle, X } from 'lucide-react';
+import { Plus, Lightbulb, Clock, Tag, Calendar, AlertCircle, CheckCircle, Zap, HelpCircle, X, List } from 'lucide-react';
 import { parseTaskInput, getParsingExamples, getParsingHelp } from '../../utils/taskParser';
 import { useApp } from '../../context/AppContext';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +10,11 @@ import { useAppTranslation } from '../../utils/i18nHelpers';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import type { ParseResult, Column } from '../../types';
+
+interface MultiParseResult {
+  line: string;
+  result: ParseResult;
+}
 
 interface SmartTaskModalProps {
   isOpen: boolean;
@@ -34,11 +39,13 @@ export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, pro
   const actualPlaceholder = placeholder || forms.placeholderSmartTask();
   const [input, setInput] = useState('');
   const [parseResult, setParseResult] = useState<ParseResult | null>(null);
+  const [multiParseResults, setMultiParseResults] = useState<MultiParseResult[]>([]);
+  const [isMultiMode, setIsMultiMode] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [showExamples, setShowExamples] = useState(false);
   const [isQuickMode, setIsQuickMode] = useState(false);
   const [modalStable, setModalStable] = useState(false); // Prevent premature closing
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   // Generate dynamic colors based on accent color
   const colors = useMemo(() => {
@@ -89,13 +96,30 @@ export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, pro
     };
   }, [state.preferences.accentColor]);
 
-  // Parse input in real-time
+  // Parse input in real-time - supports multiple lines
   useEffect(() => {
     if (input.trim()) {
-      const result = parseTaskInput(input);
-      setParseResult(result);
+      const lines = input.split('\n').filter(line => line.trim());
+      
+      // Check if we have multiple lines
+      if (lines.length > 1) {
+        setIsMultiMode(true);
+        const results: MultiParseResult[] = lines.map(line => ({
+          line: line.trim(),
+          result: parseTaskInput(line.trim())
+        }));
+        setMultiParseResults(results);
+        setParseResult(null);
+      } else {
+        setIsMultiMode(false);
+        setMultiParseResults([]);
+        const result = parseTaskInput(input);
+        setParseResult(result);
+      }
     } else {
       setParseResult(null);
+      setMultiParseResults([]);
+      setIsMultiMode(false);
     }
   }, [input]);
 
@@ -121,134 +145,165 @@ export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, pro
     if (!isOpen) {
       setInput('');
       setParseResult(null);
+      setMultiParseResults([]);
+      setIsMultiMode(false);
       setShowHelp(false);
       setShowExamples(false);
       setIsQuickMode(false);
     }
   }, [isOpen]);
 
-  const handleSubmit = useCallback((e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!input.trim() || !parseResult?.success || !parseResult.task) {
-      return;
+  // Generate UUID with fallback for Firefox compatibility
+  const generateUUID = useCallback(() => {
+    try {
+      return crypto.randomUUID();
+    } catch (error) {
+      // Fallback for browsers that don't support crypto.randomUUID()
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
     }
+  }, []);
 
-    const task = parseResult.task;
-    
+  // Helper to create a single task
+  const createTask = useCallback((task: ParseResult['task']) => {
+    if (!task) return;
+
     // ALWAYS use target column if provided (this is the column where the user clicked)
-    // Only use parsed columnId as fallback if no targetColumn is specified
     let targetColumnId = targetColumn?.id;
     if (!targetColumnId) {
-      // Only use parsed columnId if no targetColumn was specified
       targetColumnId = task.columnId;
     }
-    
-    // Final fallback to inbox if column doesn't exist
     if (!targetColumnId) {
       targetColumnId = 'inbox';
     }
 
-    // Generate UUID with fallback for Firefox compatibility
-    const generateUUID = () => {
-      try {
-        return crypto.randomUUID();
-      } catch (error) {
-        // Fallback for browsers that don't support crypto.randomUUID()
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-          const r = Math.random() * 16 | 0;
-          const v = c === 'x' ? r : (r & 0x3 | 0x8);
-          return v.toString(16);
-        });
-      }
-    };
-
     // Determine the correct column for tasks with dates
-    let finalColumnId = undefined;
-    let finalReminderDate = undefined;
+    let finalColumnId: string | undefined = undefined;
+    let finalReminderDate: string | undefined = undefined;
     
-    // PRIORITY 1: If task has a parsed date and is not for a project, ALWAYS place it in the date column
-    // This overrides any targetColumn or defaultDate
     if (task.dueDate && !projectId && !kanbanColumnId) {
       const dueDate = new Date(task.dueDate);
-      const dateStr = dueDate.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+      const dateStr = dueDate.toISOString().split('T')[0];
       finalColumnId = `date-${dateStr}`;
       finalReminderDate = dateStr;
-      
-      // Ensure the date column exists
       dispatch({ type: 'ENSURE_DATE_COLUMN', payload: dateStr });
-    }
-    // PRIORITY 2: If defaultDate is provided (e.g., from "Heute" view), use it
-    else if (defaultDate && !projectId && !kanbanColumnId) {
+    } else if (defaultDate && !projectId && !kanbanColumnId) {
       finalColumnId = `date-${defaultDate}`;
       finalReminderDate = defaultDate;
-      
-      // Ensure the date column exists
       dispatch({ type: 'ENSURE_DATE_COLUMN', payload: defaultDate });
     }
     
-    // For project kanban tasks, don't set columnId - only use projectId and kanbanColumnId
     if (!projectId && !kanbanColumnId && !finalColumnId) {
       finalColumnId = targetColumn?.id || 'inbox';
     }
 
-    // Apply active filters to new task
-    // Merge parsed tags with active tag filters (remove duplicates)
     const parsedTags = task.tags || [];
     const filterTags = state.activeTagFilters || [];
     const mergedTags = [...new Set([...parsedTags, ...filterTags])];
     
-    // Apply priority filter if exactly one is active and task has no explicit priority
     const filterPriorities = state.activePriorityFilters || [];
     const finalPriority = task.priority || (filterPriorities.length === 1 ? filterPriorities[0] : undefined);
 
-    // Create the task
     const newTask = {
       id: generateUUID(),
       title: task.title,
       description: task.description || '',
       completed: false,
-      priority: finalPriority, // Apply filter priority if no explicit priority
+      priority: finalPriority,
       estimatedTime: task.estimatedTime && task.estimatedTime > 0 ? task.estimatedTime : undefined,
-      tags: mergedTags, // Merged tags from parser and active filters
+      tags: mergedTags,
       subtasks: [],
-      columnId: finalColumnId, // Use determined column (only for planner/inbox)
-      projectId: projectId, // Project context
-      kanbanColumnId: kanbanColumnId, // Kanban column context
+      columnId: finalColumnId,
+      projectId: projectId,
+      kanbanColumnId: kanbanColumnId,
       dueDate: task.dueDate,
-      reminderDate: finalReminderDate, // Set from parsed date or will be set by automatic assignment below
+      reminderDate: finalReminderDate,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      position: Date.now()
+      position: Date.now() + Math.random() * 1000 // Add randomness for multiple tasks
     };
 
-
-    // Automatic assignment based on target column type (only for non-project contexts)
     if (targetColumn && !projectId && !kanbanColumnId) {
       if (targetColumn.type === 'date' && targetColumn.date) {
-        // Task added to date column - automatically assign date
         newTask.reminderDate = targetColumn.date;
         newTask.columnId = targetColumn.id;
-        
-        console.log('📅 Task automatically assigned to date column:', {
-          taskId: newTask.id,
-          columnId: targetColumn.id,
-          date: targetColumn.date
-        });
       } else if (targetColumn.type === 'project') {
-        // Task added to project column - automatically assign project
         newTask.projectId = targetColumn.id;
         newTask.columnId = targetColumn.id;
-        
-        console.log('🗂️ Task automatically assigned to project column:', {
-          taskId: newTask.id,
-          projectId: targetColumn.id
-        });
       }
     }
 
-    // Add the task to the store
     dispatch({ type: 'ADD_TASK', payload: newTask });
+    return newTask;
+  }, [targetColumn, projectId, kanbanColumnId, defaultDate, state.activeTagFilters, state.activePriorityFilters, dispatch, generateUUID]);
+
+  const handleSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Handle multi-task mode
+    if (isMultiMode && multiParseResults.length > 0) {
+      const successfulTasks = multiParseResults.filter(r => r.result.success && r.result.task);
+      
+      if (successfulTasks.length === 0) return;
+
+      // Create all tasks
+      successfulTasks.forEach(({ result }) => {
+        if (result.task) {
+          createTask(result.task);
+        }
+      });
+      
+      // Show feedback for multiple tasks
+      const feedbackToast = document.createElement('div');
+      feedbackToast.className = 'fixed top-4 right-4 text-white px-4 py-2 rounded-lg shadow-lg z-50 text-sm font-medium transition-all duration-300 ease-out transform';
+      feedbackToast.style.backgroundColor = colors.primary;
+      feedbackToast.textContent = `✓ ${successfulTasks.length} Aufgaben hinzugefügt`;
+      feedbackToast.style.transform = 'translateX(100%)';
+      document.body.appendChild(feedbackToast);
+      
+      setTimeout(() => {
+        feedbackToast.style.transform = 'translateX(0)';
+      }, 10);
+      
+      setTimeout(() => {
+        if (document.body.contains(feedbackToast)) {
+          feedbackToast.style.transform = 'translateX(100%)';
+          feedbackToast.style.opacity = '0';
+          setTimeout(() => {
+            if (document.body.contains(feedbackToast)) {
+              document.body.removeChild(feedbackToast);
+            }
+          }, 300);
+        }
+      }, 2000);
+      
+      // Reset form
+      setInput('');
+      setParseResult(null);
+      setMultiParseResults([]);
+      setIsMultiMode(false);
+      setIsQuickMode(false);
+      setShowExamples(false);
+      
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }, 100);
+      
+      return;
+    }
+
+    // Single task mode
+    if (!input.trim() || !parseResult?.success || !parseResult.task) {
+      return;
+    }
+
+    const task = parseResult.task;
+    createTask(task);
     
     // Show quick feedback
     const feedbackToast = document.createElement('div');
@@ -298,7 +353,7 @@ export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, pro
         }, 200);
       }
     }, 100);
-  }, [input, parseResult, targetColumn, projectId, kanbanColumnId, dispatch]);
+  }, [input, parseResult, isMultiMode, multiParseResults, createTask, colors.primary]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     // ESC key closes the modal
@@ -310,13 +365,25 @@ export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, pro
     }
     
     // Handle Enter for submitting task
-    if (e.key === 'Enter' && input.trim()) {
-      e.preventDefault();
-      e.stopPropagation();
-      handleSubmit(e as any);
+    // In multi-mode: Cmd/Ctrl+Enter submits all tasks, plain Enter adds new line
+    // In single mode: Enter submits
+    if (e.key === 'Enter') {
+      if (isMultiMode) {
+        // In multi-mode, only submit with Cmd/Ctrl+Enter
+        if ((e.metaKey || e.ctrlKey) && input.trim()) {
+          e.preventDefault();
+          e.stopPropagation();
+          handleSubmit(e as any);
+        }
+        // Otherwise let the textarea handle the newline
+      } else if (input.trim()) {
+        e.preventDefault();
+        e.stopPropagation();
+        handleSubmit(e as any);
+      }
       return;
     }
-  }, [input, protectedOnClose, handleSubmit]);
+  }, [input, isMultiMode, protectedOnClose, handleSubmit]);
 
   const insertExample = useCallback((example: string) => {
     setInput(example);
@@ -334,7 +401,7 @@ export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, pro
   }, [protectedOnClose]);
 
   // Optimize event handlers
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
   }, []);
 
@@ -458,48 +525,128 @@ export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, pro
               {/* Input Field */}
               <div 
                 className={`bg-gray-50 dark:bg-gray-700 rounded-lg border-2 transition-all duration-200 ${
-                  parseResult?.success 
+                  (parseResult?.success || (isMultiMode && multiParseResults.some(r => r.result.success)))
                     ? '' 
-                    : parseResult?.errors.length
+                    : (parseResult?.errors.length || (isMultiMode && multiParseResults.some(r => r.result.errors.length)))
                     ? 'border-red-300 dark:border-red-600'
                     : 'border-gray-200 dark:border-gray-600'
                 }`}
                 style={
-                  parseResult?.success 
+                  (parseResult?.success || (isMultiMode && multiParseResults.some(r => r.result.success)))
                     ? { borderColor: colors.light }
-                    : !parseResult?.errors.length 
+                    : !(parseResult?.errors.length || (isMultiMode && multiParseResults.some(r => r.result.errors.length)))
                     ? { borderColor: 'rgb(209 213 219)' }
                     : {}
                 }
                 onFocus={handleInputFocus}
                 onBlur={handleInputBlur}
               >
-                <div className="flex items-center p-4">
-                  <Plus className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" />
-                  <input
+                <div className="flex items-start p-4">
+                  {isMultiMode ? (
+                    <List className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0 mt-1" />
+                  ) : (
+                    <Plus className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0 mt-1" />
+                  )}
+                  <textarea
                     ref={inputRef}
-                    type="text"
                     value={input}
                     onChange={handleInputChange}
                     onKeyDown={handleKeyDown}
-                    placeholder={actualPlaceholder}
-                    className="flex-1 bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none text-lg"
+                    placeholder={isMultiMode ? 'Eine Aufgabe pro Zeile...' : actualPlaceholder}
+                    className="flex-1 bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none text-lg resize-none"
+                    rows={isMultiMode ? Math.min(input.split('\n').length + 1, 8) : 1}
+                    style={{ minHeight: isMultiMode ? '80px' : '28px' }}
                   />
-                  {parseResult?.success && (
+                  {(parseResult?.success || (isMultiMode && multiParseResults.some(r => r.result.success))) && (
                     <button
                       type="submit"
-                      className="ml-2 p-2 text-white rounded-md transition-colors"
+                      className="ml-2 p-2 text-white rounded-md transition-colors flex items-center gap-1"
                       style={{ backgroundColor: colors.primary }}
                       onMouseEnter={handleSubmitButtonMouseEnter}
                       onMouseLeave={handleSubmitButtonMouseLeave}
+                      title={isMultiMode ? 'Alle Aufgaben erstellen (⌘/Ctrl+Enter)' : 'Aufgabe erstellen (Enter)'}
                     >
                       <Plus className="w-4 h-4" />
+                      {isMultiMode && (
+                        <span className="text-xs font-medium">
+                          {multiParseResults.filter(r => r.result.success).length}
+                        </span>
+                      )}
                     </button>
                   )}
                 </div>
 
-                {/* Parse Preview */}
-                {parseResult && (
+                {/* Multi-Task Preview */}
+                {isMultiMode && multiParseResults.length > 0 && (
+                  <div className="px-4 pb-4 border-t border-gray-200 dark:border-gray-600">
+                    <div className="mt-3 space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <div className="flex items-center" style={{ color: colors.primary }}>
+                          <List className="w-4 h-4 mr-2" />
+                          <span>{multiParseResults.filter(r => r.result.success).length} von {multiParseResults.length} Aufgaben erkannt</span>
+                        </div>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">⌘/Ctrl+Enter zum Erstellen</span>
+                      </div>
+                      
+                      <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                        {multiParseResults.map((item, index) => (
+                          <div 
+                            key={index}
+                            className={`flex items-center gap-2 p-2 rounded-lg text-sm ${
+                              item.result.success 
+                                ? 'bg-gray-100 dark:bg-gray-600' 
+                                : 'bg-red-50 dark:bg-red-900/20'
+                            }`}
+                          >
+                            {item.result.success ? (
+                              <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: colors.primary }} />
+                            ) : (
+                              <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-500" />
+                            )}
+                            <span className={`flex-1 truncate ${!item.result.success ? 'text-red-600 dark:text-red-400' : 'text-gray-700 dark:text-gray-300'}`}>
+                              {item.result.success && item.result.task?.title 
+                                ? item.result.task.title 
+                                : item.line}
+                            </span>
+                            {item.result.success && item.result.task && (
+                              <div className="flex items-center gap-1 flex-shrink-0">
+                                {item.result.task.estimatedTime && item.result.task.estimatedTime > 0 && (
+                                  <span className="text-xs bg-blue-100 dark:bg-blue-900/30 px-1.5 py-0.5 rounded">
+                                    {item.result.task.estimatedTime}m
+                                  </span>
+                                )}
+                                {item.result.task.priority && state.preferences.showPriorities && (
+                                  <span className={`text-xs px-1.5 py-0.5 rounded ${
+                                    item.result.task.priority === 'high' 
+                                      ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
+                                      : item.result.task.priority === 'medium'
+                                      ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
+                                      : 'bg-gray-100 dark:bg-gray-600'
+                                  }`}>
+                                    {item.result.task.priority === 'high' ? '!!!' : item.result.task.priority === 'medium' ? '!!' : '!'}
+                                  </span>
+                                )}
+                                {item.result.task.tags && item.result.task.tags.length > 0 && (
+                                  <span className="text-xs bg-purple-100 dark:bg-purple-900/30 px-1.5 py-0.5 rounded">
+                                    #{item.result.task.tags.length}
+                                  </span>
+                                )}
+                                {item.result.task.dueDate && (
+                                  <span className="text-xs bg-orange-100 dark:bg-orange-900/30 px-1.5 py-0.5 rounded">
+                                    📅
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Single Parse Preview */}
+                {!isMultiMode && parseResult && (
                   <div className="px-4 pb-4 border-t border-gray-200 dark:border-gray-600">
                     {parseResult.success ? (
                       <div className="mt-3 space-y-3">

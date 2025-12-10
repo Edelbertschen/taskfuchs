@@ -285,8 +285,8 @@ const initialState: AppState = {
   preferences: {
     theme: 'light',
     language: 'de',
-    accentColor: '#006d8f',
-    backgroundImage: '/backgrounds/bg11.jpg',
+    accentColor: '#f97316',
+    backgroundImage: '/backgrounds/bg12.webp',
     backgroundType: 'image',
     dateFormat: 'dd.MM.yyyy',
     recentBackgroundImages: [],
@@ -4576,22 +4576,41 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // Apply theme - use useLayoutEffect for instant updates without flicker
   useLayoutEffect(() => {
     const root = document.documentElement;
-    if (state.preferences.theme === 'dark') {
-      root.classList.add('dark');
-    } else if (state.preferences.theme === 'light') {
-      root.classList.remove('dark');
-    } else {
-      // System theme
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (prefersDark) {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    const applyTheme = (prefersDark: boolean) => {
+      if (state.preferences.theme === 'dark') {
         root.classList.add('dark');
-      } else {
+      } else if (state.preferences.theme === 'light') {
         root.classList.remove('dark');
+      } else {
+        // System theme - follow system preference
+        if (prefersDark) {
+          root.classList.add('dark');
+        } else {
+          root.classList.remove('dark');
+        }
       }
-    }
+    };
+    
+    // Apply theme immediately
+    applyTheme(mediaQuery.matches);
 
     // Set accent color
     root.style.setProperty('--accent-color', state.preferences.accentColor);
+    
+    // Listen for system theme changes (only relevant when theme === 'system')
+    const handleSystemThemeChange = (e: MediaQueryListEvent) => {
+      if (state.preferences.theme === 'system') {
+        applyTheme(e.matches);
+      }
+    };
+    
+    mediaQuery.addEventListener('change', handleSystemThemeChange);
+    
+    return () => {
+      mediaQuery.removeEventListener('change', handleSystemThemeChange);
+    };
   }, [state.preferences.theme, state.preferences.accentColor]);
 
   // Auto-sync with Todoist when triggered by interval (disabled - Todoist integration removed)

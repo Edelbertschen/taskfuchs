@@ -1160,10 +1160,10 @@ export function WysiwygEditor({
       <div className={`relative ${useFullHeight ? 'flex-1 flex flex-col min-h-0' : ''}`}>
         {isPreviewMode ? (
           <div 
-            className="w-full p-3 rounded-b-xl bg-gray-50/30 dark:bg-gray-800/30 cursor-text hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors overflow-y-auto"
+            className={`w-full p-3 rounded-b-xl bg-gray-50/30 dark:bg-gray-800/30 cursor-text hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors overflow-y-auto ${useFullHeight ? 'flex-1' : ''}`}
             style={{ 
-              minHeight: `${minHeight}px`,
-              maxHeight: `${maxHeight}px`
+              minHeight: useFullHeight ? undefined : `${minHeight}px`,
+              maxHeight: useFullHeight ? undefined : `${maxHeight}px`
             }}
             onClick={handleEdit}
             title="Klicken zum Bearbeiten"
@@ -1191,10 +1191,10 @@ export function WysiwygEditor({
             onKeyDown={handleKeyDown}
             onPaste={handlePaste}
             onBlur={handleBlur}
-            className="w-full p-3 rounded-b-xl focus:outline-none bg-gray-50/30 dark:bg-gray-800/30 text-gray-900 dark:text-white resize-vertical overflow-y-auto font-mono text-sm leading-relaxed"
+            className={`w-full p-3 rounded-b-xl focus:outline-none bg-gray-50/30 dark:bg-gray-800/30 text-gray-900 dark:text-white overflow-y-auto font-mono text-sm leading-relaxed ${useFullHeight ? 'flex-1 resize-none' : 'resize-vertical'}`}
             style={{ 
-              minHeight: `${minHeight}px`,
-              maxHeight: `${maxHeight}px`
+              minHeight: useFullHeight ? undefined : `${minHeight}px`,
+              maxHeight: useFullHeight ? undefined : `${maxHeight}px`
             }}
             placeholder={placeholder}
             autoFocus={autoFocus || isEditing}

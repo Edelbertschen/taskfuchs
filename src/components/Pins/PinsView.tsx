@@ -327,41 +327,9 @@ export function PinsView() {
     setPinOffset((prev) => Math.min(maxOffset, Math.max(0, prev + step)));
   }, [state.pinColumns.length, state.preferences.columns.visible, state.preferences.columns.pinsVisible]);
 
-  // Using a ref callback approach to ensure the listener is attached when the container mounts
-  const wheelListenerRef = useRef<((e: WheelEvent) => void) | null>(null);
-  
-  // Create the wheel handler once
-  useEffect(() => {
-    wheelListenerRef.current = (e: WheelEvent) => {
-      // Only handle if SHIFT is pressed
-      if (!e.shiftKey) return;
+  // SHIFT + wheel navigation is handled globally in App.tsx via 'pins-column-navigate' event
 
-      const absX = Math.abs(e.deltaX || 0);
-      const absY = Math.abs(e.deltaY || 0);
-      const raw = absX > absY ? e.deltaX : e.deltaY;
-      if (raw === 0) return;
-      
-      e.preventDefault();
-      e.stopPropagation();
-      const direction = raw > 0 ? 'next' : 'prev';
-      navigateColumns(direction);
-    };
-  }, [navigateColumns]);
-  
-  // Attach wheel listener to container when it mounts
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container || !wheelListenerRef.current) return;
-    
-    const handler = wheelListenerRef.current;
-    container.addEventListener('wheel', handler, { passive: false });
-    
-    return () => {
-      container.removeEventListener('wheel', handler);
-    };
-  });
-
-  // Listen for column navigation from ColumnSwitcher arrows
+  // Listen for column navigation from ColumnSwitcher arrows and global SHIFT+wheel
   useEffect(() => {
     const handleColumnNavigate = (e: CustomEvent<{ direction: 'prev' | 'next' }>) => {
       navigateColumns(e.detail.direction);
@@ -384,10 +352,12 @@ export function PinsView() {
     };
 
     window.addEventListener('column-navigate', handleColumnNavigate as EventListener);
+    window.addEventListener('pins-column-navigate', handleColumnNavigate as EventListener);
     document.addEventListener('keydown', handleKeyDown);
 
     return () => {
       window.removeEventListener('column-navigate', handleColumnNavigate as EventListener);
+      window.removeEventListener('pins-column-navigate', handleColumnNavigate as EventListener);
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [navigateColumns]);

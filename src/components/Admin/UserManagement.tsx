@@ -30,6 +30,7 @@ interface User {
   language: string;
   createdAt: string;
   lastLoginAt: string;
+  lastActivityAt?: string;
   _count?: {
     tasks: number;
     projects: number;
@@ -44,7 +45,7 @@ interface Stats {
   activeUsersLast30Days: number;
 }
 
-type SortField = 'createdAt' | 'lastLoginAt' | 'tasks' | 'projects';
+type SortField = 'createdAt' | 'lastLoginAt' | 'lastActivityAt' | 'tasks' | 'projects';
 type SortDirection = 'asc' | 'desc';
 
 export function UserManagement() {
@@ -113,6 +114,10 @@ export function UserManagement() {
         case 'lastLoginAt':
           aValue = new Date(a.lastLoginAt).getTime();
           bValue = new Date(b.lastLoginAt).getTime();
+          break;
+        case 'lastActivityAt':
+          aValue = new Date(a.lastActivityAt || a.lastLoginAt).getTime();
+          bValue = new Date(b.lastActivityAt || b.lastLoginAt).getTime();
           break;
         case 'tasks':
           aValue = a._count?.tasks || 0;
@@ -398,6 +403,16 @@ export function UserManagement() {
                         <SortIcon field="lastLoginAt" />
                       </div>
                     </th>
+                    <th 
+                      className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:text-gray-700 dark:hover:text-gray-200 transition-colors select-none"
+                      onClick={() => handleSort('lastActivityAt')}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <TrendingUp className="w-3.5 h-3.5" />
+                        {t('admin.lastActivity', 'Letzte Aktivität')}
+                        <SortIcon field="lastActivityAt" />
+                      </div>
+                    </th>
                     <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       {t('admin.actions', 'Actions')}
                     </th>
@@ -437,6 +452,9 @@ export function UserManagement() {
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
                         {formatDate(user.lastLoginAt)}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                        {formatDate(user.lastActivityAt || user.lastLoginAt)}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-end gap-2">

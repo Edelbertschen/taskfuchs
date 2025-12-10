@@ -37,20 +37,55 @@ app.get('/users', async (c) => {
         select: {
           id: true
         }
+      },
+      // Get the most recent task update for "last activity"
+      tasks: {
+        select: {
+          updatedAt: true
+        },
+        orderBy: {
+          updatedAt: 'desc'
+        },
+        take: 1
+      },
+      // Also check notes for activity
+      notes: {
+        select: {
+          updatedAt: true
+        },
+        orderBy: {
+          updatedAt: 'desc'
+        },
+        take: 1
       }
     },
     orderBy: { lastLoginAt: 'desc' }
   });
 
-  // Transform to include projects count
-  const usersWithProjects = users.map(user => ({
-    ...user,
-    _count: {
-      tasks: user._count.tasks,
-      projects: user.columns.length
-    },
-    columns: undefined // Remove columns array from response
-  }));
+  // Transform to include projects count and last activity
+  const usersWithProjects = users.map(user => {
+    // Calculate last activity from tasks, notes, or lastLoginAt
+    const taskActivity = user.tasks[0]?.updatedAt;
+    const noteActivity = user.notes[0]?.updatedAt;
+    
+    // Find the most recent activity
+    const activities = [taskActivity, noteActivity, user.lastLoginAt].filter(Boolean) as Date[];
+    const lastActivityAt = activities.length > 0 
+      ? new Date(Math.max(...activities.map(d => new Date(d).getTime())))
+      : user.lastLoginAt;
+
+    return {
+      ...user,
+      _count: {
+        tasks: user._count.tasks,
+        projects: user.columns.length
+      },
+      lastActivityAt,
+      columns: undefined, // Remove columns array from response
+      tasks: undefined,   // Remove tasks array from response
+      notes: undefined    // Remove notes array from response
+    };
+  });
 
   return c.json({ users: usersWithProjects });
 });

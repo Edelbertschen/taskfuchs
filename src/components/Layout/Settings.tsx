@@ -1005,12 +1005,25 @@ const Settings = React.memo(() => {
     dispatch({ type: 'UPDATE_PREFERENCES', payload: { theme: newTheme } });
   };
 
-  // Keep local toggle in sync if theme changes elsewhere (e.g., header toggle or after Dropbox download)
+  // Keep local toggle in sync if theme changes elsewhere (e.g., header toggle, system theme change, or after Dropbox download)
   useEffect(() => {
-    const dm = state.preferences.theme === 'dark' || (
-      state.preferences.theme === 'system' && typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-    );
-    setIsDarkMode(dm);
+    const updateDarkMode = () => {
+      const dm = state.preferences.theme === 'dark' || (
+        state.preferences.theme === 'system' && typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+      );
+      setIsDarkMode(dm);
+    };
+    
+    // Initial check
+    updateDarkMode();
+    
+    // Listen for system theme changes (relevant when theme === 'system')
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    mediaQuery.addEventListener('change', updateDarkMode);
+    
+    return () => {
+      mediaQuery.removeEventListener('change', updateDarkMode);
+    };
   }, [state.preferences.theme]);
 
   const handleLanguageChange = async (newLang: 'en' | 'de' | string) => {
