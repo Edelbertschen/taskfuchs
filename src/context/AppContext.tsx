@@ -4052,6 +4052,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   // Background sync for tasks (every 30 seconds when online)
   // This ensures Desktop and Mobile stay in sync
+  // BUGFIX: Now MERGES server data instead of overwriting to prevent data loss
   useEffect(() => {
     if (!isOnlineMode() || !initialLoadComplete.current) return;
 
@@ -4061,28 +4062,80 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         
         // Only update if we got valid data
         if (data.tasks) {
-          // Compare and only dispatch if different to avoid unnecessary re-renders
-          const currentTaskIds = new Set(state.tasks.map(t => t.id));
-          const serverTaskIds = new Set(data.tasks.map((t: any) => t.id));
+          const serverTasks = data.tasks as Task[];
+          const localTasks = state.tasks;
           
-          // Check if there are differences
-          const hasNewTasks = data.tasks.some((t: any) => !currentTaskIds.has(t.id));
-          const hasDeletedTasks = state.tasks.some(t => !serverTaskIds.has(t.id));
-          const hasUpdatedTasks = data.tasks.some((t: any) => {
-            const localTask = state.tasks.find(lt => lt.id === t.id);
-            return localTask && localTask.updatedAt !== t.updatedAt;
+          // Create maps for efficient lookup
+          const serverTaskMap = new Map(serverTasks.map(t => [t.id, t]));
+          const localTaskMap = new Map(localTasks.map(t => [t.id, t]));
+          
+          // MERGE strategy: Keep local tasks that don't exist on server (not yet synced)
+          // For tasks that exist on both, use the one with the newer updatedAt
+          const mergedTasks: Task[] = [];
+          
+          // Add all local tasks (they might be newer or not yet synced)
+          localTasks.forEach(localTask => {
+            const serverTask = serverTaskMap.get(localTask.id);
+            if (!serverTask) {
+              // Local task doesn't exist on server - keep it (not yet synced)
+              mergedTasks.push(localTask);
+            } else {
+              // Both exist - use the one with newer updatedAt
+              const localTime = new Date(localTask.updatedAt || 0).getTime();
+              const serverTime = new Date(serverTask.updatedAt || 0).getTime();
+              mergedTasks.push(localTime >= serverTime ? localTask : serverTask);
+            }
           });
           
-          if (hasNewTasks || hasDeletedTasks || hasUpdatedTasks) {
-            dispatch({ type: 'SET_TASKS', payload: data.tasks });
+          // Add server tasks that don't exist locally (new from other devices)
+          serverTasks.forEach(serverTask => {
+            if (!localTaskMap.has(serverTask.id)) {
+              mergedTasks.push(serverTask);
+            }
+          });
+          
+          // Only dispatch if there are actual changes
+          const hasChanges = mergedTasks.length !== localTasks.length ||
+            mergedTasks.some((mt, idx) => mt.id !== localTasks[idx]?.id || mt.updatedAt !== localTasks[idx]?.updatedAt);
+          
+          if (hasChanges) {
+            console.log('[AppContext] Background sync: merging', serverTasks.length, 'server tasks with', localTasks.length, 'local tasks');
+            dispatch({ type: 'SET_TASKS', payload: mergedTasks });
           }
         }
         
         if (data.archivedTasks) {
-          const currentIds = new Set(state.archivedTasks.map(t => t.id));
-          const serverIds = new Set(data.archivedTasks.map((t: any) => t.id));
-          if (currentIds.size !== serverIds.size || data.archivedTasks.some((t: any) => !currentIds.has(t.id))) {
-            dispatch({ type: 'SET_ARCHIVED_TASKS', payload: data.archivedTasks });
+          const serverArchived = data.archivedTasks as Task[];
+          const localArchived = state.archivedTasks;
+          
+          // Same merge strategy for archived tasks
+          const serverMap = new Map(serverArchived.map(t => [t.id, t]));
+          const localMap = new Map(localArchived.map(t => [t.id, t]));
+          
+          const mergedArchived: Task[] = [];
+          
+          localArchived.forEach(localTask => {
+            const serverTask = serverMap.get(localTask.id);
+            if (!serverTask) {
+              mergedArchived.push(localTask);
+            } else {
+              const localTime = new Date(localTask.updatedAt || 0).getTime();
+              const serverTime = new Date(serverTask.updatedAt || 0).getTime();
+              mergedArchived.push(localTime >= serverTime ? localTask : serverTask);
+            }
+          });
+          
+          serverArchived.forEach(serverTask => {
+            if (!localMap.has(serverTask.id)) {
+              mergedArchived.push(serverTask);
+            }
+          });
+          
+          const hasArchivedChanges = mergedArchived.length !== localArchived.length ||
+            mergedArchived.some((mt, idx) => mt.id !== localArchived[idx]?.id);
+          
+          if (hasArchivedChanges) {
+            dispatch({ type: 'SET_ARCHIVED_TASKS', payload: mergedArchived });
           }
         }
       } catch (error) {
