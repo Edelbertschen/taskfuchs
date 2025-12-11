@@ -3089,15 +3089,49 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     // If online mode, fetch from API
     if (isOnlineMode()) {
       console.log('[AppContext] Online mode detected, fetching from database...');
+      
+      // WICHTIG: Erst lokale Tasks laden, dann mit Server mergen
+      // Das verhindert Datenverlust bei Tasks, die lokal erstellt aber nicht gespeichert wurden
+      const savedLocalTasks = localStorage.getItem('taskfuchs-tasks');
+      const localTasks: Task[] = savedLocalTasks ? JSON.parse(savedLocalTasks) : [];
+      const savedLocalArchived = localStorage.getItem('taskfuchs-archived-tasks');
+      const localArchived: Task[] = savedLocalArchived ? JSON.parse(savedLocalArchived) : [];
+      
       syncAPI.getFullData()
         .then((data) => {
           console.log('[AppContext] Data loaded from database:', data);
           
           if (data.tasks) {
-            dispatch({ type: 'SET_TASKS', payload: data.tasks });
+            const serverTasks = data.tasks as Task[];
+            const serverTaskIds = new Set(serverTasks.map(t => t.id));
+            
+            // Behalte lokale Tasks, die NICHT auf dem Server sind (= noch nicht gespeichert)
+            // und korrigiere ihre position zu Ganzzahlen
+            const localOnlyTasks = localTasks
+              .filter(t => !serverTaskIds.has(t.id))
+              .map(t => ({
+                ...t,
+                position: Math.floor(t.position || Date.now()) // Fix für Dezimalzahlen!
+              }));
+            
+            if (localOnlyTasks.length > 0) {
+              console.log('[AppContext] ⚠️ Gefunden: ' + localOnlyTasks.length + ' lokale Tasks, die nicht auf dem Server sind. Diese werden behalten!');
+              console.log('[AppContext] Lokale Tasks:', localOnlyTasks.map(t => t.title));
+            }
+            
+            // Merge: Server-Tasks + lokale Tasks die noch nicht auf dem Server sind
+            const mergedTasks = [...serverTasks, ...localOnlyTasks];
+            dispatch({ type: 'SET_TASKS', payload: mergedTasks });
           }
           if (data.archivedTasks) {
-            dispatch({ type: 'SET_ARCHIVED_TASKS', payload: data.archivedTasks });
+            const serverArchived = data.archivedTasks as Task[];
+            const serverArchivedIds = new Set(serverArchived.map(t => t.id));
+            const localOnlyArchived = localArchived
+              .filter(t => !serverArchivedIds.has(t.id))
+              .map(t => ({ ...t, position: Math.floor(t.position || Date.now()) }));
+            
+            const mergedArchived = [...serverArchived, ...localOnlyArchived];
+            dispatch({ type: 'SET_ARCHIVED_TASKS', payload: mergedArchived });
           }
           if (data.columns) {
             loadedColumns = data.columns;
