@@ -223,7 +223,7 @@ export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, pro
       reminderDate: finalReminderDate,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      position: Date.now() + Math.random() * 1000 // Add randomness for multiple tasks
+      position: Math.floor(Date.now() + Math.random() * 1000) // Add randomness for multiple tasks - MUST be integer for BigInt
     };
 
     if (targetColumn && !projectId && !kanbanColumnId) {
