@@ -4080,9 +4080,23 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
   }, [state.calendarSources, state.preferences?.calendars?.showInPlanner, dispatch]);
 
+  // Refs to always have current state values (avoids stale closure problem)
+  const currentTasksRef = useRef<Task[]>(state.tasks);
+  const currentArchivedTasksRef = useRef<Task[]>(state.archivedTasks);
+  
+  // Keep refs updated
+  useEffect(() => {
+    currentTasksRef.current = state.tasks;
+  }, [state.tasks]);
+  
+  useEffect(() => {
+    currentArchivedTasksRef.current = state.archivedTasks;
+  }, [state.archivedTasks]);
+
   // Background sync for tasks (every 30 seconds when online)
   // This ensures Desktop and Mobile stay in sync
   // BUGFIX: Now MERGES server data instead of overwriting to prevent data loss
+  // BUGFIX 2: Uses refs to avoid stale closure problem
   useEffect(() => {
     if (!isOnlineMode() || !initialLoadComplete.current) return;
 
@@ -4093,7 +4107,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         // Only update if we got valid data
         if (data.tasks) {
           const serverTasks = data.tasks as Task[];
-          const localTasks = state.tasks;
+          // BUGFIX: Use ref to get CURRENT tasks, not stale closure value
+          const localTasks = currentTasksRef.current;
           
           // Create maps for efficient lookup
           const serverTaskMap = new Map(serverTasks.map(t => [t.id, t]));
@@ -4136,7 +4151,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         
         if (data.archivedTasks) {
           const serverArchived = data.archivedTasks as Task[];
-          const localArchived = state.archivedTasks;
+          // BUGFIX: Use ref to get CURRENT archived tasks, not stale closure value
+          const localArchived = currentArchivedTasksRef.current;
           
           // Same merge strategy for archived tasks
           const serverMap = new Map(serverArchived.map(t => [t.id, t]));
