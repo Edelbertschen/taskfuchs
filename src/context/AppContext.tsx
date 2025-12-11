@@ -3195,6 +3195,30 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             justLoadedFromDB.current = false;
             console.log('[AppContext] DB load complete, sync effects enabled');
             
+            // BUGFIX: Process any tasks that were queued during load
+            if (pendingTasksQueue.current.length > 0) {
+              console.log('[AppContext] Processing pending tasks queue:', pendingTasksQueue.current.length);
+              const queuedTasks = [...pendingTasksQueue.current];
+              pendingTasksQueue.current = [];
+              
+              // Merge queued tasks with loaded tasks (avoid duplicates)
+              const loadedTaskIds = new Set(data.tasks?.map((t: any) => t.id) || []);
+              const newTasks = queuedTasks.filter(t => !loadedTaskIds.has(t.id));
+              
+              if (newTasks.length > 0) {
+                console.log('[AppContext] Adding', newTasks.length, 'queued tasks to state');
+                // Add to state
+                newTasks.forEach(task => {
+                  dispatch({ type: 'ADD_TASK', payload: task });
+                });
+                // Sync to database immediately
+                tasksAPI.bulkSync(newTasks.map(t => ({ ...t, externalId: t.id }))).catch(err => {
+                  console.error('[AppContext] Error syncing queued tasks:', err);
+                  showGlobalError(`Failed to save queued tasks: ${err.message || 'Connection error'}`);
+                });
+              }
+            }
+            
             // Load filter settings from localStorage (these are local, not synced to DB)
             try {
               const savedShowCompleted = localStorage.getItem('taskfuchs-show-completed');
@@ -3233,6 +3257,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           showGlobalError(`Failed to load data from server: ${error.message || 'Connection error'}`);
           // Still mark as complete on error so app isn't stuck
           initialLoadComplete.current = true;
+          
+          // BUGFIX: Process any queued tasks even on error
+          if (pendingTasksQueue.current.length > 0) {
+            console.log('[AppContext] Processing pending tasks queue after error:', pendingTasksQueue.current.length);
+            const queuedTasks = [...pendingTasksQueue.current];
+            pendingTasksQueue.current = [];
+            queuedTasks.forEach(task => {
+              dispatch({ type: 'ADD_TASK', payload: task });
+            });
+            // Try to sync to database
+            tasksAPI.bulkSync(queuedTasks.map(t => ({ ...t, externalId: t.id }))).catch(err => {
+              console.error('[AppContext] Error syncing queued tasks after load error:', err);
+            });
+          }
+          
           // Still signal data loaded even on error so app isn't stuck on loading screen
           window.dispatchEvent(new Event('app:data-loaded'));
         });
@@ -3499,6 +3538,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // Track if we just loaded from database to prevent re-syncing
   const justLoadedFromDB = useRef(false);
   
+  // Queue for tasks created before initial load completes (to prevent data loss)
+  const pendingTasksQueue = useRef<Task[]>([]);
+  
   // Track previous state for content-aware change detection (for online mode)
   // Using JSON strings to detect ANY changes, not just ID additions/removals
   const prevTasksJson = useRef<string>('');
@@ -3518,6 +3560,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   // Save data to localStorage OR database whenever state changes
   useEffect(() => {
+    // BUGFIX: If initial load is not complete but we're in online mode,
+    // queue the tasks for syncing later to prevent data loss
+    if (!initialLoadComplete.current && isOnlineMode()) {
+      // Find new tasks that aren't in the queue yet
+      const newTasks = state.tasks.filter(t => 
+        !pendingTasksQueue.current.some(pt => pt.id === t.id)
+      );
+      if (newTasks.length > 0) {
+        console.log('[AppContext] Queuing tasks for sync after load:', newTasks.length);
+        pendingTasksQueue.current = [...pendingTasksQueue.current, ...newTasks];
+      }
+      return;
+    }
+    
     if (!initialLoadComplete.current) return;
     if (justLoadedFromDB.current) return; // Don't re-sync data we just loaded
     
