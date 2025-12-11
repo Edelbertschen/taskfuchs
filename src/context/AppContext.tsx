@@ -511,11 +511,20 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, tasks: action.payload };
     
         case 'ADD_TASK': {
-      return { ...state, tasks: [...state.tasks, action.payload] };
+      // SICHERHEIT: position MUSS immer eine Ganzzahl sein (BigInt in DB)
+      const safeTask = {
+        ...action.payload,
+        position: Math.floor(action.payload.position || Date.now())
+      };
+      return { ...state, tasks: [...state.tasks, safeTask] };
     }
     
               case 'UPDATE_TASK': {
-      const updatedTask = action.payload;
+      // SICHERHEIT: position MUSS immer eine Ganzzahl sein (BigInt in DB)
+      const updatedTask = {
+        ...action.payload,
+        position: Math.floor(action.payload.position || Date.now())
+      };
       
       // Get the original task to compare estimatedTime changes
       const originalTask = state.tasks.find(task => task.id === updatedTask.id);
