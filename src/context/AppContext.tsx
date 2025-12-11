@@ -3645,6 +3645,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         });
       }
       
+      // AUCH im Online-Modus lokal speichern als Backup!
+      // Das ermöglicht den Merge beim nächsten Laden, falls der Sync noch nicht fertig war
+      try {
+        localStorage.setItem('taskfuchs-tasks', JSON.stringify(state.tasks));
+      } catch (error) {
+        console.error('Error saving tasks backup to localStorage:', error);
+      }
+      
       // Update previous state trackers
       prevTaskIds.current = currentTaskIds;
       prevTasksJson.current = currentTasksJson;
@@ -3697,6 +3705,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           console.error('[AppContext] Error syncing archived tasks to database:', err);
           showGlobalError(`Failed to save archived tasks: ${err.message || 'Connection error'}`);
         });
+      }
+      
+      // AUCH im Online-Modus lokal speichern als Backup!
+      try {
+        localStorage.setItem('taskfuchs-archived-tasks', JSON.stringify(state.archivedTasks));
+      } catch (error) {
+        console.error('Error saving archived tasks backup to localStorage:', error);
       }
       
       prevArchivedTaskIds.current = currentArchivedIds;
