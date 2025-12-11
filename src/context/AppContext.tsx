@@ -511,6 +511,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, tasks: action.payload };
     
         case 'ADD_TASK': {
+      console.log('[AppContext] ADD_TASK dispatched:', action.payload.id, action.payload.title);
       return { ...state, tasks: [...state.tasks, action.payload] };
     }
     
@@ -3518,8 +3519,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   // Save data to localStorage OR database whenever state changes
   useEffect(() => {
-    if (!initialLoadComplete.current) return;
-    if (justLoadedFromDB.current) return; // Don't re-sync data we just loaded
+    // DEBUG: Log every time this effect runs
+    console.log('[AppContext] Task save effect triggered:', {
+      initialLoadComplete: initialLoadComplete.current,
+      justLoadedFromDB: justLoadedFromDB.current,
+      isOnline: isOnlineMode(),
+      taskCount: state.tasks.length
+    });
+    
+    if (!initialLoadComplete.current) {
+      console.log('[AppContext] Skipping save - initial load not complete');
+      return;
+    }
+    if (justLoadedFromDB.current) {
+      console.log('[AppContext] Skipping save - just loaded from DB');
+      return;
+    }
     
     if (isOnlineMode()) {
       const currentTaskIds = new Set(state.tasks.map(t => t.id));
@@ -3566,12 +3581,27 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       // Detect actual content changes, not just ID changes
       const hasContentChanges = currentTasksJson !== prevTasksJson.current;
       
+      // DEBUG: Log sync decision
+      console.log('[AppContext] Task sync check:', {
+        taskCount: state.tasks.length,
+        hasContentChanges,
+        deletedCount: deletedTaskIds.length,
+        prevJsonLength: prevTasksJson.current.length,
+        currentJsonLength: currentTasksJson.length
+      });
+      
       if ((hasContentChanges || deletedTaskIds.length > 0) && state.tasks.length > 0) {
-        console.log('[AppContext] Syncing tasks to database (content changed)...');
-        tasksAPI.bulkSync(state.tasks.map(t => ({ ...t, externalId: t.id }))).catch(err => {
-          console.error('[AppContext] Error syncing tasks to database:', err);
-          showGlobalError(`Failed to save tasks: ${err.message || 'Connection error'}`);
-        });
+        console.log('[AppContext] Syncing tasks to database (content changed)...', state.tasks.length, 'tasks');
+        tasksAPI.bulkSync(state.tasks.map(t => ({ ...t, externalId: t.id })))
+          .then(result => {
+            console.log('[AppContext] Sync successful:', result);
+          })
+          .catch(err => {
+            console.error('[AppContext] Error syncing tasks to database:', err);
+            showGlobalError(`Failed to save tasks: ${err.message || 'Connection error'}`);
+          });
+      } else {
+        console.log('[AppContext] Skipping sync - no changes detected');
       }
       
       // Update previous state trackers
