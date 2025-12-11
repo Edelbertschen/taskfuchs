@@ -66,7 +66,6 @@ export function TaskContextMenu({
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
 
   // Close menu on ESC key or outside click
-  // Use 'click' instead of 'mousedown' to prevent closing when opening a new context menu
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (!isOpen) return;
@@ -95,11 +94,6 @@ export function TaskContextMenu({
         if (zIndex >= 999999) {
           return;
         }
-      }
-      
-      // Don't close if this is a right-click (opening another context menu)
-      if (event.button === 2) {
-        return;
       }
       
       // Only close if it's a legitimate outside click
@@ -131,24 +125,12 @@ export function TaskContextMenu({
     };
 
     if (isOpen) {
-      // Use setTimeout to delay adding the listener, so it doesn't catch the same click that opened the menu
-      const timeoutId = setTimeout(() => {
-        document.addEventListener('click', handleClickOutside);
-        document.addEventListener('contextmenu', handleClickOutside);
-      }, 10);
+      document.addEventListener('mousedown', handleClickOutside);
       document.addEventListener('keydown', handleKeyDown);
-      
-      return () => {
-        clearTimeout(timeoutId);
-        document.removeEventListener('click', handleClickOutside);
-        document.removeEventListener('contextmenu', handleClickOutside);
-        document.removeEventListener('keydown', handleKeyDown);
-      };
     }
 
     return () => {
-      document.removeEventListener('click', handleClickOutside);
-      document.removeEventListener('contextmenu', handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen, onClose]);

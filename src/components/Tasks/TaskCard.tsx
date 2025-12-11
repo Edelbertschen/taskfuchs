@@ -71,13 +71,16 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
   const isSelected = state.selectedTaskIds.includes(task.id);
   const isBulkMode = state.isBulkMode;
 
-  // Live updates for timer - update every second
+  // Live updates for timer - ONLY update when a timer is actually running
+  // This prevents unnecessary re-renders that close context menus and block interactions
   useEffect(() => {
+    if (!state.activeTimer?.isActive) return; // Don't run interval if no timer is active
+    
     const interval = setInterval(() => {
       setLiveUpdateTrigger(prev => prev + 1);
     }, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [state.activeTimer?.isActive]);
 
   const {
     attributes,
@@ -749,20 +752,16 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
           </button>
         </div>
       ) : (
-        /* Checkbox for completing task - always visible for easy access */
-        <div className={`flex-shrink-0 ${isFocusMode ? 'p-1' : 'p-2'} relative`}>
-          <button
-            onClick={handleToggleComplete}
-            onPointerDown={(e) => e.stopPropagation()}
-            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 hover:scale-110 ${
-              task.completed 
-                ? 'bg-green-500 border-green-500' 
-                : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
-            }`}
-            title={task.completed ? 'Als nicht erledigt markieren' : 'Als erledigt markieren'}
-          >
-            {task.completed && <Check className="w-3 h-3 text-white" />}
-          </button>
+        /* Visual Drag Indicator - When not in bulk mode (No longer functional, just visual) */
+        <div
+          className={`flex-shrink-0 ${isFocusMode ? 'p-1' : 'p-2'} text-gray-400 relative transition-all duration-200 ${
+            isDragging ? 'text-blue-500' : ''
+          }`}
+          style={{ zIndex: 0 }}
+        >
+          <GripVertical className={`${isFocusMode ? 'w-3 h-3' : 'w-4 h-4'} transition-all duration-200 ${
+            isDragging ? 'scale-110' : ''
+          }`} />
         </div>
       )}
 
