@@ -336,10 +336,15 @@ app.post('/bulk', async (c) => {
             pinColumnId: taskData.pinColumnId,
             pinned: taskData.pinned,
             reminderDate: taskData.reminderDate,
+            reminderTime: taskData.reminderTime,
             dueDate: taskData.dueDate,
             position: taskData.position !== undefined ? BigInt(taskData.position) : undefined,
             archived: taskData.archived,
+            completedAt: taskData.completedAt ? new Date(taskData.completedAt) : null,
             linkedNotes: taskData.linkedNotes,
+            recurrenceRuleId: taskData.recurrenceRuleId,
+            parentSeriesId: taskData.parentSeriesId,
+            isSeriesTemplate: taskData.isSeriesTemplate,
             updatedAt: new Date()
           }
         });
@@ -363,10 +368,15 @@ app.post('/bulk', async (c) => {
             pinColumnId: taskData.pinColumnId,
             pinned: taskData.pinned || false,
             reminderDate: taskData.reminderDate,
+            reminderTime: taskData.reminderTime,
             dueDate: taskData.dueDate,
             position: BigInt(taskData.position || Date.now()),
             archived: taskData.archived || false,
+            completedAt: taskData.completedAt ? new Date(taskData.completedAt) : null,
             linkedNotes: taskData.linkedNotes || [],
+            recurrenceRuleId: taskData.recurrenceRuleId,
+            parentSeriesId: taskData.parentSeriesId,
+            isSeriesTemplate: taskData.isSeriesTemplate || false,
             createdAt: taskData.createdAt ? new Date(taskData.createdAt) : new Date(),
             updatedAt: taskData.updatedAt ? new Date(taskData.updatedAt) : new Date()
           }

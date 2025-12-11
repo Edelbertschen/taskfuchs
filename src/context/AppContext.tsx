@@ -3200,6 +3200,34 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             prevPinColumnIds.current = new Set(data.pinColumns?.map((p: any) => p.id) || []);
             
             // Initialize JSON snapshots to track content changes
+            prevTasksJson.current = JSON.stringify((data.tasks || []).map((t: any) => ({
+              id: t.id,
+              title: t.title,
+              completed: t.completed,
+              completedAt: t.completedAt,
+              updatedAt: t.updatedAt,
+              description: t.description,
+              priority: t.priority,
+              tags: t.tags,
+              columnId: t.columnId,
+              projectId: t.projectId,
+              pinColumnId: t.pinColumnId,
+              reminderDate: t.reminderDate,
+              dueDate: t.dueDate,
+              estimatedTime: t.estimatedTime,
+              trackedTime: t.trackedTime,
+              subtasks: t.subtasks,
+              position: t.position,
+              archived: t.archived
+            })));
+            prevArchivedTasksJson.current = JSON.stringify((data.archivedTasks || []).map((t: any) => ({
+              id: t.id,
+              title: t.title,
+              completed: t.completed,
+              completedAt: t.completedAt,
+              updatedAt: t.updatedAt,
+              archived: t.archived
+            })));
             prevColumnsJson.current = JSON.stringify(existingProjectColumns.map(c => ({
               id: c.id,
               title: c.title,
