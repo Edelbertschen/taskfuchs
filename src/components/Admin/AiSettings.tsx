@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
+import { useApp } from '../../context/AppContext';
 import { aiAPI, type AISettings } from '../../services/apiService';
 import { 
   Sparkles, 
@@ -26,6 +27,10 @@ const AVAILABLE_MODELS = [
 export function AiSettings() {
   const { t } = useTranslation();
   const { state: authState } = useAuth();
+  const { state: appState } = useApp();
+  
+  // Get accent color
+  const accentColor = appState.preferences?.accentColor || '#0ea5e9';
   
   const [settings, setSettings] = useState<AISettings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -146,7 +151,10 @@ export function AiSettings() {
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
+          <div 
+            className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg"
+            style={{ backgroundColor: accentColor }}
+          >
             <Sparkles className="w-6 h-6 text-white" />
           </div>
           <div>
@@ -180,7 +188,7 @@ export function AiSettings() {
           <div className="p-6 border-b border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3 min-w-0 flex-1 overflow-hidden">
-                <Zap className="w-5 h-5 text-yellow-500 flex-shrink-0" />
+                <Zap className="w-5 h-5 flex-shrink-0" style={{ color: accentColor }} />
                 <div className="min-w-0 overflow-hidden">
                   <h3 className="font-semibold text-gray-900 dark:text-white truncate">
                     {t('ai.enableAI', 'Enable AI Features')}
@@ -192,15 +200,12 @@ export function AiSettings() {
               </div>
               <button
                 onClick={() => setEnabled(!enabled)}
-                className={`relative w-14 h-8 flex-shrink-0 rounded-full transition-colors ${
-                  enabled 
-                    ? 'bg-green-500' 
-                    : 'bg-gray-300 dark:bg-gray-600'
-                }`}
+                className="relative w-12 h-6 flex-shrink-0 rounded-full transition-colors"
+                style={{ backgroundColor: enabled ? accentColor : '#d1d5db' }}
               >
                 <span 
-                  className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow transition-transform ${
-                    enabled ? 'translate-x-7' : 'translate-x-1'
+                  className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-200 ${
+                    enabled ? 'translate-x-6' : 'translate-x-0.5'
                   }`}
                 />
               </button>
@@ -210,7 +215,7 @@ export function AiSettings() {
           {/* API Key */}
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-3 mb-4">
-              <Key className="w-5 h-5 text-blue-500" />
+              <Key className="w-5 h-5" style={{ color: accentColor }} />
               <div>
                 <h3 className="font-semibold text-gray-900 dark:text-white">
                   {t('ai.apiKey', 'API Key')}
@@ -243,7 +248,7 @@ export function AiSettings() {
           {/* Model Selection */}
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-3 mb-4">
-              <Sparkles className="w-5 h-5 text-purple-500" />
+              <Sparkles className="w-5 h-5" style={{ color: accentColor }} />
               <div>
                 <h3 className="font-semibold text-gray-900 dark:text-white">
                   {t('ai.model', 'AI Model')}
@@ -311,7 +316,8 @@ export function AiSettings() {
               <button
                 onClick={handleTestConnection}
                 disabled={isTesting || !settings?.hasApiKey}
-                className="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white rounded-xl flex items-center gap-2 transition-colors"
+                className="px-4 py-2 disabled:bg-gray-400 text-white rounded-xl flex items-center gap-2 transition-colors hover:opacity-90"
+                style={{ backgroundColor: isTesting || !settings?.hasApiKey ? undefined : accentColor }}
               >
                 {isTesting ? (
                   <RefreshCw className="w-4 h-4 animate-spin" />
@@ -343,7 +349,8 @@ export function AiSettings() {
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="w-full px-4 py-3 bg-accent hover:bg-accent/90 disabled:bg-gray-400 text-white font-medium rounded-xl flex items-center justify-center gap-2 transition-colors"
+              className="w-full px-4 py-3 disabled:bg-gray-400 text-white font-medium rounded-xl flex items-center justify-center gap-2 transition-colors hover:opacity-90"
+              style={{ backgroundColor: isSaving ? undefined : accentColor }}
             >
               {isSaving ? (
                 <RefreshCw className="w-5 h-5 animate-spin" />
@@ -356,11 +363,17 @@ export function AiSettings() {
         </div>
 
         {/* Info Box */}
-        <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
-          <h4 className="font-medium text-blue-900 dark:text-blue-200 mb-2">
+        <div 
+          className="mt-6 p-4 rounded-xl border"
+          style={{ 
+            backgroundColor: `${accentColor}10`,
+            borderColor: `${accentColor}30`
+          }}
+        >
+          <h4 className="font-medium text-gray-900 dark:text-white mb-2">
             {t('ai.howItWorks', 'How it works')}
           </h4>
-          <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
+          <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
             <li>• {t('ai.howItWorks1', 'Users can click the AI button in the task input')}</li>
             <li>• {t('ai.howItWorks2', 'Natural language is parsed into structured task data')}</li>
             <li>• {t('ai.howItWorks3', 'AI extracts title, due date, time estimate, priority, and tags')}</li>
