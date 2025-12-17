@@ -24,10 +24,13 @@ export function FloatingAddButton({ onCreateTask, onAiBulkTask, colors }: Floati
         <div className="relative">
           <button
             onClick={onAiBulkTask}
-            className="w-12 h-12 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 rounded-full flex items-center justify-center bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+            className="w-14 h-14 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 rounded-full flex items-center justify-center"
+            style={{ backgroundColor: colors.primary }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.dark}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = colors.primary}
             title="KI-Aufgaben erstellen"
           >
-            <Wand2 className="w-5 h-5" />
+            <Wand2 className="w-6 h-6" />
           </button>
         </div>
       )}

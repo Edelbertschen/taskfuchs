@@ -178,6 +178,10 @@ export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, pro
       setIsQuickMode(false);
       setAiParsedTask(null);
       setAiError(null);
+      // Reset textarea height
+      if (inputRef.current) {
+        inputRef.current.style.height = '28px';
+      }
     }
   }, [isOpen]);
 
@@ -371,6 +375,8 @@ export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, pro
       setTimeout(() => {
         if (inputRef.current) {
           inputRef.current.focus();
+          // Reset textarea height
+          inputRef.current.style.height = '28px';
         }
       }, 100);
       
@@ -423,6 +429,8 @@ export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, pro
     setTimeout(() => {
       if (inputRef.current) {
         inputRef.current.focus();
+        // Reset textarea height
+        inputRef.current.style.height = '28px';
         // Add a subtle animation by briefly highlighting the input
         inputRef.current.style.transform = 'scale(1.02)';
         inputRef.current.style.transition = 'transform 0.2s ease-out';
@@ -483,19 +491,11 @@ export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, pro
   // Optimize event handlers
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
+    // Auto-resize textarea
+    const textarea = e.target;
+    textarea.style.height = 'auto';
+    textarea.style.height = `${Math.max(28, Math.min(textarea.scrollHeight, 120))}px`;
   }, []);
-
-  const handleInputFocus = useCallback((e: React.FocusEvent<HTMLDivElement>) => {
-    if (!parseResult?.success && !parseResult?.errors.length) {
-      e.currentTarget.style.borderColor = colors.primary;
-    }
-  }, [parseResult, colors.primary]);
-
-  const handleInputBlur = useCallback((e: React.FocusEvent<HTMLDivElement>) => {
-    if (!parseResult?.success && !parseResult?.errors.length) {
-      e.currentTarget.style.borderColor = 'rgb(209 213 219)';
-    }
-  }, [parseResult]);
 
   const handleSubmitButtonMouseEnter = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.currentTarget.style.backgroundColor = colors.dark;
@@ -603,25 +603,8 @@ export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, pro
           <div className="p-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Input Field */}
-              <div 
-                className={`bg-gray-50 dark:bg-gray-700 rounded-lg border-2 transition-all duration-200 ${
-                  (parseResult?.success || (isMultiMode && multiParseResults.some(r => r.result.success)))
-                    ? '' 
-                    : (parseResult?.errors.length || (isMultiMode && multiParseResults.some(r => r.result.errors.length)))
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-gray-200 dark:border-gray-600'
-                }`}
-                style={
-                  (parseResult?.success || (isMultiMode && multiParseResults.some(r => r.result.success)))
-                    ? { borderColor: colors.light }
-                    : !(parseResult?.errors.length || (isMultiMode && multiParseResults.some(r => r.result.errors.length)))
-                    ? { borderColor: 'rgb(209 213 219)' }
-                    : {}
-                }
-                onFocus={handleInputFocus}
-                onBlur={handleInputBlur}
-              >
-                <div className="flex items-start p-4">
+              <div className="rounded-lg overflow-hidden">
+                <div className="flex items-start p-3 bg-gray-50 dark:bg-gray-700">
                   {isMultiMode ? (
                     <List className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0 mt-1" />
                   ) : (
@@ -633,30 +616,35 @@ export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, pro
                     onChange={handleInputChange}
                     onKeyDown={handleKeyDown}
                     placeholder={isMultiMode ? 'Eine Aufgabe pro Zeile...' : actualPlaceholder}
-                    className="flex-1 bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none text-lg resize-none"
+                    className="flex-1 bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none text-lg resize-none border-none overflow-hidden"
                     rows={isMultiMode ? Math.min(input.split('\n').length + 1, 8) : 1}
-                    style={{ minHeight: isMultiMode ? '80px' : '28px' }}
+                    style={{ 
+                      minHeight: isMultiMode ? '80px' : '28px',
+                      maxHeight: '120px',
+                      lineHeight: '1.4'
+                    }}
                   />
                   {/* AI Parse Button */}
                   {isAiEnabled && input.trim() && !isMultiMode && !isAiParsing && (
                     <button
                       type="button"
                       onClick={handleAiParse}
-                      className="ml-2 p-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-md hover:from-purple-600 hover:to-pink-600 transition-all shadow-sm"
+                      className="ml-2 p-2 text-white rounded-md transition-all hover:opacity-80"
+                      style={{ backgroundColor: colors.primary }}
                       title="AI-gestützte Analyse"
                     >
-                      <Wand2 className="w-5 h-5" />
+                      <Wand2 className="w-4 h-4" />
                     </button>
                   )}
                   {isAiParsing && (
-                    <div className="ml-2 p-2 bg-purple-100 dark:bg-purple-900/30 rounded-md">
-                      <Loader2 className="w-5 h-5 text-purple-500 animate-spin" />
+                    <div className="ml-2 p-2 rounded-md" style={{ backgroundColor: `${colors.primary}20` }}>
+                      <Loader2 className="w-4 h-4 animate-spin" style={{ color: colors.primary }} />
                     </div>
                   )}
                   {(parseResult?.success || (isMultiMode && multiParseResults.some(r => r.result.success))) && (
                     <button
                       type="submit"
-                      className="ml-2 p-2 text-white rounded-md transition-colors flex items-center gap-1"
+                      className="ml-2 p-2 text-white rounded-md transition-colors flex items-center gap-1 hover:opacity-80"
                       style={{ backgroundColor: colors.primary }}
                       onMouseEnter={handleSubmitButtonMouseEnter}
                       onMouseLeave={handleSubmitButtonMouseLeave}
@@ -674,7 +662,7 @@ export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, pro
 
                 {/* Multi-Task Preview */}
                 {isMultiMode && multiParseResults.length > 0 && (
-                  <div className="px-4 pb-4 border-t border-gray-200 dark:border-gray-600">
+                  <div className="px-3 pb-3 bg-gray-100 dark:bg-gray-600">
                     <div className="mt-3 space-y-2">
                       <div className="flex items-center justify-between text-sm">
                         <div className="flex items-center" style={{ color: colors.primary }}>
@@ -743,7 +731,7 @@ export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, pro
 
                 {/* AI Error Display */}
                 {aiError && (
-                  <div className="px-4 pb-4 border-t border-gray-200 dark:border-gray-600">
+                  <div className="px-3 pb-3 bg-gray-100 dark:bg-gray-600">
                     <div className="mt-3 flex items-center text-sm text-red-600 dark:text-red-400">
                       <AlertCircle className="w-4 h-4 mr-2" />
                       <span>{aiError}</span>
@@ -759,7 +747,7 @@ export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, pro
 
                 {/* AI Parsed Result Display */}
                 {aiParsedTask && !aiError && (
-                  <div className="px-4 pb-4 border-t border-gray-200 dark:border-gray-600">
+                  <div className="px-3 pb-3 bg-gray-100 dark:bg-gray-600">
                     <div className="mt-3">
                       <div className="flex items-center text-sm text-purple-600 dark:text-purple-400 mb-2">
                         <Wand2 className="w-4 h-4 mr-2" />
@@ -783,7 +771,7 @@ export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, pro
 
                 {/* Single Parse Preview */}
                 {!isMultiMode && parseResult && (
-                  <div className="px-4 pb-4 border-t border-gray-200 dark:border-gray-600">
+                  <div className="px-3 pb-3 bg-gray-100 dark:bg-gray-600">
                     {parseResult.success ? (
                       <div className="mt-3 space-y-3">
                         <div className="flex items-center text-sm" style={{ color: colors.primary }}>

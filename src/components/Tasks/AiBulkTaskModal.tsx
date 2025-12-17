@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Wand2, Loader2, CheckCircle, AlertCircle, Plus, Clock, Tag, Calendar, Flag } from 'lucide-react';
+import { X, Wand2, Loader2, CheckCircle, AlertCircle, Plus, Clock, Tag, Calendar, Flag, Sparkles } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useTranslation } from 'react-i18next';
 import { aiAPI, type AIParsedTask } from '../../services/apiService';
@@ -18,7 +18,7 @@ interface AiBulkTaskModalProps {
 
 export function AiBulkTaskModal({ isOpen, onClose }: AiBulkTaskModalProps) {
   const { state, dispatch } = useApp();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   
   const [input, setInput] = useState('');
@@ -26,6 +26,9 @@ export function AiBulkTaskModal({ isOpen, onClose }: AiBulkTaskModalProps) {
   const [parsedTasks, setParsedTasks] = useState<ParsedTaskPreview[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState<'input' | 'preview'>('input');
+
+  // Get accent color from preferences
+  const accentColor = state.preferences?.accentColor || '#0ea5e9';
 
   // Focus textarea when modal opens
   useEffect(() => {
@@ -125,7 +128,7 @@ export function AiBulkTaskModal({ isOpen, onClose }: AiBulkTaskModalProps) {
         reminderDate: reminderDate,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        position: Date.now()
+        position: Math.floor(Date.now() + Math.random() * 1000)
       };
 
       dispatch({ type: 'ADD_TASK', payload: newTask });
@@ -148,58 +151,101 @@ export function AiBulkTaskModal({ isOpen, onClose }: AiBulkTaskModalProps) {
     }
   };
 
+  const getPriorityLabel = (priority: string) => {
+    switch (priority) {
+      case 'high': return t('ai.priorityHigh', 'Hoch');
+      case 'medium': return t('ai.priorityMedium', 'Mittel');
+      case 'low': return t('ai.priorityLow', 'Niedrig');
+      default: return '';
+    }
+  };
+
+  const formatDate = (dateStr: string) => {
+    const locale = i18n.language === 'de' ? 'de-DE' : 'en-US';
+    return new Date(dateStr).toLocaleDateString(locale, { 
+      weekday: 'short', 
+      day: 'numeric', 
+      month: 'short' 
+    });
+  };
+
   if (!isOpen) return null;
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       />
       
       {/* Modal */}
-      <div className="relative w-full max-w-2xl bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-purple-500 to-pink-500">
+      <div className="relative w-full max-w-xl bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        {/* Header - Clean design matching app style */}
+        <div className="flex items-center justify-between p-5 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-              <Wand2 className="w-5 h-5 text-white" />
+            <div 
+              className="w-10 h-10 rounded-xl flex items-center justify-center relative"
+              style={{ backgroundColor: `${accentColor}20` }}
+            >
+              {/* Pulsing glow effect */}
+              <div 
+                className="absolute inset-0 rounded-xl animate-pulse"
+                style={{ 
+                  backgroundColor: accentColor,
+                  opacity: 0.15,
+                  animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                }}
+              />
+              <Sparkles className="w-5 h-5 relative z-10" style={{ color: accentColor }} />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white">
-                {t('ai.bulkTaskTitle', 'KI-Aufgabenerfassung')}
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {t('ai.bulkTaskTitle', 'Smarte Aufgabenerfassung')}
               </h2>
-              <p className="text-sm text-white/80">
-                {t('ai.bulkTaskDescription', 'Beschreiben Sie Ihre Aufgaben in natürlicher Sprache')}
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t('ai.bulkTaskSubtitle', 'Lass die KI deine Aufgaben verstehen')}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
           >
-            <X className="w-5 h-5 text-white" />
+            <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="p-5">
           {step === 'input' ? (
             <>
               {/* Input Step */}
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t('ai.describeYourTasks', 'Beschreiben Sie Ihre Aufgaben')}
+                  {t('ai.describeYourTasks', 'Was steht an?')}
                 </label>
                 <textarea
                   ref={textareaRef}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Morgen muss ich den Bericht schreiben, der hohe Priorität hat und eine Stunde dauern wird. Am Freitag muss ich die Batterien im Thermostat wechseln und den Drucker ausschalten. Morgen muss ich 45 Minuten an meiner Jahresplanung arbeiten."
-                  className="w-full h-40 px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/50 text-gray-900 dark:text-white placeholder-gray-400 resize-none"
+                  className="w-full h-32 px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 text-gray-900 dark:text-white placeholder-gray-400 resize-none transition-shadow"
+                  style={{ 
+                    '--tw-ring-color': `${accentColor}50`
+                  } as React.CSSProperties}
+                  onFocus={(e) => {
+                    e.target.style.boxShadow = `0 0 0 2px ${accentColor}40`;
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.boxShadow = 'none';
+                  }}
                 />
               </div>
+
+              {/* Hint */}
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                {t('ai.inputHint', 'Gib mehrere Aufgaben auf einmal ein – Datum, Priorität, Dauer und Projekt werden automatisch erkannt.')}
+              </p>
 
               {/* Error Display */}
               {error && (
@@ -210,12 +256,12 @@ export function AiBulkTaskModal({ isOpen, onClose }: AiBulkTaskModalProps) {
               )}
 
               {/* Example */}
-              <div className="mb-6 p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-xl">
-                <h4 className="text-sm font-medium text-purple-900 dark:text-purple-200 mb-2">
+              <div className="mb-5 p-4 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl">
+                <h4 className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
                   {t('ai.exampleInput', 'Beispiel')}
                 </h4>
-                <p className="text-sm text-purple-700 dark:text-purple-300 italic">
-                  "Tomorrow I have to write the report, which is a high priority and will take an hour. On Friday, I have to change the batteries in the thermostat."
+                <p className="text-sm text-gray-600 dark:text-gray-300 italic">
+                  {t('ai.exampleText', '"Morgen muss ich den Bericht schreiben, hohe Priorität, dauert eine Stunde. Am Freitag die Batterien im Thermostat wechseln."')}
                 </p>
               </div>
 
@@ -223,7 +269,10 @@ export function AiBulkTaskModal({ isOpen, onClose }: AiBulkTaskModalProps) {
               <button
                 onClick={handleParse}
                 disabled={!input.trim() || isParsing}
-                className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:from-gray-400 disabled:to-gray-500 text-white font-medium rounded-xl flex items-center justify-center gap-2 transition-all"
+                className="w-full py-3 text-white font-medium rounded-xl flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 active:scale-[0.98]"
+                style={{ 
+                  backgroundColor: !input.trim() || isParsing ? '#9ca3af' : accentColor 
+                }}
               >
                 {isParsing ? (
                   <>
@@ -233,7 +282,7 @@ export function AiBulkTaskModal({ isOpen, onClose }: AiBulkTaskModalProps) {
                 ) : (
                   <>
                     <Wand2 className="w-5 h-5" />
-                    {t('ai.analyzeWithAI', 'Mit KI analysieren')}
+                    {t('ai.analyzeWithAI', 'Aufgaben erkennen')}
                   </>
                 )}
               </button>
@@ -246,23 +295,28 @@ export function AiBulkTaskModal({ isOpen, onClose }: AiBulkTaskModalProps) {
                   {t('ai.parsedTasks', 'Erkannte Aufgaben')} ({parsedTasks.filter(t => t.selected).length})
                 </h3>
                 
-                <div className="space-y-3 max-h-80 overflow-y-auto">
+                <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
                   {parsedTasks.map((task) => (
                     <div
                       key={task.id}
                       onClick={() => toggleTaskSelection(task.id)}
                       className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
                         task.selected
-                          ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                          : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 opacity-60'
+                          ? 'border-current bg-gray-50 dark:bg-gray-900'
+                          : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 opacity-50'
                       }`}
+                      style={{ 
+                        borderColor: task.selected ? accentColor : undefined 
+                      }}
                     >
                       <div className="flex items-start gap-3">
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                          task.selected 
-                            ? 'border-purple-500 bg-purple-500' 
-                            : 'border-gray-300 dark:border-gray-600'
-                        }`}>
+                        <div 
+                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors`}
+                          style={{ 
+                            borderColor: task.selected ? accentColor : '#d1d5db',
+                            backgroundColor: task.selected ? accentColor : 'transparent'
+                          }}
+                        >
                           {task.selected && <CheckCircle className="w-3 h-3 text-white" />}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -273,7 +327,7 @@ export function AiBulkTaskModal({ isOpen, onClose }: AiBulkTaskModalProps) {
                             {task.dueDate && (
                               <span className="inline-flex items-center gap-1 px-2 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 rounded text-xs">
                                 <Calendar className="w-3 h-3" />
-                                {new Date(task.dueDate).toLocaleDateString('de-DE')}
+                                {formatDate(task.dueDate)}
                               </span>
                             )}
                             {task.estimatedTime && (
@@ -285,7 +339,7 @@ export function AiBulkTaskModal({ isOpen, onClose }: AiBulkTaskModalProps) {
                             {task.priority && task.priority !== 'none' && (
                               <span className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs ${getPriorityColor(task.priority)}`}>
                                 <Flag className="w-3 h-3" />
-                                {task.priority === 'high' ? 'Hoch' : task.priority === 'medium' ? 'Mittel' : 'Niedrig'}
+                                {getPriorityLabel(task.priority)}
                               </span>
                             )}
                             {task.tags && task.tags.length > 0 && (
@@ -323,7 +377,8 @@ export function AiBulkTaskModal({ isOpen, onClose }: AiBulkTaskModalProps) {
                 <button
                   onClick={handleCreateTasks}
                   disabled={parsedTasks.filter(t => t.selected).length === 0}
-                  className="flex-1 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:from-gray-400 disabled:to-gray-500 text-white font-medium rounded-xl flex items-center justify-center gap-2 transition-all"
+                  className="flex-1 py-3 text-white font-medium rounded-xl flex items-center justify-center gap-2 transition-all disabled:opacity-50 hover:opacity-90 active:scale-[0.98]"
+                  style={{ backgroundColor: accentColor }}
                 >
                   <Plus className="w-5 h-5" />
                   {t('ai.createTasks', 'Aufgaben erstellen')} ({parsedTasks.filter(t => t.selected).length})
@@ -333,10 +388,23 @@ export function AiBulkTaskModal({ isOpen, onClose }: AiBulkTaskModalProps) {
           )}
         </div>
       </div>
+
+      {/* Custom animation styles */}
+      <style>{`
+        @keyframes pulse-glow {
+          0%, 100% {
+            opacity: 0.15;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 0.25;
+            transform: scale(1.05);
+          }
+        }
+      `}</style>
     </div>,
     document.body
   );
 }
 
 export default AiBulkTaskModal;
-
