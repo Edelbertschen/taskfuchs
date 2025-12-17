@@ -37,6 +37,7 @@ import { FloatingTimerModal } from './components/Timer/FloatingTimerModal';
 import { NotificationManager } from './components/Common/NotificationManager';
 import { BackupSetupModal } from './components/Common/BackupSetupModal';
 import { OnboardingTour } from './components/Common/OnboardingTour';
+import { NewsModal, shouldShowNews } from './components/Common/NewsModal';
 import { UserGuide } from './components/Common/UserGuide';
 import { LanguageSelectionModal } from './components/Common/LanguageSelectionModal';
 import { useTranslation } from 'react-i18next';
@@ -276,6 +277,7 @@ function MainApp() {
   const backupIntervalIdRef = React.useRef<number | null>(null);
   const [showLanguageSelection, setShowLanguageSelection] = React.useState(false);
   const [showOnboarding, setShowOnboarding] = React.useState(false);
+  const [showNewsModal, setShowNewsModal] = React.useState(false);
   const [pwaUpdateAvailable, setPwaUpdateAvailable] = React.useState(false);
   const [showBackupSetup, setShowBackupSetup] = React.useState(false);
   const [showUserGuide, setShowUserGuide] = React.useState(false);
@@ -301,6 +303,16 @@ function MainApp() {
 
   // Backup setup is now triggered via sidebar warning icon instead of auto-popup
   // The 'open-backup-setup' event handler (below) will open the modal when clicked
+
+  // Show news modal after a short delay (only if not seen yet and no onboarding)
+  React.useEffect(() => {
+    if (!showOnboarding && shouldShowNews()) {
+      const timer = setTimeout(() => {
+        setShowNewsModal(true);
+      }, 2000); // Show after 2 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [showOnboarding]);
 
   // Listen for scroll state updates from child views (TaskBoard, ProjectKanbanBoard, PinsView)
   React.useEffect(() => {
@@ -1478,6 +1490,12 @@ function MainApp() {
         isOpen={showOnboarding}
         onClose={() => setShowOnboarding(false)}
         onNavigate={(view) => handleViewChange(view as ViewType)}
+      />
+
+      {/* News Modal */}
+      <NewsModal
+        isOpen={showNewsModal}
+        onClose={() => setShowNewsModal(false)}
       />
       
       {/* User Guide */}
