@@ -429,6 +429,8 @@ const initialState: AppState = {
       overlay: false,
       overlayOpacity: 0.4,
     },
+    // AI features
+    aiEnabled: true,
   },
   searchQuery: '',
   activeTagFilters: [],

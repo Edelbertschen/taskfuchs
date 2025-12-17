@@ -152,7 +152,8 @@ function getDefaultPreferences() {
       blur: false,
       overlay: false,
       overlayOpacity: 0.4
-    }
+    },
+    aiEnabled: true
   };
 }
 

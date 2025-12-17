@@ -30,6 +30,7 @@ import {
 import { SimpleTodayView } from './components/Dashboard/SimpleTodayView';
 import { FocusView } from './components/Focus/FocusView';
 import { SmartTaskModal } from './components/Tasks/SmartTaskModal';
+import { AiBulkTaskModal } from './components/Tasks/AiBulkTaskModal';
 import { TaskModal } from './components/Tasks/TaskModal';
 import { TopTimerBar } from './components/Timer/TopTimerBar';
 import { FloatingTimerModal } from './components/Timer/FloatingTimerModal';
@@ -269,6 +270,7 @@ function MainApp() {
   const [isTransitioning, setIsTransitioning] = React.useState(false);
   const [lastViewBeforeFocus, setLastViewBeforeFocus] = React.useState('today');
   const [showSmartTaskModal, setShowSmartTaskModal] = React.useState(false);
+  const [showAiBulkTaskModal, setShowAiBulkTaskModal] = React.useState(false);
   const [showFloatingTimer, setShowFloatingTimer] = React.useState(false);
   const [selectedTaskForModal, setSelectedTaskForModal] = React.useState<string | null>(null);
   const backupIntervalIdRef = React.useRef<number | null>(null);
@@ -1219,6 +1221,7 @@ function MainApp() {
       {/* Floating Add Button - Fixed at bottom right */}
       <FloatingAddButton
         onCreateTask={() => setShowSmartTaskModal(true)}
+        onAiBulkTask={(state.preferences.enableAI ?? true) ? () => setShowAiBulkTaskModal(true) : undefined}
         colors={colors}
       />
 
@@ -1260,6 +1263,12 @@ function MainApp() {
         isOpen={showSmartTaskModal}
         onClose={() => setShowSmartTaskModal(false)}
                     placeholder={t('forms.create_task_for_inbox')}
+      />
+
+      {/* AI Bulk Task Modal */}
+      <AiBulkTaskModal
+        isOpen={showAiBulkTaskModal}
+        onClose={() => setShowAiBulkTaskModal(false)}
       />
 
       {/* Global Task Modal - Render whenever a task is selected (e.g., from timer) */}

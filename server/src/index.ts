@@ -17,6 +17,7 @@ import calendarRoutes from './routes/calendar.js';
 import syncRoutes from './routes/sync.js';
 import adminRoutes from './routes/admin.js';
 import emailRoutes from './routes/email.js';
+import aiRoutes from './routes/ai.js';
 
 const app = new Hono();
 
@@ -55,6 +56,7 @@ app.route('/api/calendar', calendarRoutes);
 app.route('/api/sync', syncRoutes);
 app.route('/api/admin', adminRoutes);
 app.route('/api/email', emailRoutes);
+app.route('/api/ai', aiRoutes);
 
 // Error handling
 app.onError((err, c) => {

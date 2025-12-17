@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { adminAPI } from '../../services/apiService';
+import { AiSettings } from './AiSettings';
 import { 
   Users, 
   Trash2, 
@@ -18,8 +19,11 @@ import {
   X,
   ArrowUp,
   ArrowDown,
-  ArrowUpDown
+  ArrowUpDown,
+  Sparkles
 } from 'lucide-react';
+
+type AdminTab = 'users' | 'ai';
 
 interface User {
   id: string;
@@ -51,6 +55,7 @@ type SortDirection = 'asc' | 'desc';
 export function UserManagement() {
   const { t } = useTranslation();
   const { state: authState } = useAuth();
+  const [activeTab, setActiveTab] = useState<AdminTab>('users');
   const [users, setUsers] = useState<User[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -220,9 +225,75 @@ export function UserManagement() {
     );
   }
 
+  // If AI tab is active, render AI Settings component
+  if (activeTab === 'ai') {
+    return (
+      <div className="h-full flex flex-col">
+        {/* Tab Navigation */}
+        <div className="px-4 sm:px-6 lg:px-8 pt-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex gap-2 mb-6">
+              <button
+                onClick={() => setActiveTab('users')}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
+                  activeTab === 'users'
+                    ? 'bg-accent text-white shadow-lg'
+                    : 'bg-white/80 dark:bg-gray-800/80 text-gray-600 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 border border-gray-200/50 dark:border-gray-700/50'
+                }`}
+              >
+                <Users className="w-4 h-4" />
+                {t('admin.users', 'Users')}
+              </button>
+              <button
+                onClick={() => setActiveTab('ai')}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
+                  activeTab === 'ai'
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                    : 'bg-white/80 dark:bg-gray-800/80 text-gray-600 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 border border-gray-200/50 dark:border-gray-700/50'
+                }`}
+              >
+                <Sparkles className="w-4 h-4" />
+                {t('admin.aiSettings', 'AI Settings')}
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className="flex-1 overflow-hidden">
+          <AiSettings />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="h-full overflow-auto py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
+        {/* Tab Navigation */}
+        <div className="flex gap-2 mb-6">
+          <button
+            onClick={() => setActiveTab('users')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
+              activeTab === 'users'
+                ? 'bg-accent text-white shadow-lg'
+                : 'bg-white/80 dark:bg-gray-800/80 text-gray-600 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 border border-gray-200/50 dark:border-gray-700/50'
+            }`}
+          >
+            <Users className="w-4 h-4" />
+            {t('admin.users', 'Users')}
+          </button>
+          <button
+            onClick={() => setActiveTab('ai')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
+              activeTab === 'ai'
+                ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                : 'bg-white/80 dark:bg-gray-800/80 text-gray-600 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 border border-gray-200/50 dark:border-gray-700/50'
+            }`}
+          >
+            <Sparkles className="w-4 h-4" />
+            {t('admin.aiSettings', 'AI Settings')}
+          </button>
+        </div>
+
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">

@@ -452,3 +452,87 @@ export const adminAPI = {
   }
 };
 
+// ==================
+// AI API
+// ==================
+
+export interface AIParsedTask {
+  title: string;
+  dueDate: string | null;
+  estimatedTime: number | null;
+  priority: 'none' | 'low' | 'medium' | 'high';
+  tags: string[];
+  projectName: string | null;
+  description: string | null;
+}
+
+export interface AISettings {
+  provider: string;
+  model: string;
+  enabled: boolean;
+  baseUrl: string;
+  hasApiKey: boolean;
+  maskedApiKey: string | null;
+}
+
+export const aiAPI = {
+  /**
+   * Check if AI feature is enabled (for all authenticated users)
+   */
+  async getStatus() {
+    return fetchAPI<{ enabled: boolean; model: string | null }>('/api/ai/status');
+  },
+
+  /**
+   * Parse natural language text into structured task data
+   */
+  async parseTask(text: string, context: { projects: string[]; tags: string[] }) {
+    return fetchAPI<{ parsed: AIParsedTask }>('/api/ai/parse-task', {
+      method: 'POST',
+      body: JSON.stringify({ text, ...context })
+    });
+  },
+
+  /**
+   * Parse natural language text containing multiple tasks
+   */
+  async parseMultipleTasks(text: string, context: { projects: string[]; tags: string[]; language?: string }) {
+    return fetchAPI<{ tasks: AIParsedTask[] }>('/api/ai/parse-multiple-tasks', {
+      method: 'POST',
+      body: JSON.stringify({ text, ...context })
+    });
+  },
+
+  /**
+   * Get AI settings (admin only)
+   */
+  async getSettings() {
+    return fetchAPI<{ settings: AISettings }>('/api/ai/settings');
+  },
+
+  /**
+   * Update AI settings (admin only)
+   */
+  async updateSettings(settings: {
+    provider?: string;
+    model?: string;
+    enabled?: boolean;
+    baseUrl?: string;
+    apiKey?: string;
+  }) {
+    return fetchAPI<{ settings: AISettings }>('/api/ai/settings', {
+      method: 'PUT',
+      body: JSON.stringify(settings)
+    });
+  },
+
+  /**
+   * Test AI connection (admin only)
+   */
+  async testConnection() {
+    return fetchAPI<{ success: boolean; message: string }>('/api/ai/test', {
+      method: 'POST'
+    });
+  }
+};
+

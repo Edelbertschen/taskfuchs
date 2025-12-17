@@ -247,6 +247,8 @@ export interface UserPreferences {
   hasCompletedOnboarding?: boolean;
   // Focus mode setting
   enableFocusMode: boolean; // Whether focus mode is enabled
+  // AI feature
+  enableAI?: boolean; // Whether AI-powered task parsing is enabled for the user
   // Timer settings
   timer: {
     showOverlay: boolean;
@@ -339,6 +341,9 @@ export interface UserPreferences {
     notify?: boolean; // show 2s toast after backup
     lastSuccess?: string; // ISO timestamp of last successful backup
   };
+  
+  // AI features
+  aiEnabled?: boolean; // Whether AI task parsing is enabled for this user
 }
 
 export interface Statistics {

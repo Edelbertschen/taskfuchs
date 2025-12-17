@@ -285,3 +285,15 @@ model KanbanBoard {
   @@index([userId])
 }
 
+// AI Settings - Singleton for instance-wide AI configuration
+model AiSettings {
+  id        String   @id @default("global") // Singleton pattern
+  provider  String   @default("nebius")
+  apiKey    String   // Encrypted with AES-256-GCM
+  model     String   @default("Qwen/Qwen3-235B-A22B-Instruct-2507")
+  enabled   Boolean  @default(true) // Enabled by default
+  baseUrl   String   @default("https://api.studio.nebius.com/v1")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+

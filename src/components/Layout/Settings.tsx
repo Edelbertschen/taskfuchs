@@ -69,7 +69,8 @@ import {
   FolderOpen,
   ChevronDown,
   ChevronUp,
-  Users
+  Users,
+  Sparkles
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { DeleteConfirmationModal } from '../Common/DeleteConfirmationModal';
@@ -186,6 +187,12 @@ const Settings = React.memo(() => {
       title: t('settings.sections.appearance.title'),
       icon: Palette,
       description: t('settings.sections.appearance.description_extended')
+    },
+    {
+      id: 'ai',
+      title: t('settings.sections.ai.title', 'AI Features'),
+      icon: Sparkles,
+      description: t('settings.sections.ai.description', 'Configure AI-powered task parsing')
     },
     {
       id: 'notes',
@@ -4743,6 +4750,41 @@ const Settings = React.memo(() => {
 
           </div>
         );
+
+      case 'ai':
+        return (
+          <div className="space-y-8">
+            <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                {t('settings.sections.ai.title', 'AI Features')}
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400">
+                {t('settings.sections.ai.description', 'Configure AI-powered task parsing')}
+              </p>
+            </div>
+
+            <div className="settings-card p-6 border">
+              <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <div>
+                  <div className="font-medium text-gray-900 dark:text-white">
+                    {t('ai.enableAI', 'Enable AI Features')}
+                  </div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    {t('ai.enableDescription', 'Allow AI to parse your task input')}
+                  </div>
+                </div>
+                <Toggle
+                  enabled={state.preferences.enableAI ?? true}
+                  onChange={() => dispatch({
+                    type: 'UPDATE_PREFERENCES',
+                    payload: { enableAI: !(state.preferences.enableAI ?? true) }
+                  })}
+                />
+              </div>
+            </div>
+          </div>
+        );
+
       case 'notes':
         return (
           <div className="space-y-6">
@@ -5480,6 +5522,23 @@ const Settings = React.memo(() => {
                     onChange={() => dispatch({
                       type: 'UPDATE_PREFERENCES',
                       payload: { enableEndOfDay: !state.preferences.enableEndOfDay }
+                    })} 
+                  />
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <div>
+                    <div className="font-medium text-gray-900 dark:text-white flex items-center">
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      {t('settings.aiFeatures', 'KI-Funktionen')}
+                    </div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">{t('settings.aiDescription', 'KI-gestützte Aufgabenerfassung mit natürlicher Sprache')}</div>
+                  </div>
+                  <Toggle 
+                    enabled={state.preferences.aiEnabled !== false} 
+                    onChange={() => dispatch({
+                      type: 'UPDATE_PREFERENCES',
+                      payload: { aiEnabled: state.preferences.aiEnabled === false }
                     })} 
                   />
                 </div>

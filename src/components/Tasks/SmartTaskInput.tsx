@@ -1,13 +1,14 @@
 import React, { useState, useRef, useEffect, memo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { Plus, Lightbulb, Clock, Tag, Calendar, AlertCircle, CheckCircle, Sparkles, HelpCircle, X } from 'lucide-react';
+import { Plus, Lightbulb, Clock, Tag, Calendar, AlertCircle, CheckCircle, Sparkles, HelpCircle, X, Loader2, Wand2 } from 'lucide-react';
 import { parseTaskInput, getParsingExamples, getParsingHelp } from '../../utils/taskParser';
 import { useApp } from '../../context/AppContext';
 import { useAppTranslation } from '../../utils/i18nHelpers';
 import type { ParseResult, Column } from '../../types';
 import { useDebounce } from '../../utils/performance';
 import { createPortal } from 'react-dom';
+import { aiAPI, type AIParsedTask } from '../../services/apiService';
 
 interface SmartTaskInputProps {
   placeholder?: string;
@@ -34,6 +35,29 @@ export function SmartTaskInput({ placeholder, autoFocus = false, onTaskCreated, 
   const [showProjectSelector, setShowProjectSelector] = useState(false);
   const [selectedProject, setSelectedProject] = useState<string | undefined>(undefined);
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  // AI parsing state - default to true (show button), only hide if explicitly disabled
+  const [isAiEnabledGlobally, setIsAiEnabledGlobally] = useState(true);
+  const [isAiParsing, setIsAiParsing] = useState(false);
+  const [aiParsedTask, setAiParsedTask] = useState<AIParsedTask | null>(null);
+  const [aiError, setAiError] = useState<string | null>(null);
+  
+  // AI is enabled if both admin enabled it AND user hasn't disabled it
+  const isAiEnabled = isAiEnabledGlobally && (state.preferences.enableAI ?? true);
+  
+  // Check if AI is explicitly disabled by admin
+  useEffect(() => {
+    aiAPI.getStatus()
+      .then(res => {
+        // Only hide if admin explicitly disabled it
+        if (res.enabled === false) {
+          setIsAiEnabledGlobally(false);
+        }
+      })
+      .catch(() => {
+        // On error, keep showing the button (will show error when clicked)
+      });
+  }, []);
 
   // 🔍 Performance Boost: Debounced input für Smart-Parsing
   const debouncedInput = useDebounce(input, 150); // 150ms Delay für flüssigeres Tippen
@@ -232,6 +256,58 @@ export function SmartTaskInput({ placeholder, autoFocus = false, onTaskCreated, 
     setShowExamples(false);
   };
 
+  // AI parsing function
+  const handleAiParse = async () => {
+    if (!input.trim() || isAiParsing) return;
+    
+    setIsAiParsing(true);
+    setAiError(null);
+    setAiParsedTask(null);
+    
+    try {
+      // Gather context - projects and tags
+      const projects = state.columns
+        .filter((col: Column) => col.type === 'project')
+        .map((col: Column) => col.title);
+      const tags = state.tags.map(tag => tag.name);
+      
+      const response = await aiAPI.parseTask(input.trim(), { projects, tags });
+      setAiParsedTask(response.parsed);
+      
+      // Apply AI parsed data to the local parsing
+      const aiTask = response.parsed;
+      let newInput = aiTask.title;
+      
+      // Build a new input string with parsed data for the local parser
+      if (aiTask.dueDate) {
+        const date = new Date(aiTask.dueDate);
+        newInput += ` ${date.getDate()}.${date.getMonth() + 1}.`;
+      }
+      if (aiTask.estimatedTime) {
+        newInput += ` ${aiTask.estimatedTime}m`;
+      }
+      if (aiTask.priority && aiTask.priority !== 'none') {
+        const priorityMap = { low: '!', medium: '!!', high: '!!!' };
+        newInput += ` ${priorityMap[aiTask.priority]}`;
+      }
+      if (aiTask.tags && aiTask.tags.length > 0) {
+        newInput += ' ' + aiTask.tags.map(t => `#${t}`).join(' ');
+      }
+      if (aiTask.projectName) {
+        newInput += ` @${aiTask.projectName}`;
+      }
+      if (aiTask.description) {
+        newInput += ` n ${aiTask.description}`;
+      }
+      
+      setInput(newInput);
+    } catch (err: any) {
+      setAiError(err.message || 'AI parsing failed');
+    } finally {
+      setIsAiParsing(false);
+    }
+  };
+
   return (
     <div className="relative">
       {/* Project Selector Modal */}
@@ -306,6 +382,22 @@ export function SmartTaskInput({ placeholder, autoFocus = false, onTaskCreated, 
                 {forms.quickMode()}
               </div>
             )}
+            {/* AI Parse Button */}
+            {isAiEnabled && input.trim() && !isAiParsing && (
+              <button
+                type="button"
+                onClick={handleAiParse}
+                className="ml-2 p-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-md hover:from-purple-600 hover:to-pink-600 transition-all shadow-sm"
+                title="AI-gestützte Analyse"
+              >
+                <Wand2 className="w-4 h-4" />
+              </button>
+            )}
+            {isAiParsing && (
+              <div className="ml-2 p-2 bg-purple-100 dark:bg-purple-900/30 rounded-md">
+                <Loader2 className="w-4 h-4 text-purple-500 animate-spin" />
+              </div>
+            )}
             {parseResult?.success && !parseResult.task?.openProjectSelector && (
               <button
                 type="submit"
@@ -320,6 +412,48 @@ export function SmartTaskInput({ placeholder, autoFocus = false, onTaskCreated, 
               </div>
             )}
           </div>
+
+          {/* AI Error Display */}
+          {aiError && (
+            <div className="px-3 pb-3 border-t border-gray-100 dark:border-gray-700">
+              <div className="mt-3 flex items-center text-sm text-red-600 dark:text-red-400">
+                <AlertCircle className="w-4 h-4 mr-2" />
+                <span>{aiError}</span>
+                <button 
+                  onClick={() => setAiError(null)} 
+                  className="ml-auto p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* AI Parsed Result Display */}
+          {aiParsedTask && !aiError && (
+            <div className="px-3 pb-3 border-t border-gray-100 dark:border-gray-700">
+              <div className="mt-3">
+                <div className="flex items-center text-sm text-purple-600 dark:text-purple-400 mb-2">
+                  <Wand2 className="w-4 h-4 mr-2" />
+                  <span>AI-Analyse abgeschlossen</span>
+                  <button 
+                    onClick={() => setAiParsedTask(null)} 
+                    className="ml-auto p-1 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {aiParsedTask.projectName && (
+                    <div className="bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded text-xs flex items-center">
+                      <span className="mr-1">📁</span>
+                      {aiParsedTask.projectName}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Parse Preview */}
           {isExpanded && parseResult && (
