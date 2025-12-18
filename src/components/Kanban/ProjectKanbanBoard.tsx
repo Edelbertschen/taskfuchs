@@ -1650,10 +1650,10 @@ export function ProjectKanbanBoard() {
           </SortableContext>
         );
         
-        // In single-column view, wrap with fixed width (500px like Pins)
+        // In single-column view, wrap with fixed width (600px like Pins)
         if (isSingle) {
           result.push(
-            <div key={`single-wrap-${column.id}`} style={{ flex: '0 0 500px', maxWidth: 500, width: 500, margin: '0 auto' }}>
+            <div key={`single-wrap-${column.id}`} style={{ flex: '0 0 600px', maxWidth: 600, width: 600, margin: '0 auto' }}>
               {columnNode}
             </div>
           );

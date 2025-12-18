@@ -18,6 +18,25 @@ interface ChangelogEntry {
 // Changelog data - add new entries at the top
 const CHANGELOG: ChangelogEntry[] = [
   {
+    date: '2025-12-18',
+    items: [
+      {
+        type: 'feature',
+        text: {
+          de: 'Changelog-Modal "Was gibt es Neues?" im Nutzermenü',
+          en: 'Changelog modal "What\'s New?" in user menu'
+        }
+      },
+      {
+        type: 'improvement',
+        text: {
+          de: 'Einspalten-Ansicht in Planer, Pins und Projekten ist jetzt breiter (600px)',
+          en: 'Single-column view in Planner, Pins and Projects is now wider (600px)'
+        }
+      }
+    ]
+  },
+  {
     date: '2025-12-17',
     items: [
       {

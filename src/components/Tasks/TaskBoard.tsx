@@ -1596,7 +1596,7 @@ export function TaskBoard() {
       if (isSingle) {
         // In single-column view: same width as one column in 3-column layout (roughly 1/3 of container)
         elements.push(
-          <div key={`single-wrap-${column.id}`} style={{ flex: '0 0 500px', maxWidth: 500, width: 500, margin: '0 auto' }}>
+          <div key={`single-wrap-${column.id}`} style={{ flex: '0 0 600px', maxWidth: 600, width: 600, margin: '0 auto' }}>
             {columnNode}
           </div>
         );

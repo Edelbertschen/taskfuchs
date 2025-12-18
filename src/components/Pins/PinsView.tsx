@@ -926,7 +926,7 @@ export function PinsView() {
         );
         if (isSingle) {
           result.push(
-            <div key={`single-wrap-${column.id}`} style={{ flex: '0 0 500px', maxWidth: 500, width: 500, margin: '0 auto' }}>
+            <div key={`single-wrap-${column.id}`} style={{ flex: '0 0 600px', maxWidth: 600, width: 600, margin: '0 auto' }}>
               {node}
             </div>
           );
