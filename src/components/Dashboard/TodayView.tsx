@@ -43,8 +43,8 @@ export function TodayView({ onNavigate }: TodayViewProps = {}) {
   // Check current theme and listen for system theme changes
   useEffect(() => {
     const updateDarkMode = () => {
-      const isDark = document.documentElement.classList.contains('dark');
-      setIsDarkMode(isDark);
+    const isDark = document.documentElement.classList.contains('dark');
+    setIsDarkMode(isDark);
     };
     
     // Initial check

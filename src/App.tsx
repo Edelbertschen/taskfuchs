@@ -38,6 +38,7 @@ import { NotificationManager } from './components/Common/NotificationManager';
 import { BackupSetupModal } from './components/Common/BackupSetupModal';
 import { OnboardingTour } from './components/Common/OnboardingTour';
 import { NewsModal, shouldShowNews } from './components/Common/NewsModal';
+import { ChangelogModal } from './components/Common/ChangelogModal';
 import { UserGuide } from './components/Common/UserGuide';
 import { LanguageSelectionModal } from './components/Common/LanguageSelectionModal';
 import { useTranslation } from 'react-i18next';
@@ -278,6 +279,7 @@ function MainApp() {
   const [showLanguageSelection, setShowLanguageSelection] = React.useState(false);
   const [showOnboarding, setShowOnboarding] = React.useState(false);
   const [showNewsModal, setShowNewsModal] = React.useState(false);
+  const [showChangelogModal, setShowChangelogModal] = React.useState(false);
   const [pwaUpdateAvailable, setPwaUpdateAvailable] = React.useState(false);
   const [showBackupSetup, setShowBackupSetup] = React.useState(false);
   const [showUserGuide, setShowUserGuide] = React.useState(false);
@@ -434,10 +436,15 @@ function MainApp() {
     const handleOpenUserGuide = () => setShowUserGuide(true);
     window.addEventListener('open-user-guide', handleOpenUserGuide as EventListener);
 
+    // Handle Changelog open from anywhere
+    const handleOpenChangelog = () => setShowChangelogModal(true);
+    window.addEventListener('open-changelog', handleOpenChangelog as EventListener);
+
     return () => {
       window.removeEventListener('navigate-to-focus', handleNavigateToFocus as EventListener);
       window.removeEventListener('start-onboarding', handleStartOnboarding as EventListener);
       window.removeEventListener('open-user-guide', handleOpenUserGuide as EventListener);
+      window.removeEventListener('open-changelog', handleOpenChangelog as EventListener);
     };
   }, [currentView, dispatch]);
 
@@ -1496,6 +1503,12 @@ function MainApp() {
       <NewsModal
         isOpen={showNewsModal}
         onClose={() => setShowNewsModal(false)}
+      />
+
+      {/* Changelog Modal */}
+      <ChangelogModal
+        isOpen={showChangelogModal}
+        onClose={() => setShowChangelogModal(false)}
       />
       
       {/* User Guide */}

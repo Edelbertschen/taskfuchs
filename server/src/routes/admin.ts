@@ -75,11 +75,11 @@ app.get('/users', async (c) => {
       : user.lastLoginAt;
 
     return {
-      ...user,
-      _count: {
-        tasks: user._count.tasks,
-        projects: user.columns.length
-      },
+    ...user,
+    _count: {
+      tasks: user._count.tasks,
+      projects: user.columns.length
+    },
       lastActivityAt,
       columns: undefined, // Remove columns array from response
       tasks: undefined,   // Remove tasks array from response

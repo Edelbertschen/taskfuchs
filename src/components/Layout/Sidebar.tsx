@@ -29,6 +29,7 @@ import {
   Users,
   LogOut,
   Settings,
+  Gift,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
@@ -679,6 +680,16 @@ export const Sidebar = memo(function Sidebar({ activeView, onViewChange }: Sideb
                 >
                   <Sparkles className="w-4 h-4" />
                   {t('header.onboarding_tour')}
+                </button>
+                <button
+                  onClick={() => {
+                    window.dispatchEvent(new CustomEvent('open-changelog'));
+                    setShowPlannerUserMenu(false);
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3"
+                >
+                  <Gift className="w-4 h-4" />
+                  {t('header.whats_new', 'Was gibt es Neues?')}
                 </button>
                 
                 {/* Divider */}
