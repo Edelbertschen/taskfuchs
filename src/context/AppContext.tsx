@@ -3101,8 +3101,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (isOnlineMode()) {
       console.log('[AppContext] Online mode detected, fetching from database...');
       
-      // WICHTIG: Erst lokale Tasks laden, dann mit Server mergen
-      // Das verhindert Datenverlust bei Tasks, die lokal erstellt aber nicht gespeichert wurden
+      // AGGRESSIV: Im Online-Modus sind Server-Daten die einzige Wahrheit
+      // Lokale Tasks werden NICHT mehr gemerged um Zombie-Tasks zu verhindern
+      // Nur Tasks die in den letzten 30 Sekunden erstellt wurden, werden behalten
       const savedLocalTasks = localStorage.getItem('taskfuchs-tasks');
       const localTasks: Task[] = savedLocalTasks ? JSON.parse(savedLocalTasks) : [];
       const savedLocalArchived = localStorage.getItem('taskfuchs-archived-tasks');
@@ -3118,15 +3119,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             
             // NUR lokale Tasks behalten, die:
             // 1. NICHT auf dem Server sind UND
-            // 2. In den letzten 2 Minuten erstellt wurden (= noch nicht synchronisiert)
+            // 2. In den letzten 30 SEKUNDEN erstellt wurden (sehr kurzes Fenster!)
             // Das verhindert, dass gelöschte Tasks wieder auftauchen
-            const twoMinutesAgo = Date.now() - 2 * 60 * 1000;
+            const thirtySecondsAgo = Date.now() - 30 * 1000;
             const localOnlyTasks = localTasks
               .filter(t => {
                 if (serverTaskIds.has(t.id)) return false;
-                // Nur behalten wenn kürzlich erstellt
+                // Nur behalten wenn GERADE EBEN erstellt
                 const createdAt = t.createdAt ? new Date(t.createdAt).getTime() : 0;
-                return createdAt > twoMinutesAgo;
+                return createdAt > thirtySecondsAgo;
               })
               .map(t => ({
                 ...t,
@@ -3134,7 +3135,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
               }));
             
             if (localOnlyTasks.length > 0) {
-              console.log('[AppContext] ⚠️ Gefunden: ' + localOnlyTasks.length + ' kürzlich erstellte lokale Tasks. Diese werden behalten!');
+              console.log('[AppContext] ⚠️ Gefunden: ' + localOnlyTasks.length + ' gerade erstellte lokale Tasks. Diese werden behalten!');
               console.log('[AppContext] Lokale Tasks:', localOnlyTasks.map(t => t.title));
             }
             
@@ -3148,12 +3149,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           if (data.archivedTasks) {
             const serverArchived = data.archivedTasks as Task[];
             const serverArchivedIds = new Set(serverArchived.map(t => t.id));
-            const twoMinutesAgo = Date.now() - 2 * 60 * 1000;
+            const thirtySecondsAgo = Date.now() - 30 * 1000;
             const localOnlyArchived = localArchived
               .filter(t => {
                 if (serverArchivedIds.has(t.id)) return false;
                 const createdAt = t.createdAt ? new Date(t.createdAt).getTime() : 0;
-                return createdAt > twoMinutesAgo;
+                return createdAt > thirtySecondsAgo;
               })
               .map(t => ({ ...t, position: Math.floor(t.position || Date.now()) }));
             
