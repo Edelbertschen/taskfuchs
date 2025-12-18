@@ -361,25 +361,6 @@ export function AiSettings() {
             </button>
           </div>
         </div>
-
-        {/* Info Box */}
-        <div 
-          className="mt-6 p-4 rounded-xl border"
-          style={{ 
-            backgroundColor: `${accentColor}10`,
-            borderColor: `${accentColor}30`
-          }}
-        >
-          <h4 className="font-medium text-gray-900 dark:text-white mb-2">
-            {t('ai.howItWorks', 'How it works')}
-          </h4>
-          <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
-            <li>• {t('ai.howItWorks1', 'Users can click the AI button in the task input')}</li>
-            <li>• {t('ai.howItWorks2', 'Natural language is parsed into structured task data')}</li>
-            <li>• {t('ai.howItWorks3', 'AI extracts title, due date, time estimate, priority, and tags')}</li>
-            <li>• {t('ai.howItWorks4', 'Users review and confirm before saving the task')}</li>
-          </ul>
-        </div>
       </div>
     </div>
   );
