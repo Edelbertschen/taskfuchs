@@ -4691,18 +4691,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     
     const applyTheme = (prefersDark: boolean) => {
-      if (state.preferences.theme === 'dark') {
-        root.classList.add('dark');
-      } else if (state.preferences.theme === 'light') {
-        root.classList.remove('dark');
-      } else {
+    if (state.preferences.theme === 'dark') {
+      root.classList.add('dark');
+    } else if (state.preferences.theme === 'light') {
+      root.classList.remove('dark');
+    } else {
         // System theme - follow system preference
-        if (prefersDark) {
-          root.classList.add('dark');
-        } else {
-          root.classList.remove('dark');
-        }
+      if (prefersDark) {
+        root.classList.add('dark');
+      } else {
+        root.classList.remove('dark');
       }
+    }
     };
     
     // Apply theme immediately

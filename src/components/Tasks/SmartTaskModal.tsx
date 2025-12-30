@@ -139,8 +139,8 @@ export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, pro
       } else {
         setIsMultiMode(false);
         setMultiParseResults([]);
-        const result = parseTaskInput(input);
-        setParseResult(result);
+      const result = parseTaskInput(input);
+      setParseResult(result);
       }
     } else {
       setParseResult(null);
@@ -218,7 +218,7 @@ export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, pro
       if (aiTask.priority && aiTask.priority !== 'none') {
         const priorityMap: Record<string, string> = { low: '!', medium: '!!', high: '!!!' };
         newInput += ` ${priorityMap[aiTask.priority]}`;
-      }
+    }
       if (aiTask.tags && aiTask.tags.length > 0) {
         newInput += ' ' + aiTask.tags.map(t => `#${t}`).join(' ');
       }
@@ -237,18 +237,18 @@ export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, pro
     }
   };
 
-  // Generate UUID with fallback for Firefox compatibility
+    // Generate UUID with fallback for Firefox compatibility
   const generateUUID = useCallback(() => {
-    try {
-      return crypto.randomUUID();
-    } catch (error) {
-      // Fallback for browsers that don't support crypto.randomUUID()
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        const r = Math.random() * 16 | 0;
-        const v = c === 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-      });
-    }
+      try {
+        return crypto.randomUUID();
+      } catch (error) {
+        // Fallback for browsers that don't support crypto.randomUUID()
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+          const r = Math.random() * 16 | 0;
+          const v = c === 'x' ? r : (r & 0x3 | 0x8);
+          return v.toString(16);
+        });
+      }
   }, []);
 
   // Helper to create a single task
@@ -459,9 +459,9 @@ export function SmartTaskModal({ isOpen, onClose, targetColumn, placeholder, pro
       if (isMultiMode) {
         // In multi-mode, only submit with Cmd/Ctrl+Enter
         if ((e.metaKey || e.ctrlKey) && input.trim()) {
-          e.preventDefault();
-          e.stopPropagation();
-          handleSubmit(e as any);
+      e.preventDefault();
+      e.stopPropagation();
+      handleSubmit(e as any);
         }
         // Otherwise let the textarea handle the newline
       } else if (input.trim()) {

@@ -838,14 +838,14 @@ function MainApp() {
         return;
       }
       
-      const direction = e.deltaY > 0 ? 'next' : 'prev';
-      
-      if (currentView === 'tasks') {
-        e.preventDefault();
-        dispatch({ type: 'NAVIGATE_DATE', payload: direction });
-      } else if (currentView === 'kanban') {
-        e.preventDefault();
-        dispatch({ type: 'NAVIGATE_PROJECTS', payload: direction });
+        const direction = e.deltaY > 0 ? 'next' : 'prev';
+        
+        if (currentView === 'tasks') {
+          e.preventDefault();
+          dispatch({ type: 'NAVIGATE_DATE', payload: direction });
+        } else if (currentView === 'kanban') {
+          e.preventDefault();
+          dispatch({ type: 'NAVIGATE_PROJECTS', payload: direction });
       } else if (currentView === 'pins') {
         e.preventDefault();
         window.dispatchEvent(new CustomEvent('pins-column-navigate', { detail: { direction } }));
