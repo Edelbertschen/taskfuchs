@@ -22,9 +22,13 @@ export default defineConfig({
     VitePWA({
       // Auto updating SW; manual page reload will activate latest SW immediately
       registerType: 'autoUpdate',
+      // Add cache busting for SW updates
+      injectRegister: 'auto',
       workbox: {
         skipWaiting: true,
         clientsClaim: true,
+        // Force SW to update on every build
+        cleanupOutdatedCaches: true,
         // IMPORTANT: Exclude HTML to ensure fresh scripts are loaded on each visit
         globPatterns: ['**/*.{js,css,ico,svg,json,woff2}'],
         // Exclude large background images and screenshots from precache
@@ -44,7 +48,7 @@ export default defineConfig({
               networkTimeoutSeconds: 3
             }
           },
-          // JS/CSS: Try network first for updates
+          // JS/CSS: Try network first for updates - aggressive refresh
           {
             urlPattern: /.*\.(js|css)$/,
             handler: 'NetworkFirst',
@@ -52,9 +56,13 @@ export default defineConfig({
               cacheName: 'assets-cache',
               expiration: {
                 maxEntries: 50,
-                maxAgeSeconds: 60 * 60 // 1 hour - then refresh from network
+                maxAgeSeconds: 60 * 5 // 5 minutes - aggressive refresh for bug fixes
               },
-              networkTimeoutSeconds: 3
+              networkTimeoutSeconds: 2,
+              // Force revalidation on every request
+              fetchOptions: {
+                cache: 'no-cache'
+              }
             }
           },
           {
