@@ -18,6 +18,39 @@ interface ChangelogEntry {
 // Changelog data - add new entries at the top
 const CHANGELOG: ChangelogEntry[] = [
   {
+    date: '2025-12-30',
+    items: [
+      {
+        type: 'feature',
+        text: {
+          de: 'Mobile Companion App – Installiere TaskFuchs als native App auf iOS, Android und Desktop',
+          en: 'Mobile Companion App – Install TaskFuchs as native app on iOS, Android and Desktop'
+        }
+      },
+      {
+        type: 'improvement',
+        text: {
+          de: 'Aggressive Cache-Invalidierung für Mobile – Updates werden jetzt nach 5 Minuten statt 1 Stunde aktualisiert',
+          en: 'Aggressive cache invalidation for mobile – Updates now refresh after 5 minutes instead of 1 hour'
+        }
+      },
+      {
+        type: 'fix',
+        text: {
+          de: 'Zombie-Tasks in der Mobilversion vollständig behoben – Zeitfenster von 2 Min auf 30 Sekunden reduziert',
+          en: 'Zombie tasks in mobile version completely fixed – Time window reduced from 2 min to 30 seconds'
+        }
+      },
+      {
+        type: 'fix',
+        text: {
+          de: 'LocalStorage-Bereinigung nach Server-Sync – Verhindert dass gelöschte Tasks wieder erscheinen',
+          en: 'LocalStorage cleanup after server sync – Prevents deleted tasks from reappearing'
+        }
+      }
+    ]
+  },
+  {
     date: '2025-12-18',
     items: [
       {

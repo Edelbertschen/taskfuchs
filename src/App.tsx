@@ -39,6 +39,7 @@ import { BackupSetupModal } from './components/Common/BackupSetupModal';
 import { OnboardingTour } from './components/Common/OnboardingTour';
 import { NewsModal, shouldShowNews } from './components/Common/NewsModal';
 import { ChangelogModal } from './components/Common/ChangelogModal';
+import { MobileAppModal, shouldShowMobileAppModal } from './components/Common/MobileAppModal';
 import { UserGuide } from './components/Common/UserGuide';
 import { LanguageSelectionModal } from './components/Common/LanguageSelectionModal';
 import { useTranslation } from 'react-i18next';
@@ -280,6 +281,7 @@ function MainApp() {
   const [showOnboarding, setShowOnboarding] = React.useState(false);
   const [showNewsModal, setShowNewsModal] = React.useState(false);
   const [showChangelogModal, setShowChangelogModal] = React.useState(false);
+  const [showMobileAppModal, setShowMobileAppModal] = React.useState(false);
   const [pwaUpdateAvailable, setPwaUpdateAvailable] = React.useState(false);
   const [showBackupSetup, setShowBackupSetup] = React.useState(false);
   const [showUserGuide, setShowUserGuide] = React.useState(false);
@@ -315,6 +317,16 @@ function MainApp() {
       return () => clearTimeout(timer);
     }
   }, [showOnboarding]);
+
+  // Show mobile app modal after news modal (only if not seen yet)
+  React.useEffect(() => {
+    if (!showOnboarding && !showNewsModal && shouldShowMobileAppModal()) {
+      const timer = setTimeout(() => {
+        setShowMobileAppModal(true);
+      }, 3000); // Show after 3 seconds, after news modal
+      return () => clearTimeout(timer);
+    }
+  }, [showOnboarding, showNewsModal]);
 
   // Listen for scroll state updates from child views (TaskBoard, ProjectKanbanBoard, PinsView)
   React.useEffect(() => {
@@ -1509,6 +1521,12 @@ function MainApp() {
       <ChangelogModal
         isOpen={showChangelogModal}
         onClose={() => setShowChangelogModal(false)}
+      />
+
+      {/* Mobile App Modal */}
+      <MobileAppModal
+        isOpen={showMobileAppModal}
+        onClose={() => setShowMobileAppModal(false)}
       />
       
       {/* User Guide */}
