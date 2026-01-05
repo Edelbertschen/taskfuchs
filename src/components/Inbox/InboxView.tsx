@@ -1027,7 +1027,7 @@ export function InboxView() {
           {/* Bulk Actions */}
           {showBulkActions && (
             <div 
-              className="mb-6 p-4 rounded-xl border backdrop-blur-2xl"
+              className="mb-6 p-4 rounded-xl border backdrop-blur-2xl relative z-50"
               style={{
                 background: `${accentColor}26`, // 15% opacity
                 borderColor: `${accentColor}66`, // 40% opacity
