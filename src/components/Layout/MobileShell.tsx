@@ -3,15 +3,17 @@ import { MarkdownRenderer } from '../Common/MarkdownRenderer';
 import { 
   Plus, Check, Archive, Inbox, Sun, Sparkles, Filter, Undo2,
   GripVertical, LogOut, RefreshCw, X, ChevronRight, ChevronLeft,
-  FileText, ListChecks, Zap, Heart, Eye, EyeOff, Tag, Pin
+  FileText, ListChecks, Zap, Heart, Eye, EyeOff, Tag, Pin,
+  Mic, MicOff, Timer, Play, Pause, RotateCcw, Calendar, ArrowRight,
+  Flag, AlertCircle, Circle, Target, Send, Wand2
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { LoginPage } from '../Auth/LoginPage';
-import { syncAPI } from '../../services/apiService';
+import { syncAPI, aiAPI } from '../../services/apiService';
 import type { Task } from '../../types';
-import { format } from 'date-fns';
+import { format, addDays } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
 
 // Auto-refresh interval in milliseconds (30 seconds)
@@ -42,6 +44,22 @@ export function MobileShell() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showTagFilter, setShowTagFilter] = useState(false);
+  
+  // Long-Press Context Menu
+  const [contextMenuTask, setContextMenuTask] = useState<Task | null>(null);
+  
+  // Focus Mode
+  const [focusTask, setFocusTask] = useState<Task | null>(null);
+  const [focusTimerSeconds, setFocusTimerSeconds] = useState(25 * 60); // 25 min default
+  const [focusTimerRunning, setFocusTimerRunning] = useState(false);
+  const focusTimerRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // AI Voice/Text Input
+  const [isRecording, setIsRecording] = useState(false);
+  const [isAIProcessing, setIsAIProcessing] = useState(false);
+  const [aiInputMode, setAiInputMode] = useState<'text' | 'voice'>('text');
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
   
   // Column swipe state
   const [columnSwipeOffset, setColumnSwipeOffset] = useState(0);
@@ -580,6 +598,204 @@ export function MobileShell() {
     if ('vibrate' in navigator) navigator.vibrate(10);
   }, [selectedTask, dispatch, isOffline]);
 
+  // ===== LONG-PRESS CONTEXT MENU HANDLERS =====
+  const handleLongPress = useCallback((task: Task) => {
+    if ('vibrate' in navigator) navigator.vibrate(30);
+    setContextMenuTask(task);
+  }, []);
+
+  const handleSetPriority = useCallback((priority: 'high' | 'medium' | 'low' | 'none') => {
+    if (!contextMenuTask) return;
+    dispatch({ 
+      type: 'UPDATE_TASK', 
+      payload: { ...contextMenuTask, priority: priority === 'none' ? undefined : priority, updatedAt: new Date().toISOString() } 
+    });
+    if ('vibrate' in navigator) navigator.vibrate(10);
+    setContextMenuTask(null);
+  }, [contextMenuTask, dispatch]);
+
+  const handleMoveToTomorrow = useCallback(() => {
+    if (!contextMenuTask) return;
+    const tomorrow = format(addDays(new Date(), 1), 'yyyy-MM-dd');
+    dispatch({ 
+      type: 'UPDATE_TASK', 
+      payload: { ...contextMenuTask, columnId: `date-${tomorrow}`, reminderDate: tomorrow, updatedAt: new Date().toISOString() } 
+    });
+    dispatch({ type: 'ENSURE_DATE_COLUMN', payload: tomorrow });
+    if ('vibrate' in navigator) navigator.vibrate(10);
+    setContextMenuTask(null);
+  }, [contextMenuTask, dispatch]);
+
+  const handleAddToPin = useCallback((pinColumnId: string) => {
+    if (!contextMenuTask) return;
+    dispatch({ 
+      type: 'UPDATE_TASK', 
+      payload: { ...contextMenuTask, pinColumnId, updatedAt: new Date().toISOString() } 
+    });
+    if ('vibrate' in navigator) navigator.vibrate(10);
+    setContextMenuTask(null);
+  }, [contextMenuTask, dispatch]);
+
+  // ===== FOCUS MODE HANDLERS =====
+  const startFocusMode = useCallback((task: Task) => {
+    setFocusTask(task);
+    setFocusTimerSeconds(25 * 60);
+    setFocusTimerRunning(false);
+    setContextMenuTask(null);
+    if ('vibrate' in navigator) navigator.vibrate(20);
+  }, []);
+
+  const toggleFocusTimer = useCallback(() => {
+    if (focusTimerRunning) {
+      if (focusTimerRef.current) clearInterval(focusTimerRef.current);
+      setFocusTimerRunning(false);
+    } else {
+      focusTimerRef.current = setInterval(() => {
+        setFocusTimerSeconds(prev => {
+          if (prev <= 1) {
+            if (focusTimerRef.current) clearInterval(focusTimerRef.current);
+            setFocusTimerRunning(false);
+            if ('vibrate' in navigator) navigator.vibrate([100, 50, 100, 50, 100]);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      setFocusTimerRunning(true);
+    }
+  }, [focusTimerRunning]);
+
+  const resetFocusTimer = useCallback(() => {
+    if (focusTimerRef.current) clearInterval(focusTimerRef.current);
+    setFocusTimerRunning(false);
+    setFocusTimerSeconds(25 * 60);
+  }, []);
+
+  const completeFocusTask = useCallback(() => {
+    if (!focusTask) return;
+    handleCompleteTask(focusTask.id);
+    setFocusTask(null);
+  }, [focusTask, handleCompleteTask]);
+
+  // Cleanup focus timer on unmount
+  useEffect(() => {
+    return () => {
+      if (focusTimerRef.current) clearInterval(focusTimerRef.current);
+    };
+  }, []);
+
+  // ===== AI VOICE/TEXT INPUT HANDLERS =====
+  const handleAITextSubmit = useCallback(async () => {
+    if (!newTaskText.trim() || isAIProcessing || isOffline) return;
+    
+    setIsAIProcessing(true);
+    try {
+      // Try AI parsing first
+      const projects = state.columns.filter(c => c.type === 'project').map(c => c.title);
+      const tags = state.tags.map(t => t.name);
+      
+      const response = await aiAPI.parseTask(newTaskText.trim(), { projects, tags });
+      const parsed = response.parsed;
+      
+      const todayDate = format(new Date(), 'yyyy-MM-dd');
+      let columnId = plannerSubView === 'today' ? `date-${todayDate}` : 'inbox';
+      let reminderDate: string | undefined;
+      
+      if (parsed.dueDate) {
+        const date = new Date(parsed.dueDate);
+        reminderDate = format(date, 'yyyy-MM-dd');
+        columnId = `date-${reminderDate}`;
+      }
+      
+      const newTask: Task = {
+        id: `task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        title: parsed.title || newTaskText.trim(),
+        description: parsed.description || '',
+        completed: false,
+        archived: false,
+        tags: parsed.tags || [],
+        subtasks: [],
+        columnId,
+        reminderDate,
+        priority: parsed.priority as any,
+        estimatedTime: parsed.duration,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        position: Date.now(),
+      };
+      
+      dispatch({ type: 'ADD_TASK', payload: newTask });
+      if (reminderDate) {
+        dispatch({ type: 'ENSURE_DATE_COLUMN', payload: reminderDate });
+      }
+      
+      setNewTaskText('');
+      setIsAddingTask(false);
+      if ('vibrate' in navigator) navigator.vibrate([10, 30, 10]);
+    } catch (error) {
+      console.error('AI parsing failed, using fallback:', error);
+      // Fallback: Create task with original text
+      handleAddTask();
+    } finally {
+      setIsAIProcessing(false);
+    }
+  }, [newTaskText, isAIProcessing, isOffline, state.columns, state.tags, plannerSubView, dispatch, handleAddTask]);
+
+  const startVoiceRecording = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+      
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
+      };
+      
+      mediaRecorder.onstop = async () => {
+        stream.getTracks().forEach(track => track.stop());
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        
+        // Convert to text using Web Speech API or send to backend
+        // For now, we'll use the Web Speech API
+        try {
+          const recognition = new (window.SpeechRecognition || (window as any).webkitSpeechRecognition)();
+          recognition.lang = state.preferences.language === 'en' ? 'en-US' : 'de-DE';
+          recognition.interimResults = false;
+          
+          recognition.onresult = (event: any) => {
+            const transcript = event.results[0][0].transcript;
+            setNewTaskText(transcript);
+            setAiInputMode('text');
+          };
+          
+          recognition.onerror = () => {
+            console.error('Speech recognition failed');
+          };
+          
+          // Start recognition (will use microphone again briefly)
+          recognition.start();
+        } catch (e) {
+          console.error('Speech recognition not supported');
+        }
+      };
+      
+      mediaRecorder.start();
+      setIsRecording(true);
+      if ('vibrate' in navigator) navigator.vibrate(20);
+    } catch (error) {
+      console.error('Microphone access denied:', error);
+    }
+  }, [state.preferences.language]);
+
+  const stopVoiceRecording = useCallback(() => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      if ('vibrate' in navigator) navigator.vibrate(10);
+    }
+  }, [isRecording]);
+
   // Onboarding Screen
   if (showOnboarding) {
     return <OnboardingScreen step={onboardingStep} setStep={setOnboardingStep} onFinish={finishOnboarding} accent={accent} isDarkMode={isDarkMode} />;
@@ -588,6 +804,33 @@ export function MobileShell() {
   // Not logged in - show the same login page as desktop
   if (!isLoggedIn && !isOffline) {
     return <LoginPage />;
+  }
+
+  // Focus Mode - Full screen task focus with timer
+  if (focusTask) {
+    return (
+      <FocusModeView 
+        task={focusTask} 
+        onClose={() => { if (focusTimerRef.current) clearInterval(focusTimerRef.current); setFocusTask(null); setFocusTimerRunning(false); }}
+        onComplete={completeFocusTask}
+        accent={accent}
+        isDarkMode={isDarkMode}
+        timerSeconds={focusTimerSeconds}
+        timerRunning={focusTimerRunning}
+        onToggleTimer={toggleFocusTimer}
+        onResetTimer={resetFocusTimer}
+        onToggleSubtask={(subtaskId) => {
+          if (!focusTask) return;
+          const updatedSubtasks = focusTask.subtasks?.map(s => 
+            s.id === subtaskId ? { ...s, completed: !s.completed, updatedAt: new Date().toISOString() } : s
+          );
+          const updatedTask = { ...focusTask, subtasks: updatedSubtasks, updatedAt: new Date().toISOString() };
+          dispatch({ type: 'UPDATE_TASK', payload: updatedTask });
+          setFocusTask(updatedTask);
+          if ('vibrate' in navigator) navigator.vibrate(10);
+        }}
+      />
+    );
   }
 
   // Task Detail View
@@ -823,6 +1066,7 @@ export function MobileShell() {
                 onTap={() => setSelectedTask(task)}
                 onComplete={(e) => handleCompleteTask(task.id, e)}
                 onDelete={() => handleDeleteTask(task.id)}
+                onLongPress={() => handleLongPress(task)}
                 isCompletingAnimation={completedAnimation === task.id}
                 isDeletingAnimation={deletedAnimation === task.id}
                 isDragging={draggedTaskId === task.id}
@@ -1006,26 +1250,206 @@ export function MobileShell() {
         </div>
       )}
 
-      {/* Add Task Sheet */}
+      {/* Context Menu (Long-Press) */}
+      {contextMenuTask && (
+        <div 
+          className="fixed inset-0 z-50 flex items-end"
+          onClick={() => setContextMenuTask(null)}
+        >
+          <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }} />
+          <div 
+            className="relative w-full rounded-t-3xl animate-slide-up"
+            style={{ backgroundColor: isDarkMode ? '#1c1c1e' : '#fff', paddingBottom: 'env(safe-area-inset-bottom, 20px)' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex justify-center py-3">
+              <div className="w-10 h-1 rounded-full" style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)' }} />
+            </div>
+            
+            {/* Task Title */}
+            <div className="px-5 pb-4">
+              <p className="text-sm font-semibold truncate" style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}>
+                {contextMenuTask.title}
+              </p>
+            </div>
+            
+            {/* Priority Section */}
+            <div className="px-5 pb-4">
+              <p className="text-xs font-medium mb-2" style={{ color: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)' }}>
+                Priorität
+              </p>
+              <div className="flex gap-2">
+                {[
+                  { key: 'high', label: 'Hoch', color: '#ef4444', icon: '🔴' },
+                  { key: 'medium', label: 'Mittel', color: '#f59e0b', icon: '🟡' },
+                  { key: 'low', label: 'Niedrig', color: '#3b82f6', icon: '🔵' },
+                  { key: 'none', label: 'Keine', color: isDarkMode ? '#6b7280' : '#9ca3af', icon: '⚪' },
+                ].map(p => (
+                  <button
+                    key={p.key}
+                    onClick={() => handleSetPriority(p.key as any)}
+                    className={`flex-1 py-2.5 rounded-xl text-xs font-semibold transition-all active:scale-95 ${
+                      contextMenuTask.priority === p.key || (!contextMenuTask.priority && p.key === 'none')
+                        ? 'ring-2 ring-offset-2' 
+                        : ''
+                    }`}
+                    style={{ 
+                      backgroundColor: `${p.color}20`,
+                      color: p.color,
+                      ringColor: p.color,
+                      ringOffsetColor: isDarkMode ? '#1c1c1e' : '#fff',
+                    }}
+                  >
+                    {p.icon}
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            {/* Actions */}
+            <div className="px-5 pb-4 space-y-2">
+              {/* Move to Tomorrow */}
+              <button
+                onClick={handleMoveToTomorrow}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all active:scale-[0.98]"
+                style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)' }}
+              >
+                <Calendar className="w-5 h-5" style={{ color: accent }} />
+                <span className="text-sm font-medium" style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}>
+                  Auf Morgen verschieben
+                </span>
+                <ArrowRight className="w-4 h-4 ml-auto opacity-40" style={{ color: isDarkMode ? '#fff' : '#000' }} />
+              </button>
+              
+              {/* Focus Mode */}
+              <button
+                onClick={() => startFocusMode(contextMenuTask)}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all active:scale-[0.98]"
+                style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)' }}
+              >
+                <Target className="w-5 h-5" style={{ color: '#8b5cf6' }} />
+                <span className="text-sm font-medium" style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}>
+                  Focus-Modus starten
+                </span>
+                <ArrowRight className="w-4 h-4 ml-auto opacity-40" style={{ color: isDarkMode ? '#fff' : '#000' }} />
+              </button>
+              
+              {/* Add to Pins */}
+              {pinColumns.length > 0 && (
+                <div>
+                  <p className="text-xs font-medium mb-2 px-1" style={{ color: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)' }}>
+                    Zu Pin hinzufügen
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {pinColumns.slice(0, 4).map(col => (
+                      <button
+                        key={col.id}
+                        onClick={() => handleAddToPin(col.id)}
+                        className={`px-3 py-2 rounded-lg text-xs font-medium transition-all active:scale-95 ${
+                          contextMenuTask.pinColumnId === col.id ? 'ring-2' : ''
+                        }`}
+                        style={{ 
+                          backgroundColor: contextMenuTask.pinColumnId === col.id ? `${accent}30` : (isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)'),
+                          color: isDarkMode ? '#fff' : '#1a1a1a',
+                          ringColor: accent,
+                        }}
+                      >
+                        <Pin className="w-3 h-3 inline mr-1.5" style={{ color: accent }} />
+                        {col.title}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {/* Cancel Button */}
+            <div className="px-5 pb-2">
+              <button
+                onClick={() => setContextMenuTask(null)}
+                className="w-full py-3 rounded-xl text-sm font-semibold transition-all active:scale-[0.98]"
+                style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)', color: isDarkMode ? '#fff' : '#1a1a1a' }}
+              >
+                Abbrechen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Task Sheet with AI */}
       {isAddingTask && (
         <div className="fixed inset-0 z-50 flex items-end" onClick={(e) => { if (e.target === e.currentTarget) { setIsAddingTask(false); setNewTaskText(''); } }}>
           <div className="absolute inset-0" style={{ backgroundColor: isDarkMode ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)' }} />
           <div className="relative w-full rounded-t-2xl animate-slide-up" style={{ backgroundColor: isDarkMode ? '#1c1c1e' : '#fff', paddingBottom: 'env(safe-area-inset-bottom, 20px)' }}>
             <div className="flex justify-center py-2"><div className="w-10 h-1 rounded-full" style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)' }} /></div>
+            
+            {/* AI Badge */}
+            <div className="flex items-center justify-center gap-2 pb-2">
+              <Wand2 className="w-4 h-4" style={{ color: accent }} />
+              <span className="text-xs font-medium" style={{ color: accent }}>KI-Erfassung aktiv</span>
+            </div>
+            
             <div className="px-4 pb-4">
               <div className="flex items-center gap-3">
-                <div className="w-5 h-5 rounded-full border-2 flex-shrink-0" style={{ borderColor: accent }} />
-                <input ref={inputRef} type="text" value={newTaskText} onChange={(e) => setNewTaskText(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter') handleAddTask(); if (e.key === 'Escape') { setIsAddingTask(false); setNewTaskText(''); } }}
-                  placeholder={plannerSubView === 'today' ? t('mobile.whatToday', 'Was steht heute an?') : t('mobile.newTask', 'Neue Aufgabe...')}
-                  className="flex-1 text-base bg-transparent border-none outline-none" style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }} autoFocus />
+                {/* Voice Recording Button */}
+                <button
+                  onClick={isRecording ? stopVoiceRecording : startVoiceRecording}
+                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isRecording ? 'animate-pulse' : 'active:scale-95'}`}
+                  style={{ 
+                    backgroundColor: isRecording ? '#ef4444' : `${accent}20`,
+                  }}
+                >
+                  {isRecording ? (
+                    <MicOff className="w-5 h-5 text-white" />
+                  ) : (
+                    <Mic className="w-5 h-5" style={{ color: accent }} />
+                  )}
+                </button>
+                
+                <input 
+                  ref={inputRef} 
+                  type="text" 
+                  value={newTaskText} 
+                  onChange={(e) => setNewTaskText(e.target.value)}
+                  onKeyDown={(e) => { 
+                    if (e.key === 'Enter') handleAITextSubmit(); 
+                    if (e.key === 'Escape') { setIsAddingTask(false); setNewTaskText(''); } 
+                  }}
+                  placeholder={isRecording ? 'Spreche jetzt...' : 'z.B. "Meeting morgen 14 Uhr hohe Prio"'}
+                  className="flex-1 text-base bg-transparent border-none outline-none" 
+                  style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }} 
+                  autoFocus 
+                  disabled={isRecording}
+                />
               </div>
+              
+              {/* Hint */}
+              <p className="text-xs mt-2 px-1" style={{ color: isDarkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)' }}>
+                💡 Die KI erkennt automatisch Datum, Priorität und Dauer
+              </p>
+              
               <div className="flex items-center justify-between mt-3">
                 <span className="text-xs px-2 py-1 rounded-md" style={{ backgroundColor: `${accent}15`, color: accent }}>
                   {plannerSubView === 'today' ? `📅 ${t('mobile.today', 'Heute')}` : `📥 ${t('mobile.inbox', 'Inbox')}`}
                 </span>
-                <button onClick={handleAddTask} disabled={!newTaskText.trim()} className="px-4 py-1.5 rounded-lg text-sm font-semibold disabled:opacity-40" style={{ backgroundColor: accent, color: '#fff' }}>
-                  {t('mobile.add', 'Hinzufügen')}
+                <button 
+                  onClick={handleAITextSubmit} 
+                  disabled={!newTaskText.trim() || isAIProcessing} 
+                  className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-semibold disabled:opacity-40 transition-all active:scale-95" 
+                  style={{ backgroundColor: accent, color: '#fff' }}
+                >
+                  {isAIProcessing ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      Analysiere...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" />
+                      Erstellen
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -1233,6 +1657,7 @@ export function MobileShell() {
 interface TaskCardProps {
   task: Task; accent: string; isDarkMode: boolean; disabled: boolean;
   onTap: () => void; onComplete: (e?: React.MouseEvent) => void; onDelete: () => void;
+  onLongPress: () => void; // NEW: Opens context menu
   isCompletingAnimation: boolean; isDeletingAnimation: boolean;
   isDragging: boolean; isDragOver: boolean;
   onDragStart: (touchY: number) => void; 
@@ -1242,64 +1667,70 @@ interface TaskCardProps {
   registerRef: (el: HTMLDivElement | null) => void;
 }
 
-function TaskCard({ task, accent, isDarkMode, disabled, onTap, onComplete, onDelete, isCompletingAnimation, isDeletingAnimation, isDragging, isDragOver, onDragStart, onDragMove, onDragEnd, getPriorityColor, registerRef }: TaskCardProps) {
+function TaskCard({ task, accent, isDarkMode, disabled, onTap, onComplete, onDelete, onLongPress, isCompletingAnimation, isDeletingAnimation, isDragging, isDragOver, onDragStart, onDragMove, onDragEnd, getPriorityColor, registerRef }: TaskCardProps) {
   const [swipeOffset, setSwipeOffset] = useState(0);
   const [isDraggingSwipe, setIsDraggingSwipe] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
   const isVerticalScroll = useRef(false);
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
-  const [isLongPress, setIsLongPress] = useState(false);
+  const [isLongPressActive, setIsLongPressActive] = useState(false);
   const hasMoved = useRef(false);
   const SWIPE_THRESHOLD = 70;
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (disabled) return;
-    // Prevent text selection on long press
     e.preventDefault();
     touchStartX.current = e.touches[0].clientX;
     touchStartY.current = e.touches[0].clientY;
     isVerticalScroll.current = false;
     hasMoved.current = false;
     setIsDraggingSwipe(true);
-    const startY = e.touches[0].clientY;
+    
+    // Long press opens context menu (not drag)
     longPressTimer.current = setTimeout(() => { 
-      setIsLongPress(true); 
-      onDragStart(startY); 
-      if ('vibrate' in navigator) navigator.vibrate(30); 
-    }, 500);
+      setIsLongPressActive(true);
+      onLongPress(); // Open context menu
+    }, 400);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (disabled || touchStartX.current === null || touchStartY.current === null) return;
     hasMoved.current = true;
     
-    // If in long-press drag mode, track position globally
-    if (isLongPress) {
-      onDragMove(e.touches[0].clientY);
-      return;
+    // Cancel long press if user moves
+    if (longPressTimer.current) { 
+      clearTimeout(longPressTimer.current); 
+      longPressTimer.current = null; 
     }
     
-    if (longPressTimer.current) { clearTimeout(longPressTimer.current); longPressTimer.current = null; }
+    // If long press was triggered, ignore swipe
+    if (isLongPressActive) return;
     
     const deltaX = e.touches[0].clientX - touchStartX.current;
     const deltaY = e.touches[0].clientY - touchStartY.current;
-    if (!isVerticalScroll.current && Math.abs(deltaY) > Math.abs(deltaX) * 0.5) { isVerticalScroll.current = true; return; }
+    if (!isVerticalScroll.current && Math.abs(deltaY) > Math.abs(deltaX) * 0.5) { 
+      isVerticalScroll.current = true; 
+      return; 
+    }
     if (isVerticalScroll.current) return;
     e.preventDefault();
     setSwipeOffset(Math.max(-100, Math.min(100, deltaX)));
   };
 
   const handleTouchEnd = () => {
-    if (longPressTimer.current) { clearTimeout(longPressTimer.current); longPressTimer.current = null; }
-    if (isLongPress) { 
-      onDragEnd(); 
-      setIsLongPress(false); 
+    if (longPressTimer.current) { 
+      clearTimeout(longPressTimer.current); 
+      longPressTimer.current = null; 
     }
-    else {
+    
+    // If long press was active, just reset
+    if (isLongPressActive) {
+      setIsLongPressActive(false);
+    } else {
       setIsDraggingSwipe(false);
-      if (swipeOffset > SWIPE_THRESHOLD) onComplete(); // Swipe right = complete + archive
-      else if (swipeOffset < -SWIPE_THRESHOLD) onDelete(); // Swipe left = delete
+      if (swipeOffset > SWIPE_THRESHOLD) onComplete();
+      else if (swipeOffset < -SWIPE_THRESHOLD) onDelete();
       else if (!hasMoved.current && Math.abs(swipeOffset) < 10) onTap();
     }
     setSwipeOffset(0);
@@ -1561,6 +1992,203 @@ function OnboardingScreen({ step, setStep, onFinish, accent, isDarkMode }: Onboa
             Überspringen
           </button>
         )}
+      </div>
+    </div>
+  );
+}
+
+// ===== FOCUS MODE VIEW =====
+interface FocusModeViewProps {
+  task: Task;
+  onClose: () => void;
+  onComplete: () => void;
+  accent: string;
+  isDarkMode: boolean;
+  timerSeconds: number;
+  timerRunning: boolean;
+  onToggleTimer: () => void;
+  onResetTimer: () => void;
+  onToggleSubtask: (subtaskId: string) => void;
+}
+
+function FocusModeView({ task, onClose, onComplete, accent, isDarkMode, timerSeconds, timerRunning, onToggleTimer, onResetTimer, onToggleSubtask }: FocusModeViewProps) {
+  const hasSubtasks = task.subtasks && task.subtasks.length > 0;
+  const completedSubtasks = task.subtasks?.filter(s => s.completed).length || 0;
+  
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+  
+  const progress = ((25 * 60 - timerSeconds) / (25 * 60)) * 100;
+
+  return (
+    <div 
+      className="fixed inset-0 z-50 flex flex-col"
+      style={{ 
+        backgroundColor: isDarkMode ? '#0a0a0a' : '#fafafa',
+        paddingTop: 'max(env(safe-area-inset-top, 20px), 48px)',
+        paddingBottom: 'env(safe-area-inset-bottom, 20px)',
+      }}
+    >
+      {/* Header */}
+      <header className="flex-shrink-0 flex items-center justify-between px-5 py-4">
+        <button 
+          onClick={onClose} 
+          className="w-10 h-10 rounded-full flex items-center justify-center"
+          style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }}
+        >
+          <X className="w-5 h-5" style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }} />
+        </button>
+        <div className="flex items-center gap-2">
+          <Target className="w-5 h-5" style={{ color: '#8b5cf6' }} />
+          <span className="text-sm font-semibold" style={{ color: '#8b5cf6' }}>Focus Mode</span>
+        </div>
+        <div className="w-10" /> {/* Spacer */}
+      </header>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col items-center justify-center px-6">
+        {/* Timer Circle */}
+        <div className="relative w-64 h-64 mb-8">
+          {/* Background circle */}
+          <svg className="absolute inset-0 w-full h-full -rotate-90">
+            <circle
+              cx="128"
+              cy="128"
+              r="120"
+              fill="none"
+              stroke={isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'}
+              strokeWidth="8"
+            />
+            <circle
+              cx="128"
+              cy="128"
+              r="120"
+              fill="none"
+              stroke={timerRunning ? '#8b5cf6' : accent}
+              strokeWidth="8"
+              strokeLinecap="round"
+              strokeDasharray={2 * Math.PI * 120}
+              strokeDashoffset={2 * Math.PI * 120 * (1 - progress / 100)}
+              style={{ transition: 'stroke-dashoffset 1s linear' }}
+            />
+          </svg>
+          
+          {/* Timer display */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span 
+              className="text-5xl font-bold tracking-tight"
+              style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}
+            >
+              {formatTime(timerSeconds)}
+            </span>
+            <span 
+              className="text-sm mt-2"
+              style={{ color: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)' }}
+            >
+              {timerRunning ? 'Läuft...' : 'Pausiert'}
+            </span>
+          </div>
+        </div>
+
+        {/* Timer Controls */}
+        <div className="flex items-center gap-4 mb-8">
+          <button
+            onClick={onResetTimer}
+            className="w-14 h-14 rounded-full flex items-center justify-center transition-all active:scale-95"
+            style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }}
+          >
+            <RotateCcw className="w-6 h-6" style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }} />
+          </button>
+          
+          <button
+            onClick={onToggleTimer}
+            className="w-20 h-20 rounded-full flex items-center justify-center transition-all active:scale-95 shadow-lg"
+            style={{ 
+              backgroundColor: timerRunning ? '#ef4444' : '#8b5cf6',
+              boxShadow: timerRunning ? '0 0 30px rgba(239, 68, 68, 0.4)' : '0 0 30px rgba(139, 92, 246, 0.4)',
+            }}
+          >
+            {timerRunning ? (
+              <Pause className="w-8 h-8 text-white" />
+            ) : (
+              <Play className="w-8 h-8 text-white ml-1" />
+            )}
+          </button>
+          
+          <button
+            onClick={onComplete}
+            className="w-14 h-14 rounded-full flex items-center justify-center transition-all active:scale-95"
+            style={{ backgroundColor: '#22c55e' }}
+          >
+            <Check className="w-6 h-6 text-white" />
+          </button>
+        </div>
+
+        {/* Task Info */}
+        <div className="w-full max-w-sm px-4">
+          <h1 
+            className="text-xl font-bold text-center mb-4 leading-tight"
+            style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}
+          >
+            {task.title}
+          </h1>
+          
+          {/* Subtasks */}
+          {hasSubtasks && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-medium" style={{ color: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)' }}>
+                  Unteraufgaben
+                </span>
+                <span className="text-xs font-semibold" style={{ color: accent }}>
+                  {completedSubtasks}/{task.subtasks!.length}
+                </span>
+              </div>
+              
+              {/* Progress bar */}
+              <div 
+                className="h-1.5 rounded-full overflow-hidden mb-3"
+                style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}
+              >
+                <div 
+                  className="h-full rounded-full transition-all duration-300"
+                  style={{ width: `${(completedSubtasks / task.subtasks!.length) * 100}%`, backgroundColor: accent }}
+                />
+              </div>
+              
+              {/* Subtask list */}
+              <div className="space-y-1.5 max-h-40 overflow-y-auto">
+                {task.subtasks!.map((subtask, index) => (
+                  <button
+                    key={subtask.id || index}
+                    onClick={() => subtask.id && onToggleSubtask(subtask.id)}
+                    className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all active:scale-[0.98]"
+                    style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' }}
+                  >
+                    <div 
+                      className="w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all"
+                      style={{ 
+                        borderColor: subtask.completed ? '#22c55e' : accent,
+                        backgroundColor: subtask.completed ? '#22c55e' : 'transparent',
+                      }}
+                    >
+                      {subtask.completed && <Check className="w-3 h-3 text-white" />}
+                    </div>
+                    <span 
+                      className={`text-sm ${subtask.completed ? 'line-through opacity-50' : ''}`}
+                      style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }}
+                    >
+                      {subtask.title}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

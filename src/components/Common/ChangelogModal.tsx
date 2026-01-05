@@ -82,6 +82,27 @@ const CHANGELOG: ChangelogEntry[] = [
           de: 'Mobile: Visuelle Rückmeldung beim Erledigen – Success-Animation mit Häkchen und automatischem Schließen',
           en: 'Mobile: Visual feedback when completing – Success animation with checkmark and auto-close'
         }
+      },
+      {
+        type: 'feature',
+        text: {
+          de: 'Mobile: Long-Press Kontext-Menü – Priorität ändern, auf Morgen verschieben, zu Pins hinzufügen, Focus-Modus',
+          en: 'Mobile: Long-press context menu – Change priority, move to tomorrow, add to pins, focus mode'
+        }
+      },
+      {
+        type: 'feature',
+        text: {
+          de: 'Mobile: Focus-Modus – Vollbild-Ansicht mit 25-Min Pomodoro-Timer und Subtask-Checkliste',
+          en: 'Mobile: Focus mode – Full-screen view with 25-min Pomodoro timer and subtask checklist'
+        }
+      },
+      {
+        type: 'feature',
+        text: {
+          de: 'Mobile: KI-Schnellerfassung – Voice-Input und Smart-Text erkennen automatisch Datum, Priorität und Dauer',
+          en: 'Mobile: AI quick capture – Voice input and smart text automatically detect date, priority and duration'
+        }
       }
     ]
   },
