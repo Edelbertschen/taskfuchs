@@ -3115,68 +3115,32 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (isOnlineMode()) {
       console.log('[AppContext] Online mode detected, fetching from database...');
       
-      // AGGRESSIV: Im Online-Modus sind Server-Daten die einzige Wahrheit
-      // Lokale Tasks werden NICHT mehr gemerged um Zombie-Tasks zu verhindern
-      // Nur Tasks die in den letzten 30 Sekunden erstellt wurden, werden behalten
-      const savedLocalTasks = localStorage.getItem('taskfuchs-tasks');
-      const localTasks: Task[] = savedLocalTasks ? JSON.parse(savedLocalTasks) : [];
-      const savedLocalArchived = localStorage.getItem('taskfuchs-archived-tasks');
-      const localArchived: Task[] = savedLocalArchived ? JSON.parse(savedLocalArchived) : [];
+      // ⚠️ RADIKALE LÖSUNG: Server ist die EINZIGE Wahrheit!
+      // KEIN Merge mehr mit lokalen Tasks - das verursacht Zombie-Tasks
+      // LocalStorage wird VOR dem Server-Sync gelöscht, damit keine alten Daten interferieren
+      console.log('[AppContext] 🔄 ONLINE MODE: Server ist die einzige Wahrheit, lösche lokalen Cache...');
+      localStorage.removeItem('taskfuchs-tasks');
+      localStorage.removeItem('taskfuchs-archived-tasks');
       
       syncAPI.getFullData()
         .then((data) => {
-          console.log('[AppContext] Data loaded from database:', data);
+          console.log('[AppContext] ✅ Data loaded from database:', data);
           
           if (data.tasks) {
             const serverTasks = data.tasks as Task[];
-            const serverTaskIds = new Set(serverTasks.map(t => t.id));
-            
-            // NUR lokale Tasks behalten, die:
-            // 1. NICHT auf dem Server sind UND
-            // 2. In den letzten 30 SEKUNDEN erstellt wurden (sehr kurzes Fenster!)
-            // Das verhindert, dass gelöschte Tasks wieder auftauchen
-            const thirtySecondsAgo = Date.now() - 30 * 1000;
-            const localOnlyTasks = localTasks
-              .filter(t => {
-                if (serverTaskIds.has(t.id)) return false;
-                // Nur behalten wenn GERADE EBEN erstellt
-                const createdAt = t.createdAt ? new Date(t.createdAt).getTime() : 0;
-                return createdAt > thirtySecondsAgo;
-              })
-              .map(t => ({
-                ...t,
-                position: Math.floor(t.position || Date.now())
-              }));
-            
-            if (localOnlyTasks.length > 0) {
-              console.log('[AppContext] ⚠️ Gefunden: ' + localOnlyTasks.length + ' gerade erstellte lokale Tasks. Diese werden behalten!');
-              console.log('[AppContext] Lokale Tasks:', localOnlyTasks.map(t => t.title));
-            }
-            
-            // Server-Tasks sind die Wahrheit + nur ganz neue lokale Tasks
-            const mergedTasks = [...serverTasks, ...localOnlyTasks];
-            dispatch({ type: 'SET_TASKS', payload: mergedTasks });
-            
-            // LocalStorage mit Server-Daten aktualisieren (aufräumen)
-            localStorage.setItem('taskfuchs-tasks', JSON.stringify(mergedTasks));
+            // KEINE MERGES! Nur Server-Tasks verwenden
+            dispatch({ type: 'SET_TASKS', payload: serverTasks });
+            // LocalStorage mit Server-Daten befüllen
+            localStorage.setItem('taskfuchs-tasks', JSON.stringify(serverTasks));
+            console.log('[AppContext] 📦 Tasks vom Server geladen:', serverTasks.length);
           }
           if (data.archivedTasks) {
             const serverArchived = data.archivedTasks as Task[];
-            const serverArchivedIds = new Set(serverArchived.map(t => t.id));
-            const thirtySecondsAgo = Date.now() - 30 * 1000;
-            const localOnlyArchived = localArchived
-              .filter(t => {
-                if (serverArchivedIds.has(t.id)) return false;
-                const createdAt = t.createdAt ? new Date(t.createdAt).getTime() : 0;
-                return createdAt > thirtySecondsAgo;
-              })
-              .map(t => ({ ...t, position: Math.floor(t.position || Date.now()) }));
-            
-            const mergedArchived = [...serverArchived, ...localOnlyArchived];
-            dispatch({ type: 'SET_ARCHIVED_TASKS', payload: mergedArchived });
-            
-            // LocalStorage aufräumen
-            localStorage.setItem('taskfuchs-archived-tasks', JSON.stringify(mergedArchived));
+            // KEINE MERGES! Nur Server-Tasks verwenden
+            dispatch({ type: 'SET_ARCHIVED_TASKS', payload: serverArchived });
+            // LocalStorage mit Server-Daten befüllen
+            localStorage.setItem('taskfuchs-archived-tasks', JSON.stringify(serverArchived));
+            console.log('[AppContext] 📦 Archivierte Tasks vom Server geladen:', serverArchived.length);
           }
           if (data.columns) {
             loadedColumns = data.columns;
@@ -4181,35 +4145,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       try {
         const data = await syncAPI.getFullData();
         
-        // Only update if we got valid data
+        // ⚠️ RADIKALE LÖSUNG: Server ist die EINZIGE Wahrheit!
+        // Bei jedem Sync werden Server-Daten IMMER übernommen
         if (data.tasks) {
-          // Compare and only dispatch if different to avoid unnecessary re-renders
-          const currentTaskIds = new Set(state.tasks.map(t => t.id));
-          const serverTaskIds = new Set(data.tasks.map((t: any) => t.id));
-          
-          // Check if there are differences
-          const hasNewTasks = data.tasks.some((t: any) => !currentTaskIds.has(t.id));
-          const hasDeletedTasks = state.tasks.some(t => !serverTaskIds.has(t.id));
-          const hasUpdatedTasks = data.tasks.some((t: any) => {
-            const localTask = state.tasks.find(lt => lt.id === t.id);
-            return localTask && localTask.updatedAt !== t.updatedAt;
-          });
-          
-          if (hasNewTasks || hasDeletedTasks || hasUpdatedTasks) {
-            dispatch({ type: 'SET_TASKS', payload: data.tasks });
-            // LocalStorage mit Server-Daten synchronisieren (gelöschte Tasks entfernen)
-            localStorage.setItem('taskfuchs-tasks', JSON.stringify(data.tasks));
-          }
+          // IMMER Server-Daten setzen - keine Vergleiche, keine Merges
+          dispatch({ type: 'SET_TASKS', payload: data.tasks });
+          // LocalStorage SOFORT mit Server-Daten überschreiben
+          localStorage.setItem('taskfuchs-tasks', JSON.stringify(data.tasks));
         }
         
         if (data.archivedTasks) {
-          const currentIds = new Set(state.archivedTasks.map(t => t.id));
-          const serverIds = new Set(data.archivedTasks.map((t: any) => t.id));
-          if (currentIds.size !== serverIds.size || data.archivedTasks.some((t: any) => !currentIds.has(t.id))) {
-            dispatch({ type: 'SET_ARCHIVED_TASKS', payload: data.archivedTasks });
-            // LocalStorage synchronisieren
-            localStorage.setItem('taskfuchs-archived-tasks', JSON.stringify(data.archivedTasks));
-          }
+          // IMMER Server-Daten setzen
+          dispatch({ type: 'SET_ARCHIVED_TASKS', payload: data.archivedTasks });
+          // LocalStorage SOFORT überschreiben
+          localStorage.setItem('taskfuchs-archived-tasks', JSON.stringify(data.archivedTasks));
         }
       } catch (error) {
         // Silently fail - background sync shouldn't interrupt user

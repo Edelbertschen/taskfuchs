@@ -72,8 +72,8 @@ const CHANGELOG: ChangelogEntry[] = [
       {
         type: 'fix',
         text: {
-          de: 'Mobile: Zombie-Tasks endgültig behoben – LocalStorage wird nach Server-Sync sofort bereinigt',
-          en: 'Mobile: Zombie tasks finally fixed – LocalStorage is cleaned immediately after server sync'
+          de: 'ZOMBIE-TASKS ENDGÜLTIG BEHOBEN – LocalStorage wird VOR Server-Sync gelöscht, kein Merge mehr, Server ist einzige Wahrheit',
+          en: 'ZOMBIE TASKS FINALLY FIXED – LocalStorage cleared before server sync, no more merging, server is single source of truth'
         }
       },
       {
