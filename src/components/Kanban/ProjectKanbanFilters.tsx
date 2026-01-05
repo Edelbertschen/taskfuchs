@@ -7,7 +7,8 @@ import {
   Tag, 
   AlertCircle, 
   CheckCircle,
-  Circle
+  Circle,
+  CalendarOff
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAppTranslation } from '../../utils/i18nHelpers';
@@ -20,7 +21,7 @@ export function ProjectKanbanFilters() {
   const [showPriorityFilter, setShowPriorityFilter] = useState(false);
   const [showTagFilter, setShowTagFilter] = useState(false);
 
-  const { searchQuery, priorityFilters, tagFilters, showCompleted } = viewState.projectKanban;
+  const { searchQuery, priorityFilters, tagFilters, showCompleted, hideScheduledTasks } = viewState.projectKanban;
 
   const handleSearchChange = (query: string) => {
     dispatch({
@@ -58,14 +59,22 @@ export function ProjectKanbanFilters() {
     });
   };
 
+  const handleHideScheduledToggle = () => {
+    dispatch({
+      type: 'SET_PROJECT_KANBAN_HIDE_SCHEDULED',
+      payload: !hideScheduledTasks
+    });
+  };
+
   const clearAllFilters = () => {
     dispatch({ type: 'SET_PROJECT_KANBAN_SEARCH', payload: '' });
     dispatch({ type: 'SET_PROJECT_KANBAN_PRIORITY_FILTERS', payload: [] });
     dispatch({ type: 'SET_PROJECT_KANBAN_TAG_FILTERS', payload: [] });
     dispatch({ type: 'SET_PROJECT_KANBAN_SHOW_COMPLETED', payload: false });
+    dispatch({ type: 'SET_PROJECT_KANBAN_HIDE_SCHEDULED', payload: false });
   };
 
-  const hasActiveFilters = searchQuery || priorityFilters.length > 0 || tagFilters.length > 0 || showCompleted;
+  const hasActiveFilters = searchQuery || priorityFilters.length > 0 || tagFilters.length > 0 || showCompleted || hideScheduledTasks;
 
   const getPriorityColor = (priority: TaskPriority) => {
     switch (priority) {
@@ -253,6 +262,20 @@ export function ProjectKanbanFilters() {
           <span className="text-sm font-medium">{common.completed()}</span>
         </button>
 
+        {/* Hide Scheduled Tasks Toggle - Things3 style "Focus" */}
+        <button
+          onClick={handleHideScheduledToggle}
+          className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-colors ${
+            hideScheduledTasks
+              ? 'bg-amber-50 border-amber-300 text-amber-700 dark:bg-amber-900/30 dark:border-amber-600 dark:text-amber-400'
+              : 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600'
+          }`}
+          title={common.hideScheduledTooltip?.() || 'Zeige nur heutige und unterminierte Aufgaben'}
+        >
+          <CalendarOff className="w-4 h-4" />
+          <span className="text-sm font-medium">{common.hideScheduled?.() || 'Nur Heute'}</span>
+        </button>
+
         {/* Clear All Filters */}
         {hasActiveFilters && (
           <button
@@ -320,6 +343,19 @@ export function ProjectKanbanFilters() {
               <button
                 onClick={handleShowCompletedToggle}
                 className="ml-1 text-green-600 hover:text-green-800"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          )}
+          
+          {hideScheduledTasks && (
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-600">
+              <CalendarOff className="w-3 h-3 mr-1" />
+              {common.hideScheduled?.() || 'Nur Heute'}
+              <button
+                onClick={handleHideScheduledToggle}
+                className="ml-1 text-amber-600 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-300"
               >
                 <X className="w-3 h-3" />
               </button>

@@ -166,6 +166,7 @@ type AppAction =
   | { type: 'SET_PROJECT_KANBAN_PRIORITY_FILTERS'; payload: TaskPriority[] }
   | { type: 'SET_PROJECT_KANBAN_TAG_FILTERS'; payload: string[] }
   | { type: 'SET_PROJECT_KANBAN_SHOW_COMPLETED'; payload: boolean }
+  | { type: 'SET_PROJECT_KANBAN_HIDE_SCHEDULED'; payload: boolean }
   | { type: 'SET_PROJECT_KANBAN_VIEW_TYPE'; payload: 'board' | 'list' }
   | { type: 'ADD_PROJECT_KANBAN_COLUMN'; payload: { projectId: string; title: string; color?: string } }
   | { type: 'ADD_PROJECT_KANBAN_COLUMN_WITH_ID'; payload: { id: string; projectId: string; title: string; color: string; order: number } }
@@ -278,6 +279,7 @@ const initialState: AppState = {
       priorityFilters: [],
       tagFilters: [],
       showCompleted: false,
+      hideScheduledTasks: false,
       viewType: 'board',
     },
   },
@@ -1876,6 +1878,18 @@ function appReducer(state: AppState, action: AppAction): AppState {
           projectKanban: {
             ...state.viewState.projectKanban,
             showCompleted: action.payload,
+          },
+        },
+      };
+    
+    case 'SET_PROJECT_KANBAN_HIDE_SCHEDULED':
+      return {
+        ...state,
+        viewState: {
+          ...state.viewState,
+          projectKanban: {
+            ...state.viewState.projectKanban,
+            hideScheduledTasks: action.payload,
           },
         },
       };

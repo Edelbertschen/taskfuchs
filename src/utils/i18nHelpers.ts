@@ -114,6 +114,7 @@ export const useAppTranslation = () => {
     microsoftAuthModal: createNamespaceWrapper('microsoft_auth_modal'),
     floatingAddButton: createNamespaceWrapper('floating_add_button'),
     tasks: createNamespaceWrapper('tasks'),
+    common: createNamespaceWrapper('common'),
     settings_appearance: createNamespaceWrapper('settings_appearance'),
   settings_notes: createNamespaceWrapper('settings_notes'),
   settings_sidebar: createNamespaceWrapper('settings_sidebar'),

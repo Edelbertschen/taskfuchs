@@ -54,6 +54,13 @@ const CHANGELOG: ChangelogEntry[] = [
           de: 'Z-Index Problem bei Multiselect in Inbox behoben – Zuweisen-Dropdown jetzt über Task-Cards',
           en: 'Z-Index issue with multiselect in Inbox fixed – Assign dropdown now above task cards'
         }
+      },
+      {
+        type: 'feature',
+        text: {
+          de: 'Projekte: "Nur Heute" Filter – Blendet terminierte Aufgaben aus (Things3-Style) für mentale Ruhe',
+          en: 'Projects: "Today Only" filter – Hides scheduled tasks (Things3-style) for mental clarity'
+        }
       }
     ]
   },

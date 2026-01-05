@@ -596,6 +596,7 @@ export interface ProjectKanbanState {
   priorityFilters: TaskPriority[];
   tagFilters: string[];
   showCompleted: boolean;
+  hideScheduledTasks: boolean; // Hide tasks with future dates (show only today and no-date tasks)
   viewType: 'board' | 'list'; // Toggle between board and list view
 }
 

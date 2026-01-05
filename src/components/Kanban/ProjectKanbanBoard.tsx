@@ -936,6 +936,26 @@ export function ProjectKanbanBoard() {
       return false;
     }
 
+    // Apply "hide scheduled tasks" filter - Things3 style focus
+    // Show only: tasks without a date OR tasks scheduled for today
+    if (state.viewState.projectKanban.hideScheduledTasks) {
+      const today = startOfDay(new Date());
+      
+      // If task has no reminder date, show it (unscheduled task)
+      if (!task.reminderDate) {
+        // Task has no date - show it
+      } else {
+        // Task has a date - check if it's today
+        const taskDate = startOfDay(new Date(task.reminderDate));
+        const isToday = taskDate.getTime() === today.getTime();
+        
+        if (!isToday) {
+          // Task is scheduled for a future date - hide it
+          return false;
+        }
+      }
+    }
+
     return true;
   });
 
