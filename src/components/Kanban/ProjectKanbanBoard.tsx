@@ -1729,6 +1729,8 @@ export function ProjectKanbanBoard() {
   const handleClearAllProjectFilters = () => {
     dispatch({ type: 'SET_PROJECT_KANBAN_PRIORITY_FILTERS', payload: [] });
     dispatch({ type: 'SET_PROJECT_KANBAN_TAG_FILTERS', payload: [] });
+    dispatch({ type: 'SET_PROJECT_KANBAN_HIDE_SCHEDULED', payload: false });
+    dispatch({ type: 'SET_PROJECT_KANBAN_SHOW_COMPLETED', payload: false });
   };
 
   const getTaskCountForProjectPriority = (priority: string): number => {
@@ -2162,7 +2164,7 @@ export function ProjectKanbanBoard() {
                         </div>
                         
                         <div className="flex items-center space-x-2">
-                          {(state.viewState.projectKanban.priorityFilters.length > 0 || state.viewState.projectKanban.tagFilters.length > 0) && (
+                          {(state.viewState.projectKanban.priorityFilters.length > 0 || state.viewState.projectKanban.tagFilters.length > 0 || state.viewState.projectKanban.hideScheduledTasks || state.viewState.projectKanban.showCompleted) && (
                             <button
                               onClick={handleClearAllProjectFilters}
                               className="flex items-center space-x-1 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 px-2 py-1 rounded-lg"
@@ -2270,6 +2272,43 @@ export function ProjectKanbanBoard() {
                               );
                             })()}
                           </div>
+                        </div>
+
+                        {/* Quick Toggles - Nur Heute (Hide Scheduled) & Show Completed */}
+                        <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                          {/* Hide Scheduled / Nur Heute Toggle */}
+                          <button
+                            onClick={() => dispatch({ type: 'SET_PROJECT_KANBAN_HIDE_SCHEDULED', payload: !state.viewState.projectKanban.hideScheduledTasks })}
+                            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                              state.viewState.projectKanban.hideScheduledTasks
+                                ? 'bg-amber-500 text-white shadow-sm'
+                                : (isDarkMode ? 'bg-gray-600/60 text-gray-300 hover:bg-gray-500/60' : 'bg-gray-200/80 text-gray-700 hover:bg-gray-300/80')
+                            }`}
+                            style={state.viewState.projectKanban.hideScheduledTasks ? { 
+                              boxShadow: '0 0 8px rgba(245, 158, 11, 0.4)'
+                            } : {}}
+                            title="Zeige nur heutige und unterminierte Aufgaben"
+                          >
+                            <Clock className="w-3.5 h-3.5" />
+                            <span>Nur Heute</span>
+                          </button>
+
+                          {/* Show Completed Toggle */}
+                          <button
+                            onClick={() => dispatch({ type: 'SET_PROJECT_KANBAN_SHOW_COMPLETED', payload: !state.viewState.projectKanban.showCompleted })}
+                            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                              state.viewState.projectKanban.showCompleted
+                                ? 'bg-green-500 text-white shadow-sm'
+                                : (isDarkMode ? 'bg-gray-600/60 text-gray-300 hover:bg-gray-500/60' : 'bg-gray-200/80 text-gray-700 hover:bg-gray-300/80')
+                            }`}
+                            style={state.viewState.projectKanban.showCompleted ? { 
+                              boxShadow: '0 0 8px rgba(34, 197, 94, 0.4)'
+                            } : {}}
+                            title="Erledigte Aufgaben anzeigen"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                            <span>Erledigt</span>
+                          </button>
                         </div>
                       </div>
                     </div>
