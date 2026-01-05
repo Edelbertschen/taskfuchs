@@ -2185,7 +2185,7 @@ export function ProjectKanbanBoard() {
                       </div>
 
                       <div className="space-y-4">
-                        {/* Priority Filters - Compact buttons */}
+                        {/* Priority Filters - Single Selection with ALL button (like Pins) */}
                         <div>
                           <label className={`block text-xs font-medium mb-2 flex items-center space-x-2 ${
                             isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? 'text-gray-300' : 'text-gray-900')
@@ -2194,22 +2194,37 @@ export function ProjectKanbanBoard() {
                             <span>Prioritäten</span>
                           </label>
                           <div className="flex gap-1">
-                            {priorities.map((priority) => {
-                              const isActive = state.viewState.projectKanban.priorityFilters.includes(priority.value as any);
-                              const taskCount = getTaskCountForProjectPriority(priority.value);
-                              const priorityColors: Record<string, string> = {
-                                'high': '#ef4444',
-                                'medium': '#f59e0b', 
-                                'low': '#10b981',
-                                'none': '#9ca3af'
-                              };
-                              const color = priorityColors[priority.value] || state.preferences.accentColor;
-                              
+                            {/* ALL Button */}
+                            <button
+                              onClick={() => dispatch({ type: 'SET_PROJECT_KANBAN_PRIORITY_FILTERS', payload: [] })}
+                              className={`h-8 px-2 rounded-md text-xs font-bold transition-all duration-200 ${
+                                state.viewState.projectKanban.priorityFilters.length === 0
+                                  ? 'bg-white text-gray-800 shadow-lg scale-105'
+                                  : (isDarkMode ? 'bg-gray-600/60 text-gray-300 hover:bg-gray-500/60' : 'bg-gray-200/80 text-gray-600 hover:bg-gray-300/80') + ' hover:scale-105'
+                              }`}
+                            >
+                              ALL
+                            </button>
+                            {[
+                              { key: 'high', label: 'H', color: '#ef4444' },
+                              { key: 'medium', label: 'M', color: '#f59e0b' },
+                              { key: 'low', label: 'L', color: '#10b981' },
+                              { key: 'none', label: '–', color: '#9ca3af' }
+                            ].map(({ key, label, color }) => {
+                              const isActive = state.viewState.projectKanban.priorityFilters.length === 1 && 
+                                               state.viewState.projectKanban.priorityFilters[0] === key;
                               return (
                                 <button
-                                  key={priority.value}
-                                  onClick={() => handleToggleProjectPriority(priority.value)}
-                                  className={`h-8 px-2 text-xs font-bold rounded-md transition-all duration-200 ${
+                                  key={key}
+                                  onClick={() => {
+                                    // Single selection: toggle between this priority and ALL
+                                    if (isActive) {
+                                      dispatch({ type: 'SET_PROJECT_KANBAN_PRIORITY_FILTERS', payload: [] });
+                                    } else {
+                                      dispatch({ type: 'SET_PROJECT_KANBAN_PRIORITY_FILTERS', payload: [key as any] });
+                                    }
+                                  }}
+                                  className={`h-8 px-2 rounded-md text-xs font-bold transition-all duration-200 ${
                                     isActive
                                       ? 'text-white shadow-lg scale-105'
                                       : 'text-white/80 hover:text-white hover:scale-105'
@@ -2218,9 +2233,8 @@ export function ProjectKanbanBoard() {
                                     backgroundColor: isActive ? color : `${color}60`,
                                     boxShadow: isActive ? `0 0 12px ${color}40` : 'none'
                                   }}
-                                  title={`${priority.label} (${taskCount})`}
                                 >
-                                  {priority.label.charAt(0)}
+                                  {label}
                                 </button>
                               );
                             })}

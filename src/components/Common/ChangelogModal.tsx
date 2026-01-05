@@ -61,6 +61,13 @@ const CHANGELOG: ChangelogEntry[] = [
           de: 'Projekte: "Jederzeit" Filter – Blendet geplante Aufgaben aus, zeigt nur heutige und ungeplante Aufgaben (Things3-Style)',
           en: 'Projects: "Anytime" filter – Hides scheduled tasks, shows only today\'s and unscheduled tasks (Things3-style)'
         }
+      },
+      {
+        type: 'improvement',
+        text: {
+          de: 'Einheitlicher Prioritäten-Filter in Planer, Pins und Projekten – Single-Selection mit ALL/H/M/L/– Buttons',
+          en: 'Unified priority filter in Planner, Pins and Projects – Single-selection with ALL/H/M/L/– buttons'
+        }
       }
     ]
   },
