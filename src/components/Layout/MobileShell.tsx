@@ -4,7 +4,7 @@ import {
   Plus, Check, Archive, Inbox, Sun, Sparkles, Filter, Undo2,
   GripVertical, LogOut, RefreshCw, X, ChevronRight, ChevronLeft,
   FileText, ListChecks, Zap, Heart, Eye, EyeOff, Tag, Pin,
-  Mic, MicOff, Timer, Play, Pause, RotateCcw, Calendar, ArrowRight,
+  Timer, Play, Pause, RotateCcw, Calendar, ArrowRight,
   Flag, AlertCircle, Circle, Target, Send, Wand2
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
@@ -54,12 +54,8 @@ export function MobileShell() {
   const [focusTimerRunning, setFocusTimerRunning] = useState(false);
   const focusTimerRef = useRef<NodeJS.Timeout | null>(null);
   
-  // AI Voice/Text Input
-  const [isRecording, setIsRecording] = useState(false);
+  // AI Text Input
   const [isAIProcessing, setIsAIProcessing] = useState(false);
-  const [aiInputMode, setAiInputMode] = useState<'text' | 'voice'>('text');
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
   
   // Column swipe state
   const [columnSwipeOffset, setColumnSwipeOffset] = useState(0);
@@ -742,89 +738,6 @@ export function MobileShell() {
   }, [newTaskText, isAIProcessing, isOffline, state.columns, state.tags, plannerSubView, dispatch, handleAddTask]);
 
   // Speech Recognition reference
-  const speechRecognitionRef = useRef<any>(null);
-
-  const startVoiceRecording = useCallback(async () => {
-    // Use Web Speech API directly - much simpler and works on iOS/Android
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    
-    if (!SpeechRecognition) {
-      console.error('Speech recognition not supported in this browser');
-      alert('Spracherkennung wird in diesem Browser nicht unterstützt. Bitte verwende Chrome, Safari oder Edge.');
-      return;
-    }
-    
-    try {
-      const recognition = new SpeechRecognition();
-      speechRecognitionRef.current = recognition;
-      
-      recognition.lang = state.preferences.language === 'en' ? 'en-US' : 'de-DE';
-      recognition.interimResults = true; // Show interim results while speaking
-      recognition.continuous = true; // Keep listening until stopped
-      recognition.maxAlternatives = 1;
-      
-      recognition.onstart = () => {
-        setIsRecording(true);
-        if ('vibrate' in navigator) navigator.vibrate(20);
-      };
-      
-      recognition.onresult = (event: any) => {
-        // Get the latest transcript
-        let finalTranscript = '';
-        let interimTranscript = '';
-        
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcript = event.results[i][0].transcript;
-          if (event.results[i].isFinal) {
-            finalTranscript += transcript;
-          } else {
-            interimTranscript += transcript;
-          }
-        }
-        
-        // Update text field with what user is saying
-        if (finalTranscript) {
-          setNewTaskText(prev => (prev + ' ' + finalTranscript).trim());
-        } else if (interimTranscript) {
-          // Show interim results in placeholder or append temporarily
-          setNewTaskText(prev => {
-            const base = prev.replace(/\s*\[.*\]$/, ''); // Remove previous interim
-            return base ? `${base} [${interimTranscript}]` : `[${interimTranscript}]`;
-          });
-        }
-      };
-      
-      recognition.onerror = (event: any) => {
-        console.error('Speech recognition error:', event.error);
-        setIsRecording(false);
-        
-        if (event.error === 'not-allowed') {
-          alert('Mikrofonzugriff wurde verweigert. Bitte erlaube den Zugriff in den Browser-Einstellungen.');
-        }
-      };
-      
-      recognition.onend = () => {
-        setIsRecording(false);
-        // Clean up interim markers
-        setNewTaskText(prev => prev.replace(/\s*\[.*\]$/, '').trim());
-        if ('vibrate' in navigator) navigator.vibrate(10);
-      };
-      
-      recognition.start();
-    } catch (error) {
-      console.error('Failed to start speech recognition:', error);
-      alert('Spracherkennung konnte nicht gestartet werden.');
-    }
-  }, [state.preferences.language]);
-
-  const stopVoiceRecording = useCallback(() => {
-    if (speechRecognitionRef.current && isRecording) {
-      speechRecognitionRef.current.stop();
-      setIsRecording(false);
-      if ('vibrate' in navigator) navigator.vibrate(10);
-    }
-  }, [isRecording]);
-
   // Onboarding Screen
   if (showOnboarding) {
     return <OnboardingScreen step={onboardingStep} setStep={setOnboardingStep} onFinish={finishOnboarding} accent={accent} isDarkMode={isDarkMode} />;
@@ -1420,38 +1333,20 @@ export function MobileShell() {
             </div>
             
             <div className="px-4 pb-4">
-              <div className="flex items-center gap-3">
-                {/* Voice Recording Button */}
-                <button
-                  onClick={isRecording ? stopVoiceRecording : startVoiceRecording}
-                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isRecording ? 'animate-pulse' : 'active:scale-95'}`}
-                  style={{ 
-                    backgroundColor: isRecording ? '#ef4444' : `${accent}20`,
-                  }}
-                >
-                  {isRecording ? (
-                    <MicOff className="w-5 h-5 text-white" />
-                  ) : (
-                    <Mic className="w-5 h-5" style={{ color: accent }} />
-                  )}
-                </button>
-                
-                <input 
-                  ref={inputRef} 
-                  type="text" 
-                  value={newTaskText} 
-                  onChange={(e) => setNewTaskText(e.target.value)}
-                  onKeyDown={(e) => { 
-                    if (e.key === 'Enter') handleAITextSubmit(); 
-                    if (e.key === 'Escape') { setIsAddingTask(false); setNewTaskText(''); } 
-                  }}
-                  placeholder={isRecording ? 'Spreche jetzt...' : 'z.B. "Meeting morgen 14 Uhr hohe Prio"'}
-                  className="flex-1 text-base bg-transparent border-none outline-none" 
-                  style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }} 
-                  autoFocus 
-                  disabled={isRecording}
-                />
-              </div>
+              <input 
+                ref={inputRef} 
+                type="text" 
+                value={newTaskText} 
+                onChange={(e) => setNewTaskText(e.target.value)}
+                onKeyDown={(e) => { 
+                  if (e.key === 'Enter') handleAITextSubmit(); 
+                  if (e.key === 'Escape') { setIsAddingTask(false); setNewTaskText(''); } 
+                }}
+                placeholder='z.B. "Meeting morgen 14 Uhr hohe Prio"'
+                className="w-full text-base bg-transparent border-none outline-none mb-2" 
+                style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }} 
+                autoFocus 
+              />
               
               {/* Hint */}
               <p className="text-xs mt-2 px-1" style={{ color: isDarkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)' }}>
@@ -1465,7 +1360,7 @@ export function MobileShell() {
                 <div className="flex items-center gap-2">
                   {/* Cancel Button */}
                   <button 
-                    onClick={() => { setIsAddingTask(false); setNewTaskText(''); if (isRecording) stopVoiceRecording(); }}
+                    onClick={() => { setIsAddingTask(false); setNewTaskText(''); }}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all active:scale-95" 
                     style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)', color: isDarkMode ? '#fff' : '#1a1a1a' }}
                   >

@@ -23,13 +23,6 @@ const CHANGELOG: ChangelogEntry[] = [
       {
         type: 'fix',
         text: {
-          de: 'Mobile: Spracherkennung komplett überarbeitet – Diktieren funktioniert jetzt zuverlässig mit Live-Transkription',
-          en: 'Mobile: Speech recognition completely reworked – Dictation now works reliably with live transcription'
-        }
-      },
-      {
-        type: 'fix',
-        text: {
           de: 'ZOMBIE-TASKS ENDGÜLTIG BEHOBEN – LocalStorage wird VOR Server-Sync gelöscht, Server ist einzige Wahrheit',
           en: 'ZOMBIE TASKS FINALLY FIXED – LocalStorage cleared before server sync, server is single source of truth'
         }
@@ -91,8 +84,8 @@ const CHANGELOG: ChangelogEntry[] = [
       {
         type: 'feature',
         text: {
-          de: 'Mobile: KI-Schnellerfassung – Voice-Input und Smart-Text erkennen automatisch Datum, Priorität und Dauer',
-          en: 'Mobile: AI quick capture – Voice input and smart text automatically detect date, priority and duration'
+          de: 'Mobile: KI-Schnellerfassung – Smart-Text erkennt automatisch Datum, Priorität und Dauer',
+          en: 'Mobile: AI quick capture – Smart text automatically detects date, priority and duration'
         }
       }
     ]
