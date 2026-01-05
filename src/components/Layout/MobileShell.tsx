@@ -133,16 +133,22 @@ export function MobileShell() {
 
   // Shared refresh function for pull-to-refresh and auto-refresh
   // Syncs all data silently without UI interruption
+  // WICHTIG: LocalStorage wird DIREKT bereinigt um Zombie-Tasks zu verhindern
   const refreshFromServer = useCallback(async () => {
     try {
       const data = await syncAPI.getFullData();
       
       // Sync all data types for complete consistency
+      // ZOMBIE-FIX: Server-Daten sind die einzige Wahrheit - localStorage sofort bereinigen
       if (data.tasks) {
         dispatch({ type: 'SET_TASKS', payload: data.tasks });
+        // WICHTIG: LocalStorage SOFORT mit Server-Daten überschreiben
+        localStorage.setItem('taskfuchs-tasks', JSON.stringify(data.tasks));
       }
       if (data.archivedTasks) {
         dispatch({ type: 'SET_ARCHIVED_TASKS', payload: data.archivedTasks });
+        // WICHTIG: LocalStorage SOFORT mit Server-Daten überschreiben
+        localStorage.setItem('taskfuchs-archived-tasks', JSON.stringify(data.archivedTasks));
       }
       if (data.columns) {
         // Merge date columns (generated) with project columns (from server)
@@ -1207,9 +1213,17 @@ export function MobileShell() {
         @keyframes slide-out-right { to { transform: translateX(100%); opacity: 0; } }
         @keyframes slide-out-left { to { transform: translateX(-100%); opacity: 0; } }
         @keyframes gentle-bounce { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-8px) rotate(2deg); } }
+        @keyframes success-pop { 
+          0% { transform: scale(0); opacity: 0; } 
+          50% { transform: scale(1.2); } 
+          100% { transform: scale(1); opacity: 1; } 
+        }
+        @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
         .animate-slide-up { animation: slide-up 250ms cubic-bezier(0.2, 0, 0, 1); }
         .animate-slide-out-right { animation: slide-out-right 250ms forwards; }
         .animate-slide-out-left { animation: slide-out-left 250ms forwards; }
+        .animate-success-pop { animation: success-pop 400ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        .animate-fade-in { animation: fade-in 200ms ease-out; }
       `}</style>
     </div>
   );
@@ -1355,20 +1369,62 @@ interface TaskDetailViewProps {
 }
 
 function TaskDetailView({ task, onClose, accent, isDarkMode, onComplete, isOffline, onToggleSubtask }: TaskDetailViewProps) {
+  const [isCompleting, setIsCompleting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const hasSubtasks = task.subtasks && task.subtasks.length > 0;
   const completedSubtasks = task.subtasks?.filter(s => s.completed).length || 0;
 
+  // Handle complete with animation
+  const handleCompleteWithAnimation = () => {
+    if (isOffline || task.completed) return;
+    
+    // Start animation
+    setIsCompleting(true);
+    if ('vibrate' in navigator) navigator.vibrate([10, 50, 20]);
+    
+    // Show success state after button animation
+    setTimeout(() => {
+      setShowSuccess(true);
+      onComplete();
+      
+      // Close after success animation
+      setTimeout(() => {
+        onClose();
+      }, 600);
+    }, 200);
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex flex-col" style={{ backgroundColor: isDarkMode ? '#0a0a0a' : '#fafafa' }}>
+    <div 
+      className={`fixed inset-0 z-50 flex flex-col transition-all duration-300 ${showSuccess ? 'scale-95 opacity-0' : 'scale-100 opacity-100'}`} 
+      style={{ backgroundColor: isDarkMode ? '#0a0a0a' : '#fafafa' }}
+    >
+      {/* Success Overlay */}
+      {showSuccess && (
+        <div className="absolute inset-0 z-60 flex items-center justify-center bg-green-500/20 animate-fade-in">
+          <div className="w-24 h-24 rounded-full bg-green-500 flex items-center justify-center animate-success-pop shadow-2xl">
+            <Check className="w-12 h-12 text-white" strokeWidth={3} />
+          </div>
+        </div>
+      )}
+      
       {/* Header */}
       <header className="flex-shrink-0 flex items-center justify-between px-4 py-3" style={{ paddingTop: 'calc(max(env(safe-area-inset-top, 20px), 48px) + 8px)' }}>
         <button onClick={onClose} className="p-2 -ml-2 rounded-full" style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }}>
           <X className="w-5 h-5" style={{ color: isDarkMode ? '#fff' : '#1a1a1a' }} />
         </button>
-        <button onClick={onComplete} disabled={isOffline} className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold disabled:opacity-50"
-          style={{ backgroundColor: task.completed ? '#22c55e' : accent, color: '#fff' }}>
-          <Check className="w-4 h-4" />
-          {task.completed ? 'Erledigt' : 'Erledigen'}
+        <button 
+          onClick={handleCompleteWithAnimation} 
+          disabled={isOffline || isCompleting} 
+          className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold disabled:opacity-50 transition-all duration-200 ${isCompleting ? 'scale-110' : 'active:scale-95'}`}
+          style={{ 
+            backgroundColor: task.completed || showSuccess ? '#22c55e' : accent, 
+            color: '#fff',
+            boxShadow: isCompleting ? '0 0 20px rgba(34, 197, 94, 0.5)' : 'none'
+          }}
+        >
+          <Check className={`w-4 h-4 transition-transform duration-200 ${isCompleting ? 'scale-125' : ''}`} />
+          {task.completed ? 'Erledigt' : (isCompleting ? '✓' : 'Erledigen')}
         </button>
       </header>
 

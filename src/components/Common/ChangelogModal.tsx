@@ -68,6 +68,20 @@ const CHANGELOG: ChangelogEntry[] = [
           de: 'Einheitlicher Prioritäten-Filter in Planer, Pins und Projekten – Single-Selection mit ALL/H/M/L/– Buttons',
           en: 'Unified priority filter in Planner, Pins and Projects – Single-selection with ALL/H/M/L/– buttons'
         }
+      },
+      {
+        type: 'fix',
+        text: {
+          de: 'Mobile: Zombie-Tasks endgültig behoben – LocalStorage wird nach Server-Sync sofort bereinigt',
+          en: 'Mobile: Zombie tasks finally fixed – LocalStorage is cleaned immediately after server sync'
+        }
+      },
+      {
+        type: 'improvement',
+        text: {
+          de: 'Mobile: Visuelle Rückmeldung beim Erledigen – Success-Animation mit Häkchen und automatischem Schließen',
+          en: 'Mobile: Visual feedback when completing – Success animation with checkmark and auto-close'
+        }
       }
     ]
   },
