@@ -639,17 +639,17 @@ export function MobileShell() {
               )}
             </div>
             
-            {/* Right: All action buttons */}
-            <div className="flex items-center gap-1">
+            {/* Right: All action buttons - uniformly sized and centered */}
+            <div className="flex items-center gap-1.5">
               {/* Tag filter */}
               <button 
                 onClick={() => setShowTagFilter(!showTagFilter)} 
-                className="p-1.5 rounded-lg relative"
+                className="w-9 h-9 flex items-center justify-center rounded-xl relative active:scale-95 transition-transform"
                 style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }}
               >
-                <Tag className="w-4 h-4" style={{ color: activeTagFilters.length > 0 ? accent : (isDarkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.3)') }} />
+                <Tag className="w-4 h-4" style={{ color: activeTagFilters.length > 0 ? accent : (isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)') }} />
                 {activeTagFilters.length > 0 && (
-                  <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full text-[9px] font-bold flex items-center justify-center text-white" style={{ backgroundColor: accent }}>
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center text-white" style={{ backgroundColor: accent }}>
                     {activeTagFilters.length}
                   </span>
                 )}
@@ -657,19 +657,19 @@ export function MobileShell() {
               {/* Toggle completed tasks */}
               <button 
                 onClick={() => dispatch({ type: 'TOGGLE_SHOW_COMPLETED_TASKS' })} 
-                className="p-1.5 rounded-lg"
+                className="w-9 h-9 flex items-center justify-center rounded-xl active:scale-95 transition-transform"
                 style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }}
               >
                 {showCompletedTasks ? (
                   <Eye className="w-4 h-4" style={{ color: accent }} />
                 ) : (
-                  <EyeOff className="w-4 h-4" style={{ color: isDarkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.3)' }} />
+                  <EyeOff className="w-4 h-4" style={{ color: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)' }} />
                 )}
               </button>
               {/* Logout */}
               <button 
                 onClick={() => setShowLogoutConfirm(true)} 
-                className="p-1.5 rounded-lg"
+                className="w-9 h-9 flex items-center justify-center rounded-xl active:scale-95 transition-transform"
                 style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }}
               >
                 <LogOut className="w-4 h-4" style={{ color: isDarkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.5)' }} />
