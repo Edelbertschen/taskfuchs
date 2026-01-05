@@ -3816,7 +3816,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
               </div>
             </div>
             
-            <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-750">
+            <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
               <button
                 onClick={() => setShowMarkdownHelp(false)}
                 className="px-4 py-2 text-white rounded-lg transition-colors hover:opacity-90"
