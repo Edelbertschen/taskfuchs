@@ -47,6 +47,13 @@ const CHANGELOG: ChangelogEntry[] = [
           de: 'LocalStorage-Bereinigung nach Server-Sync – Verhindert dass gelöschte Tasks wieder erscheinen',
           en: 'LocalStorage cleanup after server sync – Prevents deleted tasks from reappearing'
         }
+      },
+      {
+        type: 'fix',
+        text: {
+          de: 'Z-Index Problem bei Multiselect in Inbox behoben – Zuweisen-Dropdown jetzt über Task-Cards',
+          en: 'Z-Index issue with multiselect in Inbox fixed – Assign dropdown now above task cards'
+        }
       }
     ]
   },
