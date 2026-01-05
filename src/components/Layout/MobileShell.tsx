@@ -741,56 +741,85 @@ export function MobileShell() {
     }
   }, [newTaskText, isAIProcessing, isOffline, state.columns, state.tags, plannerSubView, dispatch, handleAddTask]);
 
+  // Speech Recognition reference
+  const speechRecognitionRef = useRef<any>(null);
+
   const startVoiceRecording = useCallback(async () => {
+    // Use Web Speech API directly - much simpler and works on iOS/Android
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    
+    if (!SpeechRecognition) {
+      console.error('Speech recognition not supported in this browser');
+      alert('Spracherkennung wird in diesem Browser nicht unterstützt. Bitte verwende Chrome, Safari oder Edge.');
+      return;
+    }
+    
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
+      const recognition = new SpeechRecognition();
+      speechRecognitionRef.current = recognition;
       
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) audioChunksRef.current.push(e.data);
+      recognition.lang = state.preferences.language === 'en' ? 'en-US' : 'de-DE';
+      recognition.interimResults = true; // Show interim results while speaking
+      recognition.continuous = true; // Keep listening until stopped
+      recognition.maxAlternatives = 1;
+      
+      recognition.onstart = () => {
+        setIsRecording(true);
+        if ('vibrate' in navigator) navigator.vibrate(20);
       };
       
-      mediaRecorder.onstop = async () => {
-        stream.getTracks().forEach(track => track.stop());
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+      recognition.onresult = (event: any) => {
+        // Get the latest transcript
+        let finalTranscript = '';
+        let interimTranscript = '';
         
-        // Convert to text using Web Speech API or send to backend
-        // For now, we'll use the Web Speech API
-        try {
-          const recognition = new (window.SpeechRecognition || (window as any).webkitSpeechRecognition)();
-          recognition.lang = state.preferences.language === 'en' ? 'en-US' : 'de-DE';
-          recognition.interimResults = false;
-          
-          recognition.onresult = (event: any) => {
-            const transcript = event.results[0][0].transcript;
-            setNewTaskText(transcript);
-            setAiInputMode('text');
-          };
-          
-          recognition.onerror = () => {
-            console.error('Speech recognition failed');
-          };
-          
-          // Start recognition (will use microphone again briefly)
-          recognition.start();
-        } catch (e) {
-          console.error('Speech recognition not supported');
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript;
+          } else {
+            interimTranscript += transcript;
+          }
+        }
+        
+        // Update text field with what user is saying
+        if (finalTranscript) {
+          setNewTaskText(prev => (prev + ' ' + finalTranscript).trim());
+        } else if (interimTranscript) {
+          // Show interim results in placeholder or append temporarily
+          setNewTaskText(prev => {
+            const base = prev.replace(/\s*\[.*\]$/, ''); // Remove previous interim
+            return base ? `${base} [${interimTranscript}]` : `[${interimTranscript}]`;
+          });
         }
       };
       
-      mediaRecorder.start();
-      setIsRecording(true);
-      if ('vibrate' in navigator) navigator.vibrate(20);
+      recognition.onerror = (event: any) => {
+        console.error('Speech recognition error:', event.error);
+        setIsRecording(false);
+        
+        if (event.error === 'not-allowed') {
+          alert('Mikrofonzugriff wurde verweigert. Bitte erlaube den Zugriff in den Browser-Einstellungen.');
+        }
+      };
+      
+      recognition.onend = () => {
+        setIsRecording(false);
+        // Clean up interim markers
+        setNewTaskText(prev => prev.replace(/\s*\[.*\]$/, '').trim());
+        if ('vibrate' in navigator) navigator.vibrate(10);
+      };
+      
+      recognition.start();
     } catch (error) {
-      console.error('Microphone access denied:', error);
+      console.error('Failed to start speech recognition:', error);
+      alert('Spracherkennung konnte nicht gestartet werden.');
     }
   }, [state.preferences.language]);
 
   const stopVoiceRecording = useCallback(() => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
+    if (speechRecognitionRef.current && isRecording) {
+      speechRecognitionRef.current.stop();
       setIsRecording(false);
       if ('vibrate' in navigator) navigator.vibrate(10);
     }
@@ -1433,24 +1462,36 @@ export function MobileShell() {
                 <span className="text-xs px-2 py-1 rounded-md" style={{ backgroundColor: `${accent}15`, color: accent }}>
                   {plannerSubView === 'today' ? `📅 ${t('mobile.today', 'Heute')}` : `📥 ${t('mobile.inbox', 'Inbox')}`}
                 </span>
-                <button 
-                  onClick={handleAITextSubmit} 
-                  disabled={!newTaskText.trim() || isAIProcessing} 
-                  className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-semibold disabled:opacity-40 transition-all active:scale-95" 
-                  style={{ backgroundColor: accent, color: '#fff' }}
-                >
-                  {isAIProcessing ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      Analysiere...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-4 h-4" />
-                      Erstellen
-                    </>
-                  )}
-                </button>
+                <div className="flex items-center gap-2">
+                  {/* Cancel Button */}
+                  <button 
+                    onClick={() => { setIsAddingTask(false); setNewTaskText(''); if (isRecording) stopVoiceRecording(); }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all active:scale-95" 
+                    style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)', color: isDarkMode ? '#fff' : '#1a1a1a' }}
+                  >
+                    <X className="w-4 h-4" />
+                    Abbrechen
+                  </button>
+                  {/* Submit Button */}
+                  <button 
+                    onClick={handleAITextSubmit} 
+                    disabled={!newTaskText.trim() || isAIProcessing} 
+                    className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-semibold disabled:opacity-40 transition-all active:scale-95" 
+                    style={{ backgroundColor: accent, color: '#fff' }}
+                  >
+                    {isAIProcessing ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        Analysiere...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4" />
+                        Erstellen
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           </div>

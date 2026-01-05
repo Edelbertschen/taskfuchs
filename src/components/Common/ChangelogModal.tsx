@@ -18,41 +18,20 @@ interface ChangelogEntry {
 // Changelog data - add new entries at the top
 const CHANGELOG: ChangelogEntry[] = [
   {
-    date: '2025-12-30',
+    date: '2026-01-05',
     items: [
       {
-        type: 'feature',
+        type: 'fix',
         text: {
-          de: 'Mobile Companion App – Installiere TaskFuchs als native App auf iOS, Android und Desktop',
-          en: 'Mobile Companion App – Install TaskFuchs as native app on iOS, Android and Desktop'
-        }
-      },
-      {
-        type: 'improvement',
-        text: {
-          de: 'Aggressive Cache-Invalidierung für Mobile – Updates werden jetzt nach 5 Minuten statt 1 Stunde aktualisiert',
-          en: 'Aggressive cache invalidation for mobile – Updates now refresh after 5 minutes instead of 1 hour'
+          de: 'Mobile: Spracherkennung komplett überarbeitet – Diktieren funktioniert jetzt zuverlässig mit Live-Transkription',
+          en: 'Mobile: Speech recognition completely reworked – Dictation now works reliably with live transcription'
         }
       },
       {
         type: 'fix',
         text: {
-          de: 'Zombie-Tasks in der Mobilversion vollständig behoben – Zeitfenster von 2 Min auf 30 Sekunden reduziert',
-          en: 'Zombie tasks in mobile version completely fixed – Time window reduced from 2 min to 30 seconds'
-        }
-      },
-      {
-        type: 'fix',
-        text: {
-          de: 'LocalStorage-Bereinigung nach Server-Sync – Verhindert dass gelöschte Tasks wieder erscheinen',
-          en: 'LocalStorage cleanup after server sync – Prevents deleted tasks from reappearing'
-        }
-      },
-      {
-        type: 'fix',
-        text: {
-          de: 'Z-Index Problem bei Multiselect in Inbox behoben – Zuweisen-Dropdown jetzt über Task-Cards',
-          en: 'Z-Index issue with multiselect in Inbox fixed – Assign dropdown now above task cards'
+          de: 'ZOMBIE-TASKS ENDGÜLTIG BEHOBEN – LocalStorage wird VOR Server-Sync gelöscht, Server ist einzige Wahrheit',
+          en: 'ZOMBIE TASKS FINALLY FIXED – LocalStorage cleared before server sync, server is single source of truth'
         }
       },
       {
@@ -70,17 +49,29 @@ const CHANGELOG: ChangelogEntry[] = [
         }
       },
       {
-        type: 'fix',
+        type: 'improvement',
         text: {
-          de: 'ZOMBIE-TASKS ENDGÜLTIG BEHOBEN – LocalStorage wird VOR Server-Sync gelöscht, kein Merge mehr, Server ist einzige Wahrheit',
-          en: 'ZOMBIE TASKS FINALLY FIXED – LocalStorage cleared before server sync, no more merging, server is single source of truth'
+          de: 'Mobile: Visuelle Rückmeldung beim Erledigen – Success-Animation mit Häkchen und automatischem Schließen',
+          en: 'Mobile: Visual feedback when completing – Success animation with checkmark and auto-close'
         }
       },
       {
         type: 'improvement',
         text: {
-          de: 'Mobile: Visuelle Rückmeldung beim Erledigen – Success-Animation mit Häkchen und automatischem Schließen',
-          en: 'Mobile: Visual feedback when completing – Success animation with checkmark and auto-close'
+          de: 'Mobile: Header-Buttons einheitlich zentriert und mit Touch-Feedback',
+          en: 'Mobile: Header buttons uniformly centered with touch feedback'
+        }
+      }
+    ]
+  },
+  {
+    date: '2025-12-30',
+    items: [
+      {
+        type: 'feature',
+        text: {
+          de: 'Mobile Companion App – Installiere TaskFuchs als native App auf iOS, Android und Desktop',
+          en: 'Mobile Companion App – Install TaskFuchs as native app on iOS, Android and Desktop'
         }
       },
       {
