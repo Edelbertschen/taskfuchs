@@ -273,7 +273,7 @@ export function ProjectKanbanFilters() {
           title={common.hideScheduledTooltip?.() || 'Zeige nur heutige und unterminierte Aufgaben'}
         >
           <CalendarOff className="w-4 h-4" />
-          <span className="text-sm font-medium">{common.hideScheduled?.() || 'Nur Heute'}</span>
+          <span className="text-sm font-medium">{common.hideScheduled?.() || 'Jederzeit'}</span>
         </button>
 
         {/* Clear All Filters */}
@@ -352,7 +352,7 @@ export function ProjectKanbanFilters() {
           {hideScheduledTasks && (
             <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-600">
               <CalendarOff className="w-3 h-3 mr-1" />
-              {common.hideScheduled?.() || 'Nur Heute'}
+              {common.hideScheduled?.() || 'Jederzeit'}
               <button
                 onClick={handleHideScheduledToggle}
                 className="ml-1 text-amber-600 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-300"

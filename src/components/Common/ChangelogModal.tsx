@@ -58,8 +58,8 @@ const CHANGELOG: ChangelogEntry[] = [
       {
         type: 'feature',
         text: {
-          de: 'Projekte: "Nur Heute" Filter – Blendet terminierte Aufgaben aus (Things3-Style) für mentale Ruhe',
-          en: 'Projects: "Today Only" filter – Hides scheduled tasks (Things3-style) for mental clarity'
+          de: 'Projekte: "Jederzeit" Filter – Blendet geplante Aufgaben aus, zeigt nur heutige und ungeplante Aufgaben (Things3-Style)',
+          en: 'Projects: "Anytime" filter – Hides scheduled tasks, shows only today\'s and unscheduled tasks (Things3-style)'
         }
       }
     ]

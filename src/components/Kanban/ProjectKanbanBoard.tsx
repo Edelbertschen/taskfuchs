@@ -2274,9 +2274,9 @@ export function ProjectKanbanBoard() {
                           </div>
                         </div>
 
-                        {/* Quick Toggles - Nur Heute (Hide Scheduled) & Show Completed */}
+                        {/* Quick Toggles - Jederzeit (Hide Scheduled) & Show Completed */}
                         <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-                          {/* Hide Scheduled / Nur Heute Toggle */}
+                          {/* Anytime / Jederzeit Toggle - Hide future scheduled tasks */}
                           <button
                             onClick={() => dispatch({ type: 'SET_PROJECT_KANBAN_HIDE_SCHEDULED', payload: !state.viewState.projectKanban.hideScheduledTasks })}
                             className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
@@ -2287,10 +2287,10 @@ export function ProjectKanbanBoard() {
                             style={state.viewState.projectKanban.hideScheduledTasks ? { 
                               boxShadow: '0 0 8px rgba(245, 158, 11, 0.4)'
                             } : {}}
-                            title="Zeige nur heutige und unterminierte Aufgaben"
+                            title="Geplante Aufgaben ausblenden – zeige nur Aufgaben für heute und ohne Termin"
                           >
                             <Clock className="w-3.5 h-3.5" />
-                            <span>Nur Heute</span>
+                            <span>Jederzeit</span>
                           </button>
 
                           {/* Show Completed Toggle */}
