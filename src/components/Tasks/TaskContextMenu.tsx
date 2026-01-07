@@ -14,7 +14,8 @@ import {
   X,
   Bell,
   Pin,
-  ChevronRight
+  ChevronRight,
+  FolderKanban
 } from 'lucide-react';
 import { format, addDays, startOfWeek, addWeeks } from 'date-fns';
 import { useApp } from '../../context/AppContext';
@@ -58,6 +59,7 @@ export function TaskContextMenu({
   const [customReminderInput, setCustomReminderInput] = useState('');
   const [isEditingReminder, setIsEditingReminder] = useState(false);
   const [showPinSubmenu, setShowPinSubmenu] = useState(false);
+  const [showProjectSubmenu, setShowProjectSubmenu] = useState(false);
   const [submenuPosition, setSubmenuPosition] = useState<'right' | 'left'>('right');
   const timeInputRef = useRef<HTMLInputElement>(null);
   const tagInputRef = useRef<HTMLInputElement>(null);
@@ -103,6 +105,8 @@ export function TaskContextMenu({
       setShowTimeSubmenu(false);
       setShowTagsSubmenu(false);
       setShowReminderSubmenu(false);
+      setShowPinSubmenu(false);
+      setShowProjectSubmenu(false);
       setIsEditingTag(false);
       setIsEditingTime(false);
       setIsEditingReminder(false);
@@ -117,6 +121,8 @@ export function TaskContextMenu({
         setShowTimeSubmenu(false);
         setShowTagsSubmenu(false);
         setShowReminderSubmenu(false);
+        setShowPinSubmenu(false);
+        setShowProjectSubmenu(false);
         setIsEditingTag(false);
         setIsEditingTime(false);
         setIsEditingReminder(false);
@@ -1185,6 +1191,118 @@ export function TaskContextMenu({
         )}
       </div>
     )}
+
+     {/* Project Assignment */}
+     {(() => {
+       // Get all projects (columns with type 'project')
+       const projects = state.columns.filter(col => col.type === 'project');
+       const currentProject = projects.find(p => task.projectId === p.id);
+       
+       if (projects.length === 0) {
+         return null; // No projects available
+       }
+       
+       return (
+         <div className="relative">
+           <button
+             onClick={(e) => {
+               e.stopPropagation();
+               if (!showProjectSubmenu) {
+                 calculateSubmenuPosition();
+               }
+               setShowProjectSubmenu(!showProjectSubmenu);
+               setShowPrioritySubmenu(false);
+               setShowDateSubmenu(false);
+               setShowTimeSubmenu(false);
+               setShowTagsSubmenu(false);
+               setShowReminderSubmenu(false);
+               setShowPinSubmenu(false);
+             }}
+             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+           >
+             <FolderKanban className="w-4 h-4" />
+             <span className="flex-1 text-left">{t('task_context_menu.project', 'Projekt')}</span>
+             {currentProject && (
+               <span className="text-xs text-gray-500 truncate max-w-20">{currentProject.title}</span>
+             )}
+             <ChevronRight className="w-4 h-4" />
+           </button>
+           
+           {showProjectSubmenu && (
+             <div 
+               className={getSubmenuClasses("min-w-[180px] max-h-64 overflow-y-auto")}
+               style={{ zIndex: 1000000 }}
+               onClick={(e) => e.stopPropagation()}
+             >
+               {/* Remove from project option */}
+               {task.projectId && (
+                 <>
+                   <button
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       dispatch({
+                         type: 'UPDATE_TASK',
+                         payload: { 
+                           ...task, 
+                           projectId: undefined,
+                           kanbanColumnId: undefined
+                         }
+                       });
+                       setShowProjectSubmenu(false);
+                       onClose();
+                     }}
+                     className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                   >
+                     <X className="w-4 h-4" />
+                     <span>{t('task_context_menu.remove_from_project', 'Aus Projekt entfernen')}</span>
+                   </button>
+                   <div className="border-t border-gray-200 dark:border-gray-600 my-1" />
+                 </>
+               )}
+               
+               {/* Project list */}
+               {projects.map((project) => {
+                 const isSelected = task.projectId === project.id;
+                 return (
+                   <button
+                     key={project.id}
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       // Find the first kanban column for this project
+                       const projectKanbanColumns = state.columns.filter(
+                         col => col.type === 'kanban' && col.projectId === project.id
+                       );
+                       const firstKanbanColumn = projectKanbanColumns.length > 0 
+                         ? projectKanbanColumns.sort((a, b) => (a.order || 0) - (b.order || 0))[0]
+                         : null;
+                       
+                       dispatch({
+                         type: 'UPDATE_TASK',
+                         payload: { 
+                           ...task, 
+                           projectId: project.id,
+                           kanbanColumnId: firstKanbanColumn?.id
+                         }
+                       });
+                       setShowProjectSubmenu(false);
+                       onClose();
+                     }}
+                     className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                   >
+                     <div 
+                       className="w-3 h-3 rounded" 
+                       style={{ backgroundColor: project.color || state.preferences.accentColor }}
+                     />
+                     <span className="flex-1 text-left truncate">{project.title}</span>
+                     {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />}
+                   </button>
+                 );
+               })}
+             </div>
+           )}
+         </div>
+       );
+     })()}
 
      <div className="border-t border-gray-200 dark:border-gray-600 my-1" />
 

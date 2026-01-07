@@ -266,6 +266,8 @@
     "set_reminder": "Set reminder",
     "no_reminder": "No reminder",
     "set_pin": "Set pin",
+    "project": "Project",
+    "remove_from_project": "Remove from project",
     "duplicate": "Duplicate",
     "delete": "Delete",
     "select_date": "Select date"

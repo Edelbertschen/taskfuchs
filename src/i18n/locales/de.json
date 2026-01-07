@@ -271,6 +271,8 @@
     "set_reminder": "Erinnerung setzen",
     "no_reminder": "Keine Erinnerung",
     "set_pin": "Pin setzen",
+    "project": "Projekt",
+    "remove_from_project": "Aus Projekt entfernen",
     "duplicate": "Duplizieren",
     "delete": "Löschen",
     "select_date": "Datum auswählen"
