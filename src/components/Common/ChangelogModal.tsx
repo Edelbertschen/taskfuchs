@@ -23,6 +23,13 @@ const CHANGELOG: ChangelogEntry[] = [
       {
         type: 'feature',
         text: {
+          de: 'Projektspalten per Drag & Drop sortieren – Kanban-Spalten via Drag-Handle neu anordnen',
+          en: 'Project columns drag & drop sorting – Reorder Kanban columns via drag handle'
+        }
+      },
+      {
+        type: 'feature',
+        text: {
           de: 'Projekte per Drag & Drop sortieren – Projekte in der Sidebar via Drag-Handle neu anordnen',
           en: 'Projects drag & drop sorting – Reorder projects in sidebar via drag handle'
         }

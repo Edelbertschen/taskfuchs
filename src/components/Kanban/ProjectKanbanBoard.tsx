@@ -112,6 +112,7 @@ export function ProjectKanbanBoard() {
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [editingProjectTitle, setEditingProjectTitle] = useState('');
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
+  const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
   const [shouldEditNewColumn, setShouldEditNewColumn] = useState(false);
   const [deleteConfirmProjectId, setDeleteConfirmProjectId] = useState<string | null>(null);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
@@ -992,6 +993,15 @@ export function ProjectKanbanBoard() {
       return;
     }
     
+    // Handle column dragging
+    if (activeData?.type === 'column') {
+      setActiveColumnId(active.id as string);
+      if (navigator.vibrate) {
+        navigator.vibrate(50);
+      }
+      return;
+    }
+    
     // Handle project dragging (from sidebar)
     const project = projects.find(p => p.id === active.id);
     if (project) {
@@ -1013,6 +1023,7 @@ export function ProjectKanbanBoard() {
     setActiveTask(null);
     setOverId(null);
     setActiveProjectId(null);
+    setActiveColumnId(null);
 
     if (!over) return;
 
@@ -1029,7 +1040,23 @@ export function ProjectKanbanBoard() {
       return;
     }
 
-    // Column reordering removed - columns are no longer draggable
+    // Handle column reordering
+    if (activeData?.type === 'column' && over.id !== active.id && selectedProject) {
+      const oldIndex = projectColumns.findIndex(col => col.id === active.id);
+      const newIndex = projectColumns.findIndex(col => col.id === over.id);
+      
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const reorderedColumns = arrayMove(projectColumns, oldIndex, newIndex);
+        dispatch({
+          type: 'REORDER_PROJECT_KANBAN_COLUMNS',
+          payload: {
+            projectId: selectedProject.id,
+            columnIds: reorderedColumns.map(col => col.id)
+          }
+        });
+      }
+      return;
+    }
 
     // Handle project reordering
     if (activeProjectId && over.id !== active.id) {
@@ -1581,10 +1608,52 @@ export function ProjectKanbanBoard() {
     });
   };
 
-  // Simple column component without drag functionality - just like in TaskBoard
-  const SimpleKanbanColumn = ({ column, tasks }: { column: Column, tasks: Task[] }) => {
+  // Sortable column component with drag handle
+  const SortableKanbanColumn = ({ column, tasks }: { column: Column, tasks: Task[] }) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+    } = useSortable({ 
+      id: column.id,
+      data: { type: 'column' }
+    });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+      opacity: isDragging ? 0.5 : 1,
+    };
+
     return (
-      <div className="flex-1 min-w-0">
+      <div 
+        ref={setNodeRef} 
+        style={style}
+        className="flex-1 min-w-0 relative group/column"
+      >
+        {/* Drag Handle for Column - appears on hover */}
+        <div 
+          {...attributes}
+          {...listeners}
+          className={`absolute -left-2 top-3 z-10 cursor-grab active:cursor-grabbing p-1 rounded opacity-0 group-hover/column:opacity-100 transition-opacity ${
+            isDragging ? 'opacity-100' : ''
+          } ${
+            isMinimalDesign 
+              ? 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600' 
+              : 'bg-white/20 hover:bg-white/30'
+          }`}
+          title="Spalte verschieben"
+        >
+          <GripVertical className={`w-4 h-4 ${
+            isMinimalDesign 
+              ? 'text-gray-400 dark:text-gray-500' 
+              : 'text-gray-300'
+          }`} />
+        </div>
+        
         <TaskColumn
           column={column}
           tasks={tasks}
@@ -1605,7 +1674,7 @@ export function ProjectKanbanBoard() {
           kanbanColumnId={column.id}
           onColumnManager={handleOpenColumnManager}
           onEmailDrop={handleEmailDropOnColumn}
-          // No dragListeners or isDragging - columns are not draggable anymore
+          isDragging={isDragging}
         />
       </div>
     );
@@ -1677,7 +1746,7 @@ export function ProjectKanbanBoard() {
             items={columnTasks.map(task => task.id)}
             strategy={verticalListSortingStrategy}
           >
-            <SimpleKanbanColumn 
+            <SortableKanbanColumn 
               column={column}
               tasks={columnTasks}
             />
