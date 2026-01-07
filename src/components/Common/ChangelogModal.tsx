@@ -18,6 +18,32 @@ interface ChangelogEntry {
 // Changelog data - add new entries at the top
 const CHANGELOG: ChangelogEntry[] = [
   {
+    date: '2026-01-07',
+    items: [
+      {
+        type: 'feature',
+        text: {
+          de: 'Kontextmenü: Projekt-Zuweisung – Rechtsklick auf Aufgaben ermöglicht direkte Zuweisung zu Projekten und Spalten',
+          en: 'Context menu: Project assignment – Right-click on tasks allows direct assignment to projects and columns'
+        }
+      },
+      {
+        type: 'improvement',
+        text: {
+          de: 'Projekt-Zuweisung verbessert – Klare Spaltenauswahl statt verwirrender "Hauptspalte"',
+          en: 'Project assignment improved – Clear column selection instead of confusing "Main column"'
+        }
+      },
+      {
+        type: 'improvement',
+        text: {
+          de: 'Mobile: Abbrechen-Button beim Erstellen von Aufgaben hinzugefügt',
+          en: 'Mobile: Cancel button added when creating tasks'
+        }
+      }
+    ]
+  },
+  {
     date: '2026-01-05',
     items: [
       {
