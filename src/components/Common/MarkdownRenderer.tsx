@@ -166,14 +166,14 @@ export function MarkdownRenderer({ content, className = '', onCheckboxChange, em
     // Track if user is selecting text to prevent toggle on text selection
     const mouseDownPosRef = React.useRef<{ x: number; y: number } | null>(null);
     
-    // Elegant heading hierarchy - clear visual distinction
+    // Elegant heading hierarchy - clear visual distinction with larger sizes
     const headingClasses = {
-      1: "text-2xl font-bold mb-5 mt-8 first:mt-0 pb-3 border-b border-gray-200/60 dark:border-gray-700/60 tracking-tight",
-      2: "text-xl font-semibold mb-4 mt-7 first:mt-0 pb-2 border-b border-gray-200/40 dark:border-gray-700/40 tracking-tight",
-      3: "text-lg font-semibold mb-3 mt-6 first:mt-0 tracking-tight",
-      4: "text-base font-semibold mb-2 mt-5 first:mt-0",
-      5: "text-sm font-semibold mb-2 mt-4 first:mt-0 uppercase tracking-wide",
-      6: "text-xs font-semibold mb-2 mt-3 first:mt-0 uppercase tracking-wider text-gray-500 dark:text-gray-400"
+      1: "text-3xl font-bold mb-5 mt-8 first:mt-0 pb-3 border-b-2 border-gray-200 dark:border-gray-700 tracking-tight",
+      2: "text-2xl font-semibold mb-4 mt-7 first:mt-0 pb-2 border-b border-gray-200 dark:border-gray-700 tracking-tight text-gray-900 dark:text-white",
+      3: "text-xl font-semibold mb-3 mt-6 first:mt-0 tracking-tight text-gray-900 dark:text-white",
+      4: "text-lg font-semibold mb-2 mt-5 first:mt-0 text-gray-900 dark:text-white",
+      5: "text-base font-semibold mb-2 mt-4 first:mt-0 uppercase tracking-wide text-gray-800 dark:text-gray-200",
+      6: "text-sm font-semibold mb-2 mt-3 first:mt-0 uppercase tracking-wider text-gray-600 dark:text-gray-400"
     };
     
     // Only toggle if it was a genuine click, not a text selection
@@ -209,9 +209,9 @@ export function MarkdownRenderer({ content, className = '', onCheckboxChange, em
         >
           <span className="transition-transform duration-200 flex-shrink-0 select-none" style={{ userSelect: 'none' }}>
             {isCollapsed ? (
-              <ChevronRight className="w-5 h-5 text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300" />
+              <ChevronRight className={`${section.level <= 2 ? 'w-6 h-6' : 'w-5 h-5'} text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300`} />
             ) : (
-              <ChevronDown className="w-5 h-5 text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300" />
+              <ChevronDown className={`${section.level <= 2 ? 'w-6 h-6' : 'w-5 h-5'} text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300`} />
             )}
           </span>
           <span className="flex-1">{section.title}</span>
@@ -794,42 +794,42 @@ export function MarkdownRenderer({ content, className = '', onCheckboxChange, em
         <ReactMarkdown 
           remarkPlugins={[remarkGfm]}
           components={{
-            // Elegant heading rendering with clear hierarchy
+            // Elegant heading rendering with clear hierarchy - larger sizes for better distinction
             h1: ({ node, ...props }) => (
               <h1 
                 {...props} 
-                className="text-2xl font-bold mb-5 mt-8 first:mt-0 pb-3 border-b border-gray-200/60 dark:border-gray-700/60 tracking-tight"
+                className="text-3xl font-bold mb-5 mt-8 first:mt-0 pb-3 border-b-2 border-gray-200 dark:border-gray-700 tracking-tight"
                 style={{ color: getAccentColorStyles().text.color }}
               />
             ),
             h2: ({ node, ...props }) => (
               <h2 
                 {...props} 
-                className="text-xl font-semibold mb-4 mt-7 first:mt-0 pb-2 border-b border-gray-200/40 dark:border-gray-700/40 tracking-tight text-gray-900 dark:text-white" 
+                className="text-2xl font-semibold mb-4 mt-7 first:mt-0 pb-2 border-b border-gray-200 dark:border-gray-700 tracking-tight text-gray-900 dark:text-white" 
               />
             ),
             h3: ({ node, ...props }) => (
               <h3 
                 {...props} 
-                className="text-lg font-semibold mb-3 mt-6 first:mt-0 tracking-tight text-gray-900 dark:text-white" 
+                className="text-xl font-semibold mb-3 mt-6 first:mt-0 tracking-tight text-gray-900 dark:text-white" 
               />
             ),
             h4: ({ node, ...props }) => (
               <h4 
                 {...props} 
-                className="text-base font-semibold mb-2 mt-5 first:mt-0 text-gray-900 dark:text-white" 
+                className="text-lg font-semibold mb-2 mt-5 first:mt-0 text-gray-900 dark:text-white" 
               />
             ),
             h5: ({ node, ...props }) => (
               <h5 
                 {...props} 
-                className="text-sm font-semibold mb-2 mt-4 first:mt-0 uppercase tracking-wide text-gray-900 dark:text-white" 
+                className="text-base font-semibold mb-2 mt-4 first:mt-0 uppercase tracking-wide text-gray-800 dark:text-gray-200" 
               />
             ),
             h6: ({ node, ...props }) => (
               <h6 
                 {...props} 
-                className="text-xs font-semibold mb-2 mt-3 first:mt-0 uppercase tracking-wider text-gray-500 dark:text-gray-400" 
+                className="text-sm font-semibold mb-2 mt-3 first:mt-0 uppercase tracking-wider text-gray-600 dark:text-gray-400" 
               />
             ),
             
