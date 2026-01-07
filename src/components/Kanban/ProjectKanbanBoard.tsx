@@ -643,6 +643,7 @@ export function ProjectKanbanBoard() {
       transform,
       transition,
       isDragging,
+      isOver,
     } = useSortable({ id: project.id });
 
     // Add droppable for tasks
@@ -658,9 +659,12 @@ export function ProjectKanbanBoard() {
     });
 
     const style = {
+      transform: CSS.Transform.toString(transform),
       transition,
-      opacity: isDragging ? 0.5 : 1,
     };
+    
+    // Show drop indicator when another project is being dragged over this one
+    const showDropIndicator = isOver && activeProjectId && activeProjectId !== project.id;
 
     // Combine refs for sortable and droppable
     const combinedRef = (node: HTMLElement | null) => {
@@ -685,49 +689,64 @@ export function ProjectKanbanBoard() {
     const projectIndex = projects.findIndex(p => p.id === project.id);
 
     return (
-      <div
-        ref={combinedRef}
-        className={`relative p-4 cursor-pointer transition-colors group h-16 ${
-          isMinimalDesign
-            ? `border-b border-gray-200 hover:bg-gray-50 ${
-                isSelected ? 'bg-gray-100 border-l-4' : ''
-              }`
-            : `border-b border-white/15 hover:bg-black/40 ${
-                isSelected ? 'border-l-4' : ''
-              }`
-        } ${
-          isTaskDropZone && activeTask ? 'ring-2 ring-offset-1' : ''
-        }`}
-        onClick={() => !isEditing && handleProjectSelect(project.id)}
-        style={{
-          ...style,
-          backgroundColor: isMinimalDesign
-            ? (isSelected 
-                ? getAccentColorStyles().bgLight.backgroundColor
-                : isTaskDropZone && activeTask
-                ? '#f3f4f6'
-                : 'transparent')
-            : (isSelected 
-                ? (getAccentColorStyles().bg.backgroundColor + '1A') 
-                : isTaskDropZone && activeTask
-                ? (getAccentColorStyles().bg.backgroundColor + '20')
-                : 'transparent'),
-          borderLeftColor: isSelected 
-            ? getAccentColorStyles().border.borderColor
-            : 'transparent',
-          ...(isTaskDropZone && activeTask ? {
-            ringColor: isMinimalDesign 
-              ? getAccentColorStyles().border.borderColor + '50'
-              : getAccentColorStyles().border.borderColor + '50'
-          } : {})
-        }}
-        onMouseEnter={() => {
-          setHoveredProjectId(project.id);
-        }}
-        onMouseLeave={() => {
-          setHoveredProjectId(null);
-        }}
-      >
+      <div className="relative">
+        {/* Drop Indicator - shows where the project will be inserted */}
+        {showDropIndicator && (
+          <div 
+            className="absolute -top-0.5 left-2 right-2 h-1 rounded-full z-20 animate-pulse"
+            style={{ backgroundColor: state.preferences.accentColor }}
+          />
+        )}
+        
+        <div
+          ref={combinedRef}
+          className={`relative p-4 cursor-pointer transition-all duration-200 group h-16 ${
+            isMinimalDesign
+              ? `border-b border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 ${
+                  isSelected ? 'bg-gray-100 dark:bg-gray-800 border-l-4' : ''
+                }`
+              : `border-b border-white/15 hover:bg-black/40 ${
+                  isSelected ? 'border-l-4' : ''
+                }`
+          } ${
+            isTaskDropZone && activeTask ? 'ring-2 ring-offset-1' : ''
+          } ${
+            isDragging ? 'opacity-30 scale-95' : ''
+          }`}
+          onClick={() => !isEditing && handleProjectSelect(project.id)}
+          style={{
+            ...style,
+            backgroundColor: isMinimalDesign
+              ? (isSelected 
+                  ? getAccentColorStyles().bgLight.backgroundColor
+                  : isTaskDropZone && activeTask
+                  ? '#f3f4f6'
+                  : isDragging 
+                  ? 'transparent'
+                  : undefined)
+              : (isSelected 
+                  ? (getAccentColorStyles().bg.backgroundColor + '1A') 
+                  : isTaskDropZone && activeTask
+                  ? (getAccentColorStyles().bg.backgroundColor + '20')
+                  : isDragging
+                  ? 'transparent'
+                  : undefined),
+            borderLeftColor: isSelected 
+              ? getAccentColorStyles().border.borderColor
+              : 'transparent',
+            ...(isTaskDropZone && activeTask ? {
+              ringColor: isMinimalDesign 
+                ? getAccentColorStyles().border.borderColor + '50'
+                : getAccentColorStyles().border.borderColor + '50'
+            } : {})
+          }}
+          onMouseEnter={() => {
+            setHoveredProjectId(project.id);
+          }}
+          onMouseLeave={() => {
+            setHoveredProjectId(null);
+          }}
+        >
         {/* Normal Project Display */}
         <div className="flex items-center justify-between">
           {/* Drag Handle */}
@@ -853,6 +872,7 @@ export function ProjectKanbanBoard() {
             </div>
           </div>
         )}
+        </div>
         </div>
       </div>
     );
@@ -1617,6 +1637,7 @@ export function ProjectKanbanBoard() {
       transform,
       transition,
       isDragging,
+      isOver,
     } = useSortable({ 
       id: column.id,
       data: { type: 'column' }
@@ -1625,36 +1646,49 @@ export function ProjectKanbanBoard() {
     const style = {
       transform: CSS.Transform.toString(transform),
       transition,
-      opacity: isDragging ? 0.5 : 1,
     };
+    
+    // Show drop indicator when another column is being dragged over this one
+    const showDropIndicator = isOver && activeColumnId && activeColumnId !== column.id;
 
     return (
-      <div 
-        ref={setNodeRef} 
-        style={style}
-        className="flex-1 min-w-0 relative group/column"
-      >
-        {/* Drag Handle for Column - appears on hover */}
-        <div 
-          {...attributes}
-          {...listeners}
-          className={`absolute -left-2 top-3 z-10 cursor-grab active:cursor-grabbing p-1 rounded opacity-0 group-hover/column:opacity-100 transition-opacity ${
-            isDragging ? 'opacity-100' : ''
-          } ${
-            isMinimalDesign 
-              ? 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600' 
-              : 'bg-white/20 hover:bg-white/30'
-          }`}
-          title="Spalte verschieben"
-        >
-          <GripVertical className={`w-4 h-4 ${
-            isMinimalDesign 
-              ? 'text-gray-400 dark:text-gray-500' 
-              : 'text-gray-300'
-          }`} />
-        </div>
+      <div className="relative">
+        {/* Left Drop Indicator for Column */}
+        {showDropIndicator && (
+          <div 
+            className="absolute -left-1 top-0 bottom-0 w-1 rounded-full z-20 animate-pulse"
+            style={{ backgroundColor: state.preferences.accentColor }}
+          />
+        )}
         
-        <TaskColumn
+        <div 
+          ref={setNodeRef} 
+          style={style}
+          className={`flex-1 min-w-0 relative group/column transition-all duration-200 ${
+            isDragging ? 'opacity-30 scale-[0.98]' : ''
+          }`}
+        >
+          {/* Drag Handle for Column - appears on hover */}
+          <div 
+            {...attributes}
+            {...listeners}
+            className={`absolute -left-2 top-3 z-10 cursor-grab active:cursor-grabbing p-1.5 rounded-lg opacity-0 group-hover/column:opacity-100 transition-all duration-150 ${
+              isDragging ? 'opacity-100 scale-110' : ''
+            } ${
+              isMinimalDesign 
+                ? 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 shadow-sm' 
+                : 'bg-white/20 hover:bg-white/30 shadow-lg'
+            }`}
+            title="Spalte verschieben"
+          >
+            <GripVertical className={`w-4 h-4 ${
+              isMinimalDesign 
+                ? 'text-gray-500 dark:text-gray-400' 
+                : 'text-gray-200'
+            }`} />
+          </div>
+          
+          <TaskColumn
           column={column}
           tasks={tasks}
           overId={overId}
@@ -1676,6 +1710,7 @@ export function ProjectKanbanBoard() {
           onEmailDrop={handleEmailDropOnColumn}
           isDragging={isDragging}
         />
+        </div>
       </div>
     );
   };
@@ -2773,9 +2808,12 @@ export function ProjectKanbanBoard() {
 
 
 
-        {/* ✨ Elegant Minimalist DragOverlay - Same as TaskBoard */}
+        {/* ✨ Elegant DragOverlay for Tasks, Projects, and Columns */}
         <DragOverlay
-          dropAnimation={null}
+          dropAnimation={{
+            duration: 200,
+            easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
+          }}
           style={{
             zIndex: 9999,
             pointerEvents: 'none',
@@ -2783,7 +2821,6 @@ export function ProjectKanbanBoard() {
         >
           {activeTask && (
             <div style={{
-              // Final precision: -70px left, +10px down to perfectly center on cursor
               transform: 'translateX(-70px) translateY(10px)',
               filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',
             }}>
@@ -2793,6 +2830,121 @@ export function ProjectKanbanBoard() {
               />
             </div>
           )}
+          
+          {/* Project Drag Overlay */}
+          {activeProjectId && (() => {
+            const project = projects.find(p => p.id === activeProjectId);
+            if (!project) return null;
+            
+            const projectTaskCount = state.tasks.filter(t => 
+              !t.completed && 
+              !t.archived &&
+              state.viewState.projectKanban.columns
+                .filter(col => col.projectId === project.id)
+                .some(col => col.id === t.kanbanColumnId)
+            ).length;
+            
+            return (
+              <div 
+                className={`p-4 rounded-xl shadow-2xl border-2 ${
+                  isMinimalDesign
+                    ? 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600'
+                    : 'bg-gray-800 border-gray-500'
+                }`}
+                style={{
+                  width: '280px',
+                  transform: 'rotate(2deg) scale(1.02)',
+                  boxShadow: `0 20px 40px rgba(0,0,0,0.3), 0 0 0 2px ${state.preferences.accentColor}`,
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <h3 className={`text-sm font-semibold truncate ${
+                    isMinimalDesign ? 'text-gray-900 dark:text-white' : 'text-white'
+                  }`}>
+                    {project.title}
+                  </h3>
+                  <span className={`text-xs px-2 py-1 rounded-full ${
+                    isMinimalDesign 
+                      ? 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+                      : 'bg-white/20 text-white'
+                  }`}>
+                    {projectTaskCount} Tasks
+                  </span>
+                </div>
+              </div>
+            );
+          })()}
+          
+          {/* Column Drag Overlay */}
+          {activeColumnId && (() => {
+            const column = projectColumns.find(c => c.id === activeColumnId);
+            if (!column) return null;
+            
+            const columnTasks = filteredTasks.filter(t => t.kanbanColumnId === column.id);
+            
+            return (
+              <div 
+                className={`rounded-xl shadow-2xl border-2 overflow-hidden ${
+                  isMinimalDesign
+                    ? 'bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-600'
+                    : 'bg-gray-800/90 border-gray-500'
+                }`}
+                style={{
+                  width: '300px',
+                  maxHeight: '400px',
+                  transform: 'rotate(1deg) scale(1.02)',
+                  boxShadow: `0 20px 40px rgba(0,0,0,0.3), 0 0 0 2px ${state.preferences.accentColor}`,
+                }}
+              >
+                {/* Column Header */}
+                <div 
+                  className={`px-4 py-3 border-b ${
+                    isMinimalDesign
+                      ? 'bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600'
+                      : 'bg-gray-700 border-gray-600'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <h3 className={`text-sm font-semibold ${
+                      isMinimalDesign ? 'text-gray-900 dark:text-white' : 'text-white'
+                    }`}>
+                      {column.title}
+                    </h3>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${
+                      isMinimalDesign 
+                        ? 'bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300'
+                        : 'bg-white/20 text-white'
+                    }`}>
+                      {columnTasks.length}
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Preview Tasks */}
+                <div className="p-2 space-y-1 max-h-[300px] overflow-hidden">
+                  {columnTasks.slice(0, 3).map(task => (
+                    <div 
+                      key={task.id}
+                      className={`px-3 py-2 rounded-lg text-xs truncate ${
+                        isMinimalDesign
+                          ? 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                          : 'bg-gray-600 text-gray-200'
+                      }`}
+                    >
+                      {task.title}
+                    </div>
+                  ))}
+                  {columnTasks.length > 3 && (
+                    <div className={`text-xs text-center py-1 ${
+                      isMinimalDesign ? 'text-gray-500' : 'text-gray-400'
+                    }`}>
+                      +{columnTasks.length - 3} weitere
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
         </DragOverlay>
       </div>
     </DndContext>
