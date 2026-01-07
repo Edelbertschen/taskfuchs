@@ -1674,32 +1674,54 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
             </div>
 
             <div className="space-y-2">
-              {/* Priority Filters - Only for Tasks */}
+              {/* Priority Filters - Only for Tasks - Single Selection (ALL/H/M/L/–) */}
               {currentView === 'tasks' && (
                 <div className="flex items-center space-x-4">
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-0 flex-shrink-0">
                     Prioritäten:
                   </span>
-                  <div className="flex flex-wrap gap-2">
-                    {priorities.map((priority) => {
-                      const isActive = state.activePriorityFilters.includes(priority.value);
-                      const taskCount = getTaskCountForPriority(priority.value);
-                      
+                  <div className="flex gap-1">
+                    {/* ALL Button */}
+                    <button
+                      onClick={() => dispatch({ type: 'CLEAR_PRIORITY_FILTERS' })}
+                      className={`h-8 px-2 rounded-md text-xs font-bold transition-all duration-200 ${
+                        state.activePriorityFilters.length === 0
+                          ? 'bg-white text-gray-800 shadow-lg scale-105'
+                          : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 hover:scale-105'
+                      }`}
+                    >
+                      ALL
+                    </button>
+                    {/* Individual Priority Buttons */}
+                    {[
+                      { key: 'high', label: 'H', color: '#ef4444' },
+                      { key: 'medium', label: 'M', color: '#f59e0b' },
+                      { key: 'low', label: 'L', color: '#10b981' },
+                      { key: 'none', label: '–', color: '#9ca3af' }
+                    ].map(({ key, label, color }) => {
+                      const isActive = state.activePriorityFilters.length === 1 && state.activePriorityFilters[0] === key;
                       return (
                         <button
-                          key={priority.value}
-                          onClick={() => handleTogglePriority(priority.value)}
-                          className={`px-3 py-1.5 text-sm rounded-full transition-all duration-200 ${
+                          key={key}
+                          onClick={() => {
+                            // Single selection: toggle between this priority and ALL
+                            if (isActive) {
+                              dispatch({ type: 'CLEAR_PRIORITY_FILTERS' });
+                            } else {
+                              dispatch({ type: 'SET_PRIORITY_FILTERS', payload: [key] });
+                            }
+                          }}
+                          className={`h-8 px-2 rounded-md text-xs font-bold transition-all duration-200 ${
                             isActive
-                              ? 'text-white shadow-sm'
-                              : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                              ? 'text-white shadow-lg scale-105'
+                              : 'text-white/80 hover:text-white hover:scale-105'
                           }`}
-                          style={isActive ? { backgroundColor: state.preferences.accentColor } : {}}
+                          style={{
+                            backgroundColor: isActive ? color : `${color}60`,
+                            boxShadow: isActive ? `0 0 12px ${color}40` : 'none'
+                          }}
                         >
-                          <span>{priority.label}</span>
-                          <span className="ml-1 text-xs bg-black/10 dark:bg-white/10 px-1.5 py-0.5 rounded-full">
-                            {taskCount}
-                          </span>
+                          {label}
                         </button>
                       );
                     })}
