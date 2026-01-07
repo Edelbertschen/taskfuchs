@@ -25,7 +25,7 @@ import {
   arrayMove
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { FolderOpen, Plus, Settings, Edit2, Sparkles, X, MoreHorizontal, MoreVertical, Columns, Focus, ChevronUp, ChevronDown, Filter, Hash, AlertCircle, Circle, CheckCircle, Archive, Clock, Trash2, Check, FileText, Info, Pin, BarChart3, Tag } from 'lucide-react';
+import { FolderOpen, Plus, Settings, Edit2, Sparkles, X, MoreHorizontal, MoreVertical, Columns, Focus, ChevronUp, ChevronDown, Filter, Hash, AlertCircle, Circle, CheckCircle, Archive, Clock, Trash2, Check, FileText, Info, Pin, BarChart3, Tag, GripVertical } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { TaskCard } from '../Tasks/TaskCard';
 import { TaskColumn } from '../Tasks/TaskColumn';
@@ -686,8 +686,6 @@ export function ProjectKanbanBoard() {
     return (
       <div
         ref={combinedRef}
-        {...attributes}
-        {...listeners}
         className={`relative p-4 cursor-pointer transition-colors group h-16 ${
           isMinimalDesign
             ? `border-b border-gray-200 hover:bg-gray-50 ${
@@ -731,6 +729,21 @@ export function ProjectKanbanBoard() {
       >
         {/* Normal Project Display */}
         <div className="flex items-center justify-between">
+          {/* Drag Handle */}
+          <div 
+            className={`flex-shrink-0 mr-2 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity ${
+              isDragging ? 'opacity-100' : ''
+            }`}
+            {...listeners}
+            {...attributes}
+          >
+            <GripVertical className={`w-4 h-4 ${
+              isMinimalDesign
+                ? 'text-gray-400 dark:text-gray-500'
+                : 'text-gray-400'
+            }`} />
+          </div>
+          
           <div className="flex-1 min-w-0 mr-2">
             {isEditing ? (
               <input
@@ -967,7 +980,7 @@ export function ProjectKanbanBoard() {
     const { active } = event;
     const activeData = active.data.current;
     
-    // Column dragging removed - only handle tasks and projects
+    // Handle task dragging
     if (activeData?.type === 'task') {
       const task = state.tasks.find(t => t.id === active.id);
       if (task) {
@@ -975,15 +988,16 @@ export function ProjectKanbanBoard() {
         if (navigator.vibrate) {
           navigator.vibrate(50);
         }
-      } else {
-        // Check if it's a project being dragged
-        const project = projects.find(p => p.id === active.id);
-        if (project) {
-          setActiveProjectId(project.id);
-          if (navigator.vibrate) {
-            navigator.vibrate(50);
-          }
-        }
+      }
+      return;
+    }
+    
+    // Handle project dragging (from sidebar)
+    const project = projects.find(p => p.id === active.id);
+    if (project) {
+      setActiveProjectId(project.id);
+      if (navigator.vibrate) {
+        navigator.vibrate(50);
       }
     }
   };
