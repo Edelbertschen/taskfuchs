@@ -241,31 +241,7 @@ export function ProjectColumnSelector({
                     {/* Kanban Columns (if project is selected and has columns) */}
                     {isSelected && kanbanColumns.length > 0 && (
                       <div className="ml-8 space-y-1 border-l-2 border-gray-200 dark:border-gray-600 pl-4">
-                        {/* Main Column Option */}
-                        <button
-                          onClick={() => handleColumnSelect(project.id)}
-                          className={`w-full text-left p-2 rounded-lg transition-colors duration-200 flex items-center justify-between group h-10 ${
-                            currentColumnId === project.id
-                              ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700'
-                              : 'hover:bg-gray-50 dark:hover:bg-gray-700'
-                          }`}
-                        >
-                          <div className="flex items-center space-x-2">
-                            <FolderOpen className="w-3 h-3 flex-shrink-0 text-gray-500 dark:text-gray-400" />
-                            <span className={`text-sm ${
-                              currentColumnId === project.id
-                                ? 'text-green-800 dark:text-green-200 font-medium' 
-                                : 'text-gray-600 dark:text-gray-400'
-                            }`}>
-                              Hauptspalte
-                            </span>
-                          </div>
-                          {currentColumnId === project.id && (
-                            <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
-                          )}
-                        </button>
-
-                        {/* Kanban Columns */}
+                        {/* Kanban Columns - no more "Hauptspalte", show actual columns */}
                         {kanbanColumns.map((column) => {
                           const isCurrentColumn = currentColumnId === column.id;
                           

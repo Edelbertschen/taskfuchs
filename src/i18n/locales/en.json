@@ -268,6 +268,7 @@
     "set_pin": "Set pin",
     "project": "Project",
     "remove_from_project": "Remove from project",
+    "no_columns": "No columns",
     "duplicate": "Duplicate",
     "delete": "Delete",
     "select_date": "Select date"

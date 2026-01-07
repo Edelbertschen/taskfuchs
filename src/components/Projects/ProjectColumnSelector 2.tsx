@@ -139,17 +139,19 @@ export function ProjectColumnSelector({
                   
                   return (
                     <div key={project.id} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-                      {/* Project Header */}
+                      {/* Project Header - only clickable if no columns */}
                       <div
-                        className={`p-4 cursor-pointer transition-colors h-20 ${
-                          isCurrentProject && !currentColumnId
+                        className={`p-4 transition-colors ${
+                          kanbanColumns.length === 0 ? 'cursor-pointer' : ''
+                        } ${
+                          isCurrentProject && !currentColumnId && kanbanColumns.length === 0
                             ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4'
-                            : 'hover:bg-gray-50 dark:hover:bg-gray-700'
+                            : kanbanColumns.length === 0 ? 'hover:bg-gray-50 dark:hover:bg-gray-700' : ''
                         }`}
-                        style={isCurrentProject && !currentColumnId ? {
+                        style={isCurrentProject && !currentColumnId && kanbanColumns.length === 0 ? {
                           borderLeftColor: getAccentColor()
                         } : {}}
-                        onClick={() => handleProjectSelect(project.id)}
+                        onClick={() => kanbanColumns.length === 0 ? handleProjectSelect(project.id) : null}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-3">
@@ -159,11 +161,13 @@ export function ProjectColumnSelector({
                                 {project.title}
                               </h4>
                               <p className="text-sm text-gray-500 dark:text-gray-400">
-                                Hauptspalte des Projekts
+                                {kanbanColumns.length > 0 
+                                  ? `${kanbanColumns.length} Spalte${kanbanColumns.length !== 1 ? 'n' : ''}`
+                                  : 'Keine Spalten'}
                               </p>
                             </div>
                           </div>
-                          {isCurrentProject && !currentColumnId && (
+                          {isCurrentProject && !currentColumnId && kanbanColumns.length === 0 && (
                             <Check className="w-5 h-5" style={{ color: getAccentColor() }} />
                           )}
                         </div>

@@ -273,6 +273,7 @@
     "set_pin": "Pin setzen",
     "project": "Projekt",
     "remove_from_project": "Aus Projekt entfernen",
+    "no_columns": "Keine Spalten",
     "duplicate": "Duplizieren",
     "delete": "Löschen",
     "select_date": "Datum auswählen"

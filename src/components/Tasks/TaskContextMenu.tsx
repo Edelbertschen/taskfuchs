@@ -60,6 +60,7 @@ export function TaskContextMenu({
   const [isEditingReminder, setIsEditingReminder] = useState(false);
   const [showPinSubmenu, setShowPinSubmenu] = useState(false);
   const [showProjectSubmenu, setShowProjectSubmenu] = useState(false);
+  const [expandedProjectId, setExpandedProjectId] = useState<string | null>(null);
   const [submenuPosition, setSubmenuPosition] = useState<'right' | 'left'>('right');
   const timeInputRef = useRef<HTMLInputElement>(null);
   const tagInputRef = useRef<HTMLInputElement>(null);
@@ -1230,7 +1231,7 @@ export function TaskContextMenu({
            
            {showProjectSubmenu && (
              <div 
-               className={getSubmenuClasses("min-w-[180px] max-h-64 overflow-y-auto")}
+               className={getSubmenuClasses("min-w-[200px] max-h-80 overflow-y-auto")}
                style={{ zIndex: 1000000 }}
                onClick={(e) => e.stopPropagation()}
              >
@@ -1249,6 +1250,7 @@ export function TaskContextMenu({
                          }
                        });
                        setShowProjectSubmenu(false);
+                       setExpandedProjectId(null);
                        onClose();
                      }}
                      className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -1260,42 +1262,80 @@ export function TaskContextMenu({
                  </>
                )}
                
-               {/* Project list */}
+               {/* Project list with expandable columns */}
                {projects.map((project) => {
                  const isSelected = task.projectId === project.id;
+                 const isExpanded = expandedProjectId === project.id;
+                 const projectKanbanColumns = state.columns
+                   .filter(col => col.type === 'kanban' && col.projectId === project.id)
+                   .sort((a, b) => (a.order || 0) - (b.order || 0));
+                 
                  return (
-                   <button
-                     key={project.id}
-                     onClick={(e) => {
-                       e.stopPropagation();
-                       // Find the first kanban column for this project
-                       const projectKanbanColumns = state.columns.filter(
-                         col => col.type === 'kanban' && col.projectId === project.id
-                       );
-                       const firstKanbanColumn = projectKanbanColumns.length > 0 
-                         ? projectKanbanColumns.sort((a, b) => (a.order || 0) - (b.order || 0))[0]
-                         : null;
-                       
-                       dispatch({
-                         type: 'UPDATE_TASK',
-                         payload: { 
-                           ...task, 
-                           projectId: project.id,
-                           kanbanColumnId: firstKanbanColumn?.id
-                         }
-                       });
-                       setShowProjectSubmenu(false);
-                       onClose();
-                     }}
-                     className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
-                   >
-                     <div 
-                       className="w-3 h-3 rounded" 
-                       style={{ backgroundColor: project.color || state.preferences.accentColor }}
-                     />
-                     <span className="flex-1 text-left truncate">{project.title}</span>
-                     {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />}
-                   </button>
+                   <div key={project.id}>
+                     {/* Project header - click to expand/collapse */}
+                     <button
+                       onClick={(e) => {
+                         e.stopPropagation();
+                         setExpandedProjectId(isExpanded ? null : project.id);
+                       }}
+                       className={`w-full flex items-center gap-3 px-3 py-2 text-sm transition-colors ${
+                         isExpanded 
+                           ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300' 
+                           : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                       }`}
+                     >
+                       <div 
+                         className="w-3 h-3 rounded" 
+                         style={{ backgroundColor: project.color || state.preferences.accentColor }}
+                       />
+                       <span className="flex-1 text-left truncate font-medium">{project.title}</span>
+                       {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />}
+                       <ChevronRight className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+                     </button>
+                     
+                     {/* Expanded column list */}
+                     {isExpanded && projectKanbanColumns.length > 0 && (
+                       <div className="ml-4 border-l-2 border-gray-200 dark:border-gray-600">
+                         {projectKanbanColumns.map((column) => {
+                           const isColumnSelected = task.kanbanColumnId === column.id;
+                           return (
+                             <button
+                               key={column.id}
+                               onClick={(e) => {
+                                 e.stopPropagation();
+                                 dispatch({
+                                   type: 'UPDATE_TASK',
+                                   payload: { 
+                                     ...task, 
+                                     projectId: project.id,
+                                     kanbanColumnId: column.id
+                                   }
+                                 });
+                                 setShowProjectSubmenu(false);
+                                 setExpandedProjectId(null);
+                                 onClose();
+                               }}
+                               className={`w-full flex items-center gap-2 px-3 py-1.5 text-sm transition-colors ${
+                                 isColumnSelected
+                                   ? 'bg-blue-100 dark:bg-blue-800/30 text-blue-700 dark:text-blue-300'
+                                   : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200'
+                               }`}
+                             >
+                               <span className="flex-1 text-left truncate">{column.title}</span>
+                               {isColumnSelected && <Check className="w-3 h-3" />}
+                             </button>
+                           );
+                         })}
+                       </div>
+                     )}
+                     
+                     {/* No columns message */}
+                     {isExpanded && projectKanbanColumns.length === 0 && (
+                       <div className="ml-4 px-3 py-2 text-xs text-gray-400 dark:text-gray-500 italic">
+                         {t('task_context_menu.no_columns', 'Keine Spalten')}
+                       </div>
+                     )}
+                   </div>
                  );
                })}
              </div>
