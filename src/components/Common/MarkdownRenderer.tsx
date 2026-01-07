@@ -166,13 +166,14 @@ export function MarkdownRenderer({ content, className = '', onCheckboxChange, em
     // Track if user is selecting text to prevent toggle on text selection
     const mouseDownPosRef = React.useRef<{ x: number; y: number } | null>(null);
     
+    // Elegant heading hierarchy - clear visual distinction
     const headingClasses = {
-      1: "text-3xl font-bold mb-6 mt-12 first:mt-0 pb-3 border-b-2 border-gray-200 dark:border-gray-700",
-      2: "text-2xl font-semibold mb-4 mt-10 first:mt-0 pb-2 border-b border-gray-200 dark:border-gray-700",
-      3: "text-xl font-medium mb-3 mt-8 first:mt-0",
-      4: "text-lg font-medium mb-2 mt-6 first:mt-0",
-      5: "text-base font-medium mb-2 mt-5 first:mt-0",
-      6: "text-sm font-medium mb-2 mt-4 first:mt-0"
+      1: "text-2xl font-bold mb-5 mt-8 first:mt-0 pb-3 border-b border-gray-200/60 dark:border-gray-700/60 tracking-tight",
+      2: "text-xl font-semibold mb-4 mt-7 first:mt-0 pb-2 border-b border-gray-200/40 dark:border-gray-700/40 tracking-tight",
+      3: "text-lg font-semibold mb-3 mt-6 first:mt-0 tracking-tight",
+      4: "text-base font-semibold mb-2 mt-5 first:mt-0",
+      5: "text-sm font-semibold mb-2 mt-4 first:mt-0 uppercase tracking-wide",
+      6: "text-xs font-semibold mb-2 mt-3 first:mt-0 uppercase tracking-wider text-gray-500 dark:text-gray-400"
     };
     
     // Only toggle if it was a genuine click, not a text selection
@@ -243,7 +244,7 @@ export function MarkdownRenderer({ content, className = '', onCheckboxChange, em
     h5: () => null,
     h6: () => null,
     
-    // Enhanced paragraph rendering
+    // Elegant paragraph rendering
     p: ({ node, ...props }: any) => {
       if (node && 'children' in node && node.children && node.children.length === 1) {
         const child = node.children[0];
@@ -254,7 +255,7 @@ export function MarkdownRenderer({ content, className = '', onCheckboxChange, em
       return (
         <p 
           {...props} 
-          className="mb-4 leading-relaxed text-gray-800 dark:text-gray-200 text-base" 
+          className="mb-3 leading-relaxed text-gray-700 dark:text-gray-300 text-sm" 
         />
       );
     },
@@ -533,12 +534,12 @@ export function MarkdownRenderer({ content, className = '', onCheckboxChange, em
       );
     },
     
-    // Enhanced list rendering
+    // Elegant list rendering
     ul: ({ node, ...props }: any) => (
-      <ul {...props} className="markdown-list list-none space-y-0.5 mb-4 pl-0" />
+      <ul {...props} className="markdown-list list-none space-y-1 mb-3 pl-0" />
     ),
     ol: ({ node, ...props }: any) => (
-      <ol {...props} className="markdown-list list-none space-y-0.5 mb-4 pl-0" />
+      <ol {...props} className="markdown-list list-none space-y-1 mb-3 pl-0" />
     ),
     li: ({ node, ...props }: any) => {
       const hasTaskListItem = node && 'properties' in node && node.properties && 'className' in node.properties && 
@@ -546,14 +547,14 @@ export function MarkdownRenderer({ content, className = '', onCheckboxChange, em
       
       if (hasTaskListItem) {
         return (
-          <li {...props} className="task-list-item flex items-start space-x-2 py-0.5" />
+          <li {...props} className="task-list-item flex items-start space-x-2 py-0.5 text-sm text-gray-700 dark:text-gray-300" />
         );
       }
       
       return (
-        <li {...props} className="flex items-start space-x-3 py-0.5">
+        <li {...props} className="flex items-start space-x-2 py-0.5 text-sm text-gray-700 dark:text-gray-300">
           <span 
-            className="w-2 h-2 rounded-full mt-2.5 flex-shrink-0"
+            className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 opacity-60"
             style={{ backgroundColor: getAccentColorStyles().text.color }}
           />
           <span className="flex-1 leading-relaxed">{props.children}</span>
@@ -793,46 +794,46 @@ export function MarkdownRenderer({ content, className = '', onCheckboxChange, em
         <ReactMarkdown 
           remarkPlugins={[remarkGfm]}
           components={{
-            // Regular heading rendering (non-collapsible for single section)
+            // Elegant heading rendering with clear hierarchy
             h1: ({ node, ...props }) => (
               <h1 
                 {...props} 
-                className="text-3xl font-bold mb-6 mt-12 first:mt-0 pb-3 border-b-2 border-gray-200 dark:border-gray-700"
+                className="text-2xl font-bold mb-5 mt-8 first:mt-0 pb-3 border-b border-gray-200/60 dark:border-gray-700/60 tracking-tight"
                 style={{ color: getAccentColorStyles().text.color }}
               />
             ),
             h2: ({ node, ...props }) => (
               <h2 
                 {...props} 
-                className="text-2xl font-semibold mb-4 mt-10 first:mt-0 pb-2 border-b border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white" 
+                className="text-xl font-semibold mb-4 mt-7 first:mt-0 pb-2 border-b border-gray-200/40 dark:border-gray-700/40 tracking-tight text-gray-900 dark:text-white" 
               />
             ),
             h3: ({ node, ...props }) => (
               <h3 
                 {...props} 
-                className="text-xl font-medium mb-3 mt-8 first:mt-0 text-gray-900 dark:text-white" 
+                className="text-lg font-semibold mb-3 mt-6 first:mt-0 tracking-tight text-gray-900 dark:text-white" 
               />
             ),
             h4: ({ node, ...props }) => (
               <h4 
                 {...props} 
-                className="text-lg font-medium mb-2 mt-6 first:mt-0 text-gray-900 dark:text-white" 
+                className="text-base font-semibold mb-2 mt-5 first:mt-0 text-gray-900 dark:text-white" 
               />
             ),
             h5: ({ node, ...props }) => (
               <h5 
                 {...props} 
-                className="text-base font-medium mb-2 mt-5 first:mt-0 text-gray-900 dark:text-white" 
+                className="text-sm font-semibold mb-2 mt-4 first:mt-0 uppercase tracking-wide text-gray-900 dark:text-white" 
               />
             ),
             h6: ({ node, ...props }) => (
               <h6 
                 {...props} 
-                className="text-sm font-medium mb-2 mt-4 first:mt-0 text-gray-700 dark:text-gray-300" 
+                className="text-xs font-semibold mb-2 mt-3 first:mt-0 uppercase tracking-wider text-gray-500 dark:text-gray-400" 
               />
             ),
             
-            // Enhanced paragraph rendering with better spacing
+            // Elegant paragraph rendering
             p: ({ node, ...props }) => {
               // Check if this paragraph contains only an image
               if (node && 'children' in node && node.children && node.children.length === 1) {
@@ -846,7 +847,7 @@ export function MarkdownRenderer({ content, className = '', onCheckboxChange, em
               return (
                 <p 
                   {...props} 
-                  className="mb-4 leading-relaxed text-gray-800 dark:text-gray-200 text-base" 
+                  className="mb-3 leading-relaxed text-gray-700 dark:text-gray-300 text-sm" 
                 />
               );
             },
@@ -1002,12 +1003,12 @@ export function MarkdownRenderer({ content, className = '', onCheckboxChange, em
               );
             },
             
-            // Enhanced list rendering
+            // Elegant list rendering
             ul: ({ node, ...props }) => (
-              <ul {...props} className="markdown-list list-none space-y-0.5 mb-4 pl-0" />
+              <ul {...props} className="markdown-list list-none space-y-1 mb-3 pl-0" />
             ),
             ol: ({ node, ...props }) => (
-              <ol {...props} className="markdown-list list-none space-y-0.5 mb-4 pl-0" />
+              <ol {...props} className="markdown-list list-none space-y-1 mb-3 pl-0" />
             ),
             li: ({ node, ...props }) => {
               const hasTaskListItem = node && 'properties' in node && node.properties && 'className' in node.properties && 
@@ -1015,14 +1016,14 @@ export function MarkdownRenderer({ content, className = '', onCheckboxChange, em
               
               if (hasTaskListItem) {
                 return (
-                  <li {...props} className="task-list-item flex items-start space-x-2 py-0.5" />
+                  <li {...props} className="task-list-item flex items-start space-x-2 py-0.5 text-sm text-gray-700 dark:text-gray-300" />
                 );
               }
               
               return (
-                <li {...props} className="flex items-start space-x-3 py-0.5">
+                <li {...props} className="flex items-start space-x-2 py-0.5 text-sm text-gray-700 dark:text-gray-300">
                   <span 
-                    className="w-2 h-2 rounded-full mt-2.5 flex-shrink-0"
+                    className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 opacity-60"
                     style={{ backgroundColor: getAccentColorStyles().text.color }}
                   />
                   <span className="flex-1 leading-relaxed">{props.children}</span>

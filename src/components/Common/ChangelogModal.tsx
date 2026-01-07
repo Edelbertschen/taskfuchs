@@ -37,6 +37,13 @@ const CHANGELOG: ChangelogEntry[] = [
       {
         type: 'improvement',
         text: {
+          de: 'Aufgabenbeschreibungen: Elegantes Markdown-Rendering mit klarer Überschriften-Hierarchie',
+          en: 'Task descriptions: Elegant markdown rendering with clear heading hierarchy'
+        }
+      },
+      {
+        type: 'improvement',
+        text: {
           de: 'Mobile: Abbrechen-Button beim Erstellen von Aufgaben hinzugefügt',
           en: 'Mobile: Cancel button added when creating tasks'
         }
