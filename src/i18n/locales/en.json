@@ -270,6 +270,7 @@
     "remove_from_project": "Remove from project",
     "no_columns": "No columns",
     "duplicate": "Duplicate",
+    "copy_of": "Copy of",
     "delete": "Delete",
     "select_date": "Select date"
   },

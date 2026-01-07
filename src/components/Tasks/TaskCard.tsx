@@ -377,10 +377,11 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
 
 
   const handleDuplicate = () => {
+    const copyPrefix = t('task_context_menu.copy_of', 'Kopie von');
     const duplicatedTask = {
       ...task,
       id: `task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      title: `${task.title} (Kopie)`,
+      title: `${copyPrefix} ${task.title}`,
       completed: false,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),

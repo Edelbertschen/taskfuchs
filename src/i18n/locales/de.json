@@ -275,6 +275,7 @@
     "remove_from_project": "Aus Projekt entfernen",
     "no_columns": "Keine Spalten",
     "duplicate": "Duplizieren",
+    "copy_of": "Kopie von",
     "delete": "Löschen",
     "select_date": "Datum auswählen"
   },

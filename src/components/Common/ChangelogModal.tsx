@@ -21,6 +21,34 @@ const CHANGELOG: ChangelogEntry[] = [
     date: '2026-01-07',
     items: [
       {
+        type: 'improvement',
+        text: {
+          de: 'Performance: Debug-Logs werden in Production-Builds automatisch entfernt',
+          en: 'Performance: Debug logs are automatically removed in production builds'
+        }
+      },
+      {
+        type: 'feature',
+        text: {
+          de: 'Neue EmptyState-Komponente – Schönere leere Zustände mit Animationen und visuellen Akzenten',
+          en: 'New EmptyState component – Beautiful empty states with animations and visual accents'
+        }
+      },
+      {
+        type: 'feature',
+        text: {
+          de: 'Skeleton-Komponenten – Loading-Placeholders für Tasks, Projekte und Statistiken',
+          en: 'Skeleton components – Loading placeholders for tasks, projects and statistics'
+        }
+      },
+      {
+        type: 'improvement',
+        text: {
+          de: 'Aufgaben duplizieren: Präfix "Kopie von" statt Suffix "(Kopie)" für bessere Lesbarkeit',
+          en: 'Task duplication: Prefix "Copy of" instead of suffix "(Copy)" for better readability'
+        }
+      },
+      {
         type: 'feature',
         text: {
           de: 'Kontextmenü: Projekt-Zuweisung – Rechtsklick auf Aufgaben ermöglicht direkte Zuweisung zu Projekten und Spalten',

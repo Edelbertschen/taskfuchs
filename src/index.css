@@ -21,7 +21,9 @@
 
   /* Custom animations */
   --animate-spin-slow: spin 3s linear infinite;
-  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-bounce-slow: bounce 3s ease-in-out infinite;
+  --animate-float: float 3s ease-in-out infinite;
   --animate-bounce-gentle: bounce-gentle 1s ease-in-out infinite;
   --animate-confetti: confetti 3s ease-out;
   --animate-foxDance: foxDance 2s ease-in-out;
@@ -661,6 +663,15 @@
 
 .bounce-gentle {
   animation: bounce-gentle 2s infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
 }
 
 @keyframes bounce-gentle {

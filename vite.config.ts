@@ -156,6 +156,11 @@ export default defineConfig({
   // Use relative base for Electron builds so assets resolve via file:// protocol
   base: isElectron ? './' : '/',
   
+  // Remove console.logs and debugger statements in production
+  esbuild: {
+    drop: ['console', 'debugger'],
+  },
+  
   // Performance optimizations
   build: {
     outDir: 'dist',
