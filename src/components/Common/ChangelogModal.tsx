@@ -21,6 +21,13 @@ const CHANGELOG: ChangelogEntry[] = [
     date: '2026-01-07',
     items: [
       {
+        type: 'feature',
+        text: {
+          de: 'Dynamische Begrüßung je nach Tageszeit – Guten Morgen, Tag, Abend oder Nacht mit passenden Motivationssprüchen',
+          en: 'Dynamic greeting based on time of day – Good morning, afternoon, evening or night with matching motivational messages'
+        }
+      },
+      {
         type: 'improvement',
         text: {
           de: 'Performance: Debug-Logs werden in Production-Builds automatisch entfernt',

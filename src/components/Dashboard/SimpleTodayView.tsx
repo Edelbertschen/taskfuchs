@@ -325,6 +325,33 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
   const [showFilters, setShowFilters] = useState(false);
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
 
+  // Dynamic greeting based on time of day
+  const getTimeBasedGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) {
+      return {
+        greeting: t('today.greeting_morning'),
+        subtitle: t('today.greeting_subtitle_morning')
+      };
+    } else if (hour >= 12 && hour < 17) {
+      return {
+        greeting: t('today.greeting_afternoon'),
+        subtitle: t('today.greeting_subtitle_afternoon')
+      };
+    } else if (hour >= 17 && hour < 22) {
+      return {
+        greeting: t('today.greeting_evening'),
+        subtitle: t('today.greeting_subtitle_evening')
+      };
+    } else {
+      return {
+        greeting: t('today.greeting_night'),
+        subtitle: t('today.greeting_subtitle_night')
+      };
+    }
+  };
+
+  const timeGreeting = getTimeBasedGreeting();
   
   // Checklist state
   const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>([]);
@@ -2174,21 +2201,35 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
               <img 
                 src={getFuchsImagePath()} 
                 alt="Fuchs Logo" 
-                className="w-24 h-24 object-contain"
+                className="w-24 h-24 object-contain animate-float"
                 onError={(e) => { (e.currentTarget as HTMLImageElement).src = getImagePath('Fuchs.svg'); }}
               />
-              <p className="text-4xl font-medium tracking-wide" 
-                style={{ 
-                  fontFamily: "'Roboto', sans-serif",
-                  color: isDarkMode ? 'rgb(255, 255, 255)' : 'rgb(31, 41, 55)',
-                  textShadow: isMinimalDesign 
-                    ? 'none' 
-                    : isDarkMode
-                      ? '0 0 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 0, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.9)'
-                      : '0 0 8px rgba(255, 255, 255, 0.9), 0 0 20px rgba(255, 255, 255, 0.7), 0 2px 4px rgba(0, 0, 0, 0.3)'
-                }}>
-                {t('today.greeting')}
-              </p>
+              <div className="flex flex-col">
+                <p className="text-4xl font-medium tracking-wide" 
+                  style={{ 
+                    fontFamily: "'Roboto', sans-serif",
+                    color: isDarkMode ? 'rgb(255, 255, 255)' : 'rgb(31, 41, 55)',
+                    textShadow: isMinimalDesign 
+                      ? 'none' 
+                      : isDarkMode
+                        ? '0 0 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 0, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.9)'
+                        : '0 0 8px rgba(255, 255, 255, 0.9), 0 0 20px rgba(255, 255, 255, 0.7), 0 2px 4px rgba(0, 0, 0, 0.3)'
+                  }}>
+                  {timeGreeting.greeting}
+                </p>
+                <p className="text-lg font-light tracking-wide mt-1 opacity-80" 
+                  style={{ 
+                    fontFamily: "'Roboto', sans-serif",
+                    color: isDarkMode ? 'rgb(200, 200, 200)' : 'rgb(75, 85, 99)',
+                    textShadow: isMinimalDesign 
+                      ? 'none' 
+                      : isDarkMode
+                        ? '0 0 6px rgba(0, 0, 0, 0.6)'
+                        : '0 0 6px rgba(255, 255, 255, 0.8)'
+                  }}>
+                  {timeGreeting.subtitle}
+                </p>
+              </div>
             </div>
           </div>
 
