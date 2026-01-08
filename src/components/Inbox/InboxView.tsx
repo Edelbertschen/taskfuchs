@@ -1760,6 +1760,8 @@ function InboxTaskCard({
   const [editTitle, setEditTitle] = useState(task.title);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
   const [showPriorityPopup, setShowPriorityPopup] = useState(false);
+  const [showProjectSubmenu, setShowProjectSubmenu] = useState(false);
+  const [expandedProjectId, setExpandedProjectId] = useState<string | null>(null);
   const priorityButtonRef = React.useRef<HTMLButtonElement>(null);
 
   // Handle priority change
@@ -1805,7 +1807,11 @@ function InboxTaskCard({
 
   // Close context menu
   useEffect(() => {
-    const handleClick = () => setContextMenu(null);
+    const handleClick = () => {
+      setContextMenu(null);
+      setShowProjectSubmenu(false);
+      setExpandedProjectId(null);
+    };
     if (contextMenu) {
       document.addEventListener('click', handleClick);
       return () => document.removeEventListener('click', handleClick);
@@ -2241,16 +2247,149 @@ function InboxTaskCard({
             ))}
           </div>
         </div>
-        <button
-          onClick={() => {
-            onProjectSelect();
-            setContextMenu(null);
-          }}
-          className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2"
-        >
-          <FolderOpen className="w-4 h-4" />
-          <span>Zu Projekt zuweisen</span>
-        </button>
+        {/* Project Assignment Submenu */}
+        {(() => {
+          const projects = state.columns.filter(col => col.type === 'project');
+          const currentProject = projects.find(p => task.projectId === p.id);
+          
+          if (projects.length === 0) {
+            return null;
+          }
+          
+          return (
+            <div className="relative">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowProjectSubmenu(!showProjectSubmenu);
+                }}
+                className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-between"
+              >
+                <div className="flex items-center space-x-2">
+                  <FolderOpen className="w-4 h-4" />
+                  <span>{t('task_context_menu.project', 'Projekt')}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  {currentProject && (
+                    <span className="text-xs text-gray-500 truncate max-w-16">{currentProject.title}</span>
+                  )}
+                  <ChevronRight className="w-4 h-4" />
+                </div>
+              </button>
+              
+              {showProjectSubmenu && (
+                <div 
+                  className="absolute left-full top-0 ml-1 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-1 min-w-[200px] max-h-80 overflow-y-auto z-[100000]"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* Remove from project option */}
+                  {task.projectId && (
+                    <>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          dispatch({
+                            type: 'UPDATE_TASK',
+                            payload: { 
+                              ...task, 
+                              projectId: undefined,
+                              kanbanColumnId: undefined
+                            }
+                          });
+                          setShowProjectSubmenu(false);
+                          setExpandedProjectId(null);
+                          setContextMenu(null);
+                        }}
+                        className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                        <span>{t('task_context_menu.remove_from_project', 'Aus Projekt entfernen')}</span>
+                      </button>
+                      <div className="border-t border-gray-200 dark:border-gray-600 my-1" />
+                    </>
+                  )}
+                  
+                  {/* Project list with expandable columns */}
+                  {projects.map((project) => {
+                    const isSelected = task.projectId === project.id;
+                    const isExpanded = expandedProjectId === project.id;
+                    const projectKanbanColumns = state.columns
+                      .filter(col => col.type === 'kanban' && col.projectId === project.id)
+                      .sort((a, b) => (a.order || 0) - (b.order || 0));
+                    
+                    return (
+                      <div key={project.id}>
+                        {/* Project header - click to expand/collapse */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setExpandedProjectId(isExpanded ? null : project.id);
+                          }}
+                          className={`w-full flex items-center gap-3 px-3 py-2 text-sm transition-colors ${
+                            isExpanded 
+                              ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300' 
+                              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                          }`}
+                        >
+                          <div 
+                            className="w-3 h-3 rounded" 
+                            style={{ backgroundColor: project.color || accentColor }}
+                          />
+                          <span className="flex-1 text-left truncate font-medium">{project.title}</span>
+                          {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />}
+                          <ChevronRight className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+                        </button>
+                        
+                        {/* Expanded column list */}
+                        {isExpanded && projectKanbanColumns.length > 0 && (
+                          <div className="ml-4 border-l-2 border-gray-200 dark:border-gray-600">
+                            {projectKanbanColumns.map((column) => {
+                              const isColumnSelected = task.kanbanColumnId === column.id;
+                              return (
+                                <button
+                                  key={column.id}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    dispatch({
+                                      type: 'UPDATE_TASK',
+                                      payload: { 
+                                        ...task, 
+                                        projectId: project.id,
+                                        kanbanColumnId: column.id
+                                      }
+                                    });
+                                    setShowProjectSubmenu(false);
+                                    setExpandedProjectId(null);
+                                    setContextMenu(null);
+                                  }}
+                                  className={`w-full flex items-center gap-2 px-3 py-1.5 text-sm transition-colors ${
+                                    isColumnSelected
+                                      ? 'bg-blue-100 dark:bg-blue-800/30 text-blue-700 dark:text-blue-300'
+                                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200'
+                                  }`}
+                                >
+                                  <span className="flex-1 text-left truncate">{column.title}</span>
+                                  {isColumnSelected && <Check className="w-3 h-3" />}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+                        
+                        {/* No columns message */}
+                        {isExpanded && projectKanbanColumns.length === 0 && (
+                          <div className="ml-4 px-3 py-2 text-xs text-gray-400 dark:text-gray-500 italic">
+                            {t('task_context_menu.no_columns', 'Keine Spalten')}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })()}
         <button
           onClick={() => {
             if (task.pinColumnId) {
