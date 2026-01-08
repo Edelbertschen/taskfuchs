@@ -1022,6 +1022,9 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
                     } else if (currentView === 'pins') {
                       // For pins view, dispatch custom event
                       window.dispatchEvent(new CustomEvent('toggle-pins-filter'));
+                    } else if (currentView === 'tasks') {
+                      // For planner view, dispatch custom event (wie bei Pins/Projekte)
+                      window.dispatchEvent(new CustomEvent('toggle-planner-filter'));
                     } else {
                       setIsFilterOpen(!isFilterOpen);
                     }
@@ -1637,8 +1640,8 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
         </div>
       </header>
 
-      {/* Filter Panel - Compact Slider */}
-      {(currentView === 'tasks' || currentView === 'notes') && isFilterOpen && (
+      {/* Filter Panel - Compact Slider - Nur für Notes (Planer verwendet CompactFilterBar wie Pins/Projekte) */}
+      {currentView === 'notes' && isFilterOpen && (
         <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm animate-in slide-in-from-top-2 duration-300 z-[100] relative">
           <div className="max-w-7xl mx-auto px-4 py-3">
             <div className="flex items-center justify-between mb-3">

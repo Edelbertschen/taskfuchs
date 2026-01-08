@@ -500,6 +500,16 @@ export function TaskBoard() {
     };
   }, [sidebarVisible]);
 
+  // Listen for filter toggle event from Header (wie bei Pins/Projekte)
+  useEffect(() => {
+    const handleToggleFilter = () => {
+      setShowFilters(prev => !prev);
+    };
+    
+    window.addEventListener('toggle-planner-filter', handleToggleFilter);
+    return () => window.removeEventListener('toggle-planner-filter', handleToggleFilter);
+  }, []);
+
   // Get tasks grouped by projects for sidebar
   const getProjectTasks = useMemo(() => {
     const projectColumns = state.columns.filter(col => col.type === 'project');
