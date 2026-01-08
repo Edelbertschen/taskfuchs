@@ -1948,6 +1948,7 @@ export function TaskBoard() {
                   }}
                   isVisible={true}
                   onClose={() => setShowFilters(false)}
+                  hideDateFilters={true}
                 />
               )}
               
