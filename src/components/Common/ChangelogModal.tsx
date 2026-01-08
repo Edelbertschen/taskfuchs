@@ -28,6 +28,20 @@ const CHANGELOG: ChangelogEntry[] = [
         }
       },
       {
+        type: 'feature',
+        text: {
+          de: 'Gepinnte Aufgaben ausblenden – Neuer Filter in Projekte und Planer zum Ausblenden gepinnter Aufgaben',
+          en: 'Hide pinned tasks – New filter in Projects and Planner to hide pinned tasks'
+        }
+      },
+      {
+        type: 'fix',
+        text: {
+          de: 'Scrollen in Projektspalten bei aktiver Filterleiste repariert – Flexbox-Layout mit min-h-0 korrigiert',
+          en: 'Fixed scrolling in project columns with active filter bar – Flexbox layout corrected with min-h-0'
+        }
+      },
+      {
         type: 'improvement',
         text: {
           de: 'Prioritäten-Filter ausgeschrieben – Hoch, Mittel, Niedrig, Keine statt H, M, L, –',

@@ -26,6 +26,7 @@ interface CompactFilterBarProps {
   dateFilter: DateFilterOption;
   tagFilters: string[];
   showCompleted: boolean;
+  hidePinned?: boolean;
   
   // Available options
   availableTags: TagItem[];
@@ -35,6 +36,7 @@ interface CompactFilterBarProps {
   onDateFilterChange: (filter: DateFilterOption) => void;
   onTagToggle: (tagName: string) => void;
   onShowCompletedToggle: () => void;
+  onHidePinnedToggle?: () => void;
   onClearAll: () => void;
   
   // Appearance
@@ -52,6 +54,9 @@ interface CompactFilterBarProps {
   
   // Optional: hide date filters (for Planner)
   hideDateFilters?: boolean;
+  
+  // Optional: show hide pinned option
+  showHidePinnedOption?: boolean;
 }
 
 export function CompactFilterBar({
@@ -59,11 +64,13 @@ export function CompactFilterBar({
   dateFilter,
   tagFilters,
   showCompleted,
+  hidePinned = false,
   availableTags,
   onPriorityChange,
   onDateFilterChange,
   onTagToggle,
   onShowCompletedToggle,
+  onHidePinnedToggle,
   onClearAll,
   accentColor,
   isDarkMode,
@@ -72,7 +79,8 @@ export function CompactFilterBar({
   onPinnedChange,
   isVisible = true,
   onClose,
-  hideDateFilters = false
+  hideDateFilters = false,
+  showHidePinnedOption = false
 }: CompactFilterBarProps) {
   const { t } = useTranslation();
   const [showAllTags, setShowAllTags] = useState(false);
@@ -82,7 +90,8 @@ export function CompactFilterBar({
     (priorityFilter !== 'all' ? 1 : 0) + 
     (dateFilter !== 'all' ? 1 : 0) + 
     tagFilters.length + 
-    (showCompleted ? 1 : 0);
+    (showCompleted ? 1 : 0) +
+    (hidePinned ? 1 : 0);
   
   const hasActiveFilters = activeFilterCount > 0;
   
@@ -403,6 +412,31 @@ export function CompactFilterBar({
             <Check className="w-3.5 h-3.5" />
             {t('filter.showCompleted', 'Erledigte')}
           </button>
+          
+          {/* Hide Pinned Toggle (optional) */}
+          {showHidePinnedOption && onHidePinnedToggle && (
+            <button
+              onClick={onHidePinnedToggle}
+              className={`
+                px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5
+                transition-all duration-200
+                ${hidePinned 
+                  ? 'text-white shadow-md scale-[1.02]' 
+                  : isDarkMode 
+                    ? 'bg-gray-700/60 text-gray-300 hover:bg-gray-600/60 hover:scale-[1.02]' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:scale-[1.02]'
+                }
+              `}
+              style={hidePinned ? { backgroundColor: accentColor, boxShadow: `0 2px 8px ${accentColor}50` } : {}}
+              title={hidePinned 
+                ? t('filter.showPinnedTooltip', 'Gepinnte Aufgaben wieder anzeigen') 
+                : t('filter.hidePinnedTooltip', 'Gepinnte Aufgaben ausblenden')
+              }
+            >
+              <Pin className="w-3.5 h-3.5" />
+              {t('filter.hidePinned', 'Gepinnte ausblenden')}
+            </button>
+          )}
         </div>
       </div>
       

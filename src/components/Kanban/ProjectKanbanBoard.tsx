@@ -128,6 +128,14 @@ export function ProjectKanbanBoard() {
       return false;
     }
   });
+  const [hidePinnedTasks, setHidePinnedTasks] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('taskfuchs-project-hide-pinned');
+      return saved === 'true';
+    } catch {
+      return false;
+    }
+  });
   const [projectMenuDropdown, setProjectMenuDropdown] = useState<string | null>(null);
   
   // Time budget modal state
@@ -1026,6 +1034,11 @@ export function ProjectKanbanBoard() {
       }
     }
 
+    // Apply hide pinned tasks filter
+    if (hidePinnedTasks && task.pinned) {
+      return false;
+    }
+
     return true;
   });
 
@@ -1883,6 +1896,8 @@ export function ProjectKanbanBoard() {
     dispatch({ type: 'SET_PROJECT_KANBAN_TAG_FILTERS', payload: [] });
     dispatch({ type: 'SET_PROJECT_KANBAN_DATE_FILTER', payload: 'all' });
     dispatch({ type: 'SET_PROJECT_KANBAN_SHOW_COMPLETED', payload: false });
+    setHidePinnedTasks(false);
+    try { localStorage.setItem('taskfuchs-project-hide-pinned', 'false'); } catch {}
   };
 
   const getTaskCountForProjectPriority = (priority: string): number => {
@@ -2292,14 +2307,11 @@ export function ProjectKanbanBoard() {
             {/* Main Board Area */}
             {selectedProject ? (
               <div 
-                className="relative h-full flex flex-col"
-                      style={{
-                  overflow: 'hidden'
-                }}
+                className="relative flex-1 flex flex-col min-h-0"
               >
                 {/* Compact Filter Bar - Elegant & Space-Efficient */}
                 {selectedProject && (showFilterDropdown || filterPinned) && (
-                  <div className="mx-4 mt-3">
+                  <div className="mx-4 mt-3 flex-shrink-0">
                     <CompactFilterBar
                       priorityFilter={
                         state.viewState.projectKanban.priorityFilters.length === 1
@@ -2309,6 +2321,7 @@ export function ProjectKanbanBoard() {
                       dateFilter={(state.viewState.projectKanban.dateFilter || 'all') as DateFilterOption}
                       tagFilters={state.viewState.projectKanban.tagFilters}
                       showCompleted={state.viewState.projectKanban.showCompleted}
+                      hidePinned={hidePinnedTasks}
                       availableTags={state.tags.filter(tag => {
                         const actualTaskCount = filteredTasks.filter(task => task.tags.includes(tag.name)).length;
                         return tag.count > 0 && actualTaskCount > 0;
@@ -2327,6 +2340,11 @@ export function ProjectKanbanBoard() {
                       onShowCompletedToggle={() => {
                         dispatch({ type: 'SET_PROJECT_KANBAN_SHOW_COMPLETED', payload: !state.viewState.projectKanban.showCompleted });
                       }}
+                      onHidePinnedToggle={() => {
+                        const newValue = !hidePinnedTasks;
+                        setHidePinnedTasks(newValue);
+                        try { localStorage.setItem('taskfuchs-project-hide-pinned', String(newValue)); } catch {}
+                      }}
                       onClearAll={handleClearAllProjectFilters}
                       accentColor={state.preferences.accentColor}
                       isDarkMode={isDarkMode}
@@ -2341,6 +2359,7 @@ export function ProjectKanbanBoard() {
                       }}
                       isVisible={true}
                       onClose={() => setShowFilterDropdown(false)}
+                      showHidePinnedOption={true}
                     />
                   </div>
                 )}
@@ -2349,38 +2368,17 @@ export function ProjectKanbanBoard() {
 
 
                   {/* Kanban Board - Using TaskColumn like TaskBoard */}
-                  <div className="flex-1 overflow-hidden flex flex-col">
-                    <div className="flex-1 flex flex-col relative px-4 pb-4 overflow-hidden" style={{ paddingTop: '35px' }}>
-                    <div style={{ 
-                      display: 'flex', 
-                      flexDirection: 'column', 
-                      flex: 1,
-                      height: '100%',
-                      gap: '12px',
-                      padding: '0',
-                      alignItems: 'stretch',
-                      width: '100%',
-                      overflow: 'hidden'
-                    }}>
+                  <div className="flex-1 min-h-0 flex flex-col">
+                    <div className="flex-1 min-h-0 flex flex-col relative px-4 pb-4" style={{ paddingTop: '35px' }}>
+                    <div className="flex flex-col flex-1 min-h-0 gap-3 w-full">
                       {displayColumns.length > 0 && (
                           <div 
                             ref={scrollContainerRef}
                             tabIndex={0}
-                            
+                            className="flex-1 min-h-0 w-full overflow-x-auto overflow-y-hidden relative scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 pr-10"
                             style={{ 
-                              flex: 1,
-                              width: '100%',
-                              height: '100%',
-                              marginTop: '0',
-                              overflowX: 'auto',
-                              overflowY: 'hidden', // Container scrolls horizontal, columns scroll vertical
-                              scrollbarWidth: 'thin',
-                              scrollbarColor: '#CBD5E1 #F1F5F9',
-                              minWidth: 0, // Wichtig für flex-shrink
-                              position: 'relative',
-                              outline: 'none', // Remove focus outline
-                              paddingRight: '40px', // Extra space to ensure "Add Column" button is reachable
-                              scrollBehavior: 'smooth' // Smooth scrolling
+                              scrollBehavior: 'smooth',
+                              outline: 'none'
                             }}
                           >
                             <SortableContext

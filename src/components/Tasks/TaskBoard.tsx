@@ -369,6 +369,14 @@ export function TaskBoard() {
       return false;
     }
   });
+  const [hidePinnedTasks, setHidePinnedTasks] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('taskfuchs-planner-hide-pinned');
+      return saved === 'true';
+    } catch {
+      return false;
+    }
+  });
   const [mounted, setMounted] = useState(false);
   // ✨ REMOVED: originalExpandedProjects state since we no longer collapse projects during drag
   const [isProjectColumnSelectionModalOpen, setIsProjectColumnSelectionModalOpen] = useState(false);
@@ -1469,6 +1477,11 @@ export function TaskBoard() {
       }
     }
 
+    // Hide pinned tasks filter
+    if (hidePinnedTasks && task.pinned) {
+      return false;
+    }
+
     return true;
   });
 
@@ -1923,6 +1936,7 @@ export function TaskBoard() {
                   dateFilter="all"
                   tagFilters={state.activeTagFilters}
                   showCompleted={false}
+                  hidePinned={hidePinnedTasks}
                   availableTags={state.tags.filter(tag => {
                     const actualTaskCount = state.tasks.filter(task => task.tags.includes(tag.name)).length;
                     return tag.count > 0 && actualTaskCount > 0;
@@ -1931,9 +1945,16 @@ export function TaskBoard() {
                   onDateFilterChange={() => {}}
                   onTagToggle={(tagName) => dispatch({ type: 'TOGGLE_TAG_FILTER', payload: tagName })}
                   onShowCompletedToggle={() => {}}
+                  onHidePinnedToggle={() => {
+                    const newValue = !hidePinnedTasks;
+                    setHidePinnedTasks(newValue);
+                    try { localStorage.setItem('taskfuchs-planner-hide-pinned', String(newValue)); } catch {}
+                  }}
                   onClearAll={() => {
                     setPriorityFilter('all');
                     dispatch({ type: 'CLEAR_TAG_FILTERS' });
+                    setHidePinnedTasks(false);
+                    try { localStorage.setItem('taskfuchs-planner-hide-pinned', 'false'); } catch {}
                   }}
                   accentColor={state.preferences.accentColor}
                   isDarkMode={isDarkMode}
@@ -1949,6 +1970,7 @@ export function TaskBoard() {
                   isVisible={true}
                   onClose={() => setShowFilters(false)}
                   hideDateFilters={true}
+                  showHidePinnedOption={true}
                 />
               )}
               
