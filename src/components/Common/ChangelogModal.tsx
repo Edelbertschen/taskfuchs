@@ -23,8 +23,8 @@ const CHANGELOG: ChangelogEntry[] = [
       {
         type: 'feature',
         text: {
-          de: 'Kompakte Filterleiste – Elegante, platzsparende Filter mit Anpinn-Funktion für dauerhaften Zugriff',
-          en: 'Compact filter bar – Elegant, space-saving filters with pin feature for persistent access'
+          de: 'Kompakte Filterleiste – Elegante, platzsparende Filter mit Anpinn-Funktion für dauerhaften Zugriff (in Projekte, Pins und Planer)',
+          en: 'Compact filter bar – Elegant, space-saving filters with pin feature for persistent access (in Projects, Pins and Planner)'
         }
       },
       {
