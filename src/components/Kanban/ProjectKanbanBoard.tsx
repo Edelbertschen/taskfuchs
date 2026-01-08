@@ -1652,7 +1652,13 @@ export function ProjectKanbanBoard() {
     const showDropIndicator = isOver && activeColumnId && activeColumnId !== column.id;
 
     return (
-      <div className="relative">
+      <div 
+        ref={setNodeRef} 
+        style={style}
+        className={`flex-1 min-w-0 relative group/column transition-all duration-200 ${
+          isDragging ? 'opacity-30 scale-[0.98]' : ''
+        }`}
+      >
         {/* Left Drop Indicator for Column */}
         {showDropIndicator && (
           <div 
@@ -1660,14 +1666,6 @@ export function ProjectKanbanBoard() {
             style={{ backgroundColor: state.preferences.accentColor }}
           />
         )}
-        
-        <div 
-          ref={setNodeRef} 
-          style={style}
-          className={`flex-1 min-w-0 relative group/column transition-all duration-200 ${
-            isDragging ? 'opacity-30 scale-[0.98]' : ''
-          }`}
-        >
           {/* Drag Handle for Column - appears on hover */}
           <div 
             {...attributes}
@@ -1710,7 +1708,6 @@ export function ProjectKanbanBoard() {
           onEmailDrop={handleEmailDropOnColumn}
           isDragging={isDragging}
         />
-        </div>
       </div>
     );
   };

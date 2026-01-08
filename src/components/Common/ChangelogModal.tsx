@@ -18,6 +18,32 @@ interface ChangelogEntry {
 // Changelog data - add new entries at the top
 const CHANGELOG: ChangelogEntry[] = [
   {
+    date: '2026-01-08',
+    items: [
+      {
+        type: 'fix',
+        text: {
+          de: 'Spaltenbreiten bei Projekten repariert – Gleichmäßige Verteilung nach DnD-Update wiederhergestellt',
+          en: 'Fixed column widths in projects – Even distribution restored after DnD update'
+        }
+      },
+      {
+        type: 'improvement',
+        text: {
+          de: 'Markdown-Überschriften in Notizen deutlich größer – H1 bis H6 jetzt klar vom Fließtext unterscheidbar',
+          en: 'Markdown headings in notes significantly larger – H1 to H6 now clearly distinguishable from body text'
+        }
+      },
+      {
+        type: 'improvement',
+        text: {
+          de: 'Inbox: Elegantes Projekt-Submenu im Kontextmenü – Gleicher Style wie bei Projekten und Pins',
+          en: 'Inbox: Elegant project submenu in context menu – Same style as in Projects and Pins'
+        }
+      }
+    ]
+  },
+  {
     date: '2026-01-07',
     items: [
       {
