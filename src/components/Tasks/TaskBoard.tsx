@@ -1556,28 +1556,29 @@ export function TaskBoard() {
           if (column.type === 'date' && column.id.startsWith('date-')) {
             const dateStr = column.id.replace('date-', '');
             
-            // 1. Tasks directly assigned to this date column (primary assignment)
-          if (task.columnId === column.id) {
-            return true;
-          }
+            // 1. Tasks directly assigned to this date column (primary assignment via columnId)
+            if (task.columnId === column.id) {
+              return true;
+            }
+            
+            // 2. Tasks with reminderDate matching this date (AUCH für Projekt-Aufgaben!)
+            // Dies stellt sicher, dass Aufgaben immer in der richtigen Spalte erscheinen
+            if (task.reminderDate === dateStr) {
+              return true;
+            }
           
-            // 2. Tasks with deadline matching this date (additional deadline display)
+            // 3. Tasks with deadline matching this date (additional deadline display)
             if (task.deadline) {
               const taskDeadlineStr = task.deadline.includes('T') ? task.deadline.split('T')[0] : task.deadline;
               if (taskDeadlineStr === dateStr) {
                 return true; // Show as deadline reminder, even if task is elsewhere
               }
             }
-            
-            // 3. Tasks with reminderDate matching this date (if not project tasks)
-            if (task.reminderDate === dateStr && !task.projectId) {
-                return true;
-              }
-            }
+          }
             
           // For non-date columns (like inbox), show directly assigned tasks
           if (task.columnId === column.id) {
-              return true;
+            return true;
           }
           
           return false;
@@ -1718,28 +1719,28 @@ export function TaskBoard() {
                         if (focusedColumn.type === 'date' && focusedColumn.id.startsWith('date-')) {
                           const dateStr = focusedColumn.id.replace('date-', '');
                           
-                          // 1. Tasks directly assigned to this date column (primary assignment)
-                        if (task.columnId === focusedColumn.id) {
-                          return true;
-                        }
+                          // 1. Tasks directly assigned to this date column (primary assignment via columnId)
+                          if (task.columnId === focusedColumn.id) {
+                            return true;
+                          }
+                          
+                          // 2. Tasks with reminderDate matching this date (AUCH für Projekt-Aufgaben!)
+                          if (task.reminderDate === dateStr) {
+                            return true;
+                          }
                         
-                          // 2. Tasks with deadline matching this date (additional deadline display)
+                          // 3. Tasks with deadline matching this date (additional deadline display)
                           if (task.deadline) {
                             const taskDeadlineStr = task.deadline.includes('T') ? task.deadline.split('T')[0] : task.deadline;
                             if (taskDeadlineStr === dateStr) {
                               return true; // Show as deadline reminder, even if task is elsewhere
                             }
                           }
-                          
-                          // 3. Tasks with reminderDate matching this date (if not project tasks)
-                          if (task.reminderDate === dateStr && !task.projectId) {
-                              return true;
-                            }
-                          }
+                        }
                           
                         // For non-date columns (like inbox), show directly assigned tasks
                         if (task.columnId === focusedColumn.id) {
-                            return true;
+                          return true;
                         }
                         
                         return false;
