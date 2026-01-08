@@ -2199,7 +2199,7 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
             </div>
             <div className="flex items-center justify-center space-x-4 mb-4">
               <img 
-                src={getFuchsImagePath()} 
+                src={getImagePath('Taskfuchs_head.png')} 
                 alt="TaskFuchs" 
                 className="w-20 h-20 object-contain"
                 loading="eager"
