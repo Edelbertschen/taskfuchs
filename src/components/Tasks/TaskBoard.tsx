@@ -17,7 +17,8 @@ import {
   verticalListSortingStrategy
 } from '@dnd-kit/sortable';
 import { useDraggable, useDroppable } from '@dnd-kit/core';
-import { ChevronRight, ChevronDown, ChevronUp, FolderClosed, Folder, Clock, X, Filter, AlertCircle, Tag } from 'lucide-react';
+import { ChevronRight, ChevronDown, ChevronUp, FolderClosed, Folder, Clock, X, Filter, AlertCircle, Tag, SlidersHorizontal } from 'lucide-react';
+import { CompactFilterBar, PriorityOption } from '../Common/CompactFilterBar';
 import { useApp } from '../../context/AppContext';
 import { useTranslation } from 'react-i18next';
 import { TaskColumn } from './TaskColumn';
@@ -360,6 +361,14 @@ export function TaskBoard() {
   const sidebarTouchStartXRef = useRef<number | null>(null);
 
   const [showFilters, setShowFilters] = useState(false);
+  const [filterPinned, setFilterPinned] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('taskfuchs-planner-filter-pinned');
+      return saved === 'true';
+    } catch {
+      return false;
+    }
+  });
   const [mounted, setMounted] = useState(false);
   // ✨ REMOVED: originalExpandedProjects state since we no longer collapse projects during drag
   const [isProjectColumnSelectionModalOpen, setIsProjectColumnSelectionModalOpen] = useState(false);
@@ -1868,40 +1877,32 @@ export function TaskBoard() {
               </p>
             </div>
               
-            {/* Filter Toggle Button - Below the line */}
-            <div className="p-4">
-              <div>
+            {/* Compact Filter Bar - Elegant & Space-Efficient */}
+            <div className="px-4 pt-4">
+              {/* Filter Toggle Button */}
+              {!showFilters && !filterPinned && (
                 <button
-                  onClick={() => setShowFilters(!showFilters)}
+                  onClick={() => setShowFilters(true)}
                   className={`w-full flex items-center justify-between p-3 rounded-lg transition-all duration-300 ${
                     isMinimalDesign 
-                      ? (showFilters || priorityFilter !== 'all' || state.activeTagFilters.length > 0
+                      ? (priorityFilter !== 'all' || state.activeTagFilters.length > 0
                           ? 'bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600'
                           : 'bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700')
                       : (isDarkMode 
-                          ? (showFilters || priorityFilter !== 'all' || state.activeTagFilters.length > 0
+                          ? (priorityFilter !== 'all' || state.activeTagFilters.length > 0
                               ? 'bg-gray-600/40 border border-gray-500/50'
                               : 'bg-gray-700/40 hover:bg-gray-600/40 border border-gray-600/40')
-                          : (showFilters || priorityFilter !== 'all' || state.activeTagFilters.length > 0
+                          : (priorityFilter !== 'all' || state.activeTagFilters.length > 0
                               ? 'bg-white/40 border border-gray-300/50'
                               : 'bg-white/30 hover:bg-white/40 border border-gray-300/40'))
                   }`}
                   style={{ 
-                    backdropFilter: isMinimalDesign ? 'none' : 'blur(8px)',
-                    boxShadow: showFilters ? `0 0 20px ${state.preferences.accentColor}20` : 'none'
+                    backdropFilter: isMinimalDesign ? 'none' : 'blur(8px)'
                   }}
                 >
                   <div className="flex items-center space-x-2">
-                    <Filter className={`w-4 h-4 ${isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? `isDarkMode ? 'text-white' : 'text-gray-900'` : 'text-gray-900')}`} />
-                    <span className={`text-sm font-medium ${isMinimalDesign ? 'text-gray-900 dark:text-white' : (isDarkMode ? `isDarkMode ? 'text-white' : 'text-gray-900'` : 'text-gray-900')}`}>Filter</span>
-                    {(priorityFilter !== 'all' || state.activeTagFilters.length > 0) && (
-                      <div 
-                        className="w-2 h-2 rounded-full animate-pulse"
-                        style={{ backgroundColor: state.preferences.accentColor }}
-                      />
-                    )}
-                  </div>
-                  <div className="flex items-center space-x-2">
+                    <SlidersHorizontal className={`w-4 h-4 ${isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? 'text-white' : 'text-gray-900')}`} />
+                    <span className={`text-sm font-medium ${isMinimalDesign ? 'text-gray-900 dark:text-white' : (isDarkMode ? 'text-white' : 'text-gray-900')}`}>Filter</span>
                     {(priorityFilter !== 'all' || state.activeTagFilters.length > 0) && (
                       <span 
                         className="px-2 py-0.5 rounded-full text-xs font-bold text-white"
@@ -1910,169 +1911,45 @@ export function TaskBoard() {
                         {(priorityFilter !== 'all' ? 1 : 0) + state.activeTagFilters.length}
                       </span>
                     )}
-                    <ChevronDown 
-                      className={`w-4 h-4 transition-transform duration-300 ${
-                        showFilters ? 'rotate-180' : ''
-                      } ${isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? `isDarkMode ? 'text-white' : 'text-gray-900'` : 'text-gray-900')}`} 
-                    />
                   </div>
+                  <ChevronDown className={`w-4 h-4 ${isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? 'text-white' : 'text-gray-900')}`} />
                 </button>
-
-                {/* Expandable Filter Panel */}
-                <div className={`overflow-hidden transition-all duration-300 ${
-                  showFilters ? 'max-h-96 opacity-100 mt-3' : 'max-h-0 opacity-0'
-                }`}>
-                  <div className={`p-4 rounded-lg backdrop-blur-md border space-y-4 ${
-                    isMinimalDesign
-                      ? 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
-                      : (isDarkMode ? 'bg-black/70 border-gray-600/50' : 'bg-white/90 border-gray-300/50')
-                  }`}>
-                    
-                    {/* Header with Filter icon and Clear button */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="p-1.5 rounded-lg" style={{ backgroundColor: state.preferences.accentColor + '20' }}>
-                          <Filter className="w-4 h-4" style={{ color: state.preferences.accentColor }} />
-                        </div>
-                        <h3 className="text-sm font-medium text-gray-900 dark:text-white">
-                          {t('common.filter', 'Filter')}
-                        </h3>
-                        {(priorityFilter !== 'all' || state.activeTagFilters.length > 0) && (
-                          <span 
-                            className="px-2 py-0.5 rounded-full text-xs font-bold text-white"
-                            style={{ backgroundColor: state.preferences.accentColor }}
-                          >
-                            {(priorityFilter !== 'all' ? 1 : 0) + state.activeTagFilters.length}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        {(priorityFilter !== 'all' || state.activeTagFilters.length > 0) && (
-                          <button
-                            onClick={() => {
-                              setPriorityFilter('all');
-                              dispatch({ type: 'CLEAR_TAG_FILTERS' });
-                            }}
-                            className="flex items-center space-x-1 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 px-2 py-1 rounded-lg"
-                          >
-                            <X className="w-3 h-3" />
-                            <span>{t('common.clearAll', 'Alle löschen')}</span>
-                          </button>
-                        )}
-                        <button
-                          onClick={() => setShowFilters(false)}
-                          className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200"
-                          title={t('common.close', 'Schließen')}
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                    
-                    {/* Priority Filters - Compact buttons */}
-                    <div>
-                      <label className={`block text-xs font-medium mb-2 flex items-center space-x-2 ${
-                        isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? 'text-gray-300' : 'text-gray-900')
-                      }`}>
-                        <AlertCircle className="w-3 h-3" />
-                        <span>Prioritäten</span>
-                      </label>
-                      
-                      <div className="flex gap-1">
-                        {/* All Priority Button */}
-                        <button
-                          onClick={() => setPriorityFilter('all')}
-                          className={`h-8 px-2 rounded-md text-xs font-bold transition-all duration-200 ${
-                            priorityFilter === 'all'
-                              ? 'bg-white text-gray-800 shadow-lg scale-105'
-                              : (isDarkMode ? 'bg-gray-600/60 text-gray-300 hover:bg-gray-500/60' : 'bg-gray-200/80 text-gray-600 hover:bg-gray-300/80') + ' hover:scale-105'
-                          }`}
-                          title={t('tasks.filter.all_priorities')}
-                        >
-                          ALL
-                        </button>
-                        
-                        {/* Individual Priority Buttons */}
-                        {[
-                          { key: 'high', label: 'H', color: '#ef4444', title: t('tasks.priority.high') + ' Priorität' },
-                          { key: 'medium', label: 'M', color: '#f59e0b', title: t('tasks.priority.medium') + ' Priorität' },
-                          { key: 'low', label: 'L', color: '#10b981', title: t('tasks.priority.low') + ' Priorität' },
-                          { key: 'none', label: '–', color: '#9ca3af', title: t('tasks.priority.none') + ' Priorität' }
-                        ].map(({ key, label, color, title }) => (
-                          <button
-                            key={key}
-                            onClick={() => setPriorityFilter(key)}
-                            className={`h-8 px-2 rounded-md text-xs font-bold transition-all duration-200 ${
-                              priorityFilter === key
-                                ? 'text-white shadow-lg scale-105'
-                                : 'text-white/80 hover:text-white hover:scale-105'
-                            }`}
-                            title={title}
-                            style={{
-                              backgroundColor: priorityFilter === key ? color : `${color}60`,
-                              boxShadow: priorityFilter === key ? `0 0 12px ${color}40` : 'none'
-                            }}
-                          >
-                            {label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-
-                    {/* Tag Filters */}
-                    <div>
-                      <label className={`block text-xs font-medium mb-2 flex items-center space-x-2 ${
-                        isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? 'text-gray-300' : 'text-gray-900')
-                      }`}>
-                        <Tag className="w-3 h-3" />
-                        <span>Tags</span>
-                      </label>
-                      
-                      {(() => {
-                        const availableTags = state.tags.filter(tag => {
-                          const actualTaskCount = state.tasks.filter(task => task.tags.includes(tag.name)).length;
-                          return tag.count > 0 && actualTaskCount > 0;
-                        });
-                        
-                        return availableTags.length > 0 ? (
-                        <div className="flex flex-wrap gap-1.5">
-                            {availableTags
-                            .slice(0, 8) // Limit to 8 most used tags
-                            .map(tag => {
-                              const isActive = state.activeTagFilters.includes(tag.name);
-                              return (
-                                <button
-                                  key={tag.id}
-                                  onClick={() => {
-                                    dispatch({ type: 'TOGGLE_TAG_FILTER', payload: tag.name });
-                                  }}
-                                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all duration-200 ${
-                                    isActive
-                                      ? 'text-white shadow-sm scale-105'
-                                      : (isDarkMode ? 'bg-gray-600/60 text-gray-300 hover:bg-gray-500/60' : 'bg-gray-200/80 text-gray-700 hover:bg-gray-300/80') + ' hover:scale-105'
-                                  }`}
-                                  style={isActive ? {
-                                    backgroundColor: tag.color || state.preferences.accentColor,
-                                    boxShadow: `0 0 8px ${tag.color || state.preferences.accentColor}40`
-                                  } : {}}
-                                  title={`${tag.name} (${tag.count} Aufgaben)`}
-                                >
-                                  {tag.name}
-                                </button>
-                              );
-                            })}
-                        </div>
-                      ) : (
-                        <div className={`text-xs italic ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                          {t('common.noTagsAvailable', 'Keine Tags verfügbar')}
-                        </div>
-                        );
-                      })()}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              )}
+              
+              {/* Compact Filter Bar */}
+              {(showFilters || filterPinned) && (
+                <CompactFilterBar
+                  priorityFilter={priorityFilter as PriorityOption | 'all'}
+                  dateFilter="all"
+                  tagFilters={state.activeTagFilters}
+                  showCompleted={false}
+                  availableTags={state.tags.filter(tag => {
+                    const actualTaskCount = state.tasks.filter(task => task.tags.includes(tag.name)).length;
+                    return tag.count > 0 && actualTaskCount > 0;
+                  }).sort((a, b) => b.count - a.count)}
+                  onPriorityChange={(priority) => setPriorityFilter(priority)}
+                  onDateFilterChange={() => {}}
+                  onTagToggle={(tagName) => dispatch({ type: 'TOGGLE_TAG_FILTER', payload: tagName })}
+                  onShowCompletedToggle={() => {}}
+                  onClearAll={() => {
+                    setPriorityFilter('all');
+                    dispatch({ type: 'CLEAR_TAG_FILTERS' });
+                  }}
+                  accentColor={state.preferences.accentColor}
+                  isDarkMode={isDarkMode}
+                  isMinimalDesign={isMinimalDesign}
+                  isPinned={filterPinned}
+                  onPinnedChange={(pinned) => {
+                    setFilterPinned(pinned);
+                    try { localStorage.setItem('taskfuchs-planner-filter-pinned', String(pinned)); } catch {}
+                    if (pinned) {
+                      setShowFilters(true);
+                    }
+                  }}
+                  isVisible={true}
+                  onClose={() => setShowFilters(false)}
+                />
+              )}
               
               {/* Stats */}
               <div className="flex items-center justify-end mt-4">
