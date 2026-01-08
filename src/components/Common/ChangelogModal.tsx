@@ -21,6 +21,13 @@ const CHANGELOG: ChangelogEntry[] = [
     date: '2026-01-08',
     items: [
       {
+        type: 'improvement',
+        text: {
+          de: 'Datum immer sichtbar auf Aufgabenkarten – Zeigt Deadline, Fälligkeit oder Erinnerungsdatum, vergangene Daten in Rot',
+          en: 'Date always visible on task cards – Shows deadline, due date or reminder date, past dates in red'
+        }
+      },
+      {
         type: 'fix',
         text: {
           de: 'Scrollen in Projektspalten bei aktiven Filtern repariert – Flexbox-Höhenberechnung korrigiert',

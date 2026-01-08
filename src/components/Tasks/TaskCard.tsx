@@ -553,23 +553,62 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
     return project.title;
   };
 
-  // CORRECTED: Show date when task is in PROJECT context (project/kanban column)
-  const getTaskDateDisplay = () => {
-    if (!task.projectId || !task.columnId || !currentColumn) return null;
+  // IMPROVED: Show date when task has any date set (always visible in project context)
+  const getTaskDateDisplay = (): { date: string; isPast: boolean } | null => {
+    // Don't show date badge in date columns (already shown in column header)
+    if (currentColumn?.type === 'date') return null;
     
-    // Only show date when NOT in a date column (i.e., in project context)
-    if (currentColumn.type === 'date') return null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     
-    // Find the date column this task is assigned to
-    const dateColumn = state.columns.find(col => col.id === task.columnId);
-    if (!dateColumn || dateColumn.type !== 'date' || !dateColumn.date) return null;
-    
-    try {
-      const date = new Date(dateColumn.date);
-      return format(date, 'dd.MM.', { locale: de });
-    } catch (error) {
-      return null;
+    // Priority 1: Check for dueDate (recurring tasks)
+    if (task.dueDate) {
+      try {
+        const date = new Date(task.dueDate);
+        const isPast = date < today;
+        return { date: format(date, 'dd.MM.', { locale: de }), isPast };
+      } catch (error) {
+        // Continue to next check
+      }
     }
+    
+    // Priority 2: Check for deadline
+    if (task.deadline) {
+      try {
+        const date = new Date(task.deadline);
+        const isPast = date < today;
+        return { date: format(date, 'dd.MM.', { locale: de }), isPast };
+      } catch (error) {
+        // Continue to next check
+      }
+    }
+    
+    // Priority 3: Check for reminderDate
+    if (task.reminderDate) {
+      try {
+        const date = new Date(task.reminderDate);
+        const isPast = date < today;
+        return { date: format(date, 'dd.MM.', { locale: de }), isPast };
+      } catch (error) {
+        // Continue to next check
+      }
+    }
+    
+    // Priority 4: Check for assigned date column
+    if (task.columnId) {
+      const dateColumn = state.columns.find(col => col.id === task.columnId);
+      if (dateColumn?.type === 'date' && dateColumn.date) {
+        try {
+          const date = new Date(dateColumn.date);
+          const isPast = date < today;
+          return { date: format(date, 'dd.MM.', { locale: de }), isPast };
+        } catch (error) {
+          return null;
+        }
+      }
+    }
+    
+    return null;
   };
 
   // Check if this task is currently being displayed on its deadline date
@@ -994,10 +1033,18 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
                   task.completed ? 'opacity-70' : 'opacity-80 hover:opacity-100'
                 }`}
                 style={{
-                  backgroundColor: task.completed ? '#D1D5DB' : accentColor + '15',
-                  color: task.completed ? '#6B7280' : accentColor
+                  backgroundColor: task.completed 
+                    ? '#D1D5DB' 
+                    : (taskDateDisplay?.isPast && !taskProjectDisplay) 
+                      ? '#FEE2E2' 
+                      : accentColor + '15',
+                  color: task.completed 
+                    ? '#6B7280' 
+                    : (taskDateDisplay?.isPast && !taskProjectDisplay) 
+                      ? '#DC2626' 
+                      : accentColor
                 }}
-                title={taskProjectDisplay ? `${t('planner.project_label')} ${taskProjectDisplay}` : `${t('planner.assigned_date_label')} ${taskDateDisplay}`}
+                title={taskProjectDisplay ? `${t('planner.project_label')} ${taskProjectDisplay}` : `${t('planner.assigned_date_label')} ${taskDateDisplay?.date}`}
               >
                 {taskProjectDisplay ? (
                   <>
@@ -1006,8 +1053,14 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
                   </>
                 ) : (
                   <>
-                    <Calendar className="w-3 h-3" style={{ color: task.completed ? '#6B7280' : accentColor }} />
-                    {taskDateDisplay}
+                    <Calendar className="w-3 h-3" style={{ 
+                      color: task.completed 
+                        ? '#6B7280' 
+                        : taskDateDisplay?.isPast 
+                          ? '#DC2626' 
+                          : accentColor 
+                    }} />
+                    {taskDateDisplay?.date}
                   </>
                 )}
               </span>
