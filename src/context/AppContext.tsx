@@ -167,6 +167,7 @@ type AppAction =
   | { type: 'SET_PROJECT_KANBAN_TAG_FILTERS'; payload: string[] }
   | { type: 'SET_PROJECT_KANBAN_SHOW_COMPLETED'; payload: boolean }
   | { type: 'SET_PROJECT_KANBAN_HIDE_SCHEDULED'; payload: boolean }
+  | { type: 'SET_PROJECT_KANBAN_DATE_FILTER'; payload: import('./types').DateFilterOption }
   | { type: 'SET_PROJECT_KANBAN_VIEW_TYPE'; payload: 'board' | 'list' }
   | { type: 'ADD_PROJECT_KANBAN_COLUMN'; payload: { projectId: string; title: string; color?: string } }
   | { type: 'ADD_PROJECT_KANBAN_COLUMN_WITH_ID'; payload: { id: string; projectId: string; title: string; color: string; order: number } }
@@ -280,6 +281,7 @@ const initialState: AppState = {
       tagFilters: [],
       showCompleted: false,
       hideScheduledTasks: false,
+      dateFilter: 'all',
       viewType: 'board',
     },
   },
@@ -1890,6 +1892,18 @@ function appReducer(state: AppState, action: AppAction): AppState {
           projectKanban: {
             ...state.viewState.projectKanban,
             hideScheduledTasks: action.payload,
+          },
+        },
+      };
+    
+    case 'SET_PROJECT_KANBAN_DATE_FILTER':
+      return {
+        ...state,
+        viewState: {
+          ...state.viewState,
+          projectKanban: {
+            ...state.viewState.projectKanban,
+            dateFilter: action.payload,
           },
         },
       };

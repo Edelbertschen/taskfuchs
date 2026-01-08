@@ -21,6 +21,13 @@ const CHANGELOG: ChangelogEntry[] = [
     date: '2026-01-08',
     items: [
       {
+        type: 'feature',
+        text: {
+          de: 'Neue Zeitraum-Filter für Pins und Projekte – Jederzeit (nur ohne Datum), Heute, Morgen, Diese Woche',
+          en: 'New date filters for Pins and Projects – Anytime (no date only), Today, Tomorrow, This Week'
+        }
+      },
+      {
         type: 'improvement',
         text: {
           de: 'Datum immer sichtbar auf Aufgabenkarten – Zeigt Deadline, Fälligkeit oder Erinnerungsdatum, vergangene Daten in Rot',

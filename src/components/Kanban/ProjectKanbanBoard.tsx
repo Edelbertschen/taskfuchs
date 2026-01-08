@@ -25,7 +25,7 @@ import {
   arrayMove
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { FolderOpen, Plus, Settings, Edit2, Sparkles, X, MoreHorizontal, MoreVertical, Columns, Focus, ChevronUp, ChevronDown, Filter, Hash, AlertCircle, Circle, CheckCircle, Archive, Clock, Trash2, Check, FileText, Info, Pin, BarChart3, Tag, GripVertical } from 'lucide-react';
+import { FolderOpen, Plus, Settings, Edit2, Sparkles, X, MoreHorizontal, MoreVertical, Columns, Focus, ChevronUp, ChevronDown, Filter, Hash, AlertCircle, Circle, CheckCircle, Archive, Clock, Trash2, Check, FileText, Info, Pin, BarChart3, Tag, GripVertical, Calendar } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { TaskCard } from '../Tasks/TaskCard';
 import { TaskColumn } from '../Tasks/TaskColumn';
@@ -41,7 +41,7 @@ import { TaskModal } from '../Tasks/TaskModal';
 import { Header } from '../Layout/Header';
 import type { Task, Column, ProjectKanbanColumn } from '../../types';
 import type { OutlookEmail } from '../../types/email';
-import { format, addDays, startOfDay } from 'date-fns';
+import { format, addDays, startOfDay, startOfWeek } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { useEmail } from '../../context/EmailContext';
 import { createTaskFromEmail } from '../../utils/emailToTask';
@@ -970,23 +970,46 @@ export function ProjectKanbanBoard() {
       return false;
     }
 
-    // Apply "hide scheduled tasks" filter - Things3 style focus
-    // Show only: tasks without a date OR tasks scheduled for today
-    if (state.viewState.projectKanban.hideScheduledTasks) {
+    // Apply date filter
+    const dateFilter = state.viewState.projectKanban.dateFilter || 'all';
+    if (dateFilter !== 'all') {
       const today = startOfDay(new Date());
+      const tomorrow = addDays(today, 1);
+      const weekStart = startOfWeek(today, { weekStartsOn: 1 }); // Monday
+      const weekEnd = addDays(weekStart, 6); // Sunday
       
-      // If task has no reminder date, show it (unscheduled task)
-      if (!task.reminderDate) {
-        // Task has no date - show it
-      } else {
-        // Task has a date - check if it's today
-        const taskDate = startOfDay(new Date(task.reminderDate));
-        const isToday = taskDate.getTime() === today.getTime();
-        
-        if (!isToday) {
-          // Task is scheduled for a future date - hide it
-          return false;
+      // Get task date from various sources
+      const getTaskDate = () => {
+        if (task.dueDate) return startOfDay(new Date(task.dueDate));
+        if (task.deadline) return startOfDay(new Date(task.deadline));
+        if (task.reminderDate) return startOfDay(new Date(task.reminderDate));
+        // Check if assigned to date column
+        if (task.columnId) {
+          const dateColumn = state.columns.find(col => col.id === task.columnId && col.type === 'date');
+          if (dateColumn?.date) return startOfDay(new Date(dateColumn.date));
         }
+        return null;
+      };
+      
+      const taskDate = getTaskDate();
+      
+      switch (dateFilter) {
+        case 'anytime':
+          // Only show tasks WITHOUT any date
+          if (taskDate !== null) return false;
+          break;
+        case 'today':
+          // Only show tasks for today
+          if (!taskDate || taskDate.getTime() !== today.getTime()) return false;
+          break;
+        case 'tomorrow':
+          // Only show tasks for tomorrow
+          if (!taskDate || taskDate.getTime() !== tomorrow.getTime()) return false;
+          break;
+        case 'thisWeek':
+          // Only show tasks for this week (Monday to Sunday)
+          if (!taskDate || taskDate < weekStart || taskDate > weekEnd) return false;
+          break;
       }
     }
 
@@ -1844,7 +1867,7 @@ export function ProjectKanbanBoard() {
   const handleClearAllProjectFilters = () => {
     dispatch({ type: 'SET_PROJECT_KANBAN_PRIORITY_FILTERS', payload: [] });
     dispatch({ type: 'SET_PROJECT_KANBAN_TAG_FILTERS', payload: [] });
-    dispatch({ type: 'SET_PROJECT_KANBAN_HIDE_SCHEDULED', payload: false });
+    dispatch({ type: 'SET_PROJECT_KANBAN_DATE_FILTER', payload: 'all' });
     dispatch({ type: 'SET_PROJECT_KANBAN_SHOW_COMPLETED', payload: false });
   };
 
@@ -2279,13 +2302,13 @@ export function ProjectKanbanBoard() {
                         </div>
                         
                         <div className="flex items-center space-x-2">
-                          {(state.viewState.projectKanban.priorityFilters.length > 0 || state.viewState.projectKanban.tagFilters.length > 0 || state.viewState.projectKanban.hideScheduledTasks || state.viewState.projectKanban.showCompleted) && (
+                          {(state.viewState.projectKanban.priorityFilters.length > 0 || state.viewState.projectKanban.tagFilters.length > 0 || (state.viewState.projectKanban.dateFilter && state.viewState.projectKanban.dateFilter !== 'all') || state.viewState.projectKanban.showCompleted) && (
                             <button
                               onClick={handleClearAllProjectFilters}
                               className="flex items-center space-x-1 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 px-2 py-1 rounded-lg"
                             >
                               <X className="w-3 h-3" />
-                              <span>{t('clear_all_filters')}</span>
+                              <span>{t('filter.clearAll', 'Alle zurücksetzen')}</span>
                             </button>
                           )}
                           
@@ -2403,26 +2426,48 @@ export function ProjectKanbanBoard() {
                           </div>
                         </div>
 
-                        {/* Quick Toggles - Jederzeit (Hide Scheduled) & Show Completed */}
-                        <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-                          {/* Anytime / Jederzeit Toggle - Hide future scheduled tasks */}
-                          <button
-                            onClick={() => dispatch({ type: 'SET_PROJECT_KANBAN_HIDE_SCHEDULED', payload: !state.viewState.projectKanban.hideScheduledTasks })}
-                            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
-                              state.viewState.projectKanban.hideScheduledTasks
-                                ? 'bg-amber-500 text-white shadow-sm'
-                                : (isDarkMode ? 'bg-gray-600/60 text-gray-300 hover:bg-gray-500/60' : 'bg-gray-200/80 text-gray-700 hover:bg-gray-300/80')
-                            }`}
-                            style={state.viewState.projectKanban.hideScheduledTasks ? { 
-                              boxShadow: '0 0 8px rgba(245, 158, 11, 0.4)'
-                            } : {}}
-                            title="Geplante Aufgaben ausblenden – zeige nur Aufgaben für heute und ohne Termin"
-                          >
-                            <Clock className="w-3.5 h-3.5" />
-                            <span>Jederzeit</span>
-                          </button>
+                        {/* Date Filter Buttons */}
+                        <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+                          <label className={`block text-xs font-medium mb-2 flex items-center space-x-2 ${
+                            isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? 'text-gray-300' : 'text-gray-900')
+                          }`}>
+                            <Calendar className="w-3 h-3" />
+                            <span>{t('filter.dateFilter', 'Zeitraum')}</span>
+                          </label>
+                          <div className="flex flex-wrap gap-1.5">
+                            {[
+                              { key: 'all', label: t('filter.all', 'Alle'), icon: null },
+                              { key: 'anytime', label: t('filter.anytime', 'Jederzeit'), icon: Clock },
+                              { key: 'today', label: t('filter.today', 'Heute'), icon: Calendar },
+                              { key: 'tomorrow', label: t('filter.tomorrow', 'Morgen'), icon: Calendar },
+                              { key: 'thisWeek', label: t('filter.thisWeek', 'Diese Woche'), icon: Calendar }
+                            ].map(({ key, label, icon: Icon }) => {
+                              const isActive = (state.viewState.projectKanban.dateFilter || 'all') === key;
+                              return (
+                                <button
+                                  key={key}
+                                  onClick={() => dispatch({ type: 'SET_PROJECT_KANBAN_DATE_FILTER', payload: key as any })}
+                                  className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                                    isActive
+                                      ? 'text-white shadow-sm'
+                                      : (isDarkMode ? 'bg-gray-600/60 text-gray-300 hover:bg-gray-500/60' : 'bg-gray-200/80 text-gray-700 hover:bg-gray-300/80')
+                                  }`}
+                                  style={isActive ? { 
+                                    backgroundColor: state.preferences.accentColor,
+                                    boxShadow: `0 0 8px ${state.preferences.accentColor}40`
+                                  } : {}}
+                                  title={label}
+                                >
+                                  {Icon && <Icon className="w-3 h-3" />}
+                                  <span>{label}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
 
-                          {/* Show Completed Toggle */}
+                        {/* Show Completed Toggle */}
+                        <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
                           <button
                             onClick={() => dispatch({ type: 'SET_PROJECT_KANBAN_SHOW_COMPLETED', payload: !state.viewState.projectKanban.showCompleted })}
                             className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
@@ -2433,10 +2478,10 @@ export function ProjectKanbanBoard() {
                             style={state.viewState.projectKanban.showCompleted ? { 
                               boxShadow: '0 0 8px rgba(34, 197, 94, 0.4)'
                             } : {}}
-                            title="Erledigte Aufgaben anzeigen"
+                            title={t('filter.showCompleted', 'Erledigte Aufgaben anzeigen')}
                           >
                             <Check className="w-3.5 h-3.5" />
-                            <span>Erledigt</span>
+                            <span>{t('filter.completed', 'Erledigt')}</span>
                           </button>
                         </div>
                       </div>

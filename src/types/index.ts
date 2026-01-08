@@ -589,6 +589,9 @@ export interface ProjectKanbanColumn {
   isDefault?: boolean; // True for the default "Aufgaben" column
 }
 
+// Date filter options for project/pin views
+export type DateFilterOption = 'all' | 'anytime' | 'today' | 'tomorrow' | 'thisWeek';
+
 export interface ProjectKanbanState {
   selectedProjectId: string | null;
   columns: ProjectKanbanColumn[];
@@ -596,7 +599,8 @@ export interface ProjectKanbanState {
   priorityFilters: TaskPriority[];
   tagFilters: string[];
   showCompleted: boolean;
-  hideScheduledTasks: boolean; // Hide tasks with future dates (show only today and no-date tasks)
+  hideScheduledTasks: boolean; // DEPRECATED: Use dateFilter instead
+  dateFilter: DateFilterOption; // New: Filter by date (all, anytime, today, tomorrow, thisWeek)
   viewType: 'board' | 'list'; // Toggle between board and list view
 }
 

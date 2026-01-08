@@ -3,7 +3,7 @@ import { useApp } from '../../context/AppContext';
 import { createPortal } from 'react-dom';
 import { useAppTranslation } from '../../utils/i18nHelpers';
 import { useTranslation } from 'react-i18next';
-import { format } from 'date-fns';
+import { format, startOfDay, addDays, startOfWeek } from 'date-fns';
 import { 
   DndContext, 
   DragOverlay, 
@@ -44,7 +44,8 @@ import {
   Folder,
   Filter,
   AlertCircle,
-  Tag
+  Tag,
+  Clock
 } from 'lucide-react';
 import { TaskCard } from '../Tasks/TaskCard';
 import { TaskColumn } from '../Tasks/TaskColumn';
@@ -161,6 +162,7 @@ export function PinsView() {
   const [showFilterPanel, setShowFilterPanel] = useState(false);
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
   const [tagFilters, setTagFilters] = useState<string[]>([]);
+  const [dateFilter, setDateFilter] = useState<'all' | 'anytime' | 'today' | 'tomorrow' | 'thisWeek'>('all');
   
   useEffect(() => {
     setMounted(true);
@@ -430,6 +432,48 @@ export function PinsView() {
           if (!hasMatchingTag) return false;
         }
         
+        // Date filter
+        if (dateFilter !== 'all') {
+          const today = startOfDay(new Date());
+          const tomorrow = addDays(today, 1);
+          const weekStart = startOfWeek(today, { weekStartsOn: 1 }); // Monday
+          const weekEnd = addDays(weekStart, 6); // Sunday
+          
+          // Get task date from various sources
+          const getTaskDate = () => {
+            if (task.dueDate) return startOfDay(new Date(task.dueDate));
+            if (task.deadline) return startOfDay(new Date(task.deadline));
+            if (task.reminderDate) return startOfDay(new Date(task.reminderDate));
+            // Check if assigned to date column
+            if (task.columnId) {
+              const dateColumn = state.columns.find(col => col.id === task.columnId && col.type === 'date');
+              if (dateColumn?.date) return startOfDay(new Date(dateColumn.date));
+            }
+            return null;
+          };
+          
+          const taskDate = getTaskDate();
+          
+          switch (dateFilter) {
+            case 'anytime':
+              // Only show tasks WITHOUT any date
+              if (taskDate !== null) return false;
+              break;
+            case 'today':
+              // Only show tasks for today
+              if (!taskDate || taskDate.getTime() !== today.getTime()) return false;
+              break;
+            case 'tomorrow':
+              // Only show tasks for tomorrow
+              if (!taskDate || taskDate.getTime() !== tomorrow.getTime()) return false;
+              break;
+            case 'thisWeek':
+              // Only show tasks for this week (Monday to Sunday)
+              if (!taskDate || taskDate < weekStart || taskDate > weekEnd) return false;
+              break;
+          }
+        }
+        
         return true;
       })
       .forEach(task => {
@@ -443,7 +487,7 @@ export function PinsView() {
     });
 
     return tasksByColumn;
-  }, [state.tasks, state.pinColumns, priorityFilter, tagFilters]);
+  }, [state.tasks, state.pinColumns, state.columns, priorityFilter, tagFilters, dateFilter]);
 
   // Drag handlers
   const handleDragStart = (event: DragStartEvent) => {
@@ -1139,26 +1183,27 @@ export function PinsView() {
                       <Filter className="w-4 h-4" style={{ color: state.preferences.accentColor }} />
                 </div>
                     <h3 className="text-sm font-medium text-gray-900 dark:text-white">{t('pins.filter')}</h3>
-                    {(priorityFilter !== 'all' || tagFilters.length > 0) && (
+                    {(priorityFilter !== 'all' || tagFilters.length > 0 || dateFilter !== 'all') && (
                       <span 
                         className="px-2 py-0.5 rounded-full text-xs font-bold text-white"
                         style={{ backgroundColor: state.preferences.accentColor }}
                       >
-                        {(priorityFilter !== 'all' ? 1 : 0) + tagFilters.length}
+                        {(priorityFilter !== 'all' ? 1 : 0) + tagFilters.length + (dateFilter !== 'all' ? 1 : 0)}
                       </span>
                     )}
                   </div>
                   <div className="flex items-center space-x-2">
-                    {(priorityFilter !== 'all' || tagFilters.length > 0) && (
+                    {(priorityFilter !== 'all' || tagFilters.length > 0 || dateFilter !== 'all') && (
                       <button
                         onClick={() => {
                           setPriorityFilter('all');
                           setTagFilters([]);
+                          setDateFilter('all');
                         }}
                         className="flex items-center space-x-1 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 px-2 py-1 rounded-lg"
                       >
                         <X className="w-3 h-3" />
-                        <span>{t('common.clearAll', 'Alle löschen')}</span>
+                        <span>{t('filter.clearAll', 'Alle zurücksetzen')}</span>
                       </button>
                     )}
                     <button
@@ -1254,6 +1299,46 @@ export function PinsView() {
                     )}
               </div>
             </div>
+                
+                {/* Date Filter Buttons */}
+                <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+                  <label className={`block text-xs font-medium mb-2 flex items-center space-x-2 ${
+                    isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? 'text-gray-300' : 'text-gray-900')
+                  }`}>
+                    <Calendar className="w-3 h-3" />
+                    <span>{t('filter.dateFilter', 'Zeitraum')}</span>
+                  </label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      { key: 'all' as const, label: t('filter.all', 'Alle'), icon: null },
+                      { key: 'anytime' as const, label: t('filter.anytime', 'Jederzeit'), icon: Clock },
+                      { key: 'today' as const, label: t('filter.today', 'Heute'), icon: Calendar },
+                      { key: 'tomorrow' as const, label: t('filter.tomorrow', 'Morgen'), icon: Calendar },
+                      { key: 'thisWeek' as const, label: t('filter.thisWeek', 'Diese Woche'), icon: Calendar }
+                    ].map(({ key, label, icon: Icon }) => {
+                      const isActive = dateFilter === key;
+                      return (
+                        <button
+                          key={key}
+                          onClick={() => setDateFilter(key)}
+                          className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                            isActive
+                              ? 'text-white shadow-sm'
+                              : (isDarkMode ? 'bg-gray-600/60 text-gray-300 hover:bg-gray-500/60' : 'bg-gray-200/80 text-gray-700 hover:bg-gray-300/80')
+                          }`}
+                          style={isActive ? { 
+                            backgroundColor: state.preferences.accentColor,
+                            boxShadow: `0 0 8px ${state.preferences.accentColor}40`
+                          } : {}}
+                          title={label}
+                        >
+                          {Icon && <Icon className="w-3 h-3" />}
+                          <span>{label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
           </div>
             </div>
           )}
