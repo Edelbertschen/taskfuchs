@@ -1330,7 +1330,7 @@ export function MobileShell() {
             <div className="flex items-center justify-center gap-2 pb-2">
               <Wand2 className="w-4 h-4" style={{ color: accent }} />
               <span className="text-xs font-medium" style={{ color: accent }}>KI-Erfassung aktiv</span>
-            </div>
+              </div>
             
             <div className="px-4 pb-4">
               <input 
@@ -1385,7 +1385,7 @@ export function MobileShell() {
                         Erstellen
                       </>
                     )}
-                  </button>
+                </button>
                 </div>
               </div>
             </div>

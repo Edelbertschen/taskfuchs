@@ -2205,16 +2205,16 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
                 onError={(e) => { (e.currentTarget as HTMLImageElement).src = getImagePath('Fuchs.svg'); }}
               />
               <div className="flex flex-col">
-                <p className="text-4xl font-medium tracking-wide" 
-                  style={{ 
-                    fontFamily: "'Roboto', sans-serif",
-                    color: isDarkMode ? 'rgb(255, 255, 255)' : 'rgb(31, 41, 55)',
-                    textShadow: isMinimalDesign 
-                      ? 'none' 
-                      : isDarkMode
-                        ? '0 0 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 0, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.9)'
-                        : '0 0 8px rgba(255, 255, 255, 0.9), 0 0 20px rgba(255, 255, 255, 0.7), 0 2px 4px rgba(0, 0, 0, 0.3)'
-                  }}>
+              <p className="text-4xl font-medium tracking-wide" 
+                style={{ 
+                  fontFamily: "'Roboto', sans-serif",
+                  color: isDarkMode ? 'rgb(255, 255, 255)' : 'rgb(31, 41, 55)',
+                  textShadow: isMinimalDesign 
+                    ? 'none' 
+                    : isDarkMode
+                      ? '0 0 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 0, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.9)'
+                      : '0 0 8px rgba(255, 255, 255, 0.9), 0 0 20px rgba(255, 255, 255, 0.7), 0 2px 4px rgba(0, 0, 0, 0.3)'
+                }}>
                   {timeGreeting.greeting}
                 </p>
                 <p className="text-lg font-light tracking-wide mt-1 opacity-80" 
@@ -2228,7 +2228,7 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
                         : '0 0 6px rgba(255, 255, 255, 0.8)'
                   }}>
                   {timeGreeting.subtitle}
-                </p>
+              </p>
               </div>
             </div>
           </div>
