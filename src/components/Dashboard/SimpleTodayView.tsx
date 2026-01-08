@@ -2200,8 +2200,10 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
             <div className="flex items-center justify-center space-x-4 mb-4">
               <img 
                 src={getFuchsImagePath()} 
-                alt="Fuchs Logo" 
-                className="w-24 h-24 object-contain animate-float"
+                alt="TaskFuchs" 
+                className="w-20 h-20 object-contain"
+                loading="eager"
+                decoding="async"
                 onError={(e) => { (e.currentTarget as HTMLImageElement).src = getImagePath('Fuchs.svg'); }}
               />
               <div className="flex flex-col">
