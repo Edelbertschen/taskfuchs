@@ -1235,10 +1235,10 @@ export function PinsView() {
                       ALL
                     </button>
                     {[
-                      { key: 'high', label: 'H', color: '#ef4444' },
-                      { key: 'medium', label: 'M', color: '#f59e0b' },
-                      { key: 'low', label: 'L', color: '#10b981' },
-                      { key: 'none', label: '–', color: '#9ca3af' }
+                      { key: 'high', label: t('tasks.priority.high', 'Hoch'), color: '#ef4444' },
+                      { key: 'medium', label: t('tasks.priority.medium', 'Mittel'), color: '#f59e0b' },
+                      { key: 'low', label: t('tasks.priority.low', 'Niedrig'), color: '#10b981' },
+                      { key: 'none', label: t('tasks.priority.none', 'Keine'), color: '#9ca3af' }
                     ].map(({ key, label, color }) => (
                       <button
                         key={key}

@@ -21,6 +21,13 @@ const CHANGELOG: ChangelogEntry[] = [
     date: '2026-01-08',
     items: [
       {
+        type: 'improvement',
+        text: {
+          de: 'Prioritäten-Filter ausgeschrieben – Hoch, Mittel, Niedrig, Keine statt H, M, L, –',
+          en: 'Priority filters spelled out – High, Medium, Low, None instead of H, M, L, –'
+        }
+      },
+      {
         type: 'feature',
         text: {
           de: 'Neue Zeitraum-Filter für Pins und Projekte – Jederzeit (nur ohne Datum), Heute, Morgen, Diese Woche',
