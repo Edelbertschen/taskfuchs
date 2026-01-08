@@ -1890,47 +1890,35 @@ export function TaskBoard() {
               </p>
             </div>
               
-            {/* Compact Filter Bar - Elegant & Space-Efficient */}
-            <div className="px-4 pt-4">
-              {/* Filter Toggle Button */}
-              {!showFilters && !filterPinned && (
+            {/* Filter Toggle Button - Nur wenn Filter nicht offen/gepinnt */}
+            {!showFilters && !filterPinned && (
+              <div className="px-4 pt-3">
                 <button
                   onClick={() => setShowFilters(true)}
-                  className={`w-full flex items-center justify-between p-3 rounded-lg transition-all duration-300 ${
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     isMinimalDesign 
-                      ? (priorityFilter !== 'all' || state.activeTagFilters.length > 0
-                          ? 'bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600'
-                          : 'bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700')
-                      : (isDarkMode 
-                          ? (priorityFilter !== 'all' || state.activeTagFilters.length > 0
-                              ? 'bg-gray-600/40 border border-gray-500/50'
-                              : 'bg-gray-700/40 hover:bg-gray-600/40 border border-gray-600/40')
-                          : (priorityFilter !== 'all' || state.activeTagFilters.length > 0
-                              ? 'bg-white/40 border border-gray-300/50'
-                              : 'bg-white/30 hover:bg-white/40 border border-gray-300/40'))
+                      ? 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                      : (isDarkMode ? 'text-white/80 hover:bg-white/10' : 'text-gray-700 hover:bg-black/5')
                   }`}
-                  style={{ 
-                    backdropFilter: isMinimalDesign ? 'none' : 'blur(8px)'
-                  }}
+                  title="Filter anzeigen"
                 >
-                  <div className="flex items-center space-x-2">
-                    <SlidersHorizontal className={`w-4 h-4 ${isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? 'text-white' : 'text-gray-900')}`} />
-                    <span className={`text-sm font-medium ${isMinimalDesign ? 'text-gray-900 dark:text-white' : (isDarkMode ? 'text-white' : 'text-gray-900')}`}>Filter</span>
-                    {(priorityFilter !== 'all' || state.activeTagFilters.length > 0) && (
-                      <span 
-                        className="px-2 py-0.5 rounded-full text-xs font-bold text-white"
-                        style={{ backgroundColor: state.preferences.accentColor }}
-                      >
-                        {(priorityFilter !== 'all' ? 1 : 0) + state.activeTagFilters.length}
-                      </span>
-                    )}
-                  </div>
-                  <ChevronDown className={`w-4 h-4 ${isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? 'text-white' : 'text-gray-900')}`} />
+                  <SlidersHorizontal className="w-4 h-4" />
+                  <span>Filter</span>
+                  {(priorityFilter !== 'all' || state.activeTagFilters.length > 0 || hidePinnedTasks) && (
+                    <span 
+                      className="px-1.5 py-0.5 rounded-full text-xs font-bold text-white"
+                      style={{ backgroundColor: state.preferences.accentColor }}
+                    >
+                      {(priorityFilter !== 'all' ? 1 : 0) + state.activeTagFilters.length + (hidePinnedTasks ? 1 : 0)}
+                    </span>
+                  )}
                 </button>
-              )}
-              
-              {/* Compact Filter Bar */}
-              {(showFilters || filterPinned) && (
+              </div>
+            )}
+
+            {/* Compact Filter Bar - Elegant & Space-Efficient */}
+            {(showFilters || filterPinned) && (
+              <div className="px-4 pt-3">
                 <CompactFilterBar
                   priorityFilter={priorityFilter as PriorityOption | 'all'}
                   dateFilter="all"
@@ -1972,10 +1960,12 @@ export function TaskBoard() {
                   hideDateFilters={true}
                   showHidePinnedOption={true}
                 />
-              )}
+              </div>
+            )}
               
-              {/* Stats */}
-              <div className="flex items-center justify-end mt-4">
+            {/* Stats */}
+            <div className="px-4 pt-4">
+              <div className="flex items-center justify-end">
                 <span className={`text-xs ${
                   isMinimalDesign ? 'text-gray-600 dark:text-gray-300' : (isDarkMode ? 'text-gray-400' : 'text-gray-900')
                 }`}>

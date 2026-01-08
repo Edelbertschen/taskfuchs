@@ -1250,9 +1250,10 @@ function MainApp() {
       />
 
       {/* Floating Add Button - Fixed at bottom right */}
+      {/* Floating Add Button - KI nur für authentifizierte Benutzer (Web App mit MS-Login) */}
       <FloatingAddButton
         onCreateTask={() => setShowSmartTaskModal(true)}
-        onAiBulkTask={(state.preferences.enableAI ?? true) ? () => setShowAiBulkTaskModal(true) : undefined}
+        onAiBulkTask={(authState.isAuthenticated && (state.preferences.enableAI ?? true)) ? () => setShowAiBulkTaskModal(true) : undefined}
         colors={colors}
       />
 
@@ -1296,11 +1297,13 @@ function MainApp() {
                     placeholder={t('forms.create_task_for_inbox')}
       />
 
-      {/* AI Bulk Task Modal */}
-      <AiBulkTaskModal
-        isOpen={showAiBulkTaskModal}
-        onClose={() => setShowAiBulkTaskModal(false)}
-      />
+      {/* AI Bulk Task Modal - Nur für authentifizierte Benutzer (Web App mit MS-Login) */}
+      {authState.isAuthenticated && (
+        <AiBulkTaskModal
+          isOpen={showAiBulkTaskModal}
+          onClose={() => setShowAiBulkTaskModal(false)}
+        />
+      )}
 
       {/* Global Task Modal - Render whenever a task is selected (e.g., from timer) */}
       {selectedTaskForModal && (
