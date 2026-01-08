@@ -1003,6 +1003,10 @@ export function ProjectKanbanBoard() {
       const taskDate = getTaskDate();
       
       switch (dateFilter) {
+        case 'overdue':
+          // Only show tasks with date in the past (before today)
+          if (!taskDate || taskDate >= today) return false;
+          break;
         case 'anytime':
           // Only show tasks WITHOUT any date
           if (taskDate !== null) return false;

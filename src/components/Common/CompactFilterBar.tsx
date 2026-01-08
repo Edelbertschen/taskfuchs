@@ -10,7 +10,7 @@ import {
   RotateCcw
 } from 'lucide-react';
 
-export type DateFilterOption = 'all' | 'anytime' | 'today' | 'tomorrow' | 'thisWeek';
+export type DateFilterOption = 'all' | 'anytime' | 'today' | 'tomorrow' | 'thisWeek' | 'overdue';
 export type PriorityOption = 'high' | 'medium' | 'low' | 'none';
 
 interface TagItem {
@@ -96,10 +96,11 @@ export function CompactFilterBar({
   
   // Date filter options - text only, no icons
   const dateOptions: { key: DateFilterOption; label: string; tooltip: string }[] = [
-    { key: 'anytime', label: t('filter.anytime', 'Jederzeit'), tooltip: t('filter.anytimeTooltip', 'Aufgaben ohne Datum') },
+    { key: 'overdue', label: t('filter.overdue', 'Vergangen'), tooltip: t('filter.overdueTooltip', 'Überfällige Aufgaben') },
     { key: 'today', label: t('filter.today', 'Heute'), tooltip: t('filter.todayTooltip', 'Heutige Aufgaben') },
     { key: 'tomorrow', label: t('filter.tomorrow', 'Morgen'), tooltip: t('filter.tomorrowTooltip', 'Morgige Aufgaben') },
-    { key: 'thisWeek', label: t('filter.thisWeek', 'Diese Woche'), tooltip: t('filter.thisWeekTooltip', 'Aufgaben dieser Woche') }
+    { key: 'thisWeek', label: t('filter.thisWeek', 'Diese Woche'), tooltip: t('filter.thisWeekTooltip', 'Aufgaben dieser Woche') },
+    { key: 'anytime', label: t('filter.anytime', 'Jederzeit'), tooltip: t('filter.anytimeTooltip', 'Aufgaben ohne Datum') }
   ];
 
   // Toggle priority - click again to deactivate
