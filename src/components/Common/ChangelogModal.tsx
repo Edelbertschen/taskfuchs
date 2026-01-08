@@ -21,6 +21,13 @@ const CHANGELOG: ChangelogEntry[] = [
     date: '2026-01-08',
     items: [
       {
+        type: 'feature',
+        text: {
+          de: 'Kompakte Filterleiste – Elegante, platzsparende Filter mit Anpinn-Funktion für dauerhaften Zugriff',
+          en: 'Compact filter bar – Elegant, space-saving filters with pin feature for persistent access'
+        }
+      },
+      {
         type: 'improvement',
         text: {
           de: 'Prioritäten-Filter ausgeschrieben – Hoch, Mittel, Niedrig, Keine statt H, M, L, –',

@@ -25,7 +25,8 @@ import {
   arrayMove
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { FolderOpen, Plus, Settings, Edit2, Sparkles, X, MoreHorizontal, MoreVertical, Columns, Focus, ChevronUp, ChevronDown, Filter, Hash, AlertCircle, Circle, CheckCircle, Archive, Clock, Trash2, Check, FileText, Info, Pin, BarChart3, Tag, GripVertical, Calendar } from 'lucide-react';
+import { FolderOpen, Plus, Settings, Edit2, Sparkles, X, MoreHorizontal, MoreVertical, Columns, Focus, ChevronUp, ChevronDown, Filter, Hash, AlertCircle, Circle, CheckCircle, Archive, Clock, Trash2, Check, FileText, Info, Pin, BarChart3, Tag, GripVertical, Calendar, SlidersHorizontal } from 'lucide-react';
+import { CompactFilterBar, DateFilterOption, PriorityOption } from '../Common/CompactFilterBar';
 import { useApp } from '../../context/AppContext';
 import { TaskCard } from '../Tasks/TaskCard';
 import { TaskColumn } from '../Tasks/TaskColumn';
@@ -119,6 +120,14 @@ export function ProjectKanbanBoard() {
   const [hoveredProjectId, setHoveredProjectId] = useState<string | null>(null);
   const [collapsedColumns, setCollapsedColumns] = useState<Set<string>>(new Set());
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const [filterPinned, setFilterPinned] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('taskfuchs-project-filter-pinned');
+      return saved === 'true';
+    } catch {
+      return false;
+    }
+  });
   const [projectMenuDropdown, setProjectMenuDropdown] = useState<string | null>(null);
   
   // Time budget modal state
@@ -2283,209 +2292,51 @@ export function ProjectKanbanBoard() {
                   overflow: 'hidden'
                 }}
               >
-                {/* Filter Slider - Below Controls - Matching TaskBoard styling */}
-                {selectedProject && showFilterDropdown && (
-                    <div className={`overflow-hidden transition-all duration-300 max-h-96 opacity-100 mt-3 mx-4 rounded-lg backdrop-blur-md border ${
-                      isMinimalDesign
-                        ? 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
-                        : (isDarkMode ? 'bg-black/70 border-gray-600/50' : 'bg-white/90 border-gray-300/50')
-                    }`}>
-                    <div className="p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center space-x-3">
-                          <div className="p-1.5 rounded-lg" style={{ backgroundColor: state.preferences.accentColor + '20' }}>
-                            <Filter className="w-4 h-4" style={{ color: state.preferences.accentColor }} />
-                          </div>
-                          <h3 className="text-sm font-medium text-gray-900 dark:text-white">
-                            Filter
-                          </h3>
-                        </div>
-                        
-                        <div className="flex items-center space-x-2">
-                          {(state.viewState.projectKanban.priorityFilters.length > 0 || state.viewState.projectKanban.tagFilters.length > 0 || (state.viewState.projectKanban.dateFilter && state.viewState.projectKanban.dateFilter !== 'all') || state.viewState.projectKanban.showCompleted) && (
-                            <button
-                              onClick={handleClearAllProjectFilters}
-                              className="flex items-center space-x-1 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 px-2 py-1 rounded-lg"
-                            >
-                              <X className="w-3 h-3" />
-                              <span>{t('filter.clearAll', 'Alle zurücksetzen')}</span>
-                            </button>
-                          )}
-                          
-                          <button
-                            onClick={() => setShowFilterDropdown(false)}
-                            className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200"
-                            title={t('close_filter')}
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="space-y-4">
-                        {/* Priority Filters - Single Selection with ALL button (like Pins) */}
-                        <div>
-                          <label className={`block text-xs font-medium mb-2 flex items-center space-x-2 ${
-                            isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? 'text-gray-300' : 'text-gray-900')
-                          }`}>
-                            <AlertCircle className="w-3 h-3" />
-                            <span>Prioritäten</span>
-                          </label>
-                          <div className="flex gap-1">
-                            {/* ALL Button */}
-                            <button
-                              onClick={() => dispatch({ type: 'SET_PROJECT_KANBAN_PRIORITY_FILTERS', payload: [] })}
-                              className={`h-8 px-2 rounded-md text-xs font-bold transition-all duration-200 ${
-                                state.viewState.projectKanban.priorityFilters.length === 0
-                                  ? 'bg-white text-gray-800 shadow-lg scale-105'
-                                  : (isDarkMode ? 'bg-gray-600/60 text-gray-300 hover:bg-gray-500/60' : 'bg-gray-200/80 text-gray-600 hover:bg-gray-300/80') + ' hover:scale-105'
-                              }`}
-                            >
-                              ALL
-                            </button>
-                            {[
-                              { key: 'high', label: t('tasks.priority.high', 'Hoch'), color: '#ef4444' },
-                              { key: 'medium', label: t('tasks.priority.medium', 'Mittel'), color: '#f59e0b' },
-                              { key: 'low', label: t('tasks.priority.low', 'Niedrig'), color: '#10b981' },
-                              { key: 'none', label: t('tasks.priority.none', 'Keine'), color: '#9ca3af' }
-                            ].map(({ key, label, color }) => {
-                              const isActive = state.viewState.projectKanban.priorityFilters.length === 1 && 
-                                               state.viewState.projectKanban.priorityFilters[0] === key;
-                              return (
-                                <button
-                                  key={key}
-                                  onClick={() => {
-                                    // Single selection: toggle between this priority and ALL
-                                    if (isActive) {
-                                      dispatch({ type: 'SET_PROJECT_KANBAN_PRIORITY_FILTERS', payload: [] });
-                                    } else {
-                                      dispatch({ type: 'SET_PROJECT_KANBAN_PRIORITY_FILTERS', payload: [key as any] });
-                                    }
-                                  }}
-                                  className={`h-8 px-2 rounded-md text-xs font-bold transition-all duration-200 ${
-                                    isActive
-                                      ? 'text-white shadow-lg scale-105'
-                                      : 'text-white/80 hover:text-white hover:scale-105'
-                                  }`}
-                                  style={{
-                                    backgroundColor: isActive ? color : `${color}60`,
-                                    boxShadow: isActive ? `0 0 12px ${color}40` : 'none'
-                                  }}
-                                >
-                                  {label}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-
-                        {/* Tag Filters */}
-                        <div>
-                          <label className={`block text-xs font-medium mb-2 flex items-center space-x-2 ${
-                            isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? 'text-gray-300' : 'text-gray-900')
-                          }`}>
-                            <Tag className="w-3 h-3" />
-                            <span>Tags</span>
-                          </label>
-                          <div className="flex flex-wrap gap-1.5">
-                            {(() => {
-                              const availableTags = state.tags.filter(tag => {
-                                const actualTaskCount = filteredTasks.filter(task => task.tags.includes(tag.name)).length;
-                                return tag.count > 0 && actualTaskCount > 0;
-                              });
-                              
-                              return availableTags.length > 0 ? (
-                                availableTags.sort((a, b) => b.count - a.count).slice(0, 8).map((tag) => {
-                                  const isActive = state.viewState.projectKanban.tagFilters.includes(tag.name);
-                                  
-                                  return (
-                                    <button
-                                      key={tag.id}
-                                      onClick={() => handleToggleProjectTag(tag.name)}
-                                      className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all duration-200 ${
-                                        isActive
-                                          ? 'text-white shadow-sm scale-105'
-                                          : (isDarkMode ? 'bg-gray-600/60 text-gray-300 hover:bg-gray-500/60' : 'bg-gray-200/80 text-gray-700 hover:bg-gray-300/80') + ' hover:scale-105'
-                                      }`}
-                                      style={isActive ? { 
-                                        backgroundColor: tag.color || state.preferences.accentColor,
-                                        boxShadow: `0 0 8px ${tag.color || state.preferences.accentColor}40`
-                                      } : {}}
-                                      title={`${tag.name} (${getTaskCountForProjectTag(tag.name)})`}
-                                    >
-                                      {tag.name}
-                                    </button>
-                                  );
-                                })
-                              ) : (
-                                <span className={`text-xs italic ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                                  {t('no_tags_available')}
-                                </span>
-                              );
-                            })()}
-                          </div>
-                        </div>
-
-                        {/* Date Filter Buttons */}
-                        <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-                          <label className={`block text-xs font-medium mb-2 flex items-center space-x-2 ${
-                            isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? 'text-gray-300' : 'text-gray-900')
-                          }`}>
-                            <Calendar className="w-3 h-3" />
-                            <span>{t('filter.dateFilter', 'Zeitraum')}</span>
-                          </label>
-                          <div className="flex flex-wrap gap-1.5">
-                            {[
-                              { key: 'all', label: t('filter.all', 'Alle'), icon: null },
-                              { key: 'anytime', label: t('filter.anytime', 'Jederzeit'), icon: Clock },
-                              { key: 'today', label: t('filter.today', 'Heute'), icon: Calendar },
-                              { key: 'tomorrow', label: t('filter.tomorrow', 'Morgen'), icon: Calendar },
-                              { key: 'thisWeek', label: t('filter.thisWeek', 'Diese Woche'), icon: Calendar }
-                            ].map(({ key, label, icon: Icon }) => {
-                              const isActive = (state.viewState.projectKanban.dateFilter || 'all') === key;
-                              return (
-                                <button
-                                  key={key}
-                                  onClick={() => dispatch({ type: 'SET_PROJECT_KANBAN_DATE_FILTER', payload: key as any })}
-                                  className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
-                                    isActive
-                                      ? 'text-white shadow-sm'
-                                      : (isDarkMode ? 'bg-gray-600/60 text-gray-300 hover:bg-gray-500/60' : 'bg-gray-200/80 text-gray-700 hover:bg-gray-300/80')
-                                  }`}
-                                  style={isActive ? { 
-                                    backgroundColor: state.preferences.accentColor,
-                                    boxShadow: `0 0 8px ${state.preferences.accentColor}40`
-                                  } : {}}
-                                  title={label}
-                                >
-                                  {Icon && <Icon className="w-3 h-3" />}
-                                  <span>{label}</span>
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-
-                        {/* Show Completed Toggle */}
-                        <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-                          <button
-                            onClick={() => dispatch({ type: 'SET_PROJECT_KANBAN_SHOW_COMPLETED', payload: !state.viewState.projectKanban.showCompleted })}
-                            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
-                              state.viewState.projectKanban.showCompleted
-                                ? 'bg-green-500 text-white shadow-sm'
-                                : (isDarkMode ? 'bg-gray-600/60 text-gray-300 hover:bg-gray-500/60' : 'bg-gray-200/80 text-gray-700 hover:bg-gray-300/80')
-                            }`}
-                            style={state.viewState.projectKanban.showCompleted ? { 
-                              boxShadow: '0 0 8px rgba(34, 197, 94, 0.4)'
-                            } : {}}
-                            title={t('filter.showCompleted', 'Erledigte Aufgaben anzeigen')}
-                          >
-                            <Check className="w-3.5 h-3.5" />
-                            <span>{t('filter.completed', 'Erledigt')}</span>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                {/* Compact Filter Bar - Elegant & Space-Efficient */}
+                {selectedProject && (showFilterDropdown || filterPinned) && (
+                  <div className="mx-4 mt-3">
+                    <CompactFilterBar
+                      priorityFilter={
+                        state.viewState.projectKanban.priorityFilters.length === 1
+                          ? state.viewState.projectKanban.priorityFilters[0] as PriorityOption
+                          : 'all'
+                      }
+                      dateFilter={(state.viewState.projectKanban.dateFilter || 'all') as DateFilterOption}
+                      tagFilters={state.viewState.projectKanban.tagFilters}
+                      showCompleted={state.viewState.projectKanban.showCompleted}
+                      availableTags={state.tags.filter(tag => {
+                        const actualTaskCount = filteredTasks.filter(task => task.tags.includes(tag.name)).length;
+                        return tag.count > 0 && actualTaskCount > 0;
+                      }).sort((a, b) => b.count - a.count)}
+                      onPriorityChange={(priority) => {
+                        if (priority === 'all') {
+                          dispatch({ type: 'SET_PROJECT_KANBAN_PRIORITY_FILTERS', payload: [] });
+                        } else {
+                          dispatch({ type: 'SET_PROJECT_KANBAN_PRIORITY_FILTERS', payload: [priority as any] });
+                        }
+                      }}
+                      onDateFilterChange={(filter) => {
+                        dispatch({ type: 'SET_PROJECT_KANBAN_DATE_FILTER', payload: filter });
+                      }}
+                      onTagToggle={handleToggleProjectTag}
+                      onShowCompletedToggle={() => {
+                        dispatch({ type: 'SET_PROJECT_KANBAN_SHOW_COMPLETED', payload: !state.viewState.projectKanban.showCompleted });
+                      }}
+                      onClearAll={handleClearAllProjectFilters}
+                      accentColor={state.preferences.accentColor}
+                      isDarkMode={isDarkMode}
+                      isMinimalDesign={isMinimalDesign}
+                      isPinned={filterPinned}
+                      onPinnedChange={(pinned) => {
+                        setFilterPinned(pinned);
+                        try { localStorage.setItem('taskfuchs-project-filter-pinned', String(pinned)); } catch {}
+                        if (pinned) {
+                          setShowFilterDropdown(true);
+                        }
+                      }}
+                      isVisible={true}
+                      onClose={() => setShowFilterDropdown(false)}
+                    />
                   </div>
                 )}
 

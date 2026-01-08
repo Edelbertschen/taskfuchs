@@ -45,8 +45,10 @@ import {
   Filter,
   AlertCircle,
   Tag,
-  Clock
+  Clock,
+  SlidersHorizontal
 } from 'lucide-react';
+import { CompactFilterBar, DateFilterOption, PriorityOption } from '../Common/CompactFilterBar';
 import { TaskCard } from '../Tasks/TaskCard';
 import { TaskColumn } from '../Tasks/TaskColumn';
 import { TaskModal } from '../Tasks/TaskModal';
@@ -163,6 +165,14 @@ export function PinsView() {
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
   const [tagFilters, setTagFilters] = useState<string[]>([]);
   const [dateFilter, setDateFilter] = useState<'all' | 'anytime' | 'today' | 'tomorrow' | 'thisWeek'>('all');
+  const [filterPinned, setFilterPinned] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('taskfuchs-pins-filter-pinned');
+      return saved === 'true';
+    } catch {
+      return false;
+    }
+  });
   
   useEffect(() => {
     setMounted(true);
@@ -1169,177 +1179,44 @@ export function PinsView() {
             <Header currentView="pins" />
           </div>
 
-          {/* Filter Panel - Unified style like Projects */}
-          {showFilterPanel && (
-            <div className={`overflow-hidden transition-all duration-300 max-h-96 opacity-100 mx-4 mt-3 rounded-lg backdrop-blur-md border ${
-              isMinimalDesign
-                ? 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
-                : (isDarkMode ? 'bg-black/70 border-gray-600/50' : 'bg-white/90 border-gray-300/50')
-          }`}>
-              <div className="p-4 space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                    <div className="p-1.5 rounded-lg" style={{ backgroundColor: state.preferences.accentColor + '20' }}>
-                      <Filter className="w-4 h-4" style={{ color: state.preferences.accentColor }} />
-                </div>
-                    <h3 className="text-sm font-medium text-gray-900 dark:text-white">{t('pins.filter')}</h3>
-                    {(priorityFilter !== 'all' || tagFilters.length > 0 || dateFilter !== 'all') && (
-                      <span 
-                        className="px-2 py-0.5 rounded-full text-xs font-bold text-white"
-                        style={{ backgroundColor: state.preferences.accentColor }}
-                      >
-                        {(priorityFilter !== 'all' ? 1 : 0) + tagFilters.length + (dateFilter !== 'all' ? 1 : 0)}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    {(priorityFilter !== 'all' || tagFilters.length > 0 || dateFilter !== 'all') && (
-                      <button
-                        onClick={() => {
-                          setPriorityFilter('all');
-                          setTagFilters([]);
-                          setDateFilter('all');
-                        }}
-                        className="flex items-center space-x-1 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 px-2 py-1 rounded-lg"
-                      >
-                        <X className="w-3 h-3" />
-                        <span>{t('filter.clearAll', 'Alle zurücksetzen')}</span>
-                      </button>
-                    )}
-                    <button
-                      onClick={() => setShowFilterPanel(false)}
-                      className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-                
-                {/* Priority Filters - Compact buttons */}
-                <div>
-                  <label className={`block text-xs font-medium mb-2 flex items-center space-x-2 ${
-                    isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? 'text-gray-300' : 'text-gray-900')
-                  }`}>
-                    <AlertCircle className="w-3 h-3" />
-                    <span>Prioritäten</span>
-                  </label>
-                  <div className="flex gap-1">
-                    <button
-                      onClick={() => setPriorityFilter('all')}
-                      className={`h-8 px-2 rounded-md text-xs font-bold transition-all duration-200 ${
-                        priorityFilter === 'all'
-                          ? 'bg-white text-gray-800 shadow-lg scale-105'
-                          : (isDarkMode ? 'bg-gray-600/60 text-gray-300 hover:bg-gray-500/60' : 'bg-gray-200/80 text-gray-600 hover:bg-gray-300/80') + ' hover:scale-105'
-                      }`}
-                    >
-                      ALL
-                    </button>
-                    {[
-                      { key: 'high', label: t('tasks.priority.high', 'Hoch'), color: '#ef4444' },
-                      { key: 'medium', label: t('tasks.priority.medium', 'Mittel'), color: '#f59e0b' },
-                      { key: 'low', label: t('tasks.priority.low', 'Niedrig'), color: '#10b981' },
-                      { key: 'none', label: t('tasks.priority.none', 'Keine'), color: '#9ca3af' }
-                    ].map(({ key, label, color }) => (
-                      <button
-                        key={key}
-                        onClick={() => setPriorityFilter(key)}
-                        className={`h-8 px-2 rounded-md text-xs font-bold transition-all duration-200 ${
-                          priorityFilter === key
-                            ? 'text-white shadow-lg scale-105'
-                            : 'text-white/80 hover:text-white hover:scale-105'
-                        }`}
-                        style={{
-                          backgroundColor: priorityFilter === key ? color : `${color}60`,
-                          boxShadow: priorityFilter === key ? `0 0 12px ${color}40` : 'none'
-                        }}
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                
-                {/* Tag Filters */}
-                <div>
-                  <label className={`block text-xs font-medium mb-2 flex items-center space-x-2 ${
-                    isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? 'text-gray-300' : 'text-gray-900')
-                  }`}>
-                    <Tag className="w-3 h-3" />
-                    <span>Tags</span>
-                  </label>
-                  <div className="flex flex-wrap gap-1.5">
-                    {state.tags.filter(tag => tag.count > 0).slice(0, 8).map(tag => {
-                      const isActive = tagFilters.includes(tag.name);
-                      return (
-                        <button
-                          key={tag.id}
-                          onClick={() => {
-                            if (isActive) {
-                              setTagFilters(prev => prev.filter(t => t !== tag.name));
-                            } else {
-                              setTagFilters(prev => [...prev, tag.name]);
-                            }
-                          }}
-                          className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all duration-200 ${
-                            isActive
-                              ? 'text-white shadow-sm scale-105'
-                              : (isDarkMode ? 'bg-gray-600/60 text-gray-300 hover:bg-gray-500/60' : 'bg-gray-200/80 text-gray-700 hover:bg-gray-300/80') + ' hover:scale-105'
-                          }`}
-                          style={isActive ? { 
-                            backgroundColor: tag.color || state.preferences.accentColor,
-                            boxShadow: `0 0 8px ${tag.color || state.preferences.accentColor}40`
-                          } : {}}
-                        >
-                          {tag.name}
-                        </button>
-                      );
-                    })}
-                    {state.tags.filter(tag => tag.count > 0).length === 0 && (
-                      <span className="text-xs text-gray-500 dark:text-gray-400">{t('pins.no_tags_available')}</span>
-                    )}
-              </div>
-            </div>
-                
-                {/* Date Filter Buttons */}
-                <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-                  <label className={`block text-xs font-medium mb-2 flex items-center space-x-2 ${
-                    isMinimalDesign ? 'text-gray-700 dark:text-gray-300' : (isDarkMode ? 'text-gray-300' : 'text-gray-900')
-                  }`}>
-                    <Calendar className="w-3 h-3" />
-                    <span>{t('filter.dateFilter', 'Zeitraum')}</span>
-                  </label>
-                  <div className="flex flex-wrap gap-1.5">
-                    {[
-                      { key: 'all' as const, label: t('filter.all', 'Alle'), icon: null },
-                      { key: 'anytime' as const, label: t('filter.anytime', 'Jederzeit'), icon: Clock },
-                      { key: 'today' as const, label: t('filter.today', 'Heute'), icon: Calendar },
-                      { key: 'tomorrow' as const, label: t('filter.tomorrow', 'Morgen'), icon: Calendar },
-                      { key: 'thisWeek' as const, label: t('filter.thisWeek', 'Diese Woche'), icon: Calendar }
-                    ].map(({ key, label, icon: Icon }) => {
-                      const isActive = dateFilter === key;
-                      return (
-                        <button
-                          key={key}
-                          onClick={() => setDateFilter(key)}
-                          className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
-                            isActive
-                              ? 'text-white shadow-sm'
-                              : (isDarkMode ? 'bg-gray-600/60 text-gray-300 hover:bg-gray-500/60' : 'bg-gray-200/80 text-gray-700 hover:bg-gray-300/80')
-                          }`}
-                          style={isActive ? { 
-                            backgroundColor: state.preferences.accentColor,
-                            boxShadow: `0 0 8px ${state.preferences.accentColor}40`
-                          } : {}}
-                          title={label}
-                        >
-                          {Icon && <Icon className="w-3 h-3" />}
-                          <span>{label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-          </div>
+          {/* Compact Filter Bar - Elegant & Space-Efficient */}
+          {(showFilterPanel || filterPinned) && (
+            <div className="mx-4 mt-3">
+              <CompactFilterBar
+                priorityFilter={priorityFilter as PriorityOption | 'all'}
+                dateFilter={dateFilter as DateFilterOption}
+                tagFilters={tagFilters}
+                showCompleted={false}
+                availableTags={state.tags.filter(tag => tag.count > 0).sort((a, b) => b.count - a.count)}
+                onPriorityChange={(priority) => setPriorityFilter(priority)}
+                onDateFilterChange={(filter) => setDateFilter(filter)}
+                onTagToggle={(tagName) => {
+                  if (tagFilters.includes(tagName)) {
+                    setTagFilters(prev => prev.filter(t => t !== tagName));
+                  } else {
+                    setTagFilters(prev => [...prev, tagName]);
+                  }
+                }}
+                onShowCompletedToggle={() => {}}
+                onClearAll={() => {
+                  setPriorityFilter('all');
+                  setTagFilters([]);
+                  setDateFilter('all');
+                }}
+                accentColor={state.preferences.accentColor}
+                isDarkMode={isDarkMode}
+                isMinimalDesign={isMinimalDesign}
+                isPinned={filterPinned}
+                onPinnedChange={(pinned) => {
+                  setFilterPinned(pinned);
+                  try { localStorage.setItem('taskfuchs-pins-filter-pinned', String(pinned)); } catch {}
+                  if (pinned) {
+                    setShowFilterPanel(true);
+                  }
+                }}
+                isVisible={true}
+                onClose={() => setShowFilterPanel(false)}
+              />
             </div>
           )}
 
