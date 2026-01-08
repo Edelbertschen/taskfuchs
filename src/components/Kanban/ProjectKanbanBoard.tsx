@@ -2448,16 +2448,18 @@ export function ProjectKanbanBoard() {
 
 
                   {/* Kanban Board - Using TaskColumn like TaskBoard */}
-                  <div className="flex-1 overflow-hidden">
-                    <div className="h-full flex flex-col relative px-4 pb-4" style={{ paddingTop: '35px' }}>
+                  <div className="flex-1 overflow-hidden flex flex-col">
+                    <div className="flex-1 flex flex-col relative px-4 pb-4 overflow-hidden" style={{ paddingTop: '35px' }}>
                     <div style={{ 
                       display: 'flex', 
                       flexDirection: 'column', 
-                        height: 'auto', 
-                        gap: '12px',
-                        padding: '0',
-                        alignItems: 'stretch',
-                        width: '100%'
+                      flex: 1,
+                      height: '100%',
+                      gap: '12px',
+                      padding: '0',
+                      alignItems: 'stretch',
+                      width: '100%',
+                      overflow: 'hidden'
                     }}>
                       {displayColumns.length > 0 && (
                           <div 
@@ -2467,7 +2469,7 @@ export function ProjectKanbanBoard() {
                             style={{ 
                               flex: 1,
                               width: '100%',
-                              height: 'auto',
+                              height: '100%',
                               marginTop: '0',
                               overflowX: 'auto',
                               overflowY: 'hidden', // Container scrolls horizontal, columns scroll vertical

@@ -23,6 +23,13 @@ const CHANGELOG: ChangelogEntry[] = [
       {
         type: 'fix',
         text: {
+          de: 'Scrollen in Projektspalten bei aktiven Filtern repariert – Flexbox-Höhenberechnung korrigiert',
+          en: 'Fixed scrolling in project columns with active filters – Flexbox height calculation corrected'
+        }
+      },
+      {
+        type: 'fix',
+        text: {
           de: 'Spaltenbreiten bei Projekten repariert – Gleichmäßige Verteilung nach DnD-Update wiederhergestellt',
           en: 'Fixed column widths in projects – Even distribution restored after DnD update'
         }
