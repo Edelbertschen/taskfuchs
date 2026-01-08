@@ -1686,12 +1686,8 @@ export function ProjectKanbanBoard() {
     return (
       <div 
         ref={setNodeRef} 
-        style={{
-          ...style,
-          flex: '1 1 0',
-          minWidth: '280px',
-        }}
-        className={`relative group/column transition-all duration-200 ${
+        style={style}
+        className={`flex-1 min-w-0 relative group/column transition-all duration-200 ${
           isDragging ? 'opacity-30 scale-[0.98]' : ''
         }`}
       >
@@ -1761,7 +1757,7 @@ export function ProjectKanbanBoard() {
       if (column === null) {
         // null indicates "Add Column" button position
         result.push(
-          <div key={`add-column-wrapper-${index}`} style={{ flex: '1 1 0', minWidth: '280px' }}>
+          <div key={`add-column-wrapper-${index}`} className="flex-1 min-w-0">
           <button
             onClick={(e) => {
               e.preventDefault();
@@ -1798,8 +1794,10 @@ export function ProjectKanbanBoard() {
         result.push(
           <div
             key={`empty-${index}`}
-            style={{ flex: '1 1 0', minWidth: '280px', alignSelf: 'flex-start', marginTop: '0px' }}
-          />
+            className="flex-1 min-w-0"
+          >
+            <div className="h-32"></div>
+          </div>
         );
       } else {
         // Regular column
