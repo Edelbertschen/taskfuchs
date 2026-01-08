@@ -1900,79 +1900,6 @@ export function TaskBoard() {
               </p>
             </div>
               
-            {/* Filter Toggle Button - Nur wenn Filter nicht offen/gepinnt */}
-            {!showFilters && !filterPinned && (
-              <div className="px-4 pt-3">
-                <button
-                  onClick={() => setShowFilters(true)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                    isMinimalDesign 
-                      ? 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                      : (isDarkMode ? 'text-white/80 hover:bg-white/10' : 'text-gray-700 hover:bg-black/5')
-                  }`}
-                  title="Filter anzeigen"
-                >
-                  <SlidersHorizontal className="w-4 h-4" />
-                  <span>Filter</span>
-                  {(priorityFilter !== 'all' || state.activeTagFilters.length > 0 || hidePinnedTasks) && (
-                    <span 
-                      className="px-1.5 py-0.5 rounded-full text-xs font-bold text-white"
-                      style={{ backgroundColor: state.preferences.accentColor }}
-                    >
-                      {(priorityFilter !== 'all' ? 1 : 0) + state.activeTagFilters.length + (hidePinnedTasks ? 1 : 0)}
-                    </span>
-                  )}
-                </button>
-              </div>
-            )}
-
-            {/* Compact Filter Bar - Elegant & Space-Efficient */}
-            {(showFilters || filterPinned) && (
-              <div className="px-4 pt-3">
-                <CompactFilterBar
-                  priorityFilter={priorityFilter as PriorityOption | 'all'}
-                  dateFilter="all"
-                  tagFilters={state.activeTagFilters}
-                  showCompleted={false}
-                  hidePinned={hidePinnedTasks}
-                  availableTags={state.tags.filter(tag => {
-                    const actualTaskCount = state.tasks.filter(task => task.tags.includes(tag.name)).length;
-                    return tag.count > 0 && actualTaskCount > 0;
-                  }).sort((a, b) => b.count - a.count)}
-                  onPriorityChange={(priority) => setPriorityFilter(priority)}
-                  onDateFilterChange={() => {}}
-                  onTagToggle={(tagName) => dispatch({ type: 'TOGGLE_TAG_FILTER', payload: tagName })}
-                  onShowCompletedToggle={() => {}}
-                  onHidePinnedToggle={() => {
-                    const newValue = !hidePinnedTasks;
-                    setHidePinnedTasks(newValue);
-                    try { localStorage.setItem('taskfuchs-planner-hide-pinned', String(newValue)); } catch {}
-                  }}
-                  onClearAll={() => {
-                    setPriorityFilter('all');
-                    dispatch({ type: 'CLEAR_TAG_FILTERS' });
-                    setHidePinnedTasks(false);
-                    try { localStorage.setItem('taskfuchs-planner-hide-pinned', 'false'); } catch {}
-                  }}
-                  accentColor={state.preferences.accentColor}
-                  isDarkMode={isDarkMode}
-                  isMinimalDesign={isMinimalDesign}
-                  isPinned={filterPinned}
-                  onPinnedChange={(pinned) => {
-                    setFilterPinned(pinned);
-                    try { localStorage.setItem('taskfuchs-planner-filter-pinned', String(pinned)); } catch {}
-                    if (pinned) {
-                      setShowFilters(true);
-                    }
-                  }}
-                  isVisible={true}
-                  onClose={() => setShowFilters(false)}
-                  hideDateFilters={true}
-                  showHidePinnedOption={true}
-                />
-              </div>
-            )}
-              
             {/* Stats */}
             <div className="px-4 pt-4">
               <div className="flex items-center justify-end">
@@ -2059,9 +1986,61 @@ export function TaskBoard() {
             }`}>
               <Header currentView="tasks" />
             </div>
+
+            {/* CompactFilterBar - Direkt unter dem Header (wie bei Pins/Projekte) */}
+            {(showFilters || filterPinned) && (
+              <div className={`flex-shrink-0 border-b ${
+                isMinimalDesign
+                  ? 'bg-white dark:bg-[#111827] border-gray-200 dark:border-gray-800'
+                  : 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-gray-200/60 dark:border-gray-700/60'
+              }`}>
+                <div className="px-4 py-3">
+                  <CompactFilterBar
+                    priorityFilter={priorityFilter as PriorityOption | 'all'}
+                    dateFilter="all"
+                    tagFilters={state.activeTagFilters}
+                    showCompleted={false}
+                    hidePinned={hidePinnedTasks}
+                    availableTags={state.tags.filter(tag => {
+                      const actualTaskCount = state.tasks.filter(task => task.tags.includes(tag.name)).length;
+                      return tag.count > 0 && actualTaskCount > 0;
+                    }).sort((a, b) => b.count - a.count)}
+                    onPriorityChange={(priority) => setPriorityFilter(priority)}
+                    onDateFilterChange={() => {}}
+                    onTagToggle={(tagName) => dispatch({ type: 'TOGGLE_TAG_FILTER', payload: tagName })}
+                    onShowCompletedToggle={() => {}}
+                    onHidePinnedToggle={() => {
+                      const newValue = !hidePinnedTasks;
+                      setHidePinnedTasks(newValue);
+                      try { localStorage.setItem('taskfuchs-planner-hide-pinned', String(newValue)); } catch {}
+                    }}
+                    onClearAll={() => {
+                      setPriorityFilter('all');
+                      dispatch({ type: 'CLEAR_TAG_FILTERS' });
+                      setHidePinnedTasks(false);
+                      try { localStorage.setItem('taskfuchs-planner-hide-pinned', 'false'); } catch {}
+                    }}
+                    onClose={() => {
+                      setShowFilters(false);
+                      setFilterPinned(false);
+                      try { localStorage.setItem('taskfuchs-planner-filter-pinned', 'false'); } catch {}
+                    }}
+                    isPinned={filterPinned}
+                    onPinToggle={() => {
+                      const newPinned = !filterPinned;
+                      setFilterPinned(newPinned);
+                      try { localStorage.setItem('taskfuchs-planner-filter-pinned', String(newPinned)); } catch {}
+                    }}
+                    accentColor={state.preferences.accentColor}
+                    showDateFilter={false}
+                    showHidePinnedOption={true}
+                  />
+                </div>
+              </div>
+            )}
             
             <div 
-              className="relative flex-1 flex flex-col bg-transparent"
+              className="relative flex-1 flex flex-col bg-transparent min-h-0"
               style={{ 
                 overflow: 'hidden',
                 height: '100%'
