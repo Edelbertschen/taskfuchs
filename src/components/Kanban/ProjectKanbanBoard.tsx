@@ -148,9 +148,28 @@ export function ProjectKanbanBoard() {
     columnTitle: string;
     completedCount: number;
   } | null>(null);
+  
+  // Color picker state - lifted up to prevent reset during re-renders
+  const [colorPickerProjectId, setColorPickerProjectId] = useState<string | null>(null);
+  const [customColorInput, setCustomColorInput] = useState<string>('#2196F3');
 
   // Ref for horizontal scrolling
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  
+  // Close color picker when clicking outside
+  useEffect(() => {
+    if (!colorPickerProjectId) return;
+    
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      // Don't close if clicking inside a color picker popover
+      if (target.closest('[data-color-picker]')) return;
+      setColorPickerProjectId(null);
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [colorPickerProjectId]);
 
   // Use default sensors (like TaskBoard)
 
@@ -634,8 +653,19 @@ export function ProjectKanbanBoard() {
 
   // Sortable Project Component
   const SortableProject = ({ project }: { project: Column }) => {
-    const [showColorPicker, setShowColorPicker] = useState(false);
-    const [customColor, setCustomColor] = useState(project.color || '#2196F3');
+    // Use lifted state for color picker to prevent reset during re-renders
+    const showColorPicker = colorPickerProjectId === project.id;
+    const setShowColorPicker = (show: boolean) => {
+      if (show) {
+        setColorPickerProjectId(project.id);
+        setCustomColorInput(project.color || '#2196F3');
+      } else {
+        setColorPickerProjectId(null);
+      }
+    };
+    const customColor = customColorInput;
+    const setCustomColor = setCustomColorInput;
+    
     const [showContextMenu, setShowContextMenu] = useState(false);
     const [contextMenuPos, setContextMenuPos] = useState({ x: 0, y: 0 });
     const colorPickerRef = useRef<HTMLDivElement>(null);
@@ -717,21 +747,8 @@ export function ProjectKanbanBoard() {
         type: 'UPDATE_COLUMN',
         payload: { ...project, color }
       });
-      setShowColorPicker(false);
+      setColorPickerProjectId(null);
     };
-    
-    // Close color picker when clicking outside
-    useEffect(() => {
-      const handleClickOutside = (e: MouseEvent) => {
-        if (colorPickerRef.current && !colorPickerRef.current.contains(e.target as Node)) {
-          setShowColorPicker(false);
-        }
-      };
-      if (showColorPicker) {
-        document.addEventListener('mousedown', handleClickOutside);
-      }
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [showColorPicker]);
     const isSelected = selectedProject?.id === project.id;
     const isHovered = hoveredProjectId === project.id;
     const projectIndex = projects.findIndex(p => p.id === project.id);
@@ -878,6 +895,7 @@ export function ProjectKanbanBoard() {
             {/* Elegant Color Picker Popover */}
             {showColorPicker && (
               <div 
+                data-color-picker="true"
                 className="absolute right-2 top-14 z-[100] p-3 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700"
                 onClick={(e) => e.stopPropagation()}
               >
