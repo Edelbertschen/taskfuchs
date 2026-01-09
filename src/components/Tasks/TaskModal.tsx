@@ -3110,7 +3110,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                         <Clock className="w-4 h-4 text-gray-400" />
                         <span className="text-sm text-gray-600 dark:text-gray-400">{taskModal.time_estimated()}</span>
                       </div>
-                      <div className="flex items-center space-x-1">
+                      <div className="flex items-center space-x-1 px-2 py-1 rounded-lg bg-gray-100/60 dark:bg-gray-700/50 border border-gray-200/50 dark:border-gray-600/50">
                         <input
                           type="number"
                           min="0"
@@ -3120,10 +3120,10 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                             setFormData(prev => ({ ...prev, estimatedTime: value > 0 ? value : undefined }));
                             setHasUnsavedChanges(true);
                           }}
-                          className="w-16 text-right px-2 py-1 text-sm rounded-lg bg-transparent text-gray-900 dark:text-white focus:outline-none focus:bg-gray-100/50 dark:focus:bg-gray-800/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                          placeholder=""
+                          className="w-14 text-right px-1 py-0.5 text-sm rounded bg-transparent text-gray-900 dark:text-white focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          placeholder="0"
                         />
-                        <span className="text-xs text-gray-400">min</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">min</span>
                       </div>
                     </div>
                     
