@@ -97,6 +97,7 @@ model Column {
   order       Int
   linkedNotes String[] @default([])
   timebudget  Json? // ProjectTimebudget for projects
+  color       String? // Project color for visual identification
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -61,7 +61,8 @@ app.post('/', async (c) => {
       date: data.date,
       order: data.order || 0,
       linkedNotes: data.linkedNotes || [],
-      timebudget: data.timebudget
+      timebudget: data.timebudget,
+      color: data.color
     }
   });
 
@@ -97,6 +98,7 @@ app.put('/:id', async (c) => {
       order: data.order,
       linkedNotes: data.linkedNotes,
       timebudget: data.timebudget,
+      color: data.color,
       updatedAt: new Date()
     }
   });
@@ -196,6 +198,7 @@ app.post('/bulk', async (c) => {
             order: columnData.order,
             linkedNotes: columnData.linkedNotes,
             timebudget: columnData.timebudget,
+            color: columnData.color,
             updatedAt: new Date()
           }
         });
@@ -209,7 +212,8 @@ app.post('/bulk', async (c) => {
             date: columnData.date,
             order: columnData.order || 0,
             linkedNotes: columnData.linkedNotes || [],
-            timebudget: columnData.timebudget
+            timebudget: columnData.timebudget,
+            color: columnData.color
           }
         });
       }

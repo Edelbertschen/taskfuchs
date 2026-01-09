@@ -3248,7 +3248,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
               type: c.type,
               order: c.order,
               linkedNotes: c.linkedNotes,
-              timebudget: c.timebudget
+              timebudget: c.timebudget,
+              color: c.color
             })));
             prevPinColumnsJson.current = JSON.stringify((data.pinColumns || []).map((p: any) => ({
               id: p.externalId || p.id,
@@ -3949,7 +3950,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         type: c.type,
         order: c.order,
         linkedNotes: c.linkedNotes,
-        timebudget: c.timebudget
+        timebudget: c.timebudget,
+        color: c.color
       })));
       
       // Detect actual content changes

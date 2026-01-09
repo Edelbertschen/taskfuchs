@@ -177,7 +177,8 @@ app.post('/', async (c) => {
             date: col.date,
             order: col.order || 0,
             linkedNotes: col.linkedNotes || [],
-            timebudget: col.timebudget
+            timebudget: col.timebudget,
+            color: col.color
           }))
         });
       }
