@@ -1051,7 +1051,7 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
               </div>
             )}
             
-            {/* Context Badge - moved here to align with time row */}
+            {/* Context Badge - Project (5 chars) + Date */}
             {(taskProjectDisplay || taskDateDisplay) && (
               <span 
                 className={`inline-flex items-center gap-1.5 px-2 py-0.5 text-xs font-medium rounded-md transition-opacity flex-shrink-0 ${
@@ -1060,44 +1060,55 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
                 style={{
                   backgroundColor: task.completed 
                     ? '#D1D5DB' 
-                    : taskProjectDisplay && taskProject?.color
-                      ? taskProject.color + '18' // Very subtle project color background
-                      : (taskDateDisplay?.isPast && !taskProjectDisplay) 
+                    : taskProject?.color
+                      ? taskProject.color + '18'
+                      : taskDateDisplay?.isPast 
                         ? '#FEE2E2' 
                         : accentColor + '15',
                   color: task.completed 
                     ? '#6B7280' 
-                    : taskProjectDisplay && taskProject?.color
+                    : taskProject?.color
                       ? taskProject.color
-                      : (taskDateDisplay?.isPast && !taskProjectDisplay) 
+                      : taskDateDisplay?.isPast 
                         ? '#DC2626' 
                         : accentColor
                 }}
-                title={taskProjectDisplay ? `${t('planner.project_label')} ${taskProjectDisplay}` : `${t('planner.assigned_date_label')} ${taskDateDisplay?.date}`}
+                title={taskProjectDisplay ? `${t('planner.project_label')} ${taskProjectDisplay}${taskDateDisplay ? ` · ${taskDateDisplay.date}` : ''}` : `${t('planner.assigned_date_label')} ${taskDateDisplay?.date}`}
               >
-                {taskProjectDisplay ? (
+                {/* Project name (first 5 chars) */}
+                {taskProjectDisplay && (
                   <>
-                    {/* Project color dot */}
-                    {taskProject?.color ? (
+                    {taskProject?.color && (
                       <span 
                         className="w-2 h-2 rounded-full flex-shrink-0 shadow-sm"
                         style={{ backgroundColor: task.completed ? '#9CA3AF' : taskProject.color }}
                       />
-                    ) : (
-                      <FolderOpen className="w-3 h-3" style={{ color: task.completed ? '#6B7280' : accentColor }} />
                     )}
-                    <span className="truncate max-w-[80px]">{taskProjectDisplay}</span>
+                    <span className="font-semibold">{taskProjectDisplay.slice(0, 5)}</span>
+                    {taskDateDisplay && <span className="text-gray-400 dark:text-gray-500">·</span>}
                   </>
-                ) : (
+                )}
+                {/* Date */}
+                {taskDateDisplay && (
                   <>
-                    <Calendar className="w-3 h-3" style={{ 
+                    {!taskProjectDisplay && (
+                      <Calendar className="w-3 h-3" style={{ 
+                        color: task.completed 
+                          ? '#6B7280' 
+                          : taskDateDisplay.isPast 
+                            ? '#DC2626' 
+                            : accentColor 
+                      }} />
+                    )}
+                    <span style={{ 
                       color: task.completed 
                         ? '#6B7280' 
-                        : taskDateDisplay?.isPast 
+                        : taskDateDisplay.isPast 
                           ? '#DC2626' 
-                          : accentColor 
-                    }} />
-                    {taskDateDisplay?.date}
+                          : taskProject?.color || accentColor 
+                    }}>
+                      {taskDateDisplay.date}
+                    </span>
                   </>
                 )}
               </span>
