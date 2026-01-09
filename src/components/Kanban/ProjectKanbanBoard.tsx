@@ -26,7 +26,7 @@ import {
   arrayMove
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { FolderOpen, Plus, Settings, Edit2, Sparkles, X, MoreHorizontal, Columns, Focus, ChevronUp, ChevronDown, Filter, Hash, AlertCircle, Circle, CheckCircle, Archive, Clock, Trash2, Check, FileText, Info, Pin, Tag, GripVertical, Calendar, SlidersHorizontal, Pencil, Palette, Columns3 } from 'lucide-react';
+import { FolderOpen, Plus, Settings, Edit2, Sparkles, X, MoreHorizontal, Columns, Focus, ChevronUp, ChevronDown, Filter, Hash, AlertCircle, Circle, CheckCircle, Archive, Clock, Trash2, Check, FileText, Info, Pin, Tag, GripVertical, Calendar, SlidersHorizontal, Pencil, Palette, LayoutGrid } from 'lucide-react';
 import { CompactFilterBar, DateFilterOption, PriorityOption } from '../Common/CompactFilterBar';
 import { useApp } from '../../context/AppContext';
 import { TaskCard } from '../Tasks/TaskCard';
@@ -984,7 +984,7 @@ export function ProjectKanbanBoard() {
               }}
               className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
-              <Columns3 className="w-4 h-4" />
+              <LayoutGrid className="w-4 h-4" />
               <span>{t('projects.organize_columns', 'Spalten organisieren')}</span>
             </button>
             
