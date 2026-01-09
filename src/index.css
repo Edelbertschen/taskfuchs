@@ -706,6 +706,7 @@
   z-index: 10;
   --border-angle: 0deg;
   border: 2px solid transparent !important;
+  overflow: visible !important;
   background: 
     linear-gradient(var(--card-bg, #ffffff), var(--card-bg, #ffffff)) padding-box,
     conic-gradient(

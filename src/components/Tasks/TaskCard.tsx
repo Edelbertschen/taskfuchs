@@ -708,7 +708,9 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
       {...(!isBulkMode ? attributes : {})}
       {...(!isBulkMode ? listeners : {})}
       data-task-card="true"
-      className={`group relative flex items-center rounded-lg overflow-hidden card-hover task-card ${
+      className={`group relative flex items-center rounded-lg card-hover task-card ${
+        isActiveTimer ? '' : 'overflow-hidden'
+      } ${
         task.completed && !isActiveTimer ? 'opacity-50' : ''
       } ${
         isActiveTimer 
