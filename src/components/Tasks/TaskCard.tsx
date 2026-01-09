@@ -1075,15 +1075,9 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
                 }}
                 title={taskProjectDisplay ? `${t('planner.project_label')} ${taskProjectDisplay}${taskDateDisplay ? ` · ${taskDateDisplay.date}` : ''}` : `${t('planner.assigned_date_label')} ${taskDateDisplay?.date}`}
               >
-                {/* Project name (first 5 chars) */}
+                {/* Project name (first 5 chars) - no color dot */}
                 {taskProjectDisplay && (
                   <>
-                    {taskProject?.color && (
-                      <span 
-                        className="w-2 h-2 rounded-full flex-shrink-0 shadow-sm"
-                        style={{ backgroundColor: task.completed ? '#9CA3AF' : taskProject.color }}
-                      />
-                    )}
                     <span className="font-semibold">{taskProjectDisplay.slice(0, 5)}</span>
                     {taskDateDisplay && <span className="text-gray-400 dark:text-gray-500">·</span>}
                   </>

@@ -2410,9 +2410,9 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                                   setIsCreatingColumn(false);
                                   setNewColumnTitle('');
                                 }}
-                                className="text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                                className="w-6 h-6 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
                               >
-                                {actions.close()}
+                                <X className="w-4 h-4" />
                               </button>
                             </div>
                           </div>
@@ -2465,13 +2465,14 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                                 <div key={project.id} className="border-b border-gray-100 dark:border-gray-700 last:border-b-0">
                                   <div 
                                     onClick={() => handleProjectClick(project.id)}
-                                    className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                                    className="relative flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                                   >
-                                    <div className="flex items-center space-x-3">
-                                      <div 
-                                        className="w-3 h-3 rounded-full"
-                                        style={{ backgroundColor: state.preferences.accentColor }}
-                                      />
+                                    {/* Project Color Bar */}
+                                    <div 
+                                      className="absolute left-0 top-0 bottom-0 w-1"
+                                      style={{ backgroundColor: project.color || state.preferences.accentColor }}
+                                    />
+                                    <div className="flex items-center space-x-3 pl-2">
                                       <span className="font-medium text-gray-900 dark:text-white">
                                         {project.title}
                                       </span>
@@ -2519,12 +2520,13 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                                     </div>
 
                                     {/* Project Header */}
-                                    <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                                      <div className="flex items-center space-x-3">
-                                        <div 
-                                          className="w-3 h-3 rounded-full"
-                                          style={{ backgroundColor: state.preferences.accentColor }}
-                                        />
+                                    <div className="p-4 border-b border-gray-200 dark:border-gray-700 relative">
+                                      {/* Project Color Bar */}
+                                      <div 
+                                        className="absolute left-0 top-0 bottom-0 w-1"
+                                        style={{ backgroundColor: selectedProject?.color || state.preferences.accentColor }}
+                                      />
+                                      <div className="flex items-center space-x-3 pl-2">
                                         <span className="font-medium text-gray-900 dark:text-white">
                                           {selectedProject?.title}
                                         </span>
