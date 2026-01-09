@@ -767,7 +767,7 @@ export function ProjectKanbanBoard() {
       >
         {/* Project Color Bar - Left Edge */}
         <div
-          className="absolute left-0 top-0 bottom-0 w-1 transition-all duration-200"
+          className="absolute left-0 top-0 bottom-0 w-2 transition-all duration-200"
           style={{
             backgroundColor: project.color || (isSelected ? getAccentColorStyles().border.borderColor : 'transparent')
           }}
@@ -848,15 +848,31 @@ export function ProjectKanbanBoard() {
               }`}>
                 {projectTaskCount}
               </span>
-              
+
             {/* Elegant Color Picker Popover */}
             {showColorPicker && (
               <div 
                 className="absolute right-2 top-14 z-[100] p-3 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700"
                 onClick={(e) => e.stopPropagation()}
               >
+                {/* No Color Option */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                    handleColorChange(undefined);
+                  }}
+                  className={`w-full mb-2 px-2 py-1.5 text-xs rounded-lg transition-all duration-150 flex items-center gap-2 ${
+                    !project.color 
+                      ? 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200' 
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  <X className="w-3 h-3" />
+                  {t('projects.no_color', 'Keine Farbe')}
+              </button>
+
                 {/* Preset Colors */}
-                <div className="flex gap-1.5 mb-3">
+                <div className="flex gap-1.5 mb-2">
                   {PROJECT_COLORS.map((color) => (
                     <button
                       key={color}
@@ -872,13 +888,12 @@ export function ProjectKanbanBoard() {
                   ))}
                 </div>
                 
-                {/* Custom Color + Remove */}
+                {/* Custom Color */}
                 <div className="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
                   <input
                     type="color"
                     value={customColor}
                     onChange={(e) => setCustomColor(e.target.value)}
-                    onBlur={() => handleColorChange(customColor)}
                     className="w-6 h-6 rounded cursor-pointer border-0 p-0"
                     title={t('projects.custom_color', 'Eigene Farbe')}
                   />
@@ -887,22 +902,13 @@ export function ProjectKanbanBoard() {
                       e.stopPropagation();
                       handleColorChange(customColor);
                     }}
-                    className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                    className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex-1"
                   >
-                    {t('common.apply', 'OK')}
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleColorChange(undefined);
-                    }}
-                    className="text-xs px-2 py-1 text-gray-500 hover:text-red-500 transition-colors"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
+                    {t('projects.custom_color', 'Eigene Farbe')}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </div>
         )}
         </div>

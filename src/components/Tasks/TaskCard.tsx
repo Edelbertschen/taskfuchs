@@ -788,29 +788,17 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
           />
       )}
       
-      {/* Project Color - Background tint + Bottom bar */}
+      {/* Project Color - Very subtle background tint only */}
       {taskProject?.color && !task.completed && (
-        <>
-          {/* Subtle background tint */}
-          <div
-            className="absolute inset-0 pointer-events-none transition-all duration-300"
-            style={{
-              backgroundColor: taskProject.color,
-              opacity: isDragging ? 0.03 : 0.06,
-              zIndex: 0
-            }}
-          />
-          {/* Bold bottom bar */}
-          <div
-            className="absolute bottom-0 left-0 right-0 h-1 transition-all duration-300"
-            style={{
-              backgroundColor: taskProject.color,
-              opacity: isDragging ? 0.6 : 0.9,
-              zIndex: 2
-            }}
-            title={taskProject.name}
-          />
-        </>
+        <div
+          className="absolute inset-0 pointer-events-none transition-all duration-300 rounded-lg"
+          style={{
+            backgroundColor: taskProject.color,
+            opacity: isDragging ? 0.08 : 0.15,
+            zIndex: 0
+          }}
+          title={taskProject.name}
+        />
       )}
       
       {/* Bulk Mode Selection Checkbox */}
