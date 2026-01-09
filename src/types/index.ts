@@ -591,7 +591,7 @@ export interface ProjectKanbanColumn {
 }
 
 // Date filter options for project/pin views
-export type DateFilterOption = 'all' | 'anytime' | 'today' | 'tomorrow' | 'thisWeek';
+export type DateFilterOption = 'all' | 'anytime' | 'today' | 'tomorrow' | 'thisWeek' | 'overdue';
 
 export interface ProjectKanbanState {
   selectedProjectId: string | null;
