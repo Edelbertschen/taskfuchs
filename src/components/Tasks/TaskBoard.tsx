@@ -2169,12 +2169,7 @@ export function TaskBoard() {
             {/* ✨ Butter-Smooth Apple-Style Animations */}
             <style>
               {`
-                /* 🎯 Timer Active Card - Smooth Highlight */
-                .timer-active-card {
-                  border-color: var(--accent-color, #3B82F6) !important;
-                  box-shadow: 0 0 0 1px var(--accent-color, #3B82F6) !important;
-                  transition: all 200ms cubic-bezier(0.23, 1, 0.320, 1) !important;
-                }
+                /* 🎯 Timer Active Card - Snake Border Animation (defined in index.css) */
                 
                 /* 🌟 Smooth Focus Ring for Accessibility */
                 *:focus-visible {
