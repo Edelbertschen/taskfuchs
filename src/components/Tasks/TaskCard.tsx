@@ -788,13 +788,13 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
           />
       )}
       
-      {/* Project Color - Very subtle background tint only */}
+      {/* Project Color - Visible background tint */}
       {taskProject?.color && !task.completed && (
         <div
           className="absolute inset-0 pointer-events-none transition-all duration-300 rounded-lg"
           style={{
             backgroundColor: taskProject.color,
-            opacity: isDragging ? 0.08 : 0.15,
+            opacity: isDragging ? 0.2 : 0.3,
             zIndex: 0
           }}
           title={taskProject.name}
