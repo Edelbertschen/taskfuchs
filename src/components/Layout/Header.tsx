@@ -39,7 +39,6 @@ import {
   HelpCircle,
   Sparkles,
   FileText,
-  Info,
   Printer,
   Edit3,
   Trash2,
@@ -760,24 +759,6 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
                       <span className="text-gray-900 dark:text-white font-semibold text-lg">
                         {selectedProject.title}
                       </span>
-                      
-                      {/* Info Icon for Notes Slider */}
-                      <button
-                        onClick={() => {
-                          window.dispatchEvent(new CustomEvent('toggle-notes-slider'));
-                        }}
-                        className={`p-2 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 ${
-                          notesSliderOpen 
-                            ? 'text-white' 
-                            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
-                        }`}
-                        style={{ 
-                          backgroundColor: notesSliderOpen ? state.preferences.accentColor : undefined,
-                        }}
-                        title={notesSliderOpen ? t('header.notes_hide_details') : t('header.notes_show_details')}
-                      >
-                        <Info className="w-4 h-4" />
-                      </button>
                       
                       {pinnedNote && (
                         <button
