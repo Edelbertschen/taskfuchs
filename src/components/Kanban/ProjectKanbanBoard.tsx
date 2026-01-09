@@ -152,6 +152,10 @@ export function ProjectKanbanBoard() {
   // Color picker state - lifted up to prevent reset during re-renders
   const [colorPickerProjectId, setColorPickerProjectId] = useState<string | null>(null);
   const [customColorInput, setCustomColorInput] = useState<string>('#2196F3');
+  
+  // Context menu state - lifted up to prevent reset during re-renders (timer updates)
+  const [contextMenuProjectId, setContextMenuProjectId] = useState<string | null>(null);
+  const [contextMenuPos, setContextMenuPos] = useState({ x: 0, y: 0 });
 
   // Ref for horizontal scrolling
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -170,6 +174,21 @@ export function ProjectKanbanBoard() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [colorPickerProjectId]);
+  
+  // Close context menu when clicking outside
+  useEffect(() => {
+    if (!contextMenuProjectId) return;
+    
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      // Don't close if clicking inside the context menu
+      if (target.closest('[data-context-menu]')) return;
+      setContextMenuProjectId(null);
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [contextMenuProjectId]);
 
   // Use default sensors (like TaskBoard)
 
@@ -666,31 +685,17 @@ export function ProjectKanbanBoard() {
     const customColor = customColorInput;
     const setCustomColor = setCustomColorInput;
     
-    const [showContextMenu, setShowContextMenu] = useState(false);
-    const [contextMenuPos, setContextMenuPos] = useState({ x: 0, y: 0 });
+    // Use lifted state for context menu to prevent reset during re-renders
+    const showContextMenu = contextMenuProjectId === project.id;
     const colorPickerRef = useRef<HTMLDivElement>(null);
-    const contextMenuRef = useRef<HTMLDivElement>(null);
     
     // Handle right-click context menu
     const handleContextMenu = (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
       setContextMenuPos({ x: e.clientX, y: e.clientY });
-      setShowContextMenu(true);
+      setContextMenuProjectId(project.id);
     };
-    
-    // Close context menu on click outside
-    useEffect(() => {
-      const handleClickOutside = (e: MouseEvent) => {
-        if (contextMenuRef.current && !contextMenuRef.current.contains(e.target as Node)) {
-          setShowContextMenu(false);
-        }
-      };
-      if (showContextMenu) {
-        document.addEventListener('mousedown', handleClickOutside);
-      }
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [showContextMenu]);
     
     const {
       attributes,
@@ -808,11 +813,21 @@ export function ProjectKanbanBoard() {
           setHoveredProjectId(null);
         }}
       >
-        {/* Project Color Bar - Left Edge */}
+        {/* Selection Indicator - Thin accent bar on the very left edge */}
+        {isSelected && (
+          <div
+            className="absolute left-0 top-0 bottom-0 w-1 transition-all duration-200 z-10"
+            style={{
+              backgroundColor: getAccentColorStyles().border.borderColor
+            }}
+          />
+        )}
+        
+        {/* Project Color Bar - Left Edge (offset when selected) */}
         <div
-          className="absolute left-0 top-0 bottom-0 w-2 transition-all duration-200"
+          className={`absolute top-0 bottom-0 w-2 transition-all duration-200 ${isSelected ? 'left-1' : 'left-0'}`}
           style={{
-            backgroundColor: project.color || (isSelected ? getAccentColorStyles().border.borderColor : 'transparent')
+            backgroundColor: project.color || 'transparent'
           }}
         />
         
@@ -961,7 +976,7 @@ export function ProjectKanbanBoard() {
         {/* Context Menu */}
         {showContextMenu && createPortal(
           <div
-            ref={contextMenuRef}
+            data-context-menu="true"
             className="fixed z-[9999] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-1 min-w-[180px] animate-in fade-in zoom-in-95 duration-150"
             style={{
               left: contextMenuPos.x,
@@ -972,7 +987,7 @@ export function ProjectKanbanBoard() {
             {/* Projekt umbenennen */}
             <button
               onClick={() => {
-                setShowContextMenu(false);
+                setContextMenuProjectId(null);
                 handleStartEditProject(project.id, project.title);
               }}
               className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -984,7 +999,7 @@ export function ProjectKanbanBoard() {
             {/* Farbe zuweisen */}
             <button
               onClick={() => {
-                setShowContextMenu(false);
+                setContextMenuProjectId(null);
                 setShowColorPicker(true);
               }}
               className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -996,7 +1011,7 @@ export function ProjectKanbanBoard() {
             {/* Spalten organisieren */}
             <button
               onClick={() => {
-                setShowContextMenu(false);
+                setContextMenuProjectId(null);
                 handleProjectSelect(project.id);
                 setShowColumnManager(true);
               }}
@@ -1011,7 +1026,7 @@ export function ProjectKanbanBoard() {
             {/* Projekt löschen */}
             <button
               onClick={() => {
-                setShowContextMenu(false);
+                setContextMenuProjectId(null);
                 setDeleteConfirmProjectId(project.id);
               }}
               className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
