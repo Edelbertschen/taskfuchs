@@ -625,8 +625,27 @@ export function ProjectKanbanBoard() {
     );
   };
 
+  // Apple-inspired color palette for projects
+  const PROJECT_COLORS = [
+    { id: 'none', color: undefined, name: { de: 'Keine', en: 'None' } },
+    { id: 'red', color: '#E54D42', name: { de: 'Rot', en: 'Red' } },
+    { id: 'orange', color: '#E89830', name: { de: 'Orange', en: 'Orange' } },
+    { id: 'yellow', color: '#DFBF3C', name: { de: 'Gelb', en: 'Yellow' } },
+    { id: 'green', color: '#4CAF50', name: { de: 'Grün', en: 'Green' } },
+    { id: 'teal', color: '#26A69A', name: { de: 'Türkis', en: 'Teal' } },
+    { id: 'blue', color: '#2196F3', name: { de: 'Blau', en: 'Blue' } },
+    { id: 'indigo', color: '#5C6BC0', name: { de: 'Indigo', en: 'Indigo' } },
+    { id: 'purple', color: '#9C27B0', name: { de: 'Violett', en: 'Purple' } },
+    { id: 'pink', color: '#EC407A', name: { de: 'Pink', en: 'Pink' } },
+    { id: 'gray', color: '#78909C', name: { de: 'Grau', en: 'Gray' } },
+    { id: 'brown', color: '#8D6E63', name: { de: 'Braun', en: 'Brown' } },
+  ];
+
   // Sortable Project Component
   const SortableProject = ({ project }: { project: Column }) => {
+    const [showColorPicker, setShowColorPicker] = useState(false);
+    const colorPickerRef = useRef<HTMLDivElement>(null);
+    
     const {
       attributes,
       listeners,
@@ -675,6 +694,28 @@ export function ProjectKanbanBoard() {
     ).length;
 
     const isEditing = editingProjectId === project.id;
+    
+    // Handle color change
+    const handleColorChange = (color: string | undefined) => {
+      dispatch({
+        type: 'UPDATE_COLUMN',
+        payload: { ...project, color }
+      });
+      setShowColorPicker(false);
+    };
+    
+    // Close color picker when clicking outside
+    useEffect(() => {
+      const handleClickOutside = (e: MouseEvent) => {
+        if (colorPickerRef.current && !colorPickerRef.current.contains(e.target as Node)) {
+          setShowColorPicker(false);
+        }
+      };
+      if (showColorPicker) {
+        document.addEventListener('mousedown', handleClickOutside);
+      }
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [showColorPicker]);
     const isSelected = selectedProject?.id === project.id;
     const isHovered = hoveredProjectId === project.id;
     const projectIndex = projects.findIndex(p => p.id === project.id);
@@ -773,13 +814,71 @@ export function ProjectKanbanBoard() {
               />
             ) : (
               <div className="flex items-center gap-2 min-w-0">
-                {/* Project Color Indicator */}
-                {project.color && (
-                  <span 
-                    className="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-sm"
-                    style={{ backgroundColor: project.color }}
-                  />
-                )}
+                {/* Project Color Indicator & Picker */}
+                <div className="relative" ref={colorPickerRef}>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowColorPicker(!showColorPicker);
+                    }}
+                    className="group/color flex items-center justify-center w-5 h-5 rounded-full transition-all duration-200 hover:scale-110 flex-shrink-0"
+                    style={{
+                      backgroundColor: project.color || 'transparent',
+                      border: project.color ? 'none' : '2px dashed currentColor',
+                      borderColor: project.color ? undefined : (isMinimalDesign ? '#9ca3af' : '#6b7280')
+                    }}
+                    title={t('projects.change_color', 'Farbe ändern')}
+                  >
+                    {!project.color && (
+                      <span className="text-[8px] text-gray-400">●</span>
+                    )}
+                  </button>
+
+                  {/* Color Picker Popover */}
+                  {showColorPicker && (
+                    <div 
+                      className="absolute left-0 top-7 z-[100] p-3 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700"
+                      style={{ 
+                        animation: 'fadeIn 0.15s ease-out',
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="grid grid-cols-6 gap-2">
+                        {PROJECT_COLORS.map((colorOption) => (
+                          <button
+                            key={colorOption.id}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleColorChange(colorOption.color);
+                            }}
+                            className={`
+                              w-6 h-6 rounded-full transition-all duration-200 
+                              hover:scale-110 hover:shadow-md
+                              flex items-center justify-center
+                              ${project.color === colorOption.color || (!project.color && !colorOption.color) 
+                                ? 'ring-2 ring-offset-1 ring-gray-400 dark:ring-gray-500 dark:ring-offset-gray-800' 
+                                : ''
+                              }
+                            `}
+                            style={{
+                              backgroundColor: colorOption.color || 'transparent',
+                              border: colorOption.color ? 'none' : '2px dashed #9ca3af'
+                            }}
+                            title={t(`colors.${colorOption.id}`, colorOption.name.de)}
+                          >
+                            {colorOption.color && project.color === colorOption.color && (
+                              <Check className="w-3 h-3 text-white drop-shadow-sm" />
+                            )}
+                            {!colorOption.color && (
+                              <X className="w-3 h-3 text-gray-400" />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 <h3 className={`text-sm font-medium truncate ${
                   isMinimalDesign
                     ? (isSelected 
