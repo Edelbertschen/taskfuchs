@@ -686,51 +686,47 @@
 }
 
 /* Timer Snake Border Animation */
-@keyframes snake-rotate {
+@keyframes border-spin {
   0% {
-    transform: rotate(0deg);
+    --border-angle: 0deg;
   }
   100% {
-    transform: rotate(360deg);
+    --border-angle: 360deg;
   }
 }
 
-@keyframes snake-glow {
-  0%, 100% {
-    opacity: 0.8;
-  }
-  50% {
-    opacity: 1;
-  }
+@property --border-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
 }
 
 .timer-active-card {
   position: relative;
   z-index: 10;
+  --border-angle: 0deg;
   border: 2px solid transparent !important;
-  background: linear-gradient(var(--card-bg, #ffffff), var(--card-bg, #ffffff)) padding-box,
-              linear-gradient(90deg, var(--accent-color, #0ea5e9), transparent 50%) border-box;
+  background: 
+    linear-gradient(var(--card-bg, #ffffff), var(--card-bg, #ffffff)) padding-box,
+    conic-gradient(
+      from var(--border-angle),
+      var(--accent-color, #0ea5e9) 0deg,
+      var(--accent-color, #0ea5e9) 45deg,
+      transparent 90deg,
+      transparent 270deg,
+      var(--accent-color, #0ea5e9) 315deg,
+      var(--accent-color, #0ea5e9) 360deg
+    ) border-box;
+  animation: border-spin 2s linear infinite;
 }
 
-.timer-active-card::before {
-  content: '';
-  position: absolute;
-  inset: -3px;
-  border-radius: 10px;
-  padding: 3px;
-  background: conic-gradient(
-    from 0deg,
-    var(--accent-color, #0ea5e9) 0deg,
-    var(--accent-color, #0ea5e9) 60deg,
-    transparent 120deg,
-    transparent 360deg
-  );
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  animation: snake-rotate 2s linear infinite, snake-glow 2s ease-in-out infinite;
-  pointer-events: none;
+/* Fallback for browsers without @property support */
+@supports not (background: conic-gradient(from var(--border-angle), red, blue)) {
+  .timer-active-card {
+    border: 2px solid var(--accent-color, #0ea5e9) !important;
+    box-shadow: 0 0 10px var(--accent-color, #0ea5e9);
+    animation: none;
+  }
 }
 
 /* Dark mode adjustment */
