@@ -536,8 +536,9 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
   const subtaskTime = task.subtasks?.reduce((sum, st) => sum + (st.estimatedTime && st.estimatedTime > 0 ? st.estimatedTime : 0), 0) || 0;
   const totalEstimatedTime = taskTime + subtaskTime;
 
-  // Get accent color from preferences
+  // Get accent color and dark mode from preferences
   const accentColor = state.preferences.accentColor || '#0ea5e9';
+  const isDarkMode = state.preferences.darkMode;
 
   // Get project info for task (name and color)
   const getTaskProject = () => {
@@ -1031,8 +1032,12 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
                         task.completed ? 'opacity-60' : 'opacity-80 hover:opacity-100'
                       }`}
                       style={{
-                        backgroundColor: task.completed ? '#E5E7EB' : `${accentColor}20`,
-                        color: task.completed ? '#6B7280' : accentColor,
+                        backgroundColor: task.completed 
+                          ? (isDarkMode ? '#374151' : '#E5E7EB') 
+                          : `${accentColor}20`,
+                        color: task.completed 
+                          ? (isDarkMode ? '#9CA3AF' : '#6B7280') 
+                          : accentColor,
                       }}
                       title={tag}
                     >
@@ -1051,60 +1056,36 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
               </div>
             )}
             
-            {/* Context Badge - Project (5 chars) + Date */}
-            {(taskProjectDisplay || taskDateDisplay) && (
+            {/* Context Badge - Date only */}
+            {taskDateDisplay && (
               <span 
                 className={`inline-flex items-center gap-1.5 px-2 py-0.5 text-xs font-medium rounded-md transition-opacity flex-shrink-0 ${
                   task.completed ? 'opacity-70' : 'opacity-90 hover:opacity-100'
                 }`}
                 style={{
                   backgroundColor: task.completed 
-                    ? '#D1D5DB' 
-                    : taskProject?.color
-                      ? taskProject.color + '18'
-                      : taskDateDisplay?.isPast 
-                        ? '#FEE2E2' 
-                        : accentColor + '15',
+                    ? (isDarkMode ? '#374151' : '#D1D5DB')
+                    : taskDateDisplay.isPast 
+                      ? (isDarkMode ? '#7F1D1D' : '#FEE2E2')
+                      : accentColor + '15',
                   color: task.completed 
-                    ? '#6B7280' 
-                    : taskProject?.color
-                      ? taskProject.color
-                      : taskDateDisplay?.isPast 
-                        ? '#DC2626' 
-                        : accentColor
+                    ? (isDarkMode ? '#9CA3AF' : '#6B7280')
+                    : taskDateDisplay.isPast 
+                      ? (isDarkMode ? '#FCA5A5' : '#DC2626')
+                      : accentColor
                 }}
-                title={taskProjectDisplay ? `${t('planner.project_label')} ${taskProjectDisplay}${taskDateDisplay ? ` · ${taskDateDisplay.date}` : ''}` : `${t('planner.assigned_date_label')} ${taskDateDisplay?.date}`}
+                title={`${t('planner.assigned_date_label')} ${taskDateDisplay.date}`}
               >
-                {/* Project name (first 5 chars) - no color dot */}
-                {taskProjectDisplay && (
-                  <>
-                    <span className="font-semibold">{taskProjectDisplay.slice(0, 5)}</span>
-                    {taskDateDisplay && <span className="text-gray-400 dark:text-gray-500">·</span>}
-                  </>
-                )}
-                {/* Date */}
-                {taskDateDisplay && (
-                  <>
-                    {!taskProjectDisplay && (
-                      <Calendar className="w-3 h-3" style={{ 
-                        color: task.completed 
-                          ? '#6B7280' 
-                          : taskDateDisplay.isPast 
-                            ? '#DC2626' 
-                            : accentColor 
-                      }} />
-                    )}
-                    <span style={{ 
-                      color: task.completed 
-                        ? '#6B7280' 
-                        : taskDateDisplay.isPast 
-                          ? '#DC2626' 
-                          : taskProject?.color || accentColor 
-                    }}>
-                      {taskDateDisplay.date}
-                    </span>
-                  </>
-                )}
+                <Calendar className="w-3 h-3" style={{ 
+                  color: task.completed 
+                    ? (isDarkMode ? '#9CA3AF' : '#6B7280')
+                    : taskDateDisplay.isPast 
+                      ? (isDarkMode ? '#FCA5A5' : '#DC2626')
+                      : accentColor 
+                }} />
+                <span>
+                  {taskDateDisplay.date}
+                </span>
               </span>
             )}
           </div>

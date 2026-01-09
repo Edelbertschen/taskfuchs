@@ -1555,26 +1555,49 @@ export function TaskBoard() {
           // For date columns, show tasks based on multiple criteria
           if (column.type === 'date' && column.id.startsWith('date-')) {
             const dateStr = column.id.replace('date-', '');
+            const todayStr = format(new Date(), 'yyyy-MM-dd');
+            const isToday = dateStr === todayStr;
+            const isPastColumn = dateStr < todayStr;
+            
+            // Don't show any tasks in past date columns - they should appear in "Today"
+            if (isPastColumn) {
+              return false;
+            }
             
             // 1. Tasks directly assigned to this date column (primary assignment via columnId)
-          if (task.columnId === column.id) {
-            return true;
-          }
+            if (task.columnId === column.id) {
+              return true;
+            }
+            
+            // 2. For TODAY: Also show tasks with past dates (columnId or reminderDate)
+            if (isToday) {
+              // Show tasks from past date columns
+              if (task.columnId && task.columnId.startsWith('date-')) {
+                const taskDateStr = task.columnId.replace('date-', '');
+                if (taskDateStr < todayStr) {
+                  return true;
+                }
+              }
+              // Show tasks with past reminderDate
+              if (task.reminderDate && task.reminderDate < todayStr) {
+                return true;
+              }
+            }
           
-            // 2. Tasks with reminderDate matching this date (AUCH für Projekt-Aufgaben!)
+            // 3. Tasks with reminderDate matching this date (AUCH für Projekt-Aufgaben!)
             // Dies stellt sicher, dass Aufgaben immer in der richtigen Spalte erscheinen
             if (task.reminderDate === dateStr) {
               return true;
             }
           
-            // 3. Tasks with deadline matching this date (additional deadline display)
+            // 4. Tasks with deadline matching this date (additional deadline display)
             if (task.deadline) {
               const taskDeadlineStr = task.deadline.includes('T') ? task.deadline.split('T')[0] : task.deadline;
               if (taskDeadlineStr === dateStr) {
                 return true; // Show as deadline reminder, even if task is elsewhere
               }
-              }
             }
+          }
             
           // For non-date columns (like inbox), show directly assigned tasks
           if (task.columnId === column.id) {
@@ -1718,25 +1741,48 @@ export function TaskBoard() {
                         // For date columns, show tasks based on multiple criteria
                         if (focusedColumn.type === 'date' && focusedColumn.id.startsWith('date-')) {
                           const dateStr = focusedColumn.id.replace('date-', '');
+                          const todayStr = format(new Date(), 'yyyy-MM-dd');
+                          const isToday = dateStr === todayStr;
+                          const isPastColumn = dateStr < todayStr;
+                          
+                          // Don't show any tasks in past date columns - they should appear in "Today"
+                          if (isPastColumn) {
+                            return false;
+                          }
                           
                           // 1. Tasks directly assigned to this date column (primary assignment via columnId)
-                        if (task.columnId === focusedColumn.id) {
-                          return true;
-                        }
+                          if (task.columnId === focusedColumn.id) {
+                            return true;
+                          }
+                          
+                          // 2. For TODAY: Also show tasks with past dates (columnId or reminderDate)
+                          if (isToday) {
+                            // Show tasks from past date columns
+                            if (task.columnId && task.columnId.startsWith('date-')) {
+                              const taskDateStr = task.columnId.replace('date-', '');
+                              if (taskDateStr < todayStr) {
+                                return true;
+                              }
+                            }
+                            // Show tasks with past reminderDate
+                            if (task.reminderDate && task.reminderDate < todayStr) {
+                              return true;
+                            }
+                          }
                         
-                          // 2. Tasks with reminderDate matching this date (AUCH für Projekt-Aufgaben!)
+                          // 3. Tasks with reminderDate matching this date (AUCH für Projekt-Aufgaben!)
                           if (task.reminderDate === dateStr) {
                             return true;
                           }
                         
-                          // 3. Tasks with deadline matching this date (additional deadline display)
+                          // 4. Tasks with deadline matching this date (additional deadline display)
                           if (task.deadline) {
                             const taskDeadlineStr = task.deadline.includes('T') ? task.deadline.split('T')[0] : task.deadline;
                             if (taskDeadlineStr === dateStr) {
                               return true; // Show as deadline reminder, even if task is elsewhere
                             }
-                            }
                           }
+                        }
                           
                         // For non-date columns (like inbox), show directly assigned tasks
                         if (task.columnId === focusedColumn.id) {
