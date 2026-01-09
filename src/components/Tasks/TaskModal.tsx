@@ -3120,7 +3120,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                             setFormData(prev => ({ ...prev, estimatedTime: value > 0 ? value : undefined }));
                             setHasUnsavedChanges(true);
                           }}
-                          className="w-16 text-right px-2 py-1 text-sm rounded-lg bg-transparent text-gray-900 dark:text-white focus:outline-none focus:bg-gray-100/50 dark:focus:bg-gray-800/50"
+                          className="w-16 text-right px-2 py-1 text-sm rounded-lg bg-transparent text-gray-900 dark:text-white focus:outline-none focus:bg-gray-100/50 dark:focus:bg-gray-800/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           placeholder=""
                         />
                         <span className="text-xs text-gray-400">min</span>
@@ -3152,7 +3152,7 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                               }}
                               placeholder=""
                               data-tracked-time-input
-                              className="w-12 px-1 py-0.5 text-xs text-right border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1"
+                              className="w-12 px-1 py-0.5 text-xs text-right border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                               style={{ '--tw-ring-color': state.preferences.accentColor } as React.CSSProperties}
                             />
                             <span className="text-xs text-gray-400">m</span>
