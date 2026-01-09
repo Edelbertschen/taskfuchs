@@ -710,13 +710,13 @@
     linear-gradient(var(--card-bg, #ffffff), var(--card-bg, #ffffff)) padding-box,
     conic-gradient(
       from var(--border-angle),
-      var(--accent-color, #0ea5e9) 0deg,
-      var(--accent-color, #0ea5e9) 90deg,
-      transparent 180deg,
-      transparent 270deg,
-      var(--accent-color, #0ea5e9) 360deg
+      transparent 0deg,
+      var(--accent-color, #0ea5e9) 30deg,
+      var(--accent-color, #0ea5e9) 180deg,
+      transparent 210deg,
+      transparent 360deg
     ) border-box;
-  animation: border-spin 3s linear infinite;
+  animation: border-spin 5s linear infinite;
 }
 
 /* Fallback for browsers without @property support */
