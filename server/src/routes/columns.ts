@@ -98,7 +98,7 @@ app.put('/:id', async (c) => {
       order: data.order,
       linkedNotes: data.linkedNotes,
       timebudget: data.timebudget,
-      color: data.color,
+      color: data.color === undefined ? null : data.color, // Explicitly set null to clear color
       updatedAt: new Date()
     }
   });
@@ -198,7 +198,7 @@ app.post('/bulk', async (c) => {
             order: columnData.order,
             linkedNotes: columnData.linkedNotes,
             timebudget: columnData.timebudget,
-            color: columnData.color,
+            color: columnData.color === undefined ? null : columnData.color, // Explicitly set null to clear color
             updatedAt: new Date()
           }
         });
