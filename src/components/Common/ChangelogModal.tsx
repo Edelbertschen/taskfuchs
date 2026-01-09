@@ -28,6 +28,48 @@ const CHANGELOG: ChangelogEntry[] = [
         }
       },
       {
+        type: 'feature',
+        text: {
+          de: 'Kontextmenü für Projekte – Rechtsklick auf Projekte in der Sidebar für schnellen Zugriff auf Umbenennen, Farbe, Spalten und Löschen',
+          en: 'Context menu for projects – Right-click projects in sidebar for quick access to rename, color, columns and delete'
+        }
+      },
+      {
+        type: 'feature',
+        text: {
+          de: 'Projektname bei Hover – Der Projektname erscheint dezent beim Überfahren der Aufgabenkarte',
+          en: 'Project name on hover – Project name appears subtly when hovering over task card'
+        }
+      },
+      {
+        type: 'improvement',
+        text: {
+          de: 'Elegante Timer-Animation – Laufende Timer werden mit einer sanft rotierenden Lichtlinie um die Karte angezeigt',
+          en: 'Elegant timer animation – Active timers shown with a smoothly rotating light line around the card'
+        }
+      },
+      {
+        type: 'improvement',
+        text: {
+          de: 'Vergangene Aufgaben automatisch in Heute – Aufgaben mit vergangenen Daten erscheinen automatisch in der Heute-Spalte',
+          en: 'Past tasks automatically in Today – Tasks with past dates automatically appear in the Today column'
+        }
+      },
+      {
+        type: 'fix',
+        text: {
+          de: 'Darkmode-Fixes – Badges und Tags jetzt korrekt im Darkmode dargestellt',
+          en: 'Darkmode fixes – Badges and tags now correctly displayed in dark mode'
+        }
+      },
+      {
+        type: 'improvement',
+        text: {
+          de: 'Aufgeräumte Zeiteingabe – Spinner-Buttons bei Minuteneingabe entfernt für cleanes Design',
+          en: 'Cleaner time input – Spinner buttons removed from minute input for clean design'
+        }
+      },
+      {
         type: 'improvement',
         text: {
           de: 'Aufgeräumter Projekt-Header – Info-Button für Notiz-Verknüpfung entfernt',
