@@ -19,8 +19,7 @@ import {
   Users,
   Clock,
   CheckCircle,
-  MoreVertical,
-  BarChart3
+  Palette
 } from 'lucide-react';
 import { 
   DndContext, 
@@ -44,13 +43,28 @@ import { CSS } from '@dnd-kit/utilities';
 import { useApp } from '../../context/AppContext';
 import type { Column } from '../../types';
 import { DeleteConfirmationModal } from '../Common/DeleteConfirmationModal';
-import { ProjectTimebudgetModal } from './ProjectTimebudgetModal';
 
 interface ProjectManagerProps {
   isOpen: boolean;
   onClose: () => void;
   sourceColumnId?: string; // The column ID where this project should be created/belong to
 }
+
+// Apple-inspired color palette - sophisticated, muted tones
+const PROJECT_COLORS = [
+  { id: 'none', color: undefined, name: { de: 'Keine', en: 'None' } },
+  { id: 'red', color: '#E54D42', name: { de: 'Rot', en: 'Red' } },
+  { id: 'orange', color: '#E89830', name: { de: 'Orange', en: 'Orange' } },
+  { id: 'yellow', color: '#DFBF3C', name: { de: 'Gelb', en: 'Yellow' } },
+  { id: 'green', color: '#4CAF50', name: { de: 'Grün', en: 'Green' } },
+  { id: 'teal', color: '#26A69A', name: { de: 'Türkis', en: 'Teal' } },
+  { id: 'blue', color: '#2196F3', name: { de: 'Blau', en: 'Blue' } },
+  { id: 'indigo', color: '#5C6BC0', name: { de: 'Indigo', en: 'Indigo' } },
+  { id: 'purple', color: '#9C27B0', name: { de: 'Violett', en: 'Purple' } },
+  { id: 'pink', color: '#EC407A', name: { de: 'Pink', en: 'Pink' } },
+  { id: 'gray', color: '#78909C', name: { de: 'Grau', en: 'Gray' } },
+  { id: 'brown', color: '#8D6E63', name: { de: 'Braun', en: 'Brown' } },
+];
 
 interface SortableProjectItemProps {
   project: Column;
@@ -61,7 +75,7 @@ interface SortableProjectItemProps {
   onSaveEdit: () => void;
   onCancelEdit: () => void;
   onDelete: () => void;
-  onOpenTimebudget: () => void;
+  onColorChange: (color: string | undefined) => void;
   taskCount: number;
 }
 
@@ -74,10 +88,25 @@ function SortableProjectItem({
   onSaveEdit,
   onCancelEdit,
   onDelete,
-  onOpenTimebudget,
+  onColorChange,
   taskCount
 }: SortableProjectItemProps) {
   const { i18n } = useTranslation();
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  const colorPickerRef = React.useRef<HTMLDivElement>(null);
+
+  // Close color picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (colorPickerRef.current && !colorPickerRef.current.contains(e.target as Node)) {
+        setShowColorPicker(false);
+      }
+    };
+    if (showColorPicker) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showColorPicker]);
   const {
     attributes,
     listeners,
@@ -218,32 +247,85 @@ function SortableProjectItem({
           </div>
         ) : (
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2 flex-1">
-              <div>
+            <div className="flex items-center space-x-3 flex-1">
+              {/* Color Indicator & Picker */}
+              <div className="relative" ref={colorPickerRef}>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowColorPicker(!showColorPicker);
+                  }}
+                  className="group/color flex items-center justify-center w-6 h-6 rounded-full transition-all duration-200 hover:scale-110"
+                  style={{
+                    backgroundColor: project.color || 'transparent',
+                    border: project.color ? 'none' : '2px dashed currentColor'
+                  }}
+                  title={i18n.language === 'en' ? 'Change color' : 'Farbe ändern'}
+                >
+                  {!project.color && (
+                    <Palette className="w-3 h-3 text-gray-400 group-hover/color:text-gray-600 dark:group-hover/color:text-gray-300" />
+                  )}
+                </button>
+
+                {/* Color Picker Popover */}
+                {showColorPicker && (
+                  <div 
+                    className="absolute left-0 top-8 z-50 p-3 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 animate-in fade-in-0 zoom-in-95 duration-150"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="grid grid-cols-6 gap-2">
+                      {PROJECT_COLORS.map((colorOption) => (
+                        <button
+                          key={colorOption.id}
+                          onClick={() => {
+                            onColorChange(colorOption.color);
+                            setShowColorPicker(false);
+                          }}
+                          className={`
+                            w-7 h-7 rounded-full transition-all duration-200 
+                            hover:scale-110 hover:shadow-md
+                            flex items-center justify-center
+                            ${project.color === colorOption.color || (!project.color && !colorOption.color) 
+                              ? 'ring-2 ring-offset-2 ring-gray-400 dark:ring-gray-500 dark:ring-offset-gray-800' 
+                              : ''
+                            }
+                          `}
+                          style={{
+                            backgroundColor: colorOption.color || 'transparent',
+                            border: colorOption.color ? 'none' : '2px dashed #9ca3af'
+                          }}
+                          title={i18n.language === 'en' ? colorOption.name.en : colorOption.name.de}
+                        >
+                          {(!colorOption.color && (!project.color || project.color === colorOption.color)) && (
+                            <X className="w-3 h-3 text-gray-400" />
+                          )}
+                          {colorOption.color && project.color === colorOption.color && (
+                            <Check className="w-3.5 h-3.5 text-white drop-shadow-sm" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex-1 min-w-0">
                 <h3 className="text-sm font-medium text-gray-900 dark:text-white truncate">
                   {project.title}
                 </h3>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {taskCount} Aufgaben
+                  {taskCount} {i18n.language === 'en' ? 'tasks' : 'Aufgaben'}
                 </p>
               </div>
-              {/* Edit Button inline next to title */}
+            </div>
+            <div className="flex items-center space-x-1">
+              {/* Edit Button */}
               <button
                 onClick={onStartEdit}
                 className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
                 title={i18n.language === 'en' ? 'Rename Project' : 'Projekt umbenennen'}
               >
                 <Edit2 className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="flex items-center space-x-1">
-              {/* Timebudget Button */}
-              <button
-                onClick={onOpenTimebudget}
-                className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200"
-                title={i18n.language === 'en' ? 'Capacity Planning' : 'Kapazitätsplanung'}
-              >
-                <BarChart3 className="w-4 h-4" />
               </button>
               {/* Delete Button */}
               <button
@@ -267,13 +349,11 @@ export function ProjectManager({ isOpen, onClose, sourceColumnId }: ProjectManag
   const { state, dispatch } = useApp();
   const [editingProject, setEditingProject] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
-  const [selectedProject, setSelectedProject] = useState<Column | null>(null);
   const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; projectId: string; projectName: string }>({
     isOpen: false,
     projectId: '',
     projectName: ''
   });
-
 
   // Get accent color from settings
   const accentColor = state.preferences.accentColor || '#f97316';
@@ -366,6 +446,16 @@ export function ProjectManager({ isOpen, onClose, sourceColumnId }: ProjectManag
   const handleCancelEdit = () => {
     setEditingProject(null);
     setEditTitle('');
+  };
+
+  const handleColorChange = (projectId: string, color: string | undefined) => {
+    const project = projectColumns.find(p => p.id === projectId);
+    if (project) {
+      dispatch({
+        type: 'UPDATE_COLUMN',
+        payload: { ...project, color }
+      });
+    }
   };
 
   const handleDeleteProject = (project: Column) => {
@@ -560,7 +650,7 @@ export function ProjectManager({ isOpen, onClose, sourceColumnId }: ProjectManag
                         onSaveEdit={handleSaveEdit}
                         onCancelEdit={handleCancelEdit}
                         onDelete={() => handleDeleteProject(project)}
-                        onOpenTimebudget={() => setSelectedProject(project)}
+                        onColorChange={(color) => handleColorChange(project.id, color)}
                         taskCount={getTaskCountForProject(project.id)}
                       />
                     ))}
@@ -592,14 +682,6 @@ export function ProjectManager({ isOpen, onClose, sourceColumnId }: ProjectManag
           warningText={i18n.language === 'en' ? 'This action cannot be undone.' : 'Diese Aktion kann nicht rückgängig gemacht werden.'}
         />
 
-      {/* Project Timebudget Modal */}
-      {selectedProject && (
-        <ProjectTimebudgetModal
-          isOpen={selectedProject !== null}
-          onClose={() => setSelectedProject(null)}
-          project={selectedProject}
-        />
-      )}
     </>,
     document.body
   );

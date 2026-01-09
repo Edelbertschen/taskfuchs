@@ -539,19 +539,30 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
   // Get accent color from preferences
   const accentColor = state.preferences.accentColor || '#0ea5e9';
 
-  // CORRECTED: Show project name when task is in PLANNER (date column)
-  const getTaskProjectDisplay = () => {
-    if (!task.projectId || !currentColumn) return null;
-    
-    // Only show project name when displayed in a DATE column (Planner)
-    if (currentColumn.type !== 'date') return null;
+  // Get project info for task (name and color)
+  const getTaskProject = () => {
+    if (!task.projectId) return null;
     
     // Find the project this task is assigned to
     const project = state.columns.find(col => col.id === task.projectId);
     if (!project || project.type !== 'project') return null;
     
-    return project.title;
+    return { name: project.title, color: project.color };
   };
+
+  // CORRECTED: Show project name when task is in PLANNER (date column)
+  const getTaskProjectDisplay = () => {
+    const project = getTaskProject();
+    if (!project || !currentColumn) return null;
+    
+    // Only show project name when displayed in a DATE column (Planner)
+    if (currentColumn.type !== 'date') return null;
+    
+    return project.name;
+  };
+  
+  // Get project color for left border indicator (show in ALL views)
+  const taskProject = getTaskProject();
 
   // IMPROVED: Show date when task has any date set (always visible in project context)
   // WICHTIG: reminderDate hat höchste Priorität (Konsistenz mit TaskModal)
@@ -575,10 +586,10 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
     
     // Priority 2: Check for assigned date column (falls keine reminderDate)
     if (task.columnId) {
-      const dateColumn = state.columns.find(col => col.id === task.columnId);
+    const dateColumn = state.columns.find(col => col.id === task.columnId);
       if (dateColumn?.type === 'date' && dateColumn.date) {
-        try {
-          const date = new Date(dateColumn.date);
+    try {
+      const date = new Date(dateColumn.date);
           const isPast = date < today;
           return { date: format(date, 'dd.MM.', { locale: de }), isPast };
         } catch (error) {
@@ -604,9 +615,9 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
         const date = new Date(task.dueDate);
         const isPast = date < today;
         return { date: format(date, 'dd.MM.', { locale: de }), isPast };
-      } catch (error) {
-        return null;
-      }
+    } catch (error) {
+      return null;
+    }
     }
     
     return null;
@@ -775,6 +786,19 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
               zIndex: 0
             }}
           />
+      )}
+      
+      {/* Project Color Indicator - Subtle top-right accent */}
+      {taskProject?.color && (
+        <div
+          className="absolute top-0 right-0 w-8 h-1 rounded-bl-full transition-all duration-300"
+          style={{
+            backgroundColor: task.completed ? '#9CA3AF' : taskProject.color,
+            opacity: isDragging ? 0.6 : (task.completed ? 0.4 : 0.85),
+            zIndex: 1
+          }}
+          title={taskProject.name}
+        />
       )}
       
       {/* Bulk Mode Selection Checkbox */}
@@ -1030,27 +1054,39 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
             {/* Context Badge - moved here to align with time row */}
             {(taskProjectDisplay || taskDateDisplay) && (
               <span 
-                className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-md transition-opacity flex-shrink-0 ${
-                  task.completed ? 'opacity-70' : 'opacity-80 hover:opacity-100'
+                className={`inline-flex items-center gap-1.5 px-2 py-0.5 text-xs font-medium rounded-md transition-opacity flex-shrink-0 ${
+                  task.completed ? 'opacity-70' : 'opacity-90 hover:opacity-100'
                 }`}
                 style={{
                   backgroundColor: task.completed 
                     ? '#D1D5DB' 
-                    : (taskDateDisplay?.isPast && !taskProjectDisplay) 
-                      ? '#FEE2E2' 
-                      : accentColor + '15',
+                    : taskProjectDisplay && taskProject?.color
+                      ? taskProject.color + '18' // Very subtle project color background
+                      : (taskDateDisplay?.isPast && !taskProjectDisplay) 
+                        ? '#FEE2E2' 
+                        : accentColor + '15',
                   color: task.completed 
                     ? '#6B7280' 
-                    : (taskDateDisplay?.isPast && !taskProjectDisplay) 
-                      ? '#DC2626' 
-                      : accentColor
+                    : taskProjectDisplay && taskProject?.color
+                      ? taskProject.color
+                      : (taskDateDisplay?.isPast && !taskProjectDisplay) 
+                        ? '#DC2626' 
+                        : accentColor
                 }}
                 title={taskProjectDisplay ? `${t('planner.project_label')} ${taskProjectDisplay}` : `${t('planner.assigned_date_label')} ${taskDateDisplay?.date}`}
               >
                 {taskProjectDisplay ? (
                   <>
-                    <FolderOpen className="w-3 h-3" style={{ color: task.completed ? '#6B7280' : accentColor }} />
-                    {taskProjectDisplay}
+                    {/* Project color dot */}
+                    {taskProject?.color ? (
+                      <span 
+                        className="w-2 h-2 rounded-full flex-shrink-0 shadow-sm"
+                        style={{ backgroundColor: task.completed ? '#9CA3AF' : taskProject.color }}
+                      />
+                    ) : (
+                      <FolderOpen className="w-3 h-3" style={{ color: task.completed ? '#6B7280' : accentColor }} />
+                    )}
+                    <span className="truncate max-w-[80px]">{taskProjectDisplay}</span>
                   </>
                 ) : (
                   <>

@@ -18,6 +18,25 @@ interface ChangelogEntry {
 // Changelog data - add new entries at the top
 const CHANGELOG: ChangelogEntry[] = [
   {
+    date: '2026-01-09',
+    items: [
+      {
+        type: 'feature',
+        text: {
+          de: 'Projektfarben – Weise Projekten Farben zu für schnelle visuelle Erkennung auf Aufgabenkarten',
+          en: 'Project colors – Assign colors to projects for quick visual identification on task cards'
+        }
+      },
+      {
+        type: 'improvement',
+        text: {
+          de: 'Kapazitätsplanung entfernt – Vereinfachte Oberfläche ohne Timebudget-Funktionen',
+          en: 'Capacity planning removed – Simplified interface without timebudget features'
+        }
+      }
+    ]
+  },
+  {
     date: '2026-01-08',
     items: [
       {

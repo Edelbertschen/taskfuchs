@@ -50,8 +50,6 @@ import { ProfileModal } from '../Common/ProfileModal';
 import { DatePickerSlider } from '../Common/DatePickerSlider';
 import { UserGuide } from '../Common/UserGuide';
 import { OnboardingTour } from '../Common/OnboardingTour';
-import { ProjectTimebudgetHeader } from '../Projects/ProjectTimebudgetHeader';
-import { ProjectTimebudgetDetailModal } from '../Projects/ProjectTimebudgetDetailModal';
 import { ColumnManager } from '../Projects/ColumnManager';
 import { exportPlannerToPrint } from '../../utils/plannerExport';
 import { format } from 'date-fns';
@@ -91,7 +89,6 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState('');
   
   // Project states
-  const [showProjectTimebudgetModal, setShowProjectTimebudgetModal] = useState(false);
   const [editingProjectTitle, setEditingProjectTitle] = useState(false);
   const [showColumnManager, setShowColumnManager] = useState(false);
   // 🔍 Performance Boost: Debounced search für bessere Performance 
@@ -764,10 +761,6 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
                         {selectedProject.title}
                       </span>
                       
-                      {/* Project Timebudget Display */}
-                      <ProjectTimebudgetHeader project={selectedProject} />
-
-                      
                       {/* Info Icon for Notes Slider */}
                       <button
                         onClick={() => {
@@ -1272,20 +1265,6 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
                           const selectedProject = state.columns.find(col => col.type === 'project' && col.id === state.viewState.projectKanban.selectedProjectId);
                           return selectedProject ? (
                           <>
-                            {/* Zeitbudget */}
-                            {selectedProject.timebudget && (
-                            <button
-                              onClick={() => {
-                                  setShowProjectTimebudgetModal(true);
-                                  setShowMoreMenu(false);
-                                }}
-                                className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                              >
-                                <Clock className="w-4 h-4" />
-                                <span>{t('projects.time_budget')}</span>
-                              </button>
-                            )}
-                            
                             {/* Spalten organisieren */}
                             <button
                               onClick={() => {
@@ -1462,20 +1441,6 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
                           const selectedProject = state.columns.find(col => col.type === 'project' && col.id === state.viewState.projectKanban.selectedProjectId);
                           return selectedProject ? (
                           <>
-                            {/* Zeitbudget */}
-                            {selectedProject.timebudget && (
-                            <button
-                              onClick={() => {
-                                  setShowProjectTimebudgetModal(true);
-                                  setShowMoreMenu(false);
-                                }}
-                                className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                              >
-                                <Clock className="w-4 h-4" />
-                                <span>{t('projects.time_budget')}</span>
-                              </button>
-                            )}
-                            
                             {/* Spalten organisieren */}
                             <button
                               onClick={() => {
@@ -1807,17 +1772,6 @@ export const Header = memo(function Header({ currentView }: HeaderProps) {
       />
 
       {/* Onboarding Tour disabled here (handled centrally in App) */}
-
-      {/* Project Timebudget Modal */}
-      {showProjectTimebudgetModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <ProjectTimebudgetDetailModal 
-            project={state.columns.find(col => col.type === 'project' && col.id === state.viewState.projectKanban.selectedProjectId)}
-            isOpen={true}
-            onClose={() => setShowProjectTimebudgetModal(false)}
-          />
-        </div>
-      )}
 
       {/* Project Rename Modal */}
       {editingProjectTitle && createPortal(

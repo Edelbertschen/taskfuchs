@@ -1557,10 +1557,10 @@ export function TaskBoard() {
             const dateStr = column.id.replace('date-', '');
             
             // 1. Tasks directly assigned to this date column (primary assignment via columnId)
-            if (task.columnId === column.id) {
-              return true;
-            }
-            
+          if (task.columnId === column.id) {
+            return true;
+          }
+          
             // 2. Tasks with reminderDate matching this date (AUCH für Projekt-Aufgaben!)
             // Dies stellt sicher, dass Aufgaben immer in der richtigen Spalte erscheinen
             if (task.reminderDate === dateStr) {
@@ -1573,12 +1573,12 @@ export function TaskBoard() {
               if (taskDeadlineStr === dateStr) {
                 return true; // Show as deadline reminder, even if task is elsewhere
               }
+              }
             }
-          }
             
           // For non-date columns (like inbox), show directly assigned tasks
           if (task.columnId === column.id) {
-            return true;
+              return true;
           }
           
           return false;
@@ -1720,10 +1720,10 @@ export function TaskBoard() {
                           const dateStr = focusedColumn.id.replace('date-', '');
                           
                           // 1. Tasks directly assigned to this date column (primary assignment via columnId)
-                          if (task.columnId === focusedColumn.id) {
-                            return true;
-                          }
-                          
+                        if (task.columnId === focusedColumn.id) {
+                          return true;
+                        }
+                        
                           // 2. Tasks with reminderDate matching this date (AUCH für Projekt-Aufgaben!)
                           if (task.reminderDate === dateStr) {
                             return true;
@@ -1735,12 +1735,12 @@ export function TaskBoard() {
                             if (taskDeadlineStr === dateStr) {
                               return true; // Show as deadline reminder, even if task is elsewhere
                             }
+                            }
                           }
-                        }
                           
                         // For non-date columns (like inbox), show directly assigned tasks
                         if (task.columnId === focusedColumn.id) {
-                          return true;
+                            return true;
                         }
                         
                         return false;
@@ -1899,9 +1899,9 @@ export function TaskBoard() {
               }`}>
                 {t('planner.drag_hint') || 'Ziehe Aufgaben in die Tagesspalten'}
               </p>
-            </div>
+              </div>
               
-            {/* Stats */}
+              {/* Stats */}
             <div className="px-4 pt-4">
               <div className="flex items-center justify-end">
                 <span className={`text-xs ${
@@ -1987,7 +1987,7 @@ export function TaskBoard() {
             }`}>
               <Header currentView="tasks" />
             </div>
-
+            
             {/* CompactFilterBar - Direkt unter dem Header (wie bei Pins/Projekte) */}
             {(showFilters || filterPinned) && (
               <div className={`flex-shrink-0 border-b ${

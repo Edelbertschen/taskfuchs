@@ -111,6 +111,7 @@ export interface Column {
   parentColumnId?: string; // For projects: which column they were created in/belong to
   linkedNotes?: string[]; // Note IDs linked to this project (for project columns)
   timebudget?: ProjectTimebudget; // Time budget configuration for projects
+  color?: string; // Project color for visual identification
   
   // Helper properties for Microsoft To Do integration
   isProject?: boolean; // Computed from type === 'project'

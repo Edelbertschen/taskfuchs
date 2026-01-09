@@ -4163,16 +4163,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         // Bei jedem Sync werden Server-Daten IMMER übernommen
         if (data.tasks) {
           // IMMER Server-Daten setzen - keine Vergleiche, keine Merges
-          dispatch({ type: 'SET_TASKS', payload: data.tasks });
+            dispatch({ type: 'SET_TASKS', payload: data.tasks });
           // LocalStorage SOFORT mit Server-Daten überschreiben
-          localStorage.setItem('taskfuchs-tasks', JSON.stringify(data.tasks));
+            localStorage.setItem('taskfuchs-tasks', JSON.stringify(data.tasks));
         }
         
         if (data.archivedTasks) {
           // IMMER Server-Daten setzen
-          dispatch({ type: 'SET_ARCHIVED_TASKS', payload: data.archivedTasks });
+            dispatch({ type: 'SET_ARCHIVED_TASKS', payload: data.archivedTasks });
           // LocalStorage SOFORT überschreiben
-          localStorage.setItem('taskfuchs-archived-tasks', JSON.stringify(data.archivedTasks));
+            localStorage.setItem('taskfuchs-archived-tasks', JSON.stringify(data.archivedTasks));
         }
       } catch (error) {
         // Silently fail - background sync shouldn't interrupt user

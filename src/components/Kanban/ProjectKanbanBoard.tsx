@@ -25,7 +25,7 @@ import {
   arrayMove
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { FolderOpen, Plus, Settings, Edit2, Sparkles, X, MoreHorizontal, MoreVertical, Columns, Focus, ChevronUp, ChevronDown, Filter, Hash, AlertCircle, Circle, CheckCircle, Archive, Clock, Trash2, Check, FileText, Info, Pin, BarChart3, Tag, GripVertical, Calendar, SlidersHorizontal } from 'lucide-react';
+import { FolderOpen, Plus, Settings, Edit2, Sparkles, X, MoreHorizontal, Columns, Focus, ChevronUp, ChevronDown, Filter, Hash, AlertCircle, Circle, CheckCircle, Archive, Clock, Trash2, Check, FileText, Info, Pin, Tag, GripVertical, Calendar, SlidersHorizontal } from 'lucide-react';
 import { CompactFilterBar, DateFilterOption, PriorityOption } from '../Common/CompactFilterBar';
 import { useApp } from '../../context/AppContext';
 import { TaskCard } from '../Tasks/TaskCard';
@@ -35,8 +35,6 @@ import { ProjectManager } from '../Projects/ProjectManager';
 import { ColumnManager } from '../Projects/ColumnManager';
 import { ProjectToggle } from '../Projects/ProjectToggle';
 import { ProjectColumnSelector } from '../Projects/ProjectColumnSelector';
-import { ProjectTimebudgetModal } from '../Projects/ProjectTimebudgetModal';
-import { ProjectTimebudgetIcon } from '../Projects/ProjectTimebudgetIcon';
 import { SmartTaskModal } from '../Tasks/SmartTaskModal';
 import { TaskModal } from '../Tasks/TaskModal';
 import { Header } from '../Layout/Header';
@@ -136,11 +134,6 @@ export function ProjectKanbanBoard() {
       return false;
     }
   });
-  const [projectMenuDropdown, setProjectMenuDropdown] = useState<string | null>(null);
-  
-  // Time budget modal state
-  const [showTimebudgetModal, setShowTimebudgetModal] = useState(false);
-  const [timebudgetProject, setTimebudgetProject] = useState<Column | null>(null);
   
   // Notes linking state
   const [showNotesSlider, setShowNotesSlider] = useState(false);
@@ -162,25 +155,6 @@ export function ProjectKanbanBoard() {
 
   // Do not auto-open sidebar; initial state is derived from persisted minimized state
 
-  // Close project menu dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      // Check if click is on the menu button or its children - if so, don't close
-      const menuButton = document.querySelector('[data-menu-button="project"]');
-      const menuContainer = document.querySelector('[data-menu-container="project"]');
-      
-      if (menuButton?.contains(e.target as Node) || menuContainer?.contains(e.target as Node)) {
-        return; // Don't close if clicking inside menu or button
-      }
-      
-      setProjectMenuDropdown(null);
-    };
-
-    if (projectMenuDropdown) {
-      document.addEventListener('click', handleClickOutside);
-      return () => document.removeEventListener('click', handleClickOutside);
-    }
-  }, [projectMenuDropdown]);
 
   // Send initial sidebar state to header
   useEffect(() => {
@@ -715,55 +689,55 @@ export function ProjectKanbanBoard() {
           />
         )}
         
-        <div
-          ref={combinedRef}
+      <div
+        ref={combinedRef}
           className={`relative p-4 cursor-pointer transition-all duration-200 group h-16 ${
-            isMinimalDesign
+          isMinimalDesign
               ? `border-b border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 ${
                   isSelected ? 'bg-gray-100 dark:bg-gray-800 border-l-4' : ''
-                }`
-              : `border-b border-white/15 hover:bg-black/40 ${
-                  isSelected ? 'border-l-4' : ''
-                }`
-          } ${
-            isTaskDropZone && activeTask ? 'ring-2 ring-offset-1' : ''
+              }`
+            : `border-b border-white/15 hover:bg-black/40 ${
+                isSelected ? 'border-l-4' : ''
+              }`
+        } ${
+          isTaskDropZone && activeTask ? 'ring-2 ring-offset-1' : ''
           } ${
             isDragging ? 'opacity-30 scale-95' : ''
-          }`}
-          onClick={() => !isEditing && handleProjectSelect(project.id)}
-          style={{
-            ...style,
-            backgroundColor: isMinimalDesign
-              ? (isSelected 
-                  ? getAccentColorStyles().bgLight.backgroundColor
-                  : isTaskDropZone && activeTask
-                  ? '#f3f4f6'
+        }`}
+        onClick={() => !isEditing && handleProjectSelect(project.id)}
+        style={{
+          ...style,
+          backgroundColor: isMinimalDesign
+            ? (isSelected 
+                ? getAccentColorStyles().bgLight.backgroundColor
+                : isTaskDropZone && activeTask
+                ? '#f3f4f6'
                   : isDragging 
                   ? 'transparent'
                   : undefined)
-              : (isSelected 
-                  ? (getAccentColorStyles().bg.backgroundColor + '1A') 
-                  : isTaskDropZone && activeTask
-                  ? (getAccentColorStyles().bg.backgroundColor + '20')
+            : (isSelected 
+                ? (getAccentColorStyles().bg.backgroundColor + '1A') 
+                : isTaskDropZone && activeTask
+                ? (getAccentColorStyles().bg.backgroundColor + '20')
                   : isDragging
                   ? 'transparent'
                   : undefined),
-            borderLeftColor: isSelected 
-              ? getAccentColorStyles().border.borderColor
-              : 'transparent',
-            ...(isTaskDropZone && activeTask ? {
-              ringColor: isMinimalDesign 
-                ? getAccentColorStyles().border.borderColor + '50'
-                : getAccentColorStyles().border.borderColor + '50'
-            } : {})
-          }}
-          onMouseEnter={() => {
-            setHoveredProjectId(project.id);
-          }}
-          onMouseLeave={() => {
-            setHoveredProjectId(null);
-          }}
-        >
+          borderLeftColor: isSelected 
+            ? getAccentColorStyles().border.borderColor
+            : 'transparent',
+          ...(isTaskDropZone && activeTask ? {
+            ringColor: isMinimalDesign 
+              ? getAccentColorStyles().border.borderColor + '50'
+              : getAccentColorStyles().border.borderColor + '50'
+          } : {})
+        }}
+        onMouseEnter={() => {
+          setHoveredProjectId(project.id);
+        }}
+        onMouseLeave={() => {
+          setHoveredProjectId(null);
+        }}
+      >
         {/* Normal Project Display */}
         <div className="flex items-center justify-between">
           {/* Drag Handle */}
@@ -798,33 +772,32 @@ export function ProjectKanbanBoard() {
                 onClick={(e) => e.stopPropagation()}
               />
             ) : (
-              <h3 className={`text-sm font-medium truncate ${
-                isMinimalDesign
-                  ? (isSelected 
-                      ? 'text-gray-900 dark:text-white' 
-                      : 'text-gray-700 dark:text-gray-300')
-                  : (isSelected 
-                      ? (isDarkMode ? 'text-white' : 'text-gray-900')
-                      : (isDarkMode ? 'text-gray-200' : 'text-gray-900'))
-              }`}>
-                {project.title}
-              </h3>
+              <div className="flex items-center gap-2 min-w-0">
+                {/* Project Color Indicator */}
+                {project.color && (
+                  <span 
+                    className="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-sm"
+                    style={{ backgroundColor: project.color }}
+                  />
+                )}
+                <h3 className={`text-sm font-medium truncate ${
+                  isMinimalDesign
+                    ? (isSelected 
+                        ? 'text-gray-900 dark:text-white' 
+                        : 'text-gray-700 dark:text-gray-300')
+                    : (isSelected 
+                        ? (isDarkMode ? 'text-white' : 'text-gray-900')
+                        : (isDarkMode ? 'text-gray-200' : 'text-gray-900'))
+                }`}>
+                  {project.title}
+                </h3>
+              </div>
             )}
           </div>
           
                   {/* Right side - Task count and indicators */}
         {!isEditing && (
           <div className="flex items-center space-x-1">
-            {/* Timebudget indicator icon */}
-            <ProjectTimebudgetIcon 
-              project={project} 
-              className="mr-1"
-              onClick={() => {
-                setTimebudgetProject(project);
-                setShowTimebudgetModal(true);
-              }}
-            />
-            
             {/* Task count indicator - plain text like Inbox */}
             <span className={`text-sm font-medium ${
               isMinimalDesign
@@ -833,60 +806,6 @@ export function ProjectKanbanBoard() {
               }`}>
                 {projectTaskCount}
               </span>
-
-            {/* Three-dots menu */}
-            <div className="relative">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setProjectMenuDropdown(projectMenuDropdown === project.id ? null : project.id);
-                }}
-                className={`p-1 rounded transition-colors opacity-0 group-hover:opacity-100 ${
-                  isMinimalDesign
-                    ? 'hover:bg-gray-200 dark:hover:bg-gray-700'
-                    : 'hover:bg-gray-600'
-                }`}
-                title="Projekt-Optionen"
-                data-menu-button="project"
-              >
-                <MoreVertical className={`w-4 h-4 ${
-                  isMinimalDesign
-                    ? 'text-gray-600 dark:text-gray-400'
-                    : 'text-gray-300'
-                }`} />
-              </button>
-
-              {/* Dropdown Menu */}
-              {projectMenuDropdown === project.id && (
-                <div 
-                  className={`absolute right-0 top-8 w-48 rounded-lg shadow-lg border z-50 ${
-                    isMinimalDesign
-                      ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
-                      : 'bg-gray-800 border-gray-600'
-                  }`}
-                  onClick={(e) => e.stopPropagation()}
-                  data-menu-container="project"
-                >
-                  <div className="py-1">
-                    <button
-                      onClick={() => {
-                        setTimebudgetProject(project);
-                        setShowTimebudgetModal(true);
-                        setProjectMenuDropdown(null);
-                      }}
-                      className={`w-full px-4 py-2 text-left text-sm transition-colors flex items-center space-x-2 ${
-                        isMinimalDesign
-                          ? 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                          : 'text-gray-200 hover:bg-gray-700'
-                      }`}
-                    >
-                      <BarChart3 className="w-4 h-4" />
-                      <span>Kapazitätsplanung</span>
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
         )}
         </div>
@@ -1072,11 +991,11 @@ export function ProjectKanbanBoard() {
     }
     
     // Handle project dragging (from sidebar)
-    const project = projects.find(p => p.id === active.id);
-    if (project) {
-      setActiveProjectId(project.id);
-      if (navigator.vibrate) {
-        navigator.vibrate(50);
+        const project = projects.find(p => p.id === active.id);
+        if (project) {
+          setActiveProjectId(project.id);
+          if (navigator.vibrate) {
+            navigator.vibrate(50);
       }
     }
   };
@@ -1735,7 +1654,7 @@ export function ProjectKanbanBoard() {
             }`} />
           </div>
           
-          <TaskColumn
+        <TaskColumn
           column={column}
           tasks={tasks}
           overId={overId}
@@ -2323,8 +2242,8 @@ export function ProjectKanbanBoard() {
                       showCompleted={state.viewState.projectKanban.showCompleted}
                       hidePinned={hidePinnedTasks}
                       availableTags={state.tags.filter(tag => {
-                        const actualTaskCount = filteredTasks.filter(task => task.tags.includes(tag.name)).length;
-                        return tag.count > 0 && actualTaskCount > 0;
+                                const actualTaskCount = filteredTasks.filter(task => task.tags.includes(tag.name)).length;
+                                return tag.count > 0 && actualTaskCount > 0;
                       }).sort((a, b) => b.count - a.count)}
                       onPriorityChange={(priority) => {
                         if (priority === 'all') {
@@ -2481,18 +2400,6 @@ export function ProjectKanbanBoard() {
             projectColumns.some(col => col.projectId === deleteConfirmProjectId && col.id === t.kanbanColumnId)
           ).length : 0}
         />
-
-        {/* Time Budget Modal */}
-        {showTimebudgetModal && timebudgetProject && (
-          <ProjectTimebudgetModal
-            isOpen={showTimebudgetModal}
-            onClose={() => {
-              setShowTimebudgetModal(false);
-              setTimebudgetProject(null);
-            }}
-            project={timebudgetProject}
-          />
-        )}
 
         {/* Project Column Selector Modal */}
         {showProjectColumnSelector && targetProjectId && (
@@ -2756,12 +2663,21 @@ export function ProjectKanbanBoard() {
                 }}
               >
                 <div className="flex items-center justify-between">
-                  <h3 className={`text-sm font-semibold truncate ${
-                    isMinimalDesign ? 'text-gray-900 dark:text-white' : 'text-white'
-                  }`}>
-                    {project.title}
-                  </h3>
-                  <span className={`text-xs px-2 py-1 rounded-full ${
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    {/* Project Color Indicator */}
+                    {project.color && (
+                      <span 
+                        className="w-3 h-3 rounded-full flex-shrink-0 shadow-sm"
+                        style={{ backgroundColor: project.color }}
+                      />
+                    )}
+                    <h3 className={`text-sm font-semibold truncate ${
+                      isMinimalDesign ? 'text-gray-900 dark:text-white' : 'text-white'
+                    }`}>
+                      {project.title}
+                    </h3>
+                  </div>
+                  <span className={`text-xs px-2 py-1 rounded-full flex-shrink-0 ${
                     isMinimalDesign 
                       ? 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
                       : 'bg-white/20 text-white'

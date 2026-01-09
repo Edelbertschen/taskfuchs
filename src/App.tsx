@@ -1299,10 +1299,10 @@ function MainApp() {
 
       {/* AI Bulk Task Modal - Nur für authentifizierte Benutzer (Web App mit MS-Login) */}
       {authState.isAuthenticated && (
-        <AiBulkTaskModal
-          isOpen={showAiBulkTaskModal}
-          onClose={() => setShowAiBulkTaskModal(false)}
-        />
+      <AiBulkTaskModal
+        isOpen={showAiBulkTaskModal}
+        onClose={() => setShowAiBulkTaskModal(false)}
+      />
       )}
 
       {/* Global Task Modal - Render whenever a task is selected (e.g., from timer) */}

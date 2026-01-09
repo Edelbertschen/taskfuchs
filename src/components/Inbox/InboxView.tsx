@@ -2258,15 +2258,15 @@ function InboxTaskCard({
           
           return (
             <div className="relative">
-              <button
+        <button
                 onClick={(e) => {
                   e.stopPropagation();
                   setShowProjectSubmenu(!showProjectSubmenu);
-                }}
+          }}
                 className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-between"
               >
                 <div className="flex items-center space-x-2">
-                  <FolderOpen className="w-4 h-4" />
+          <FolderOpen className="w-4 h-4" />
                   <span>{t('task_context_menu.project', 'Projekt')}</span>
                 </div>
                 <div className="flex items-center gap-1">
@@ -2275,7 +2275,7 @@ function InboxTaskCard({
                   )}
                   <ChevronRight className="w-4 h-4" />
                 </div>
-              </button>
+        </button>
               
               {showProjectSubmenu && (
                 <div 

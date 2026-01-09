@@ -1203,8 +1203,8 @@ export function PinsView() {
                 }}
                 onShowCompletedToggle={() => {}}
                 onClearAll={() => {
-                  setPriorityFilter('all');
-                  setTagFilters([]);
+                          setPriorityFilter('all');
+                          setTagFilters([]);
                   setDateFilter('all');
                 }}
                 accentColor={state.preferences.accentColor}
@@ -1216,8 +1216,8 @@ export function PinsView() {
                   try { localStorage.setItem('taskfuchs-pins-filter-pinned', String(pinned)); } catch {}
                   if (pinned) {
                     setShowFilterPanel(true);
-                  }
-                }}
+                            }
+                          }}
                 isVisible={true}
                 onClose={() => setShowFilterPanel(false)}
               />

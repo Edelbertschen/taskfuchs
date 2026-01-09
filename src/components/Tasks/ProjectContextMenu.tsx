@@ -2,13 +2,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../../context/AppContext';
-import { Clock, Edit3, Trash2 } from 'lucide-react';
+import { Edit3, Trash2 } from 'lucide-react';
 
 interface ProjectContextMenuProps {
   project: any;
   isOpen: boolean;
   onClose: () => void;
-  onTimebudget: () => void;
   onRename: () => void;
   onDelete: () => void;
   mousePosition: { x: number; y: number };
@@ -18,7 +17,6 @@ export function ProjectContextMenu({
   project,
   isOpen,
   onClose,
-  onTimebudget,
   onRename,
   onDelete,
   mousePosition
@@ -98,16 +96,6 @@ export function ProjectContextMenu({
 
   const menuItems = [
     {
-      label: t('projects.time_budget'),
-      icon: <Clock className="w-4 h-4" />,
-      action: () => {
-        onTimebudget();
-        onClose();
-      },
-      danger: false,
-      hidden: !project.timebudget // Only show if project has timebudget
-    },
-    {
       label: t('projects.rename_project'),
       icon: <Edit3 className="w-4 h-4" />,
       action: () => {
@@ -125,7 +113,7 @@ export function ProjectContextMenu({
       },
       danger: true
     }
-  ].filter(item => !item.hidden);
+  ];
 
   return createPortal(
     <div

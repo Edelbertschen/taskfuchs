@@ -77,7 +77,6 @@ import { SmartTaskModal } from './SmartTaskModal';
 import { DropIndicator } from './DropIndicator';
 import { TagDisplay } from '../Tags/TagDisplay';
 import { playCompletionSound } from '../../utils/soundUtils';
-import { ProjectTimebudgetDetailModal } from '../Projects/ProjectTimebudgetDetailModal';
 
 interface ListViewProps {
   onTaskEdit?: (task: Task) => void;
@@ -1091,7 +1090,6 @@ export function ListView({ onTaskEdit, onTaskView, onTaskPlay }: ListViewProps) 
   const [contextMenuProject, setContextMenuProject] = useState<any>(null);
   const [showProjectContextMenu, setShowProjectContextMenu] = useState(false);
   const [editingProject, setEditingProject] = useState<{id: string, title: string} | null>(null);
-  const [showProjectTimebudgetModal, setShowProjectTimebudgetModal] = useState<any>(null);
 
   // ✨ DnD Sensors for precise cursor tracking (fixes huge offset issue)
   const sensors = useSensors(
@@ -1563,18 +1561,6 @@ export function ListView({ onTaskEdit, onTaskView, onTaskPlay }: ListViewProps) 
                           {/* Dropdown menu */}
                           {showProjectContextMenu && contextMenuProject?.id === project.id && (
                             <div className="absolute right-0 top-8 bg-gray-800 border border-gray-600 rounded-lg shadow-lg py-1 z-50 min-w-[160px]">
-                              {project.timebudget && (
-                                <button
-                                  onClick={() => {
-                                    setShowProjectTimebudgetModal(project);
-                                    setShowProjectContextMenu(false);
-                                  }}
-                                  className="w-full px-3 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 flex items-center space-x-2"
-                                >
-                                  <Clock className="w-4 h-4" />
-                                  <span>{t('projects.time_budget')}</span>
-                                </button>
-                              )}
                               <button
                                 onClick={() => {
                                   setEditingProject({ id: project.id, title: project.title });
@@ -1727,17 +1713,6 @@ export function ListView({ onTaskEdit, onTaskView, onTaskPlay }: ListViewProps) 
             </button>
           </div>
         </div>
-      </div>
-    )}
-    
-    {/* Project Timebudget Modal */}
-    {showProjectTimebudgetModal && (
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                 <ProjectTimebudgetDetailModal 
-           project={showProjectTimebudgetModal}
-           isOpen={true}
-           onClose={() => setShowProjectTimebudgetModal(null)}
-         />
       </div>
     )}
     </>
