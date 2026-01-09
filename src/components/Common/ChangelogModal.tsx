@@ -23,8 +23,15 @@ const CHANGELOG: ChangelogEntry[] = [
       {
         type: 'feature',
         text: {
-          de: 'Projektfarben – Weise Projekten Farben zu für schnelle visuelle Erkennung auf Aufgabenkarten',
-          en: 'Project colors – Assign colors to projects for quick visual identification on task cards'
+          de: 'Projektfarben – Weise Projekten Farben zu für schnelle visuelle Erkennung auf Aufgabenkarten. Farbauswahl direkt in der Projekt-Sidebar per Klick auf den Farbkreis.',
+          en: 'Project colors – Assign colors to projects for quick visual identification on task cards. Color selection directly in project sidebar by clicking the color circle.'
+        }
+      },
+      {
+        type: 'improvement',
+        text: {
+          de: 'Aufgeräumter Projekt-Header – Info-Button für Notiz-Verknüpfung entfernt',
+          en: 'Cleaner project header – Info button for note linking removed'
         }
       },
       {
