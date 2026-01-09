@@ -1266,9 +1266,9 @@ export function TaskContextMenu({
                {projects.map((project) => {
                  const isSelected = task.projectId === project.id;
                  const isExpanded = expandedProjectId === project.id;
-                 const projectKanbanColumns = state.columns
-                   .filter(col => col.type === 'kanban' && col.projectId === project.id)
-                   .sort((a, b) => (a.order || 0) - (b.order || 0));
+                const projectKanbanColumns = state.viewState.projectKanban.columns
+                  .filter(col => col.projectId === project.id)
+                  .sort((a, b) => (a.order || 0) - (b.order || 0));
                  
                  return (
                    <div key={project.id}>
