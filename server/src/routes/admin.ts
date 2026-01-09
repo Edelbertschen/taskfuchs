@@ -27,7 +27,11 @@ app.get('/users', async (c) => {
       lastLoginAt: true,
       _count: {
         select: {
-          tasks: true
+          tasks: {
+            where: {
+              completed: false
+            }
+          }
         }
       },
       columns: {
@@ -174,7 +178,11 @@ app.get('/stats', async (c) => {
     activeUsersLast30Days
   ] = await Promise.all([
     prisma.user.count(),
-    prisma.task.count(),
+    prisma.task.count({
+      where: {
+        completed: false
+      }
+    }),
     prisma.column.count({
       where: {
         type: 'project'
@@ -213,14 +221,20 @@ app.get('/stats', async (c) => {
     take: 10
   });
 
-  // Get top users by task count
+  // Get top users by active task count
   const topUsers = await prisma.user.findMany({
     select: {
       id: true,
       email: true,
       name: true,
       _count: {
-        select: { tasks: true }
+        select: { 
+          tasks: {
+            where: {
+              completed: false
+            }
+          }
+        }
       }
     },
     orderBy: {
