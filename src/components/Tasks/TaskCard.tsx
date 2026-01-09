@@ -1056,7 +1056,27 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
               </div>
             )}
             
-            {/* Context Badge - Date only */}
+            {/* Project Badge - Hover Reveal */}
+            {taskProject && isHovered && !task.completed && (
+              <span 
+                className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-md flex-shrink-0 animate-fade-in"
+                style={{
+                  backgroundColor: taskProject.color ? `${taskProject.color}20` : `${accentColor}15`,
+                  color: taskProject.color || accentColor
+                }}
+                title={taskProject.name}
+              >
+                <span 
+                  className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                  style={{ backgroundColor: taskProject.color || accentColor }}
+                />
+                <span className="truncate max-w-[80px]">
+                  {taskProject.name}
+                </span>
+              </span>
+            )}
+            
+            {/* Context Badge - Date */}
             {taskDateDisplay && (
               <span 
                 className={`inline-flex items-center gap-1.5 px-2 py-0.5 text-xs font-medium rounded-md transition-opacity flex-shrink-0 ${
