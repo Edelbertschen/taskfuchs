@@ -2033,7 +2033,11 @@
     "board_under_repair": "Projekt-Board wird repariert",
     "time_budget": "Zeitbudget",
     "rename_project": "Projekt umbenennen",
+    "rename": "Projekt umbenennen",
     "delete_project": "Projekt löschen",
+    "delete": "Projekt löschen",
+    "assign_color": "Farbe zuweisen",
+    "organize_columns": "Spalten organisieren",
     "timebudget": {
       "open": "Kapazitätsplanung öffnen",
       "create": "Kapazitätsplanung erstellen"

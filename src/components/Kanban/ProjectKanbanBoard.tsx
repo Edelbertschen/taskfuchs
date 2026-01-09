@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 
 import { useAppTranslation } from '../../utils/i18nHelpers';
 import { useTranslation } from 'react-i18next';
@@ -25,7 +26,7 @@ import {
   arrayMove
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { FolderOpen, Plus, Settings, Edit2, Sparkles, X, MoreHorizontal, Columns, Focus, ChevronUp, ChevronDown, Filter, Hash, AlertCircle, Circle, CheckCircle, Archive, Clock, Trash2, Check, FileText, Info, Pin, Tag, GripVertical, Calendar, SlidersHorizontal } from 'lucide-react';
+import { FolderOpen, Plus, Settings, Edit2, Sparkles, X, MoreHorizontal, Columns, Focus, ChevronUp, ChevronDown, Filter, Hash, AlertCircle, Circle, CheckCircle, Archive, Clock, Trash2, Check, FileText, Info, Pin, Tag, GripVertical, Calendar, SlidersHorizontal, Pencil, Palette, Columns3 } from 'lucide-react';
 import { CompactFilterBar, DateFilterOption, PriorityOption } from '../Common/CompactFilterBar';
 import { useApp } from '../../context/AppContext';
 import { TaskCard } from '../Tasks/TaskCard';
@@ -635,7 +636,31 @@ export function ProjectKanbanBoard() {
   const SortableProject = ({ project }: { project: Column }) => {
     const [showColorPicker, setShowColorPicker] = useState(false);
     const [customColor, setCustomColor] = useState(project.color || '#2196F3');
+    const [showContextMenu, setShowContextMenu] = useState(false);
+    const [contextMenuPos, setContextMenuPos] = useState({ x: 0, y: 0 });
     const colorPickerRef = useRef<HTMLDivElement>(null);
+    const contextMenuRef = useRef<HTMLDivElement>(null);
+    
+    // Handle right-click context menu
+    const handleContextMenu = (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setContextMenuPos({ x: e.clientX, y: e.clientY });
+      setShowContextMenu(true);
+    };
+    
+    // Close context menu on click outside
+    useEffect(() => {
+      const handleClickOutside = (e: MouseEvent) => {
+        if (contextMenuRef.current && !contextMenuRef.current.contains(e.target as Node)) {
+          setShowContextMenu(false);
+        }
+      };
+      if (showContextMenu) {
+        document.addEventListener('mousedown', handleClickOutside);
+      }
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [showContextMenu]);
     
     const {
       attributes,
@@ -735,6 +760,7 @@ export function ProjectKanbanBoard() {
             isDragging ? 'opacity-30 scale-95' : ''
         }`}
         onClick={() => !isEditing && handleProjectSelect(project.id)}
+        onContextMenu={handleContextMenu}
         style={{
           ...style,
           backgroundColor: isMinimalDesign
@@ -913,6 +939,71 @@ export function ProjectKanbanBoard() {
         )}
         </div>
         </div>
+        
+        {/* Context Menu */}
+        {showContextMenu && createPortal(
+          <div
+            ref={contextMenuRef}
+            className="fixed z-[9999] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-1 min-w-[180px] animate-in fade-in zoom-in-95 duration-150"
+            style={{
+              left: contextMenuPos.x,
+              top: contextMenuPos.y,
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Projekt umbenennen */}
+            <button
+              onClick={() => {
+                setShowContextMenu(false);
+                handleStartEdit(project);
+              }}
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              <Pencil className="w-4 h-4" />
+              <span>{t('projects.rename', 'Projekt umbenennen')}</span>
+            </button>
+            
+            {/* Farbe zuweisen */}
+            <button
+              onClick={() => {
+                setShowContextMenu(false);
+                setShowColorPicker(true);
+              }}
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              <Palette className="w-4 h-4" />
+              <span>{t('projects.assign_color', 'Farbe zuweisen')}</span>
+            </button>
+            
+            {/* Spalten organisieren */}
+            <button
+              onClick={() => {
+                setShowContextMenu(false);
+                handleProjectSelect(project.id);
+                setShowColumnManager(true);
+              }}
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              <Columns3 className="w-4 h-4" />
+              <span>{t('projects.organize_columns', 'Spalten organisieren')}</span>
+            </button>
+            
+            <div className="border-t border-gray-200 dark:border-gray-600 my-1" />
+            
+            {/* Projekt löschen */}
+            <button
+              onClick={() => {
+                setShowContextMenu(false);
+                setProjectToDelete(project);
+              }}
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>{t('projects.delete', 'Projekt löschen')}</span>
+            </button>
+          </div>,
+          document.body
+        )}
       </div>
     );
   };

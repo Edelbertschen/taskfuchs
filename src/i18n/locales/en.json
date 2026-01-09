@@ -1535,7 +1535,11 @@
     "board_under_repair": "Project board under repair",
     "time_budget": "Time Budget",
     "rename_project": "Rename Project",
-    "delete_project": "Delete Project"
+    "rename": "Rename Project",
+    "delete_project": "Delete Project",
+    "delete": "Delete Project",
+    "assign_color": "Assign Color",
+    "organize_columns": "Organize Columns"
   },
   "planner": {
     "drag_hint": "Drag tasks into day columns",
