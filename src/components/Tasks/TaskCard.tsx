@@ -707,7 +707,7 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
       {...(!isBulkMode ? attributes : {})}
       {...(!isBulkMode ? listeners : {})}
       data-task-card="true"
-      className={`group relative flex items-center rounded-lg overflow-visible card-hover task-card ${
+      className={`group relative flex items-center rounded-lg overflow-hidden card-hover task-card ${
         task.completed && !isActiveTimer ? 'opacity-50' : ''
       } ${
         isActiveTimer 
@@ -788,17 +788,29 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
           />
       )}
       
-      {/* Project Color Indicator - Subtle top-right accent */}
-      {taskProject?.color && (
-        <div
-          className="absolute top-0 right-0 w-8 h-1 rounded-bl-full transition-all duration-300"
-          style={{
-            backgroundColor: task.completed ? '#9CA3AF' : taskProject.color,
-            opacity: isDragging ? 0.6 : (task.completed ? 0.4 : 0.85),
-            zIndex: 1
-          }}
-          title={taskProject.name}
-        />
+      {/* Project Color - Background tint + Bottom bar */}
+      {taskProject?.color && !task.completed && (
+        <>
+          {/* Subtle background tint */}
+          <div
+            className="absolute inset-0 pointer-events-none transition-all duration-300"
+            style={{
+              backgroundColor: taskProject.color,
+              opacity: isDragging ? 0.03 : 0.06,
+              zIndex: 0
+            }}
+          />
+          {/* Bold bottom bar */}
+          <div
+            className="absolute bottom-0 left-0 right-0 h-1 transition-all duration-300"
+            style={{
+              backgroundColor: taskProject.color,
+              opacity: isDragging ? 0.6 : 0.9,
+              zIndex: 2
+            }}
+            title={taskProject.name}
+          />
+        </>
       )}
       
       {/* Bulk Mode Selection Checkbox */}

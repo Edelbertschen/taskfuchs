@@ -625,25 +625,16 @@ export function ProjectKanbanBoard() {
     );
   };
 
-  // Apple-inspired color palette for projects
+  // Compact color palette for projects
   const PROJECT_COLORS = [
-    { id: 'none', color: undefined, name: { de: 'Keine', en: 'None' } },
-    { id: 'red', color: '#E54D42', name: { de: 'Rot', en: 'Red' } },
-    { id: 'orange', color: '#E89830', name: { de: 'Orange', en: 'Orange' } },
-    { id: 'yellow', color: '#DFBF3C', name: { de: 'Gelb', en: 'Yellow' } },
-    { id: 'green', color: '#4CAF50', name: { de: 'Grün', en: 'Green' } },
-    { id: 'teal', color: '#26A69A', name: { de: 'Türkis', en: 'Teal' } },
-    { id: 'blue', color: '#2196F3', name: { de: 'Blau', en: 'Blue' } },
-    { id: 'indigo', color: '#5C6BC0', name: { de: 'Indigo', en: 'Indigo' } },
-    { id: 'purple', color: '#9C27B0', name: { de: 'Violett', en: 'Purple' } },
-    { id: 'pink', color: '#EC407A', name: { de: 'Pink', en: 'Pink' } },
-    { id: 'gray', color: '#78909C', name: { de: 'Grau', en: 'Gray' } },
-    { id: 'brown', color: '#8D6E63', name: { de: 'Braun', en: 'Brown' } },
+    '#E54D42', '#E89830', '#DFBF3C', '#4CAF50', '#26A69A', 
+    '#2196F3', '#5C6BC0', '#9C27B0', '#EC407A', '#78909C'
   ];
 
   // Sortable Project Component
   const SortableProject = ({ project }: { project: Column }) => {
     const [showColorPicker, setShowColorPicker] = useState(false);
+    const [customColor, setCustomColor] = useState(project.color || '#2196F3');
     const colorPickerRef = useRef<HTMLDivElement>(null);
     
     const {
@@ -732,14 +723,12 @@ export function ProjectKanbanBoard() {
         
       <div
         ref={combinedRef}
-          className={`relative p-4 cursor-pointer transition-all duration-200 group h-16 ${
+          className={`relative p-4 pl-5 cursor-pointer transition-all duration-200 group h-16 ${
           isMinimalDesign
               ? `border-b border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 ${
-                  isSelected ? 'bg-gray-100 dark:bg-gray-800 border-l-4' : ''
+                  isSelected ? 'bg-gray-100 dark:bg-gray-800' : ''
               }`
-            : `border-b border-white/15 hover:bg-black/40 ${
-                isSelected ? 'border-l-4' : ''
-              }`
+            : `border-b border-white/15 hover:bg-black/40`
         } ${
           isTaskDropZone && activeTask ? 'ring-2 ring-offset-1' : ''
           } ${
@@ -763,9 +752,6 @@ export function ProjectKanbanBoard() {
                   : isDragging
                   ? 'transparent'
                   : undefined),
-          borderLeftColor: isSelected 
-            ? getAccentColorStyles().border.borderColor
-            : 'transparent',
           ...(isTaskDropZone && activeTask ? {
             ringColor: isMinimalDesign 
               ? getAccentColorStyles().border.borderColor + '50'
@@ -779,6 +765,14 @@ export function ProjectKanbanBoard() {
           setHoveredProjectId(null);
         }}
       >
+        {/* Project Color Bar - Left Edge */}
+        <div
+          className="absolute left-0 top-0 bottom-0 w-1 transition-all duration-200"
+          style={{
+            backgroundColor: project.color || (isSelected ? getAccentColorStyles().border.borderColor : 'transparent')
+          }}
+        />
+        
         {/* Normal Project Display */}
         <div className="flex items-center justify-between">
           {/* Drag Handle */}
@@ -813,91 +807,40 @@ export function ProjectKanbanBoard() {
                 onClick={(e) => e.stopPropagation()}
               />
             ) : (
-              <div className="flex items-center gap-2 min-w-0">
-                {/* Project Color Indicator & Picker */}
-                <div className="relative" ref={colorPickerRef}>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowColorPicker(!showColorPicker);
-                    }}
-                    className="group/color flex items-center justify-center w-5 h-5 rounded-full transition-all duration-200 hover:scale-110 flex-shrink-0"
-                    style={{
-                      backgroundColor: project.color || 'transparent',
-                      border: project.color ? 'none' : '2px dashed currentColor',
-                      borderColor: project.color ? undefined : (isMinimalDesign ? '#9ca3af' : '#6b7280')
-                    }}
-                    title={t('projects.change_color', 'Farbe ändern')}
-                  >
-                    {!project.color && (
-                      <span className="text-[8px] text-gray-400">●</span>
-                    )}
-                  </button>
-
-                  {/* Color Picker Popover */}
-                  {showColorPicker && (
-                    <div 
-                      className="absolute left-0 top-7 z-[100] p-3 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700"
-                      style={{ 
-                        animation: 'fadeIn 0.15s ease-out',
-                      }}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <div className="grid grid-cols-6 gap-2">
-                        {PROJECT_COLORS.map((colorOption) => (
-                          <button
-                            key={colorOption.id}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleColorChange(colorOption.color);
-                            }}
-                            className={`
-                              w-6 h-6 rounded-full transition-all duration-200 
-                              hover:scale-110 hover:shadow-md
-                              flex items-center justify-center
-                              ${project.color === colorOption.color || (!project.color && !colorOption.color) 
-                                ? 'ring-2 ring-offset-1 ring-gray-400 dark:ring-gray-500 dark:ring-offset-gray-800' 
-                                : ''
-                              }
-                            `}
-                            style={{
-                              backgroundColor: colorOption.color || 'transparent',
-                              border: colorOption.color ? 'none' : '2px dashed #9ca3af'
-                            }}
-                            title={t(`colors.${colorOption.id}`, colorOption.name.de)}
-                          >
-                            {colorOption.color && project.color === colorOption.color && (
-                              <Check className="w-3 h-3 text-white drop-shadow-sm" />
-                            )}
-                            {!colorOption.color && (
-                              <X className="w-3 h-3 text-gray-400" />
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <h3 className={`text-sm font-medium truncate ${
-                  isMinimalDesign
-                    ? (isSelected 
-                        ? 'text-gray-900 dark:text-white' 
-                        : 'text-gray-700 dark:text-gray-300')
-                    : (isSelected 
-                        ? (isDarkMode ? 'text-white' : 'text-gray-900')
-                        : (isDarkMode ? 'text-gray-200' : 'text-gray-900'))
-                }`}>
-                  {project.title}
-                </h3>
-              </div>
+              <h3 className={`text-sm font-medium truncate ${
+                isMinimalDesign
+                  ? (isSelected 
+                      ? 'text-gray-900 dark:text-white' 
+                      : 'text-gray-700 dark:text-gray-300')
+                  : (isSelected 
+                      ? (isDarkMode ? 'text-white' : 'text-gray-900')
+                      : (isDarkMode ? 'text-gray-200' : 'text-gray-900'))
+              }`}>
+                {project.title}
+              </h3>
             )}
           </div>
           
-                  {/* Right side - Task count and indicators */}
+                  {/* Right side - Task count and color picker */}
         {!isEditing && (
-          <div className="flex items-center space-x-1">
-            {/* Task count indicator - plain text like Inbox */}
+          <div className="flex items-center space-x-2" ref={colorPickerRef}>
+            {/* Color Picker Button - compact */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowColorPicker(!showColorPicker);
+              }}
+              className={`w-4 h-4 rounded-full transition-all duration-200 hover:scale-125 flex-shrink-0 opacity-0 group-hover:opacity-100 ${
+                showColorPicker ? 'opacity-100 scale-110' : ''
+              }`}
+              style={{
+                backgroundColor: project.color || '#d1d5db',
+                boxShadow: project.color ? `0 0 0 2px ${project.color}30` : 'none'
+              }}
+              title={t('projects.change_color', 'Farbe ändern')}
+            />
+            
+            {/* Task count indicator */}
             <span className={`text-sm font-medium ${
               isMinimalDesign
                 ? 'text-gray-500 dark:text-gray-400' 
@@ -905,6 +848,61 @@ export function ProjectKanbanBoard() {
               }`}>
                 {projectTaskCount}
               </span>
+              
+            {/* Elegant Color Picker Popover */}
+            {showColorPicker && (
+              <div 
+                className="absolute right-2 top-14 z-[100] p-3 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Preset Colors */}
+                <div className="flex gap-1.5 mb-3">
+                  {PROJECT_COLORS.map((color) => (
+                    <button
+                      key={color}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleColorChange(color);
+                      }}
+                      className={`w-5 h-5 rounded-full transition-all duration-150 hover:scale-125 ${
+                        project.color === color ? 'ring-2 ring-offset-1 ring-gray-500 dark:ring-offset-gray-800' : ''
+                      }`}
+                      style={{ backgroundColor: color }}
+                    />
+                  ))}
+                </div>
+                
+                {/* Custom Color + Remove */}
+                <div className="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                  <input
+                    type="color"
+                    value={customColor}
+                    onChange={(e) => setCustomColor(e.target.value)}
+                    onBlur={() => handleColorChange(customColor)}
+                    className="w-6 h-6 rounded cursor-pointer border-0 p-0"
+                    title={t('projects.custom_color', 'Eigene Farbe')}
+                  />
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleColorChange(customColor);
+                    }}
+                    className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                  >
+                    {t('common.apply', 'OK')}
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleColorChange(undefined);
+                    }}
+                    className="text-xs px-2 py-1 text-gray-500 hover:text-red-500 transition-colors"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
         </div>
