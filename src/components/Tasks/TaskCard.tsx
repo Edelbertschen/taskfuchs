@@ -567,18 +567,19 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
 
   // IMPROVED: Show date when task has any date set (always visible in project context)
   // WICHTIG: reminderDate hat höchste Priorität (Konsistenz mit TaskModal)
+  // Bei überfälligen Aufgaben wird das Datum IMMER angezeigt (auch in Datumsspalten)
   const getTaskDateDisplay = (): { date: string; isPast: boolean } | null => {
-    // Don't show date badge in date columns (already shown in column header)
-    if (currentColumn?.type === 'date') return null;
-    
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    const isDateColumn = currentColumn?.type === 'date';
     
     // Priority 1: reminderDate (primäre Datumsquelle, wie im TaskModal)
     if (task.reminderDate) {
       try {
         const date = new Date(task.reminderDate);
         const isPast = date < today;
+        // Bei Datumsspalten nur anzeigen, wenn überfällig
+        if (isDateColumn && !isPast) return null;
         return { date: format(date, 'dd.MM.', { locale: de }), isPast };
       } catch (error) {
         // Continue to next check
@@ -587,11 +588,13 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
     
     // Priority 2: Check for assigned date column (falls keine reminderDate)
     if (task.columnId) {
-    const dateColumn = state.columns.find(col => col.id === task.columnId);
+      const dateColumn = state.columns.find(col => col.id === task.columnId);
       if (dateColumn?.type === 'date' && dateColumn.date) {
-    try {
-      const date = new Date(dateColumn.date);
+        try {
+          const date = new Date(dateColumn.date);
           const isPast = date < today;
+          // Bei Datumsspalten nur anzeigen, wenn überfällig
+          if (isDateColumn && !isPast) return null;
           return { date: format(date, 'dd.MM.', { locale: de }), isPast };
         } catch (error) {
           // Continue to next check
@@ -604,6 +607,8 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
       try {
         const date = new Date(task.deadline);
         const isPast = date < today;
+        // Bei Datumsspalten nur anzeigen, wenn überfällig
+        if (isDateColumn && !isPast) return null;
         return { date: format(date, 'dd.MM.', { locale: de }), isPast };
       } catch (error) {
         // Continue to next check
@@ -615,10 +620,12 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
       try {
         const date = new Date(task.dueDate);
         const isPast = date < today;
+        // Bei Datumsspalten nur anzeigen, wenn überfällig
+        if (isDateColumn && !isPast) return null;
         return { date: format(date, 'dd.MM.', { locale: de }), isPast };
-    } catch (error) {
-      return null;
-    }
+      } catch (error) {
+        return null;
+      }
     }
     
     return null;
