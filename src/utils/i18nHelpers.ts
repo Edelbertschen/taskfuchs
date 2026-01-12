@@ -29,7 +29,7 @@ export const useAppTranslation = () => {
           const snakeCaseKey = camelToSnakeCase(prop);
           
           // Check if this might be a nested object (like 'emptyState', 'placeholders', etc.)
-          const nestedObjectKeys = ['emptyState', 'placeholders', 'tooltips', 'insights', 'statCards', 'sections', 'metrics', 'timeRange', 'tabs', 'dateLabels', 'selection', 'emptyStates', 'deleteModal', 'recurrenceTypes', 'visibility', 'searchResults', 'deleteConfirmation'];
+          const nestedObjectKeys = ['emptyState', 'placeholders', 'tooltips', 'insights', 'statCards', 'sections', 'metrics', 'timeRange', 'tabs', 'dateLabels', 'selection', 'emptyStates', 'deleteModal', 'recurrenceTypes', 'visibility', 'searchResults', 'deleteConfirmation', 'project'];
           if (nestedObjectKeys.includes(prop)) {
             // Return another proxy for nested objects
             return createNestedWrapper(namespace, snakeCaseKey);

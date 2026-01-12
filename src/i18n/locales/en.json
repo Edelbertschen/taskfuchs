@@ -1880,6 +1880,17 @@
     "organize_columns": "Organize columns",
     "export_planner": "Export planner"
   },
+  "kanban": {
+    "project": {
+      "delete_title": "Delete Project",
+      "delete_confirm": "Are you sure you want to delete the project \"{{name}}\"?",
+      "delete_warning": "This project contains {{count}} tasks that will also be deleted.",
+      "delete_input_label": "Type \"DELETE\" to confirm:",
+      "delete_placeholder": "DELETE",
+      "delete_cancel": "Cancel",
+      "delete_button": "Delete Project"
+    }
+  },
   "landing_page": {
     "tagline": "Your smart helper for focused work.",
     "features": {

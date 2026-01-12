@@ -690,6 +690,17 @@
     "bulk_mode_start": "Mehrfachauswahl starten",
     "bulk_mode_end": "Mehrfachauswahl beenden"
   },
+  "kanban": {
+    "project": {
+      "delete_title": "Projekt löschen",
+      "delete_confirm": "Möchtest du das Projekt \"{{name}}\" wirklich löschen?",
+      "delete_warning": "Dieses Projekt enthält {{count}} Aufgaben, die ebenfalls gelöscht werden.",
+      "delete_input_label": "Gib \"LÖSCHEN\" ein, um das Löschen zu bestätigen:",
+      "delete_placeholder": "LÖSCHEN",
+      "delete_cancel": "Abbrechen",
+      "delete_button": "Projekt löschen"
+    }
+  },
   "actions": {
     "edit": "Bearbeiten",
     "delete": "Löschen",

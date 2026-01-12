@@ -606,7 +606,7 @@ export function ProjectKanbanBoard() {
         }`}>
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-              {kanban.project.deleteTitle()}
+              {t('kanban.project.delete_title')}
             </h3>
             <button
               onClick={onClose}
@@ -618,15 +618,15 @@ export function ProjectKanbanBoard() {
           
           <div className="mb-4">
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-              {kanban.project.deleteConfirm(project.title)}
+              {t('kanban.project.delete_confirm', { name: project.title })}
             </p>
             {taskCount > 0 && (
               <p className="text-sm text-red-600 dark:text-red-400 mb-2">
-                {kanban.project.deleteWarning(taskCount)}
+                {t('kanban.project.delete_warning', { count: taskCount })}
               </p>
             )}
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              {kanban.project.deleteInputLabel()}
+              {t('kanban.project.delete_input_label')}
             </p>
           </div>
 
@@ -635,7 +635,7 @@ export function ProjectKanbanBoard() {
               type="text"
               value={confirmText}
               onChange={(e) => setConfirmText(e.target.value)}
-                              placeholder={kanban.project.deletePlaceholder()}
+              placeholder={t('kanban.project.delete_placeholder')}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
               autoFocus
             />
@@ -646,17 +646,17 @@ export function ProjectKanbanBoard() {
               onClick={onClose}
               className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-600 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors"
             >
-              {kanban.project.deleteCancel()}
+              {t('kanban.project.delete_cancel')}
             </button>
             <button
               onClick={() => {
                 onConfirm();
                 onClose();
               }}
-                              disabled={confirmText !== kanban.project.deletePlaceholder()}
+              disabled={confirmText !== t('kanban.project.delete_placeholder')}
               className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {kanban.project.deleteButton()}
+              {t('kanban.project.delete_button')}
             </button>
           </div>
         </div>
