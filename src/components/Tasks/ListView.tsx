@@ -1349,17 +1349,55 @@ export function ListView({ onTaskEdit, onTaskView, onTaskPlay }: ListViewProps) 
   }, [state.tasks, state.showCompletedTasks]);
 
   // Group tasks by date only - memoized for performance
+  // Überfällige Aufgaben erscheinen in "Heute"
   const dateGroups = useMemo(() => {
     const groups: TaskGroup[] = [];
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
     
     const dateColumns = state.columns
       .filter(col => col.type === 'date')
       .sort((a, b) => (a.date || '').localeCompare(b.date || ''));
 
-    // Date groups
+    // Date groups - skip past columns, their tasks appear in "Today"
     for (const column of dateColumns) {
+      const columnDateStr = column.date || '';
+      const isPastColumn = columnDateStr < todayStr;
+      const isTodayColumn = columnDateStr === todayStr;
+      
+      // Skip past date columns - their tasks will appear in Today
+      if (isPastColumn) {
+        continue;
+      }
+      
       const columnTasks = visibleTasks
-        .filter(task => task.columnId === column.id)
+        .filter(task => {
+          // Direct assignment to this column
+          if (task.columnId === column.id) {
+            return true;
+          }
+          
+          // For TODAY: Also show tasks with past dates
+          if (isTodayColumn) {
+            // Tasks from past date columns
+            if (task.columnId && task.columnId.startsWith('date-')) {
+              const taskDateStr = task.columnId.replace('date-', '');
+              if (taskDateStr < todayStr) {
+                return true;
+              }
+            }
+            // Tasks with past reminderDate
+            if (task.reminderDate && task.reminderDate < todayStr) {
+              return true;
+            }
+          }
+          
+          // Tasks with reminderDate matching this column
+          if (task.reminderDate === columnDateStr) {
+            return true;
+          }
+          
+          return false;
+        })
         .sort((a, b) => a.position - b.position);
 
       let title = column.title;
@@ -1369,8 +1407,6 @@ export function ListView({ onTaskEdit, onTaskView, onTaskPlay }: ListViewProps) 
           title = 'Heute';
         } else if (isTomorrow(date)) {
           title = 'Morgen';
-        } else if (isYesterday(date)) {
-          title = 'Gestern';
         } else {
           title = format(date, 'eeee, d. MMM', { locale: de });
         }

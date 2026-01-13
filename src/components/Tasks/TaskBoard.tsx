@@ -1428,12 +1428,17 @@ export function TaskBoard() {
     else if (task.deadline) {
       shouldShowInTaskBoard = true;
     }
-    // 4. Tasks with projectId but no reminderDate stay in project view only (unless they have deadline)
+    // 4. Tasks with reminderDate should ALWAYS be visible in TaskBoard
+    // (they will be assigned to the correct date column or "Today" if past)
+    else if (task.reminderDate) {
+      shouldShowInTaskBoard = true;
+    }
+    // 5. Tasks with projectId but no reminderDate stay in project view only (unless they have deadline)
     else if (task.projectId && !task.reminderDate && !task.deadline) {
       shouldShowInTaskBoard = false;
     }
-    // 5. Tasks with projectId AND reminderDate are visible in both project and date planner
-    // 6. Tasks without projectId but with valid columnId are shown normally
+    // 6. Tasks with projectId AND reminderDate are visible in both project and date planner
+    // 7. Tasks without projectId but with valid columnId are shown normally
     else {
       shouldShowInTaskBoard = true;
     }
@@ -1566,21 +1571,33 @@ export function TaskBoard() {
             
             // 1. Tasks directly assigned to this date column (primary assignment via columnId)
             if (task.columnId === column.id) {
+              // ABER: Wenn die Aufgabe eine reminderDate hat, die nicht heute ist, 
+              // zeige sie nicht in dieser Spalte (sie wird in der reminderDate-Spalte erscheinen)
+              if (task.reminderDate && task.reminderDate !== dateStr && task.reminderDate >= todayStr) {
+                return false;
+              }
               return true;
             }
             
-            // 2. For TODAY: Also show tasks with past dates (columnId or reminderDate)
+            // 2. For TODAY: Also show tasks with past dates (columnId, reminderDate, or deadline)
             if (isToday) {
-              // Show tasks from past date columns
+              // Show tasks from past date columns (columnId)
               if (task.columnId && task.columnId.startsWith('date-')) {
                 const taskDateStr = task.columnId.replace('date-', '');
                 if (taskDateStr < todayStr) {
                   return true;
                 }
               }
-              // Show tasks with past reminderDate
+              // Show tasks with past reminderDate (CRITICAL: unabhängig von columnId!)
               if (task.reminderDate && task.reminderDate < todayStr) {
                 return true;
+              }
+              // Show tasks with past deadline
+              if (task.deadline) {
+                const taskDeadlineStr = task.deadline.includes('T') ? task.deadline.split('T')[0] : task.deadline;
+                if (taskDeadlineStr < todayStr) {
+                  return true;
+                }
               }
             }
           
