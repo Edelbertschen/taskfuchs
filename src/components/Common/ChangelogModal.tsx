@@ -18,6 +18,32 @@ interface ChangelogEntry {
 // Changelog data - add new entries at the top
 const CHANGELOG: ChangelogEntry[] = [
   {
+    date: '2026-01-13',
+    items: [
+      {
+        type: 'feature',
+        text: {
+          de: 'Datum entfernen – Neue Option "Kein Datum" im Kontextmenü zum Entfernen des Datums einer Aufgabe',
+          en: 'Remove date – New "No date" option in context menu to remove a task\'s date'
+        }
+      },
+      {
+        type: 'improvement',
+        text: {
+          de: 'Überfällige Aufgaben markiert – Aufgaben mit vergangenem Datum zeigen das Datum rot auf der Karte, auch in Datumsspalten',
+          en: 'Overdue tasks marked – Tasks with past dates show the date in red on the card, even in date columns'
+        }
+      },
+      {
+        type: 'fix',
+        text: {
+          de: 'Überfällige Aufgaben zuverlässig in Heute – Alle Aufgaben mit vergangenen Daten erscheinen jetzt garantiert in der Heute-Spalte',
+          en: 'Overdue tasks reliably in Today – All tasks with past dates now guaranteed to appear in the Today column'
+        }
+      }
+    ]
+  },
+  {
     date: '2026-01-09',
     items: [
       {
