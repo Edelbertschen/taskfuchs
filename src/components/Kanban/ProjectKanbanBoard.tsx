@@ -571,98 +571,11 @@ export function ProjectKanbanBoard() {
     }
   }, [shouldEditNewColumn, projectColumns]);
 
-  // New DeleteProjectModal Component
-  const DeleteProjectModal = ({ 
-    isOpen, 
-    onClose, 
-    onConfirm, 
-    project, 
-    taskCount 
-  }: { 
-    isOpen: boolean; 
-    onClose: () => void; 
-    onConfirm: () => void; 
-    project: Column | null; 
-    taskCount: number; 
-  }) => {
-    const [confirmText, setConfirmText] = useState('');
-
-    // Reset confirmation text when modal opens/closes
-    useEffect(() => {
-      if (isOpen) {
-        setConfirmText('');
-      }
-    }, [isOpen]);
-
-    if (!isOpen || !project) return null;
-
-    return (
-              <div className="fixed inset-0 flex items-center justify-center">
-        <div className="fixed inset-0 bg-black/50 transition-opacity" onClick={onClose} />
-        <div className={`relative rounded-lg shadow-xl p-6 max-w-md w-full mx-4 ${
-          isMinimalDesign
-            ? 'bg-white dark:bg-gray-800'
-            : 'bg-white dark:bg-gray-800'
-        }`}>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-              {t('kanban.project.delete_title')}
-            </h3>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          
-          <div className="mb-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-              {t('kanban.project.delete_confirm', { name: project.title })}
-            </p>
-            {taskCount > 0 && (
-              <p className="text-sm text-red-600 dark:text-red-400 mb-2">
-                {t('kanban.project.delete_warning', { count: taskCount })}
-              </p>
-            )}
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              {t('kanban.project.delete_input_label')}
-            </p>
-          </div>
-
-          <div className="mb-4">
-            <input
-              type="text"
-              value={confirmText}
-              onChange={(e) => setConfirmText(e.target.value)}
-              placeholder={t('kanban.project.delete_placeholder')}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-              autoFocus
-            />
-          </div>
-
-          <div className="flex justify-end space-x-3">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-600 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors"
-            >
-              {t('kanban.project.delete_cancel')}
-            </button>
-            <button
-              onClick={() => {
-                onConfirm();
-                onClose();
-              }}
-              disabled={confirmText !== t('kanban.project.delete_placeholder')}
-              className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {t('kanban.project.delete_button')}
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
+  // Delete Project Modal - uses lifted state to prevent input reset during re-renders
+  const deleteProject = deleteConfirmProjectId ? projects.find(p => p.id === deleteConfirmProjectId) || null : null;
+  const deleteTaskCount = deleteConfirmProjectId ? state.tasks.filter(t => 
+    projectColumns.some(col => col.projectId === deleteConfirmProjectId && col.id === t.kanbanColumnId)
+  ).length : 0;
 
   // Compact color palette for projects
   const PROJECT_COLORS = [
@@ -2618,15 +2531,70 @@ export function ProjectKanbanBoard() {
           />
         )}
 
-        <DeleteProjectModal
-          isOpen={deleteConfirmProjectId !== null}
-          onClose={handleCancelDeleteProject}
-          onConfirm={handleConfirmDeleteProject}
-          project={deleteConfirmProjectId ? projects.find(p => p.id === deleteConfirmProjectId) || null : null}
-          taskCount={deleteConfirmProjectId ? state.tasks.filter(t => 
-            projectColumns.some(col => col.projectId === deleteConfirmProjectId && col.id === t.kanbanColumnId)
-          ).length : 0}
-        />
+        {/* Delete Project Modal - inline to use lifted state */}
+        {deleteConfirmProjectId !== null && deleteProject && (
+          <div className="fixed inset-0 flex items-center justify-center z-[999999]">
+            <div className="fixed inset-0 bg-black/50 transition-opacity" onClick={handleCancelDeleteProject} />
+            <div className={`relative rounded-lg shadow-xl p-6 max-w-md w-full mx-4 z-[1000000] ${
+              isMinimalDesign
+                ? 'bg-white dark:bg-gray-800'
+                : 'bg-white dark:bg-gray-800'
+            }`}>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                  {t('kanban.project.delete_title')}
+                </h3>
+                <button
+                  onClick={handleCancelDeleteProject}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <div className="mb-4">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                  {t('kanban.project.delete_confirm', { name: deleteProject.title })}
+                </p>
+                {deleteTaskCount > 0 && (
+                  <p className="text-sm text-red-600 dark:text-red-400 mb-2">
+                    {t('kanban.project.delete_warning', { count: deleteTaskCount })}
+                  </p>
+                )}
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {t('kanban.project.delete_input_label')}
+                </p>
+              </div>
+
+              <div className="mb-4">
+                <input
+                  type="text"
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  placeholder={t('kanban.project.delete_placeholder')}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={handleCancelDeleteProject}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-600 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors"
+                >
+                  {t('kanban.project.delete_cancel')}
+                </button>
+                <button
+                  onClick={handleConfirmDeleteProject}
+                  disabled={deleteConfirmText !== t('kanban.project.delete_placeholder')}
+                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {t('kanban.project.delete_button')}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Project Column Selector Modal */}
         {showProjectColumnSelector && targetProjectId && (
