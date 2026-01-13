@@ -232,9 +232,30 @@ export function TaskActionsMenu({
     setCustomReminderInput('');
   };
 
-  const handleDateAssignment = (e: React.MouseEvent, dateType: 'today' | 'tomorrow' | 'next-week' | 'custom') => {
+  const handleDateAssignment = (e: React.MouseEvent, dateType: 'today' | 'tomorrow' | 'next-week' | 'custom' | 'none') => {
     e.stopPropagation();
     e.preventDefault();
+    
+    if (dateType === 'none') {
+      // Remove date from task
+      dispatch({
+        type: 'UPDATE_TASK',
+        payload: {
+          ...task,
+          columnId: 'inbox', // Move to inbox when removing date
+          reminderDate: undefined,
+          dueDate: undefined,
+          updatedAt: new Date().toISOString()
+        }
+      });
+      
+      console.log(`📅 Removed date from task "${task.title}"`);
+      
+      // Close menu
+      setIsOpen(false);
+      setShowDateSubmenu(false);
+      return;
+    }
     
     if (dateType === 'custom') {
       setShowDatePicker(true);
@@ -1001,6 +1022,14 @@ export function TaskActionsMenu({
             >
               <Calendar className="w-4 h-4" />
               <span>Datum wählen...</span>
+            </button>
+            <div className="border-t border-gray-200 dark:border-gray-600 my-1" />
+            <button
+              onClick={(e) => handleDateAssignment(e, 'none')}
+              className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              <X className="w-4 h-4 text-gray-400" />
+              <span>Kein Datum</span>
             </button>
           </div>
         )}
