@@ -62,8 +62,26 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
   const [showContextMenu, setShowContextMenu] = useState(false);
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
   const [isAnimatingComplete, setIsAnimatingComplete] = useState(false);
+  const [isNewlyCreated, setIsNewlyCreated] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
+  const hasAnimatedRef = useRef(false);
+
+  // Check if task was just created (within last 2 seconds) and animate once
+  useEffect(() => {
+    if (hasAnimatedRef.current) return;
+    
+    const createdAt = task.createdAt ? new Date(task.createdAt).getTime() : 0;
+    const now = Date.now();
+    const isRecent = now - createdAt < 2000; // Created within last 2 seconds
+    
+    if (isRecent) {
+      hasAnimatedRef.current = true;
+      setIsNewlyCreated(true);
+      // Remove animation class after animation completes
+      setTimeout(() => setIsNewlyCreated(false), 400);
+    }
+  }, [task.createdAt]);
 
   // Check if this task has an active timer
   const isActiveTimer = state.activeTimer?.taskId === task.id && state.activeTimer?.isActive && !state.activeTimer?.isPaused;
@@ -701,11 +719,12 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
   // ✨ FIXED: Keep the card in layout but make it invisible to prevent layout shifts
   const isDraggedOriginal = isSortableDragging && !isInDragOverlay;
 
-  // ✨ FIXED: Minimal DragOverlay styling - no conflicting transforms
+  // ✨ ENHANCED: DragOverlay styling with lift effect
   const dragOverlayStyle = isInDragOverlay ? {
-    filter: 'drop-shadow(0 8px 25px rgba(0, 0, 0, 0.15))',
-    // No manual transforms - let DragOverlay handle positioning
+    filter: 'drop-shadow(0 12px 30px rgba(0, 0, 0, 0.2)) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1))',
+    transform: 'scale(1.03) rotate(1.5deg)',
     zIndex: 1000,
+    transition: 'transform 150ms ease-out, filter 150ms ease-out',
   } : {};
 
   return (
@@ -735,6 +754,8 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
         isSelected ? 'ring-2 ring-offset-2' : ''
       } ${
         !isBulkMode ? 'cursor-grab active:cursor-grabbing' : ''
+      } ${
+        isNewlyCreated ? 'animate-task-appear' : ''
       }`}
       style={{
         // ✨ NUCLEAR: Completely isolated style - NO useSortable interference

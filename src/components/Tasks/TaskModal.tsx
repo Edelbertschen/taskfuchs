@@ -2468,10 +2468,10 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                                     className="relative flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                                   >
                                     {/* Project Color Bar */}
-                                    <div 
+                                      <div 
                                       className="absolute left-0 top-0 bottom-0 w-1"
                                       style={{ backgroundColor: project.color || state.preferences.accentColor }}
-                                    />
+                                      />
                                     <div className="flex items-center space-x-3 pl-2">
                                       <span className="font-medium text-gray-900 dark:text-white">
                                         {project.title}
@@ -2522,10 +2522,10 @@ export function TaskModal({ task, isOpen, onClose, onSaved, onNavigatePrev, onNa
                                     {/* Project Header */}
                                     <div className="p-4 border-b border-gray-200 dark:border-gray-700 relative">
                                       {/* Project Color Bar */}
-                                      <div 
+                                        <div 
                                         className="absolute left-0 top-0 bottom-0 w-1"
                                         style={{ backgroundColor: selectedProject?.color || state.preferences.accentColor }}
-                                      />
+                                        />
                                       <div className="flex items-center space-x-3 pl-2">
                                         <span className="font-medium text-gray-900 dark:text-white">
                                           {selectedProject?.title}

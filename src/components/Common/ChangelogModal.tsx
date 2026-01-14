@@ -35,6 +35,20 @@ const CHANGELOG: ChangelogEntry[] = [
         }
       },
       {
+        type: 'improvement',
+        text: {
+          de: 'Einblend-Animation – Neue Aufgaben gleiten sanft von oben ein mit dezenter Glow-Animation',
+          en: 'Slide-in animation – New tasks smoothly slide in from above with subtle glow effect'
+        }
+      },
+      {
+        type: 'improvement',
+        text: {
+          de: 'Verbessertes Drag & Drop – Aufgaben schweben beim Ziehen mit Rotation, Zielspalten leuchten dezent auf',
+          en: 'Enhanced Drag & Drop – Tasks float with rotation while dragging, target columns glow subtly'
+        }
+      },
+      {
         type: 'fix',
         text: {
           de: 'Projekt löschen funktioniert – Eingabe von "LÖSCHEN" wird nicht mehr bei laufendem Timer zurückgesetzt',

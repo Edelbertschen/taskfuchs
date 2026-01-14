@@ -1139,25 +1139,26 @@ const TaskColumn = React.memo(({
 
         {/* Animated background effect when dragging over */}
         {isValidDropTarget && (
-          <div 
-            className="absolute inset-0 pointer-events-none rounded-lg opacity-20"
-            style={{
-              background: `radial-gradient(circle at center, ${state.preferences.accentColor}20, transparent 70%)`,
-              animation: 'gentle-pulse 2s ease-in-out infinite',
-            }}
-          />
+          <>
+            {/* Radial gradient background */}
+            <div 
+              className="absolute inset-0 pointer-events-none rounded-lg"
+              style={{
+                background: `radial-gradient(ellipse at center top, ${state.preferences.accentColor}15, transparent 60%)`,
+                animation: 'gentle-pulse 1.5s ease-in-out infinite',
+              }}
+            />
+            {/* Glowing border effect */}
+            <div 
+              className="absolute inset-0 pointer-events-none rounded-lg"
+              style={{
+                boxShadow: `inset 0 0 0 2px ${state.preferences.accentColor}40`,
+                animation: 'drop-zone-pulse 1.5s ease-in-out infinite',
+              }}
+            />
+          </>
         )}
       </div>
-
-      {/* CSS for additional animations */}
-      <style>
-        {`
-          @keyframes gentle-pulse {
-            0%, 100% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.05); opacity: 1; }
-          }
-        `}
-      </style>
 
       {/* Smart Task Modal */}
       <SmartTaskModal
