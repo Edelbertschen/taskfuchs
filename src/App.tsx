@@ -49,6 +49,12 @@ import { ImageTest } from './components/Common/ImageTest';
 import { FloatingAddButton } from './components/Common/FloatingAddButton';
 import { LoadingSpinner } from './components/Common/LoadingSpinner';
 import { AppLoadingScreen } from './components/Common/AppLoadingScreen';
+import { 
+  SkeletonPinsView, 
+  SkeletonStatisticsView, 
+  SkeletonSettingsView,
+  SkeletonListView
+} from './components/Common/SkeletonLoader';
 import { EmailSidebar } from './components/Email';
 import { Plus, Home, Inbox, CheckSquare, Columns, FileText, MoreHorizontal, X } from 'lucide-react';
 import { MaterialIcon } from './components/Common/MaterialIcon';
@@ -271,6 +277,10 @@ function MainApp() {
   const [currentView, setCurrentView] = React.useState('today');
   const [previousView, setPreviousView] = React.useState<string | null>(null);
   const [isTransitioning, setIsTransitioning] = React.useState(false);
+  const [transitionDirection, setTransitionDirection] = React.useState<'left' | 'right'>('right');
+  
+  // View hierarchy for determining slide direction
+  const viewOrder = ['today', 'inbox', 'tasks', 'kanban', 'pins', 'series', 'tags', 'statistics', 'archive', 'settings'];
   const [lastViewBeforeFocus, setLastViewBeforeFocus] = React.useState('today');
   const [showSmartTaskModal, setShowSmartTaskModal] = React.useState(false);
   const [showAiBulkTaskModal, setShowAiBulkTaskModal] = React.useState(false);
@@ -351,24 +361,30 @@ function MainApp() {
     return <MobileShell />;
   }
 
-  // Quick navigation with subtle fade/morph effect
+  // Smooth navigation with slide/fade transition
   const handleViewChange = React.useCallback((newView: string) => {
     if (newView === currentView || isTransitioning) return;
     
+    // Determine slide direction based on view hierarchy
+    const currentIndex = viewOrder.indexOf(currentView);
+    const newIndex = viewOrder.indexOf(newView);
+    const direction = newIndex > currentIndex ? 'left' : 'right';
+    
     setPreviousView(currentView);
+    setTransitionDirection(direction);
     setIsTransitioning(true);
     
-    // Almost instant view change with quick fade
+    // View change with smooth slide transition
     setTimeout(() => {
       setCurrentView(newView);
       
-      // End transition quickly
+      // End transition after animation completes
       setTimeout(() => {
         setIsTransitioning(false);
         setPreviousView(null);
-      }, 80);
-    }, 30);
-  }, [currentView, isTransitioning]);
+      }, 200);
+    }, 50);
+  }, [currentView, isTransitioning, viewOrder]);
 
   // Timer catch-up on visibility change (ensures elapsed time reflects background time)
   React.useEffect(() => {
@@ -961,37 +977,37 @@ function MainApp() {
         return <KanbanBoard />;
       case 'pins':
         return (
-          <Suspense fallback={<LoadingSpinner message="Lade Pins..." />}>
+          <Suspense fallback={<SkeletonPinsView />}>
             <PinsView />
           </Suspense>
         );
       case 'series':
         return (
-          <Suspense fallback={<LoadingSpinner message="Lade Serien..." />}>
+          <Suspense fallback={<SkeletonListView />}>
             <SeriesView />
           </Suspense>
         );
       case 'tags':
         return (
-          <Suspense fallback={<LoadingSpinner message="Lade Tags..." />}>
+          <Suspense fallback={<SkeletonListView />}>
             <TagManager />
           </Suspense>
         );
       case 'archive':
         return (
-          <Suspense fallback={<LoadingSpinner message="Lade Archiv..." />}>
+          <Suspense fallback={<SkeletonListView />}>
             <ArchiveView />
           </Suspense>
         );
       case 'statistics':
         return (
-          <Suspense fallback={<LoadingSpinner message="Lade Statistiken..." />}>
+          <Suspense fallback={<SkeletonStatisticsView />}>
             <StatisticsView />
           </Suspense>
         );
       case 'settings':
         return (
-          <Suspense fallback={<LoadingSpinner message="Lade Einstellungen..." />}>
+          <Suspense fallback={<SkeletonSettingsView />}>
             <Settings />
           </Suspense>
         );
@@ -1164,12 +1180,15 @@ function MainApp() {
         
         {/* Content area - different layout for kanban/inbox vs other views */}
         <div className="relative w-full h-full overflow-hidden pb-16 md:pb-0">
-          {/* Current View - subtle fade transition */}
+          {/* Current View - smooth slide/fade transition */}
           <div 
             className="absolute inset-0"
             style={{
-              opacity: isTransitioning ? 0.85 : 1,
-              transition: 'opacity 80ms ease-out'
+              opacity: isTransitioning ? 0 : 1,
+              transform: isTransitioning 
+                ? `translateX(${transitionDirection === 'left' ? '-20px' : '20px'})` 
+                : 'translateX(0)',
+              transition: 'opacity 200ms ease-out, transform 200ms ease-out'
             }}
           >
             {currentView === 'focus' ? (

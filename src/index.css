@@ -656,6 +656,51 @@
   animation: spin-slow 4s linear infinite;
 }
 
+/* Fade-in animation for smooth appearance */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+/* Skeleton shimmer animation */
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s linear infinite;
+  background: linear-gradient(
+    90deg,
+    rgba(229, 231, 235, 1) 0%,
+    rgba(243, 244, 246, 1) 50%,
+    rgba(229, 231, 235, 1) 100%
+  );
+  background-size: 200% 100%;
+}
+
+.dark .animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(55, 65, 81, 1) 0%,
+    rgba(75, 85, 99, 1) 50%,
+    rgba(55, 65, 81, 1) 100%
+  );
+  background-size: 200% 100%;
+}
+
 /* ============================================
    CHECKBOX COMPLETE ANIMATION
    ============================================ */

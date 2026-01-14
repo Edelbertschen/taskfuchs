@@ -23,6 +23,20 @@ const CHANGELOG: ChangelogEntry[] = [
       {
         type: 'improvement',
         text: {
+          de: 'Animierte View-Übergänge – Flüssige Slide-Animationen beim Wechseln zwischen Ansichten',
+          en: 'Animated view transitions – Smooth slide animations when switching between views'
+        }
+      },
+      {
+        type: 'improvement',
+        text: {
+          de: 'Skeleton Loading States – Elegante Platzhalter-Animationen beim Laden von Ansichten statt langweiliger Spinner',
+          en: 'Skeleton loading states – Elegant placeholder animations when loading views instead of boring spinners'
+        }
+      },
+      {
+        type: 'improvement',
+        text: {
           de: 'Befriedigende Checkbox-Animation – Beim Abhaken einer Aufgabe erscheint jetzt ein eleganter Pop-Effekt mit Glow und ein Häkchen, das sanft einfliegt',
           en: 'Satisfying checkbox animation – Completing a task now shows an elegant pop effect with glow and a smoothly flying checkmark'
         }
