@@ -18,6 +18,32 @@ interface ChangelogEntry {
 // Changelog data - add new entries at the top
 const CHANGELOG: ChangelogEntry[] = [
   {
+    date: '2026-01-14',
+    items: [
+      {
+        type: 'improvement',
+        text: {
+          de: 'Befriedigende Checkbox-Animation – Beim Abhaken einer Aufgabe erscheint jetzt ein eleganter Pop-Effekt mit Glow und ein Häkchen, das sanft einfliegt',
+          en: 'Satisfying checkbox animation – Completing a task now shows an elegant pop effect with glow and a smoothly flying checkmark'
+        }
+      },
+      {
+        type: 'improvement',
+        text: {
+          de: 'Lebendige Hover-Effekte – Aufgabenkarten schweben beim Überfahren leicht an, mit sanftem Schatten und dezenter Akzentfarben-Umrandung',
+          en: 'Lively hover effects – Task cards gently lift when hovered, with soft shadow and subtle accent color border'
+        }
+      },
+      {
+        type: 'fix',
+        text: {
+          de: 'Projekt löschen funktioniert – Eingabe von "LÖSCHEN" wird nicht mehr bei laufendem Timer zurückgesetzt',
+          en: 'Delete project works – Typing "DELETE" no longer resets when timer is running'
+        }
+      }
+    ]
+  },
+  {
     date: '2026-01-13',
     items: [
       {
