@@ -227,9 +227,9 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
     // Trigger celebration animation if task is being completed
     if (newCompletedState) {
       triggerCelebration();
-      // Trigger checkbox animation
+      // Trigger checkbox animation with extended timing for smooth effect
       setIsAnimatingComplete(true);
-      setTimeout(() => setIsAnimatingComplete(false), 400);
+      setTimeout(() => setIsAnimatingComplete(false), 500);
     }
     
     dispatch({
