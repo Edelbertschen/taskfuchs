@@ -61,6 +61,7 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
   const [liveUpdateTrigger, setLiveUpdateTrigger] = useState(0);
   const [showContextMenu, setShowContextMenu] = useState(false);
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
+  const [isAnimatingComplete, setIsAnimatingComplete] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -226,6 +227,9 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
     // Trigger celebration animation if task is being completed
     if (newCompletedState) {
       triggerCelebration();
+      // Trigger checkbox animation
+      setIsAnimatingComplete(true);
+      setTimeout(() => setIsAnimatingComplete(false), 400);
     }
     
     dispatch({
@@ -925,7 +929,9 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
                 <button
                   onClick={handleToggleComplete}
                   onPointerDown={(e) => e.stopPropagation()}
-                  className={`${isFocusMode ? 'p-1' : 'p-1.5'} rounded-full transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-110`}
+                  className={`${isFocusMode ? 'p-1' : 'p-1.5'} rounded-full transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-110 ${
+                    isAnimatingComplete ? 'animate-complete-pop' : ''
+                  }`}
                   style={{
                     backgroundColor: task.completed ? '#10B981' : accentColor,
                     color: 'white',
@@ -934,7 +940,7 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
                   title={task.completed ? 'Als nicht erledigt markieren' : 'Als erledigt markieren'}
                 >
                   {task.completed ? (
-                    <CheckCircle className={`${isFocusMode ? 'w-3 h-3' : 'w-3.5 h-3.5'}`} />
+                    <CheckCircle className={`${isFocusMode ? 'w-3 h-3' : 'w-3.5 h-3.5'} ${isAnimatingComplete ? 'animate-check-fly-in' : ''}`} />
                   ) : (
                     <Check className={`${isFocusMode ? 'w-3 h-3' : 'w-3.5 h-3.5'}`} />
                   )}
@@ -960,7 +966,9 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
                 <button
                   onClick={handleToggleComplete}
                   onPointerDown={(e) => e.stopPropagation()}
-                  className={`${isFocusMode ? 'p-1' : 'p-1.5'} rounded-full transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-110`}
+                  className={`${isFocusMode ? 'p-1' : 'p-1.5'} rounded-full transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-110 ${
+                    isAnimatingComplete ? 'animate-complete-pop' : ''
+                  }`}
                   style={{
                     backgroundColor: task.completed ? '#10B981' : accentColor,
                     color: 'white',
@@ -969,7 +977,7 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
                   title={task.completed ? 'Als nicht erledigt markieren' : 'Als erledigt markieren'}
                 >
                   {task.completed ? (
-                    <CheckCircle className={`${isFocusMode ? 'w-3 h-3' : 'w-3.5 h-3.5'}`} />
+                    <CheckCircle className={`${isFocusMode ? 'w-3 h-3' : 'w-3.5 h-3.5'} ${isAnimatingComplete ? 'animate-check-fly-in' : ''}`} />
                   ) : (
                     <Check className={`${isFocusMode ? 'w-3 h-3' : 'w-3.5 h-3.5'}`} />
                   )}
