@@ -23,15 +23,22 @@ const CHANGELOG: ChangelogEntry[] = [
       {
         type: 'fix',
         text: {
-          de: 'DnD-Versatz in Pins behoben – Aufgabenkarten springen beim Ziehen nicht mehr nach rechts',
-          en: 'DnD offset in Pins fixed – Task cards no longer jump to the right when dragging'
+          de: 'Perfekter Hover-Effekt – Aufgabenkarten bekommen beim Überfahren ein elegantes, sichtbares Farboverlay in der Akzentfarbe. Text springt nicht mehr, alles bleibt an seinem Platz. Super clean und edel! ✨',
+          en: 'Perfect hover effect – Task cards get an elegant, visible color overlay in the accent color on hover. Text no longer jumps, everything stays in place. Super clean and elegant! ✨'
         }
       },
       {
-        type: 'improvement',
+        type: 'fix',
         text: {
-          de: 'Eleganter Hover-Effekt – Aufgabenkarten ändern dezent ihre Farbe beim Überfahren (Akzentfarbe in Transparenz), ohne zu springen oder die Größe zu ändern',
-          en: 'Elegant hover effect – Task cards subtly change color on hover (accent color in transparency), without jumping or changing size'
+          de: 'DnD in Heute funktioniert jetzt – Aufgaben können in der Heute-Ansicht problemlos per Drag & Drop sortiert werden. Karten bleiben beim Ziehen sichtbar!',
+          en: 'DnD in Today works now – Tasks can be easily sorted in Today view via drag & drop. Cards remain visible while dragging!'
+        }
+      },
+      {
+        type: 'fix',
+        text: {
+          de: 'DnD-Versatz in Pins endgültig behoben – Aufgabenkarten springen beim Ziehen nicht mehr nach rechts. Funktioniert jetzt genauso perfekt wie in Planer und Projekte! 🎯',
+          en: 'DnD offset in Pins finally fixed – Task cards no longer jump to the right when dragging. Now works just as perfectly as in Planner and Projects! 🎯'
         }
       },
       {

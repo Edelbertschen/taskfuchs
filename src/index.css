@@ -1279,11 +1279,11 @@
 }
 
 .card-hover:hover::before {
-  background-color: rgba(var(--accent-color-rgb, 59, 130, 246), 0.05);
+  background-color: rgba(var(--accent-color-rgb, 59, 130, 246), 0.08);
 }
 
 .dark .card-hover:hover::before {
-  background-color: rgba(var(--accent-color-rgb, 59, 130, 246), 0.1);
+  background-color: rgba(var(--accent-color-rgb, 59, 130, 246), 0.15);
 }
 
 /* Card active/pressed state - slight darkening */

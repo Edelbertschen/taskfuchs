@@ -1326,10 +1326,16 @@ export function PinsView() {
           }}
         >
           {activeTask && (
-            <TaskCard
-              task={activeTask}
-              isInDragOverlay={true}
-            />
+            <div style={{
+              // Offset compensation to prevent springing
+              transform: `translateX(${sidebarMinimized ? '-50px' : 'calc(-50px - 280px)'}) translateY(-80px)`,
+              filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',
+            }}>
+              <TaskCard
+                task={activeTask}
+                isInDragOverlay={true}
+              />
+            </div>
           )}
         </DragOverlay>
 

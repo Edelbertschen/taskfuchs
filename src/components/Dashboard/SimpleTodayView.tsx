@@ -15,6 +15,7 @@ import { getFuchsImagePath, getImagePath } from '../../utils/imageUtils';
 // DnD Kit imports
 import {
   DndContext,
+  DragOverlay,
   DragEndEvent,
   DragOverEvent,
   DragStartEvent,
@@ -3206,6 +3207,23 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
         );
       })()}
     </div>
+
+    {/* DragOverlay for smooth DnD */}
+    <DragOverlay
+      dropAnimation={null}
+      style={{
+        zIndex: 9999,
+        pointerEvents: 'none',
+      }}
+    >
+      {activeTask && (
+        <TaskCard
+          task={activeTask}
+          isInDragOverlay={true}
+        />
+      )}
+    </DragOverlay>
+
     </DndContext>
   );
 }

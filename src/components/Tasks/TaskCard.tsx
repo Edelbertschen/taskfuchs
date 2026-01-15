@@ -1092,10 +1092,12 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
               </div>
             )}
             
-            {/* Project Badge - Hover Reveal */}
-            {taskProject && isHovered && !task.completed && (
+            {/* Project Badge - Hover Reveal with fixed space */}
+            {taskProject && !task.completed && (
               <span 
-                className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-md flex-shrink-0 animate-fade-in"
+                className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-md flex-shrink-0 transition-opacity duration-200 ${
+                  isHovered ? 'opacity-100' : 'opacity-0'
+                }`}
                 style={{
                   backgroundColor: taskProject.color ? `${taskProject.color}20` : `${accentColor}15`,
                   color: taskProject.color || accentColor
