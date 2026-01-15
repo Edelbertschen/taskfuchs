@@ -23,22 +23,22 @@ const CHANGELOG: ChangelogEntry[] = [
       {
         type: 'fix',
         text: {
-          de: 'Perfekter Hover-Effekt – Aufgabenkarten bekommen beim Überfahren ein elegantes, sichtbares Farboverlay in der Akzentfarbe. Text springt nicht mehr, alles bleibt an seinem Platz. Super clean und edel! ✨',
-          en: 'Perfect hover effect – Task cards get an elegant, visible color overlay in the accent color on hover. Text no longer jumps, everything stays in place. Super clean and elegant! ✨'
+          de: 'Perfekter Hover-Effekt – Aufgabenkarten bekommen beim Überfahren ein elegantes, sichtbares Farboverlay in der Akzentfarbe (8-15%). Projektname wird mit Positionierung angezeigt, sodass nichts mehr springt. Super clean und edel! ✨',
+          en: 'Perfect hover effect – Task cards get an elegant, visible color overlay in the accent color on hover (8-15%). Project name is positioned absolutely so nothing jumps anymore. Super clean and elegant! ✨'
         }
       },
       {
         type: 'fix',
         text: {
-          de: 'DnD in Heute funktioniert jetzt – Aufgaben können in der Heute-Ansicht problemlos per Drag & Drop sortiert werden. Karten bleiben beim Ziehen sichtbar!',
-          en: 'DnD in Today works now – Tasks can be easily sorted in Today view via drag & drop. Cards remain visible while dragging!'
+          de: 'DnD in Heute perfekt – Visuelle Dropzone mit gestricheltem Rahmen und Hintergrund zeigt jetzt genau an, wo die Aufgabe gedroppt wird. Drag & Drop funktioniert einwandfrei! 🎯',
+          en: 'DnD in Today perfected – Visual dropzone with dashed border and background now shows exactly where the task will be dropped. Drag & drop works flawlessly! 🎯'
         }
       },
       {
         type: 'fix',
         text: {
-          de: 'DnD-Versatz in Pins endgültig behoben – Aufgabenkarten springen beim Ziehen nicht mehr nach rechts. Funktioniert jetzt genauso perfekt wie in Planer und Projekte! 🎯',
-          en: 'DnD offset in Pins finally fixed – Task cards no longer jump to the right when dragging. Now works just as perfectly as in Planner and Projects! 🎯'
+          de: 'DnD-Versatz in Pins behoben – Transform-Offset aus DragOverlay entfernt. Aufgabenkarten springen nicht mehr nach rechts oder oben beim Ziehen! 🎯',
+          en: 'DnD offset in Pins fixed – Transform offset removed from DragOverlay. Task cards no longer jump to the right or up when dragging! 🎯'
         }
       },
       {

@@ -44,6 +44,7 @@ import {
 import { TaskModal } from '../Tasks/TaskModal';
 import { SmartTaskModal } from '../Tasks/SmartTaskModal';
 import { TaskCard } from '../Tasks/TaskCard';
+import { DropIndicator } from '../Tasks/DropIndicator';
 import { EndOfDayModal } from '../Common/EndOfDayModal';
 import type { Task } from '../../types';
 import type { OutlookEmail } from '../../types/email';
@@ -2566,21 +2567,34 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
                     {todayTasks.length <= 10 ? (
                       // 1 oder 2 Spalten - alle Aufgaben direkt anzeigen
                       todayTasks.map((task, index) => (
-                        <SwipeableTaskCard
-                          key={task.id}
-                          onSwipeLeft={() => {
-                            setLastArchivedTaskId(task.id);
-                            dispatch({ type: 'UPDATE_TASK', payload: { ...task, columnId: 'archive' } });
-                            setSnackbarOpen(true);
-                          }}
-                          onSwipeRight={() => handleTaskClick(task.id)}
-                        >
-                          <TaskCard
-                            task={task}
-                            isFirst={todayTasks.length <= 5 ? index === 0 : false}
-                            isLast={todayTasks.length <= 5 ? index === todayTasks.length - 1 : false}
+                        <React.Fragment key={task.id}>
+                          {/* Drop indicator before the task */}
+                          <DropIndicator 
+                            isVisible={overId === task.id}
+                            position="top"
                           />
-                        </SwipeableTaskCard>
+                          <SwipeableTaskCard
+                            onSwipeLeft={() => {
+                              setLastArchivedTaskId(task.id);
+                              dispatch({ type: 'UPDATE_TASK', payload: { ...task, columnId: 'archive' } });
+                              setSnackbarOpen(true);
+                            }}
+                            onSwipeRight={() => handleTaskClick(task.id)}
+                          >
+                            <TaskCard
+                              task={task}
+                              isFirst={todayTasks.length <= 5 ? index === 0 : false}
+                              isLast={todayTasks.length <= 5 ? index === todayTasks.length - 1 : false}
+                            />
+                          </SwipeableTaskCard>
+                          {/* Drop indicator after the last task */}
+                          {index === todayTasks.length - 1 && (
+                            <DropIndicator 
+                              isVisible={overId === 'today-end'}
+                              position="bottom"
+                            />
+                          )}
+                        </React.Fragment>
                       ))
                     ) : (
                       // 3 Spalten - horizontaler Scroll
@@ -2603,22 +2617,35 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
                         
                         return allColumns.map((columnTasks, colIdx) => (
                           <div key={`col-${colIdx}`} className="flex-shrink-0 w-[280px] space-y-1">
-                            {columnTasks.map((task) => (
-                              <SwipeableTaskCard
-                                key={task.id}
-                                onSwipeLeft={() => {
-                                  setLastArchivedTaskId(task.id);
-                                  dispatch({ type: 'UPDATE_TASK', payload: { ...task, columnId: 'archive' } });
-                                  setSnackbarOpen(true);
-                                }}
-                                onSwipeRight={() => handleTaskClick(task.id)}
-                              >
-                                <TaskCard
-                                  task={task}
-                                  isFirst={false}
-                                  isLast={false}
+                            {columnTasks.map((task, taskIdx) => (
+                              <React.Fragment key={task.id}>
+                                {/* Drop indicator before the task */}
+                                <DropIndicator 
+                                  isVisible={overId === task.id}
+                                  position="top"
                                 />
-                              </SwipeableTaskCard>
+                                <SwipeableTaskCard
+                                  onSwipeLeft={() => {
+                                    setLastArchivedTaskId(task.id);
+                                    dispatch({ type: 'UPDATE_TASK', payload: { ...task, columnId: 'archive' } });
+                                    setSnackbarOpen(true);
+                                  }}
+                                  onSwipeRight={() => handleTaskClick(task.id)}
+                                >
+                                  <TaskCard
+                                    task={task}
+                                    isFirst={false}
+                                    isLast={false}
+                                  />
+                                </SwipeableTaskCard>
+                                {/* Drop indicator after the last task */}
+                                {taskIdx === columnTasks.length - 1 && (
+                                  <DropIndicator 
+                                    isVisible={overId === 'today-end'}
+                                    position="bottom"
+                                  />
+                                )}
+                              </React.Fragment>
                             ))}
                           </div>
                         ));

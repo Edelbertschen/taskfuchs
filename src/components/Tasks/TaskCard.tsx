@@ -1024,7 +1024,7 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
 
         {/* Bottom area - Time, Subtasks, Tags and Context Badge */}
         {!isFocusMode && ((hasAnyTimeEstimate || totalSubtasks > 0) || (taskProjectDisplay || taskDateDisplay) || (task.tags && task.tags.length > 0)) && (
-          <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mt-1 gap-2">
+          <div className="relative flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mt-1 gap-2 min-h-[18px]">
             <div className="flex items-center space-x-1.5 flex-shrink-0">
               {/* Time display - show if task has time estimate OR tracked time */}
               {(() => {
@@ -1092,10 +1092,10 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
               </div>
             )}
             
-            {/* Project Badge - Hover Reveal with fixed space */}
+            {/* Project Badge - Hover Reveal with absolute positioning */}
             {taskProject && !task.completed && (
               <span 
-                className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-md flex-shrink-0 transition-opacity duration-200 ${
+                className={`absolute right-0 bottom-0 inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-md pointer-events-none transition-opacity duration-200 ${
                   isHovered ? 'opacity-100' : 'opacity-0'
                 }`}
                 style={{
