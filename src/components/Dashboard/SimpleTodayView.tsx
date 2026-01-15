@@ -3244,10 +3244,16 @@ export function SimpleTodayView({ onNavigate }: TodayViewProps = {}) {
       }}
     >
       {activeTask && (
-        <TaskCard
-          task={activeTask}
-          isInDragOverlay={true}
-        />
+        <div style={{
+          // ✨ OFFSET: Compensate for layout positioning
+          transform: 'translateX(-76px) translateY(-100px)',
+          filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',
+        }}>
+          <TaskCard
+            task={activeTask}
+            isInDragOverlay={true}
+          />
+        </div>
       )}
     </DragOverlay>
 
