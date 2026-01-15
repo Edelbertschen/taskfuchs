@@ -1262,41 +1262,27 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Card hover - enhanced with accent glow */
+/* Card hover - subtle color tint with accent color */
 .card-hover {
-  transition: 
-    transform 200ms cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 250ms cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 200ms ease-out;
-  will-change: transform, box-shadow;
+  transition: background-color 200ms ease-out;
 }
 
 .card-hover:hover {
-  transform: translateY(-2px) scale(1.008);
-  box-shadow: 
-    0 8px 25px rgba(0, 0, 0, 0.1),
-    0 4px 10px rgba(0, 0, 0, 0.06),
-    0 0 0 1px rgba(var(--accent-color-rgb, 59, 130, 246), 0.15),
-    0 0 20px -5px rgba(var(--accent-color-rgb, 59, 130, 246), 0.15);
-  border-color: rgba(var(--accent-color-rgb, 59, 130, 246), 0.3) !important;
+  background-color: rgba(var(--accent-color-rgb, 59, 130, 246), 0.04);
 }
 
 .dark .card-hover:hover {
-  box-shadow: 
-    0 8px 25px rgba(0, 0, 0, 0.35),
-    0 4px 10px rgba(0, 0, 0, 0.2),
-    0 0 0 1px rgba(var(--accent-color-rgb, 59, 130, 246), 0.25),
-    0 0 25px -5px rgba(var(--accent-color-rgb, 59, 130, 246), 0.2);
-  border-color: rgba(var(--accent-color-rgb, 59, 130, 246), 0.4) !important;
+  background-color: rgba(var(--accent-color-rgb, 59, 130, 246), 0.08);
 }
 
-/* Card active/pressed state */
+/* Card active/pressed state - slight darkening */
 .card-hover:active {
-  transform: translateY(0px) scale(0.995);
+  background-color: rgba(var(--accent-color-rgb, 59, 130, 246), 0.08);
   transition-duration: 80ms;
-  box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.08),
-    0 0 0 1px rgba(var(--accent-color-rgb, 59, 130, 246), 0.2);
+}
+
+.dark .card-hover:active {
+  background-color: rgba(var(--accent-color-rgb, 59, 130, 246), 0.12);
 }
 
 /* Modal animations */

@@ -165,6 +165,14 @@ export function PinsView() {
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
   const [tagFilters, setTagFilters] = useState<string[]>([]);
   const [dateFilter, setDateFilter] = useState<'all' | 'anytime' | 'today' | 'tomorrow' | 'thisWeek'>('all');
+  const [showCompletedTasks, setShowCompletedTasks] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('taskfuchs-pins-show-completed');
+      return saved === 'true';
+    } catch {
+      return false;
+    }
+  });
   const [filterPinned, setFilterPinned] = useState<boolean>(() => {
     try {
       const saved = localStorage.getItem('taskfuchs-pins-filter-pinned');
@@ -905,7 +913,7 @@ export function PinsView() {
             activeTask={activeTask}
             activeColumn={activeColumn}
             onSmartTaskAdd={undefined} // Disabled for pins
-            showCompletedTasks={state.showCompletedTasks}
+            showCompletedTasks={showCompletedTasks}
             isProjectColumn={true} // ✨ Treat pins like projects for immediate updates
             isEditing={editingColumnId === column.id}
             editingTitle={editingColumnTitle}
@@ -1190,7 +1198,7 @@ export function PinsView() {
                 priorityFilter={priorityFilter as PriorityOption | 'all'}
                 dateFilter={dateFilter as DateFilterOption}
                 tagFilters={tagFilters}
-                showCompleted={false}
+                showCompleted={showCompletedTasks}
                 availableTags={state.tags.filter(tag => tag.count > 0).sort((a, b) => b.count - a.count)}
                 onPriorityChange={(priority) => setPriorityFilter(priority)}
                 onDateFilterChange={(filter) => setDateFilter(filter)}
@@ -1200,6 +1208,13 @@ export function PinsView() {
                   } else {
                     setTagFilters(prev => [...prev, tagName]);
                   }
+                }}
+                onShowCompletedToggle={() => {
+                  const newValue = !showCompletedTasks;
+                  setShowCompletedTasks(newValue);
+                  try { 
+                    localStorage.setItem('taskfuchs-pins-show-completed', String(newValue)); 
+                  } catch {}
                 }}
                 onShowCompletedToggle={() => {}}
                 onClearAll={() => {
@@ -1305,20 +1320,16 @@ export function PinsView() {
         {/* Drag Overlay - Minimalist style like Planer */}
         <DragOverlay
           dropAnimation={null}
-              style={{ 
+          style={{ 
             zIndex: 9999,
             pointerEvents: 'none',
-              }}
-            >
+          }}
+        >
           {activeTask && (
-            <div style={{
-              filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',
-            }}>
-              <TaskCard
-                task={activeTask}
-                isInDragOverlay={true}
-              />
-            </div>
+            <TaskCard
+              task={activeTask}
+              isInDragOverlay={true}
+            />
           )}
         </DragOverlay>
 

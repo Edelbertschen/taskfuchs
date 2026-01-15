@@ -18,6 +18,46 @@ interface ChangelogEntry {
 // Changelog data - add new entries at the top
 const CHANGELOG: ChangelogEntry[] = [
   {
+    date: '2026-01-15',
+    items: [
+      {
+        type: 'fix',
+        text: {
+          de: 'DnD-Versatz in Pins behoben – Aufgabenkarten springen beim Ziehen nicht mehr nach rechts',
+          en: 'DnD offset in Pins fixed – Task cards no longer jump to the right when dragging'
+        }
+      },
+      {
+        type: 'improvement',
+        text: {
+          de: 'Eleganter Hover-Effekt – Aufgabenkarten ändern dezent ihre Farbe beim Überfahren (Akzentfarbe in Transparenz), ohne zu springen oder die Größe zu ändern',
+          en: 'Elegant hover effect – Task cards subtly change color on hover (accent color in transparency), without jumping or changing size'
+        }
+      },
+      {
+        type: 'fix',
+        text: {
+          de: 'Erledigte Aufgaben in Pins – Filter für erledigte Aufgaben funktioniert jetzt auch in der Pins-Ansicht',
+          en: 'Completed tasks in Pins – Filter for completed tasks now works in Pins view as well'
+        }
+      },
+      {
+        type: 'fix',
+        text: {
+          de: 'Archivieren aus Planer – Aufgaben können nun zuverlässig aus allen Planer-Spalten archiviert werden',
+          en: 'Archive from Planner – Tasks can now be reliably archived from all Planner columns'
+        }
+      },
+      {
+        type: 'fix',
+        text: {
+          de: 'Überfällige Aufgaben in Heute – Vergangene Aufgaben erscheinen nun garantiert in der Heute-Spalte',
+          en: 'Overdue tasks in Today – Past tasks now guaranteed to appear in the Today column'
+        }
+      }
+    ]
+  },
+  {
     date: '2026-01-14',
     items: [
       {
