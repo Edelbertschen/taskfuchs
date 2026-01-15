@@ -82,7 +82,7 @@ type AppAction =
   | { type: 'SET_TAG_FILTERS'; payload: string[] }
   | { type: 'SET_PRIORITY_FILTERS'; payload: string[] }
   | { type: 'SET_ACTIVE_TIMER'; payload: ActiveTimerContext | null }
-  | { type: 'START_TIMER'; payload: { taskId: string } }
+  | { type: 'START_TIMER'; payload: { taskId: string; mode?: 'normal' | 'pomodoro' } }
   | { type: 'PAUSE_TIMER' }
   | { type: 'RESUME_TIMER' }
   | { type: 'STOP_TIMER' }
@@ -113,7 +113,7 @@ type AppAction =
   | { type: 'TOGGLE_SHOW_COMPLETED_TASKS' }
   | { type: 'ARCHIVE_TASK'; payload: string }
   | { type: 'RESTORE_TASK'; payload: string }
-  | { type: 'ARCHIVE_COMPLETED_TASKS_IN_COLUMN'; payload: string }
+  | { type: 'ARCHIVE_COMPLETED_TASKS_IN_COLUMN'; payload: string | { columnId: string; taskIds?: string[] } }
   | { type: 'DELETE_ARCHIVED_TASK'; payload: string }
   | { type: 'CLEAR_ARCHIVE' }
   | { type: 'SET_ARCHIVED_TASKS'; payload: Task[] }
@@ -1196,12 +1196,32 @@ function appReducer(state: AppState, action: AppAction): AppState {
       console.log('📂 Payload (column ID):', action.payload);
       console.log('📊 All tasks:', state.tasks.length);
       
-      const completedTasksInColumn = state.tasks.filter(
-        task => task.completed && (
-          task.columnId === action.payload || // Normal columns
-          task.kanbanColumnId === action.payload // Project kanban columns
-        )
-      );
+      const archivePayload = typeof action.payload === 'string'
+        ? { columnId: action.payload, taskIds: undefined }
+        : action.payload;
+
+      const completedTasksInColumn = archivePayload.taskIds?.length
+        ? state.tasks.filter(task => archivePayload.taskIds?.includes(task.id))
+        : state.tasks.filter(
+            task => {
+              if (!task.completed) return false;
+              
+              // Check for normal columns and project kanban columns
+              if (task.columnId === archivePayload.columnId || task.kanbanColumnId === archivePayload.columnId) {
+                return true;
+              }
+              
+              // For date columns: also check reminderDate
+              if (archivePayload.columnId.startsWith('date-')) {
+                const dateStr = archivePayload.columnId.replace('date-', '');
+                if (task.reminderDate === dateStr) {
+                  return true;
+                }
+              }
+              
+              return false;
+            }
+          );
       
       console.log('✅ Found completed tasks in column:', completedTasksInColumn.length);
       console.log('📋 Tasks to archive:', completedTasksInColumn);
@@ -1222,12 +1242,26 @@ function appReducer(state: AppState, action: AppAction): AppState {
         }
       }
       
-      const remainingTasks = state.tasks.filter(task => !(
-        task.completed && (
-          task.columnId === action.payload || 
-          task.kanbanColumnId === action.payload
-        )
-      ));
+      const remainingTasks = archivePayload.taskIds?.length
+        ? state.tasks.filter(task => !archivePayload.taskIds?.includes(task.id))
+        : state.tasks.filter(task => {
+            if (!task.completed) return true;
+            
+            // Keep tasks that don't match the archive criteria
+            if (task.columnId === archivePayload.columnId || task.kanbanColumnId === archivePayload.columnId) {
+              return false; // Remove (archive) this task
+            }
+            
+            // For date columns: also check reminderDate
+            if (archivePayload.columnId.startsWith('date-')) {
+              const dateStr = archivePayload.columnId.replace('date-', '');
+              if (task.reminderDate === dateStr) {
+                return false; // Remove (archive) this task
+              }
+            }
+            
+            return true; // Keep this task
+          });
       
       console.log('📊 Remaining tasks after archive:', remainingTasks.length);
       console.log('📁 Current archived tasks:', state.archivedTasks.length);

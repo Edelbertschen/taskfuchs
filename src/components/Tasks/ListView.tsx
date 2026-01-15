@@ -1371,28 +1371,39 @@ export function ListView({ onTaskEdit, onTaskView, onTaskPlay }: ListViewProps) 
       
       const columnTasks = visibleTasks
         .filter(task => {
-          // Direct assignment to this column
-          if (task.columnId === column.id) {
-            return true;
-          }
-          
-          // For TODAY: Also show tasks with past dates
+          // PRIORITY 1: For TODAY - show ALL tasks with past dates FIRST
+          // This ensures overdue tasks reliably appear in "Today"
           if (isTodayColumn) {
             // Tasks from past date columns
             if (task.columnId && task.columnId.startsWith('date-')) {
               const taskDateStr = task.columnId.replace('date-', '');
               if (taskDateStr < todayStr) {
+                console.log(`📅 [ListView] Past columnId task moved to today: "${task.title}" (columnId: ${task.columnId})`);
                 return true;
               }
             }
             // Tasks with past reminderDate
             if (task.reminderDate && task.reminderDate < todayStr) {
+              console.log(`📅 [ListView] Past reminderDate task moved to today: "${task.title}" (reminderDate: ${task.reminderDate})`);
               return true;
             }
           }
           
-          // Tasks with reminderDate matching this column
+          // PRIORITY 2: Tasks with reminderDate matching this column
           if (task.reminderDate === columnDateStr) {
+            return true;
+          }
+          
+          // PRIORITY 3: Direct assignment to this column via columnId
+          // BUT NOT if they have a different reminderDate (they'll show in reminderDate column)
+          if (task.columnId === column.id) {
+            // If task has reminderDate that differs from this column, don't show here
+            if (task.reminderDate && task.reminderDate !== columnDateStr) {
+              // Only hide if reminderDate is future (past ones already shown above for today)
+              if (!isTodayColumn || task.reminderDate >= todayStr) {
+                return false;
+              }
+            }
             return true;
           }
           

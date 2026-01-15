@@ -465,7 +465,10 @@ const TaskColumn = React.memo(({
   };
 
   const handleArchiveCompletedTasks = () => {
-    const completedTasksCount = tasks.filter(task => task.completed).length;
+    const completedTasksForArchive = tasks.filter(
+      task => task.completed && !deadlineReminderTaskIds.includes(task.id)
+    );
+    const completedTasksCount = completedTasksForArchive.length;
     if (completedTasksCount === 0) return;
     
     setArchiveModalData({
@@ -479,13 +482,19 @@ const TaskColumn = React.memo(({
     console.log('🎯 Archive Modal: OK clicked');
     console.log('📊 Archive Modal Data:', archiveModalData);
     console.log('📂 Column ID:', column.id);
-    console.log('✅ Completed tasks in column:', tasks.filter(task => task.completed));
+    const completedTasksForArchive = tasks.filter(
+      task => task.completed && !deadlineReminderTaskIds.includes(task.id)
+    );
+    console.log('✅ Completed tasks in column:', completedTasksForArchive);
     
     if (archiveModalData) {
       console.log('📤 Dispatching ARCHIVE_COMPLETED_TASKS_IN_COLUMN action');
       dispatch({
         type: 'ARCHIVE_COMPLETED_TASKS_IN_COLUMN',
-        payload: column.id
+        payload: {
+          columnId: column.id,
+          taskIds: completedTasksForArchive.map(task => task.id)
+        }
       });
       console.log('✅ Archive action dispatched successfully');
     } else {

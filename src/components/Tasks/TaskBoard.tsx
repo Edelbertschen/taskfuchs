@@ -250,10 +250,7 @@ function DroppableProjectHeader({ project, tasks, isExpanded, onToggle, accentCo
       } ${isExpanded ? 'bg-gray-800/30' : ''} ${
         isOver ? 'bg-blue-600/30 border border-blue-500/50' : ''
             }`
-      }`}
-      style={isMinimalDesign && isExpanded 
-        ? { borderLeftColor: isDarkMode ? '#6b7280' : '#374151' } 
-        : {}}
+      } ${isMinimalDesign && isExpanded ? 'border-l-gray-700 dark:border-l-gray-600' : ''}`}
     >
       <div className="flex items-center space-x-2 flex-1 min-w-0">
         {isExpanded ? (
@@ -272,7 +269,7 @@ function DroppableProjectHeader({ project, tasks, isExpanded, onToggle, accentCo
           <div className={`font-medium text-sm truncate text-left ${
             isMinimalDesign
               ? (isExpanded ? 'text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-300')
-              : `isDarkMode ? 'text-white' : 'text-gray-900'`
+              : 'text-gray-900 dark:text-white'
           }`}>
             {project.title}
           </div>
@@ -1373,7 +1370,7 @@ export function TaskBoard() {
 
   const handleTaskPlay = (task: Task) => {
     // Check if pomodoro is enabled and start timer accordingly
-    const timerMode = state.preferences?.pomodoro?.enabled ? 'pomodoro' : 'normal';
+    const timerMode = (state.preferences as any)?.pomodoro?.enabled ? 'pomodoro' : 'normal';
     dispatch({ 
       type: 'START_TIMER', 
       payload: { taskId: task.id, mode: timerMode } 
@@ -1569,49 +1566,56 @@ export function TaskBoard() {
               return false;
             }
             
-            // 1. Tasks directly assigned to this date column (primary assignment via columnId)
-            if (task.columnId === column.id) {
-              // ABER: Wenn die Aufgabe eine reminderDate hat, die nicht heute ist, 
-              // zeige sie nicht in dieser Spalte (sie wird in der reminderDate-Spalte erscheinen)
-              if (task.reminderDate && task.reminderDate !== dateStr && task.reminderDate >= todayStr) {
-                return false;
-              }
-              return true;
-            }
-            
-            // 2. For TODAY: Also show tasks with past dates (columnId, reminderDate, or deadline)
+            // PRIORITY 1: For TODAY - show ALL tasks with past dates FIRST
+            // This ensures overdue tasks reliably appear in "Today"
             if (isToday) {
-              // Show tasks from past date columns (columnId)
+              // Tasks from past date columns (columnId)
               if (task.columnId && task.columnId.startsWith('date-')) {
                 const taskDateStr = task.columnId.replace('date-', '');
                 if (taskDateStr < todayStr) {
+                  console.log(`📅 Past columnId task moved to today: "${task.title}" (columnId: ${task.columnId})`);
                   return true;
                 }
               }
-              // Show tasks with past reminderDate (CRITICAL: unabhängig von columnId!)
+              // Tasks with past reminderDate (CRITICAL: even if they have a different columnId!)
               if (task.reminderDate && task.reminderDate < todayStr) {
+                console.log(`📅 Past reminderDate task moved to today: "${task.title}" (reminderDate: ${task.reminderDate})`);
                 return true;
               }
-              // Show tasks with past deadline
+              // Tasks with past deadline
               if (task.deadline) {
                 const taskDeadlineStr = task.deadline.includes('T') ? task.deadline.split('T')[0] : task.deadline;
                 if (taskDeadlineStr < todayStr) {
+                  console.log(`📅 Past deadline task moved to today: "${task.title}" (deadline: ${taskDeadlineStr})`);
                   return true;
                 }
               }
             }
-          
-            // 3. Tasks with reminderDate matching this date (AUCH für Projekt-Aufgaben!)
-            // Dies stellt sicher, dass Aufgaben immer in der richtigen Spalte erscheinen
+            
+            // PRIORITY 2: Tasks with reminderDate matching this date
+            // (works for all date columns including today)
             if (task.reminderDate === dateStr) {
               return true;
             }
+            
+            // PRIORITY 3: Tasks directly assigned to this date column via columnId
+            // BUT NOT if they have a different reminderDate (they'll show in reminderDate column)
+            if (task.columnId === column.id) {
+              // If task has reminderDate that differs from this column, don't show here
+              if (task.reminderDate && task.reminderDate !== dateStr) {
+                // Only hide if reminderDate is future (past ones already shown above for today)
+                if (task.reminderDate >= todayStr) {
+                  return false;
+                }
+              }
+              return true;
+            }
           
-            // 4. Tasks with deadline matching this date (additional deadline display)
+            // PRIORITY 4: Tasks with deadline matching this date (additional deadline display)
             if (task.deadline) {
               const taskDeadlineStr = task.deadline.includes('T') ? task.deadline.split('T')[0] : task.deadline;
               if (taskDeadlineStr === dateStr) {
-                return true; // Show as deadline reminder, even if task is elsewhere
+                return true; // Show as deadline reminder
               }
             }
           }
@@ -2090,13 +2094,13 @@ export function TaskBoard() {
                       try { localStorage.setItem('taskfuchs-planner-filter-pinned', 'false'); } catch {}
                     }}
                     isPinned={filterPinned}
-                    onPinToggle={() => {
-                      const newPinned = !filterPinned;
-                      setFilterPinned(newPinned);
-                      try { localStorage.setItem('taskfuchs-planner-filter-pinned', String(newPinned)); } catch {}
+                    onPinnedChange={(pinned) => {
+                      setFilterPinned(pinned);
+                      try { localStorage.setItem('taskfuchs-planner-filter-pinned', String(pinned)); } catch {}
                     }}
                     accentColor={state.preferences.accentColor}
-                    showDateFilter={false}
+                    isDarkMode={isDarkMode}
+                    isMinimalDesign={isMinimalDesign}
                     showHidePinnedOption={true}
                   />
                 </div>
