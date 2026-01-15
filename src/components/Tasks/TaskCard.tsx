@@ -719,12 +719,10 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
   // ✨ FIXED: Keep the card in layout but make it invisible to prevent layout shifts
   const isDraggedOriginal = isSortableDragging && !isInDragOverlay;
 
-  // ✨ ENHANCED: DragOverlay styling with lift effect
+  // ✨ ENHANCED: DragOverlay styling with lift effect (NO transform to prevent offset)
   const dragOverlayStyle = isInDragOverlay ? {
     filter: 'drop-shadow(0 12px 30px rgba(0, 0, 0, 0.2)) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1))',
-    transform: 'scale(1.03) rotate(1.5deg)',
     zIndex: 1000,
-    transition: 'transform 150ms ease-out, filter 150ms ease-out',
   } : {};
 
   return (

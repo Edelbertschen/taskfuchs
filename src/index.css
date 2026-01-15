@@ -1262,27 +1262,44 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Card hover - subtle color tint with accent color */
+/* Card hover - subtle color overlay with accent color */
 .card-hover {
+  position: relative;
+}
+
+.card-hover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: rgba(var(--accent-color-rgb, 59, 130, 246), 0);
+  border-radius: inherit;
+  pointer-events: none;
   transition: background-color 200ms ease-out;
+  z-index: 1;
 }
 
-.card-hover:hover {
-  background-color: rgba(var(--accent-color-rgb, 59, 130, 246), 0.04);
+.card-hover:hover::before {
+  background-color: rgba(var(--accent-color-rgb, 59, 130, 246), 0.05);
 }
 
-.dark .card-hover:hover {
-  background-color: rgba(var(--accent-color-rgb, 59, 130, 246), 0.08);
+.dark .card-hover:hover::before {
+  background-color: rgba(var(--accent-color-rgb, 59, 130, 246), 0.1);
 }
 
 /* Card active/pressed state - slight darkening */
-.card-hover:active {
-  background-color: rgba(var(--accent-color-rgb, 59, 130, 246), 0.08);
+.card-hover:active::before {
+  background-color: rgba(var(--accent-color-rgb, 59, 130, 246), 0.1);
   transition-duration: 80ms;
 }
 
-.dark .card-hover:active {
-  background-color: rgba(var(--accent-color-rgb, 59, 130, 246), 0.12);
+.dark .card-hover:active::before {
+  background-color: rgba(var(--accent-color-rgb, 59, 130, 246), 0.15);
+}
+
+/* Ensure card content is above the overlay */
+.card-hover > * {
+  position: relative;
+  z-index: 2;
 }
 
 /* Modal animations */
