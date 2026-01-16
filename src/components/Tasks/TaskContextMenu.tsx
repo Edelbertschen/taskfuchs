@@ -45,7 +45,7 @@ export function TaskContextMenu({
 }: TaskContextMenuProps) {
   const { state, dispatch } = useApp();
   const { pins, tasks } = useAppTranslation();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [showPrioritySubmenu, setShowPrioritySubmenu] = useState(false);
   const [showDateSubmenu, setShowDateSubmenu] = useState(false);
   const [showTimeSubmenu, setShowTimeSubmenu] = useState(false);
@@ -1294,14 +1294,52 @@ export function TaskContextMenu({
                   .filter(col => col.projectId === project.id)
                   .sort((a, b) => (a.order || 0) - (b.order || 0));
                  
+                 // Handler for direct project assignment (creates column if needed)
+                 const handleDirectProjectAssign = (e: React.MouseEvent) => {
+                   e.stopPropagation();
+                   
+                   let targetColumnId: string;
+                   
+                   if (projectKanbanColumns.length === 0) {
+                     // No columns exist - create "Allgemein" column
+                     const newColumnId = `kanban-col-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+                     const columnTitle = i18n.language === 'en' ? 'General' : 'Allgemein';
+                     
+                     dispatch({
+                       type: 'ADD_PROJECT_KANBAN_COLUMN',
+                       payload: {
+                         id: newColumnId,
+                         title: columnTitle,
+                         projectId: project.id,
+                         order: 0
+                       }
+                     });
+                     
+                     targetColumnId = newColumnId;
+                   } else {
+                     // Use first column
+                     targetColumnId = projectKanbanColumns[0].id;
+                   }
+                   
+                   // Assign task to project and column
+                   dispatch({
+                     type: 'UPDATE_TASK',
+                     payload: { 
+                       ...task, 
+                       projectId: project.id,
+                       kanbanColumnId: targetColumnId
+                     }
+                   });
+                   
+                   setShowProjectSubmenu(false);
+                   setExpandedProjectId(null);
+                   onClose();
+                 };
+                 
                  return (
                    <div key={project.id}>
-                     {/* Project header - click to expand/collapse */}
-                     <button
-                       onClick={(e) => {
-                         e.stopPropagation();
-                         setExpandedProjectId(isExpanded ? null : project.id);
-                       }}
+                     {/* Project header - click on name to assign directly, chevron to expand */}
+                     <div
                        className={`w-full flex items-center gap-3 px-3 py-2 text-sm transition-colors ${
                          isExpanded 
                            ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300' 
@@ -1309,13 +1347,34 @@ export function TaskContextMenu({
                        }`}
                      >
                        <div 
-                         className="w-3 h-3 rounded" 
+                         className="w-3 h-3 rounded flex-shrink-0" 
                          style={{ backgroundColor: project.color || state.preferences.accentColor }}
                        />
-                       <span className="flex-1 text-left truncate font-medium">{project.title}</span>
-                       {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />}
-                       <ChevronRight className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
-                     </button>
+                       {/* Project name - click to assign directly */}
+                       <button
+                         onClick={handleDirectProjectAssign}
+                         className="flex-1 text-left truncate font-medium hover:underline"
+                         title={projectKanbanColumns.length === 0 
+                           ? t('task_context_menu.assign_create_column', 'Zuweisen (erstellt "Allgemein"-Spalte)')
+                           : t('task_context_menu.assign_first_column', 'Zur ersten Spalte zuweisen')
+                         }
+                       >
+                         {project.title}
+                       </button>
+                       {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0" />}
+                       {/* Chevron to expand columns */}
+                       {projectKanbanColumns.length > 0 && (
+                         <button
+                           onClick={(e) => {
+                             e.stopPropagation();
+                             setExpandedProjectId(isExpanded ? null : project.id);
+                           }}
+                           className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded"
+                         >
+                           <ChevronRight className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+                         </button>
+                       )}
+                     </div>
                      
                      {/* Expanded column list */}
                      {isExpanded && projectKanbanColumns.length > 0 && (
@@ -1350,13 +1409,6 @@ export function TaskContextMenu({
                              </button>
                            );
                          })}
-                       </div>
-                     )}
-                     
-                     {/* No columns message */}
-                     {isExpanded && projectKanbanColumns.length === 0 && (
-                       <div className="ml-4 px-3 py-2 text-xs text-gray-400 dark:text-gray-500 italic">
-                         {t('task_context_menu.no_columns', 'Keine Spalten')}
                        </div>
                      )}
                    </div>

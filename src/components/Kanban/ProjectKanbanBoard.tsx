@@ -98,6 +98,21 @@ export function ProjectKanbanBoard() {
     }
   });
 
+  // View Mode: 'board' or 'list'
+  const [viewMode, setViewMode] = useState<'board' | 'list'>(() => {
+    try {
+      const saved = localStorage.getItem('taskfuchs-project-view-mode');
+      return saved ? JSON.parse(saved) : 'board';
+    } catch {
+      return 'board';
+    }
+  });
+
+  // Persist view mode
+  useEffect(() => {
+    localStorage.setItem('taskfuchs-project-view-mode', JSON.stringify(viewMode));
+  }, [viewMode]);
+
   // Project Assignment Modal states
   const [showProjectColumnSelector, setShowProjectColumnSelector] = useState(false);
   const [draggedTaskForProjectAssignment, setDraggedTaskForProjectAssignment] = useState<Task | null>(null);
@@ -2368,9 +2383,44 @@ export function ProjectKanbanBoard() {
               <div 
                 className="relative flex-1 flex flex-col min-h-0"
               >
-                {/* Compact Filter Bar - Elegant & Space-Efficient */}
-                {selectedProject && (showFilterDropdown || filterPinned) && (
-                  <div className="mx-4 mt-3 flex-shrink-0">
+                {/* View Mode Toggle + Filter Bar */}
+                <div className="mx-4 mt-3 flex-shrink-0 flex items-center gap-3">
+                  {/* Board/List Toggle */}
+                  <div className={`flex items-center rounded-lg p-0.5 ${
+                    isMinimalDesign 
+                      ? 'bg-gray-100 dark:bg-gray-800' 
+                      : 'bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm'
+                  }`}>
+                    <button
+                      onClick={() => setViewMode('board')}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
+                        viewMode === 'board'
+                          ? 'bg-white dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white'
+                          : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                      }`}
+                      title={t('projects.board_view', 'Board')}
+                    >
+                      <LayoutGrid className="w-3.5 h-3.5" />
+                      <span>Board</span>
+                    </button>
+                    <button
+                      onClick={() => setViewMode('list')}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
+                        viewMode === 'list'
+                          ? 'bg-white dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white'
+                          : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                      }`}
+                      title={t('projects.list_view', 'Liste')}
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                      </svg>
+                      <span>Liste</span>
+                    </button>
+                  </div>
+                  
+                  {/* Filter Bar */}
+                  {(showFilterDropdown || filterPinned) && (
                     <CompactFilterBar
                       priorityFilter={
                         state.viewState.projectKanban.priorityFilters.length === 1
@@ -2420,13 +2470,14 @@ export function ProjectKanbanBoard() {
                       onClose={() => setShowFilterDropdown(false)}
                       showHidePinnedOption={true}
                     />
-                  </div>
-                )}
+                  )}
+                </div>
 
                 {/* Linked Notes Section */}
 
 
-                  {/* Kanban Board - Using TaskColumn like TaskBoard */}
+                  {/* Board View */}
+                  {viewMode === 'board' && (
                   <div className="flex-1 min-h-0 flex flex-col">
                     <div className="flex-1 min-h-0 flex flex-col relative px-4 pb-4" style={{ paddingTop: '35px' }}>
                     <div className="flex flex-col flex-1 min-h-0 gap-3 w-full">
@@ -2459,6 +2510,92 @@ export function ProjectKanbanBoard() {
                     </div>
                   </div>
               </div>
+                  )}
+
+                  {/* List View */}
+                  {viewMode === 'list' && (
+                    <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-4" style={{ paddingTop: '16px' }}>
+                      <div className="max-w-4xl mx-auto space-y-6">
+                        {displayColumns.map((column) => {
+                          if (!column) return null;
+                          
+                          // Get tasks for this column
+                          const columnTasks = filteredTasks.filter(task => 
+                            task.kanbanColumnId === column.id
+                          ).sort((a, b) => (a.position || 0) - (b.position || 0));
+                          
+                          // Filter completed tasks if needed
+                          const visibleTasks = state.viewState.projectKanban.showCompleted 
+                            ? columnTasks 
+                            : columnTasks.filter(task => !task.completed);
+                          
+                          return (
+                            <div key={column.id} className="mb-6">
+                              {/* Column Header */}
+                              <div className={`flex items-center gap-3 mb-3 pb-2 border-b ${
+                                isMinimalDesign 
+                                  ? 'border-gray-200 dark:border-gray-700' 
+                                  : 'border-gray-200/60 dark:border-gray-700/60'
+                              }`}>
+                                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+                                  {column.title}
+                                </h3>
+                                <span className={`text-xs px-2 py-0.5 rounded-full ${
+                                  isMinimalDesign
+                                    ? 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
+                                    : 'bg-gray-100/80 dark:bg-gray-800/80 text-gray-500 dark:text-gray-400'
+                                }`}>
+                                  {visibleTasks.length}
+                                </span>
+                              </div>
+                              
+                              {/* Tasks */}
+                              {visibleTasks.length > 0 ? (
+                                <SortableContext
+                                  items={visibleTasks.map(task => task.id)}
+                                  strategy={verticalListSortingStrategy}
+                                >
+                                  <div className="space-y-1">
+                                    {visibleTasks.map((task, index) => (
+                                      <div 
+                                        key={task.id}
+                                        className={`${
+                                          isMinimalDesign
+                                            ? 'bg-white dark:bg-gray-800 rounded-lg shadow-sm'
+                                            : 'bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg shadow-sm'
+                                        }`}
+                                      >
+                                        <TaskCard
+                                          task={task}
+                                          isFirst={index === 0}
+                                          isLast={index === visibleTasks.length - 1}
+                                          currentColumn={column}
+                                        />
+                                      </div>
+                                    ))}
+                                  </div>
+                                </SortableContext>
+                              ) : (
+                                <div className={`text-center py-6 text-sm ${
+                                  isMinimalDesign
+                                    ? 'text-gray-400 dark:text-gray-500'
+                                    : 'text-gray-400/80 dark:text-gray-500/80'
+                                }`}>
+                                  {t('projects.no_tasks_in_column', 'Keine Aufgaben in dieser Spalte')}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                        
+                        {displayColumns.length === 0 && (
+                          <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                            {t('projects.no_columns', 'Keine Spalten vorhanden')}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
             </div>
           ) : (
             <div className="flex-1 flex items-center justify-center">
