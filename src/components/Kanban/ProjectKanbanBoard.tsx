@@ -611,7 +611,7 @@ export function ProjectKanbanBoard() {
     columnId, 
     visibleTasks, 
     parentOverId,
-    isDragging,
+    activeTaskId,
     isMinimalDesign: minDesign,
     column,
     t: translate,
@@ -621,7 +621,7 @@ export function ProjectKanbanBoard() {
     columnId: string;
     visibleTasks: Task[];
     parentOverId: string | null; // From parent DndContext
-    isDragging: boolean; // Whether any task is being dragged
+    activeTaskId: string | null; // ID of the task being dragged
     isMinimalDesign: boolean;
     column: ProjectKanbanColumn;
     t: (key: string, fallback?: string) => string;
@@ -636,75 +636,88 @@ export function ProjectKanbanBoard() {
       }
     });
 
-    // Visual feedback: Either directly over the column dropzone OR over a task in this column
-    const isOverTaskInThisColumn = parentOverId && visibleTasks.some(task => task.id === parentOverId);
-    const isDropTarget = isOver || isOverTaskInThisColumn || parentOverId === `list-column-${columnId}`;
-    
-    // Show dropzone hint when dragging but not over this column
-    const showDropHint = isDragging && !isDropTarget;
+    // ✨ STABLE DROP INDICATOR LOGIC - Same as TaskColumn (Board view)
+    const getStableDropIndicator = (taskId: string, index: number): boolean => {
+      if (!activeTaskId) return false;
+      
+      // Don't show indicator if dragging the same task
+      if (activeTaskId === taskId) return false;
+      
+      // Check if hovering over this specific task
+      if (parentOverId === taskId) return true;
+      
+      // Check if hovering over the column dropzone AND this is the first task
+      if (parentOverId === `list-column-${columnId}` && index === 0) return true;
+      
+      return false;
+    };
+
+    // Check if we should show bottom drop indicator (for empty column or after last task)
+    const showBottomDropIndicator = activeTaskId && (
+      (isOver && visibleTasks.length === 0) || 
+      (parentOverId === `list-column-${columnId}` && visibleTasks.length > 0)
+    );
 
     return (
       <div 
         ref={setNodeRef}
-        className={`px-4 pb-3 transition-all duration-200 rounded-xl relative ${
-          isDropTarget ? 'scale-[1.01]' : ''
-        }`}
-        style={{
-          backgroundColor: isDropTarget ? `${accentColor}12` : (showDropHint ? `${accentColor}05` : 'transparent'),
-          boxShadow: isDropTarget ? `inset 0 0 0 3px ${accentColor}, 0 0 20px ${accentColor}30` : 'none',
-          border: showDropHint ? `2px dashed ${accentColor}30` : (isDropTarget ? 'none' : '2px solid transparent'),
-        }}
+        className="px-4 pb-3"
       >
-        {/* Drop Target Indicator - Strong visual feedback */}
-        {isDropTarget && (
-          <div 
-            className="absolute inset-0 rounded-xl pointer-events-none"
-            style={{
-              background: `linear-gradient(135deg, ${accentColor}15 0%, ${accentColor}08 100%)`,
-              animation: 'pulse 1s ease-in-out infinite',
-            }}
-          />
-        )}
-        
         {visibleTasks.length > 0 ? (
           <SortableContext
             items={visibleTasks.map(task => task.id)}
             strategy={verticalListSortingStrategy}
           >
-            {/* ✨ NO space-y to prevent layout shifts - use fixed margins */}
             <div className="flex flex-col relative">
-              {visibleTasks.map((task, index) => (
-                <div 
-                  key={task.id}
-                  className="mb-1 last:mb-0"
-                  style={{ contain: 'layout' }}
-                >
-                  <TaskCard
-                    task={task}
-                    isFirst={index === 0}
-                    isLast={index === visibleTasks.length - 1}
-                    currentColumn={column}
-                    isCompactListView={true}
-                  />
-                </div>
-              ))}
+              {visibleTasks.map((task, index) => {
+                const showDropIndicatorAbove = getStableDropIndicator(task.id, index);
+                const isThisTaskBeingDragged = activeTaskId === task.id;
+                
+                return (
+                  <div key={task.id}>
+                    {/* ✨ Drop Space - Only show if this task is NOT being dragged */}
+                    {!isThisTaskBeingDragged && (
+                      <DropIndicator 
+                        isVisible={showDropIndicatorAbove}
+                        position="top"
+                      />
+                    )}
+                    
+                    {/* Task Card */}
+                    <TaskCard
+                      task={task}
+                      isFirst={index === 0}
+                      isLast={index === visibleTasks.length - 1}
+                      currentColumn={column}
+                      isCompactListView={true}
+                    />
+                  </div>
+                );
+              })}
+              
+              {/* ✨ Drop indicator at end of list */}
+              <DropIndicator 
+                isVisible={!!showBottomDropIndicator && !visibleTasks.some(t => t.id === parentOverId)}
+                position="bottom"
+              />
             </div>
           </SortableContext>
         ) : (
-          // Empty column droppable area - more prominent
+          // Empty column droppable area - gestrichelte Box wie im Board
           <div 
-            className={`text-center py-6 text-sm rounded-lg border-2 border-dashed transition-all duration-200 ${
+            className={`text-center py-6 text-sm rounded-xl border-2 border-dashed transition-all duration-200 ${
               minDesign
                 ? 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500'
                 : 'border-gray-200/60 dark:border-gray-700/60 text-gray-400/80 dark:text-gray-500/80'
             }`}
             style={{
-              borderColor: isDropTarget ? accentColor : undefined,
-              backgroundColor: isDropTarget ? `${accentColor}15` : undefined,
-              transform: isDropTarget ? 'scale(1.02)' : 'scale(1)',
+              borderColor: isOver ? accentColor : undefined,
+              backgroundColor: isOver ? `${accentColor}15` : undefined,
+              transform: isOver ? 'scale(1.01)' : 'scale(1)',
+              minHeight: isOver ? '80px' : '60px',
             }}
           >
-            {isDropTarget 
+            {isOver 
               ? translate('projects.drop_here', 'Hier ablegen')
               : translate('projects.no_tasks_in_column', 'Keine Aufgaben in dieser Spalte')
             }
@@ -2753,7 +2766,7 @@ export function ProjectKanbanBoard() {
                                   columnId={column.id}
                                   visibleTasks={visibleTasks}
                                   parentOverId={overId}
-                                  isDragging={!!activeTask}
+                                  activeTaskId={activeTask?.id || null}
                                   isMinimalDesign={isMinimalDesign}
                                   column={column}
                                   t={t}
