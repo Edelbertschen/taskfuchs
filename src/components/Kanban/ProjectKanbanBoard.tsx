@@ -2641,32 +2641,62 @@ export function ProjectKanbanBoard() {
                                 </span>
                               </button>
                               
-                              {/* Tasks - Collapsible - Simple list without DnD */}
+                              {/* Tasks - Collapsible - WITH DnD like Superproductivity */}
                               {!isCollapsed && (
                                 <div className="px-4 pb-3">
                                   {visibleTasks.length > 0 ? (
-                                    <div className="flex flex-col gap-1">
-                                      {visibleTasks.map((task, index) => (
-                                        <TaskCard
-                                          key={task.id}
-                                          task={task}
-                                          isFirst={index === 0}
-                                          isLast={index === visibleTasks.length - 1}
-                                          currentColumn={column}
-                                          isCompactListView={true}
+                                    <SortableContext
+                                      items={visibleTasks.map(task => task.id)}
+                                      strategy={verticalListSortingStrategy}
+                                    >
+                                      <div className="flex flex-col">
+                                        {visibleTasks.map((task, index) => {
+                                          // Show drop indicator when hovering over this task
+                                          const showIndicator = activeTask && overId === task.id && activeTask.id !== task.id;
+                                          
+                                          return (
+                                            <div key={task.id}>
+                                              {/* Drop indicator - compact for list view */}
+                                              <DropIndicator 
+                                                isVisible={!!showIndicator}
+                                                position="top"
+                                                compact={true}
+                                              />
+                                              <TaskCard
+                                                task={task}
+                                                isFirst={index === 0}
+                                                isLast={index === visibleTasks.length - 1}
+                                                currentColumn={column}
+                                                isCompactListView={true}
+                                              />
+                                            </div>
+                                          );
+                                        })}
+                                        {/* Bottom drop indicator when hovering over empty area */}
+                                        <DropIndicator 
+                                          isVisible={!!activeTask && overId === `list-section-${column.id}`}
+                                          position="bottom"
+                                          compact={true}
                                         />
-                                      ))}
-                                    </div>
+                                      </div>
+                                    </SortableContext>
                                   ) : (
                                     <div 
-                                      className={`text-center py-4 text-sm rounded-lg border-2 border-dashed ${
+                                      className={`text-center py-4 text-sm rounded-lg border-2 border-dashed transition-colors ${
                                         isMinimalDesign
                                           ? 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500'
                                           : 'border-gray-200/60 dark:border-gray-700/60 text-gray-400/80 dark:text-gray-500/80'
                                       }`}
-                                      style={{ minHeight: '44px' }}
+                                      style={{ 
+                                        minHeight: '44px',
+                                        borderColor: activeTask && overId === `list-section-${column.id}` ? state.preferences.accentColor : undefined,
+                                        backgroundColor: activeTask && overId === `list-section-${column.id}` ? `${state.preferences.accentColor}15` : undefined,
+                                      }}
                                     >
-                                      {t('projects.no_tasks_in_column', 'Keine Aufgaben in dieser Spalte')}
+                                      {activeTask && overId === `list-section-${column.id}` 
+                                        ? t('projects.drop_here', 'Hier ablegen')
+                                        : t('projects.no_tasks_in_column', 'Keine Aufgaben in dieser Spalte')
+                                      }
                                     </div>
                                   )}
                                   
