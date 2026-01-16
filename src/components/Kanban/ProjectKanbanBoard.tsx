@@ -610,6 +610,7 @@ export function ProjectKanbanBoard() {
   const ListViewColumnDropzone = React.memo(({ 
     columnId, 
     visibleTasks, 
+    parentOverId,
     isMinimalDesign: minDesign,
     column,
     t: translate,
@@ -618,7 +619,7 @@ export function ProjectKanbanBoard() {
   }: {
     columnId: string;
     visibleTasks: Task[];
-    overId?: string | null; // Not used anymore
+    parentOverId: string | null; // From parent DndContext
     isMinimalDesign: boolean;
     column: ProjectKanbanColumn;
     t: (key: string, fallback?: string) => string;
@@ -633,8 +634,9 @@ export function ProjectKanbanBoard() {
       }
     });
 
-    // Visual feedback when hovering over the dropzone
-    const isDropTarget = isOver;
+    // Visual feedback: Either directly over the column dropzone OR over a task in this column
+    const isOverTaskInThisColumn = parentOverId && visibleTasks.some(task => task.id === parentOverId);
+    const isDropTarget = isOver || isOverTaskInThisColumn || parentOverId === `list-column-${columnId}`;
 
     return (
       <div 
@@ -2744,6 +2746,7 @@ export function ProjectKanbanBoard() {
                                 <ListViewColumnDropzone
                                   columnId={column.id}
                                   visibleTasks={visibleTasks}
+                                  parentOverId={overId}
                                   isMinimalDesign={isMinimalDesign}
                                   column={column}
                                   t={t}
