@@ -636,25 +636,35 @@ export function ProjectKanbanBoard() {
       }
     });
 
-    // ✨ PRECISE DROP INDICATOR LOGIC - Only ONE indicator at a time
-    // Find which task is being hovered over (if any)
+    // ✨ STABLE DROP INDICATOR LOGIC - Only ONE indicator, no jumping
+    // Check if any task in THIS column is being hovered
     const hoveredTaskIndex = visibleTasks.findIndex(task => task.id === parentOverId);
-    const isHoveringOverTask = hoveredTaskIndex !== -1;
-    const isHoveringOverColumn = parentOverId === `list-column-${columnId}` || isOver;
+    const isHoveringOverTaskInThisColumn = hoveredTaskIndex !== -1;
     
-    // Determine the single drop position
+    // Check if column dropzone itself is being hovered (not a task)
+    const isHoveringOverColumnDropzone = parentOverId === `list-column-${columnId}`;
+    
+    // Determine the single drop position - STABLE logic
     const getDropPosition = (): { type: 'before-task' | 'end' | 'none'; taskIndex?: number } => {
       if (!activeTaskId) return { type: 'none' };
       
-      // If hovering over a specific task, show indicator BEFORE that task
-      if (isHoveringOverTask) {
+      // Priority 1: If hovering over a specific task in this column, show BEFORE that task
+      if (isHoveringOverTaskInThisColumn) {
+        const hoveredTask = visibleTasks[hoveredTaskIndex];
         // Don't show indicator if hovering over the dragged task itself
-        if (visibleTasks[hoveredTaskIndex].id === activeTaskId) return { type: 'none' };
+        if (hoveredTask.id === activeTaskId) {
+          // When over the dragged task, check if there's a next task to show before
+          // This prevents the indicator from disappearing completely
+          if (hoveredTaskIndex < visibleTasks.length - 1) {
+            return { type: 'before-task', taskIndex: hoveredTaskIndex + 1 };
+          }
+          return { type: 'end' };
+        }
         return { type: 'before-task', taskIndex: hoveredTaskIndex };
       }
       
-      // If hovering over the column area (not over a task), show at END
-      if (isHoveringOverColumn) {
+      // Priority 2: If hovering over column dropzone (empty area), show at END
+      if (isHoveringOverColumnDropzone || isOver) {
         return { type: 'end' };
       }
       
@@ -3160,13 +3170,17 @@ export function ProjectKanbanBoard() {
           style={{
             zIndex: 9999,
             pointerEvents: 'none',
+            // Full width for list view to match actual card width
+            width: viewMode === 'list' ? 'calc(100vw - 400px)' : undefined,
           }}
         >
           {activeTask && (
             <div style={{
-              transform: 'translateX(-70px) translateY(10px)',
+              transform: viewMode === 'list' 
+                ? 'translateX(-100px) translateY(10px)' 
+                : 'translateX(-70px) translateY(10px)',
               filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',
-              width: viewMode === 'list' ? '600px' : '280px', // Wider in list view
+              width: '100%', // Fill container width
             }}>
               <TaskCard
                 task={activeTask}
