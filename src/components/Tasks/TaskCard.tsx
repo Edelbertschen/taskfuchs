@@ -762,28 +762,21 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
         isNewlyCreated ? 'animate-task-appear' : ''
       }`}
       style={{
-        // ✨ NUCLEAR: Completely isolated style - NO useSortable interference
+        // ✨ SUPERPRODUCTIVITY-STYLE: Keep element in place, just make it semi-transparent
         ...dragOverlayStyle,
-        marginBottom: isDraggedOriginal ? '0px' : '4px', // Remove spacing for dragged card
-        height: isDraggedOriginal ? '0px' : (isFocusMode || isCompactListView ? '44px' : '70px'), // Completely collapse dragged card
-        minHeight: isDraggedOriginal ? '0px' : (isFocusMode || isCompactListView ? '44px' : '70px'),
-        maxHeight: isDraggedOriginal ? '0px' : (isFocusMode || isCompactListView ? '44px' : '70px'),
+        marginBottom: '4px',
+        height: isFocusMode || isCompactListView ? '44px' : '70px',
+        minHeight: isFocusMode || isCompactListView ? '44px' : '70px',
+        maxHeight: isFocusMode || isCompactListView ? '44px' : '70px',
         '--accent-color': accentColor,
         '--accent-color-rgb': accentRgb ? `${accentRgb.r}, ${accentRgb.g}, ${accentRgb.b}` : '14, 165, 233',
-        // ✨ COMPLETE COLLAPSE: Remove card entirely from layout during drag
-        opacity: isDraggedOriginal ? 0 : 1,
-        overflow: isDraggedOriginal ? 'hidden' : 'visible',
-        padding: isDraggedOriginal ? '0px' : undefined, // Remove padding to fully collapse
-        // ✨ ABSOLUTE: Never any transform at all
+        // ✨ LIKE SUPERPRODUCTIVITY: Just opacity, keep size for correct DnD calculations
+        opacity: isDraggedOriginal ? 0.15 : 1,
+        // ✨ NO transform - let @dnd-kit handle positioning
         transform: 'none',
         WebkitTransform: 'none',
-        // ✨ Copy only safe properties from useSortable style
         transition: style.transition,
         zIndex: style.zIndex,
-        // ✨ Fixed: Clean transform handling
-        // No conflicting transforms that cause springing
-        willChange: 'auto',
-        contain: 'layout style',
         // Only show deadline styling when stable
         ...(!isDragging && isDeadlineDisplay && {
           borderColor: accentColor,
