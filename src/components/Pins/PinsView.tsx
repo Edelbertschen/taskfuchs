@@ -1216,7 +1216,6 @@ export function PinsView() {
                     localStorage.setItem('taskfuchs-pins-show-completed', String(newValue)); 
                   } catch {}
                 }}
-                onShowCompletedToggle={() => {}}
                 onClearAll={() => {
                           setPriorityFilter('all');
                           setTagFilters([]);

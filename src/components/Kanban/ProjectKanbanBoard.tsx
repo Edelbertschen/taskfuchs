@@ -3,29 +3,8 @@ import { createPortal } from 'react-dom';
 
 import { useAppTranslation } from '../../utils/i18nHelpers';
 import { useTranslation } from 'react-i18next';
-import { 
-  DndContext, 
-  DragStartEvent, 
-  DragEndEvent, 
-  DragOverEvent,
-  useDroppable,
-  pointerWithin,
-  rectIntersection,
-  closestCenter,
-  MouseSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
-  DragOverlay
-} from '@dnd-kit/core';
-import { 
-  SortableContext, 
-  verticalListSortingStrategy,
-  horizontalListSortingStrategy,
-  useSortable,
-  arrayMove
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+// ✨ Using @hello-pangea/dnd for smooth DnD (imported in child components)
+// @dnd-kit removed to prevent conflicts
 import { FolderOpen, Plus, Settings, Edit2, Sparkles, X, MoreHorizontal, Columns, Focus, ChevronUp, ChevronDown, Filter, Hash, AlertCircle, Circle, CheckCircle, Archive, Clock, Trash2, Check, FileText, Info, Pin, Tag, GripVertical, Calendar, SlidersHorizontal, Pencil, Palette, LayoutGrid } from 'lucide-react';
 import { CompactFilterBar, DateFilterOption, PriorityOption } from '../Common/CompactFilterBar';
 import { useApp } from '../../context/AppContext';
@@ -46,6 +25,7 @@ import { de } from 'date-fns/locale';
 import { useEmail } from '../../context/EmailContext';
 import { createTaskFromEmail } from '../../utils/emailToTask';
 import { ProjectListView } from './ProjectListView';
+import { ProjectBoardView } from './ProjectBoardView';
 
 export function ProjectKanbanBoard() {
   const { state, dispatch } = useApp();
@@ -656,41 +636,14 @@ export function ProjectKanbanBoard() {
       setContextMenuProjectId(project.id);
     };
     
-    const {
-      attributes,
-      listeners,
-      setNodeRef,
-      transform,
-      transition,
-      isDragging,
-      isOver,
-    } = useSortable({ id: project.id });
-
-    // Add droppable for tasks
-    const {
-      setNodeRef: setDroppableRef,
-      isOver: isTaskDropZone,
-    } = useDroppable({
-      id: `project-drop-${project.id}`,
-      data: {
-        type: 'project-drop-zone',
-        projectId: project.id,
-      },
-    });
-
-    const style = {
-      transform: CSS.Transform.toString(transform),
-      transition,
-    };
-    
-    // Show drop indicator when another project is being dragged over this one
-    const showDropIndicator = isOver && activeProjectId && activeProjectId !== project.id;
-
-    // Combine refs for sortable and droppable
-    const combinedRef = (node: HTMLElement | null) => {
-      setNodeRef(node);
-      setDroppableRef(node);
-    };
+    // ✨ DnD for projects temporarily disabled - using @hello-pangea/dnd for tasks only
+    const attributes = {};
+    const listeners = {};
+    const isDragging = false;
+    const isTaskDropZone = false;
+    const style = {};
+    const showDropIndicator = false;
+    const combinedRef = (node: HTMLElement | null) => {};
 
     // Get all columns for THIS specific project (not just the selected project)
     const allProjectColumns = state.viewState.projectKanban.columns
@@ -1814,35 +1767,16 @@ export function ProjectKanbanBoard() {
   };
 
   // Sortable column component with drag handle
+  // ✨ DnD for columns temporarily disabled - using @hello-pangea/dnd for tasks only
   const SortableKanbanColumn = ({ column, tasks }: { column: Column, tasks: Task[] }) => {
-    const {
-      attributes,
-      listeners,
-      setNodeRef,
-      transform,
-      transition,
-      isDragging,
-      isOver,
-    } = useSortable({ 
-      id: column.id,
-      data: { type: 'column' }
-    });
-
-    const style = {
-      transform: CSS.Transform.toString(transform),
-      transition,
-    };
-    
-    // Show drop indicator when another column is being dragged over this one
-    const showDropIndicator = isOver && activeColumnId && activeColumnId !== column.id;
+    const attributes = {};
+    const listeners = {};
+    const isDragging = false;
+    const showDropIndicator = false;
 
     return (
       <div 
-        ref={setNodeRef} 
-        style={style}
-        className={`flex-1 min-w-0 relative group/column transition-all duration-200 ${
-          isDragging ? 'opacity-30 scale-[0.98]' : ''
-        }`}
+        className={`flex-1 min-w-0 relative group/column transition-all duration-200`}
       >
         {/* Left Drop Indicator for Column */}
         {showDropIndicator && (
@@ -2131,13 +2065,7 @@ export function ProjectKanbanBoard() {
 
 
   return (
-    <DndContext 
-      onDragStart={handleDragStart} 
-      onDragOver={handleDragOver}
-      onDragEnd={handleDragEnd}
-      onDragCancel={handleDragCancel}
-      sensors={sensors}
-    >
+    <>
       <div className={`h-full w-full flex overflow-hidden ${
         isMinimalDesign ? 'bg-white dark:bg-[#111827]' : ''
       }`}>
@@ -2537,43 +2465,38 @@ export function ProjectKanbanBoard() {
                 {/* Linked Notes Section */}
 
 
-                  {/* Board View */}
+                  {/* Board View - Using @hello-pangea/dnd */}
                   {viewMode === 'board' && (
-                  <div className="flex-1 min-h-0 flex flex-col">
-                    <div className="flex-1 min-h-0 flex flex-col relative px-4 pb-4" style={{ paddingTop: '35px' }}>
-                    <div className="flex flex-col flex-1 min-h-0 gap-3 w-full">
-                      {displayColumns.length > 0 && (
-                          <div 
-                            ref={scrollContainerRef}
-                            tabIndex={0}
-                            className="flex-1 min-h-0 w-full overflow-x-auto overflow-y-hidden relative scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 pr-10"
-                            style={{ 
-                              scrollBehavior: 'smooth',
-                              outline: 'none'
-                            }}
-                          >
-                            <SortableContext
-                              items={projectColumns.map(col => col.id)}
-                              strategy={horizontalListSortingStrategy}
-                            >
-                              <div style={{ 
-                                display: 'flex', 
-                                gap: isMinimalDesign ? '5px' : '9px',
-                                alignItems: 'flex-start',
-                                minWidth: 'fit-content' // Ensure container is wide enough for all content
-                              }}>
-                                {renderColumns(displayColumns)}
-                              </div>
-                            </SortableContext>
-                          </div>
-
-                      )}
-                    </div>
-                  </div>
-              </div>
+                    <ProjectBoardView
+                      columns={displayColumns}
+                      tasks={filteredTasks}
+                      showCompleted={state.viewState.projectKanban.showCompleted}
+                      isMinimalDesign={isMinimalDesign}
+                      columnCount={columnCount}
+                      isDarkMode={isDarkMode}
+                      accentColor={state.preferences.accentColor}
+                      onAddTask={(columnId) => {
+                        const targetCol = projectColumns.find(c => c.id === columnId);
+                        if (targetCol) {
+                          setSmartTaskTargetColumn({
+                            ...targetCol,
+                            kanbanColumnId: targetCol.id
+                          });
+                          setShowSmartTaskModal(true);
+                        }
+                      }}
+                      onArchiveColumn={(columnId) => {
+                        const completedTasks = filteredTasks.filter(
+                          t => t.kanbanColumnId === columnId && t.completed
+                        );
+                        completedTasks.forEach(task => {
+                          dispatch({ type: 'UPDATE_TASK', payload: { ...task, archived: true } });
+                        });
+                      }}
+                    />
                   )}
 
-                  {/* List View - Using @hello-pangea/dnd for smooth DnD */}
+                  {/* List View - Using @hello-pangea/dnd */}
                   {viewMode === 'list' && (
                     <ProjectListView
                       columns={displayColumns}
@@ -2941,153 +2864,7 @@ export function ProjectKanbanBoard() {
 
 
 
-        {/* ✨ DragOverlay with same offset compensation as TaskBoard (Planer) */}
-        <DragOverlay
-          dropAnimation={null}
-          style={{
-            zIndex: 9999,
-            pointerEvents: 'none',
-          }}
-        >
-          {activeTask && (
-            <div style={{
-              // ✨ SAME offset as Planer (TaskBoard) to compensate for sidebar
-              transform: `translateX(${sidebarVisible ? 'calc(-76px - 320px)' : '-76px'}) translateY(-100px)`,
-              filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',
-            }}>
-              <TaskCard
-                task={activeTask}
-                isInDragOverlay={true}
-                isCompactListView={viewMode === 'list'}
-              />
-            </div>
-          )}
-          
-          {/* Project Drag Overlay */}
-          {activeProjectId && (() => {
-            const project = projects.find(p => p.id === activeProjectId);
-            if (!project) return null;
-            
-            const projectTaskCount = state.tasks.filter(t => 
-              !t.completed && 
-              !t.archived &&
-              state.viewState.projectKanban.columns
-                .filter(col => col.projectId === project.id)
-                .some(col => col.id === t.kanbanColumnId)
-            ).length;
-            
-            return (
-              <div 
-                className={`p-4 rounded-xl shadow-2xl border-2 ${
-                  isMinimalDesign
-                    ? 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600'
-                    : 'bg-gray-800 border-gray-500'
-                }`}
-                style={{
-                  width: '280px',
-                  transform: 'rotate(2deg) scale(1.02)',
-                  boxShadow: `0 20px 40px rgba(0,0,0,0.3), 0 0 0 2px ${state.preferences.accentColor}`,
-                }}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 min-w-0 flex-1">
-                    {/* Project Color Indicator */}
-                    {project.color && (
-                      <span 
-                        className="w-3 h-3 rounded-full flex-shrink-0 shadow-sm"
-                        style={{ backgroundColor: project.color }}
-                      />
-                    )}
-                    <h3 className={`text-sm font-semibold truncate ${
-                      isMinimalDesign ? 'text-gray-900 dark:text-white' : 'text-white'
-                    }`}>
-                      {project.title}
-                    </h3>
-                  </div>
-                  <span className={`text-xs px-2 py-1 rounded-full flex-shrink-0 ${
-                    isMinimalDesign 
-                      ? 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
-                      : 'bg-white/20 text-white'
-                  }`}>
-                    {projectTaskCount} Tasks
-                  </span>
-                </div>
-              </div>
-            );
-          })()}
-          
-          {/* Column Drag Overlay */}
-          {activeColumnId && (() => {
-            const column = projectColumns.find(c => c.id === activeColumnId);
-            if (!column) return null;
-            
-            const columnTasks = filteredTasks.filter(t => t.kanbanColumnId === column.id);
-            
-            return (
-              <div 
-                className={`rounded-xl shadow-2xl border-2 overflow-hidden ${
-                  isMinimalDesign
-                    ? 'bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-600'
-                    : 'bg-gray-800/90 border-gray-500'
-                }`}
-                style={{
-                  width: '300px',
-                  maxHeight: '400px',
-                  transform: 'rotate(1deg) scale(1.02)',
-                  boxShadow: `0 20px 40px rgba(0,0,0,0.3), 0 0 0 2px ${state.preferences.accentColor}`,
-                }}
-              >
-                {/* Column Header */}
-                <div 
-                  className={`px-4 py-3 border-b ${
-                    isMinimalDesign
-                      ? 'bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600'
-                      : 'bg-gray-700 border-gray-600'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <h3 className={`text-sm font-semibold ${
-                      isMinimalDesign ? 'text-gray-900 dark:text-white' : 'text-white'
-                    }`}>
-                      {column.title}
-                    </h3>
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${
-                      isMinimalDesign 
-                        ? 'bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300'
-                        : 'bg-white/20 text-white'
-                    }`}>
-                      {columnTasks.length}
-                    </span>
-                  </div>
-                </div>
-                
-                {/* Preview Tasks */}
-                <div className="p-2 space-y-1 max-h-[300px] overflow-hidden">
-                  {columnTasks.slice(0, 3).map(task => (
-                    <div 
-                      key={task.id}
-                      className={`px-3 py-2 rounded-lg text-xs truncate ${
-                        isMinimalDesign
-                          ? 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                          : 'bg-gray-600 text-gray-200'
-                      }`}
-                    >
-                      {task.title}
-                    </div>
-                  ))}
-                  {columnTasks.length > 3 && (
-                    <div className={`text-xs text-center py-1 ${
-                      isMinimalDesign ? 'text-gray-500' : 'text-gray-400'
-                    }`}>
-                      +{columnTasks.length - 3} weitere
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })()}
-        </DragOverlay>
       </div>
-    </DndContext>
+    </>
   );
 }
