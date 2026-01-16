@@ -5,6 +5,7 @@ import { useAppTranslation } from '../../utils/i18nHelpers';
 import { useTranslation } from 'react-i18next';
 // ✨ Using @hello-pangea/dnd for smooth DnD (imported in child components)
 // @dnd-kit removed to prevent conflicts
+import { arrayMove } from '@dnd-kit/sortable'; // Only utility function needed
 import { FolderOpen, Plus, Settings, Edit2, Sparkles, X, MoreHorizontal, Columns, Focus, ChevronUp, ChevronDown, Filter, Hash, AlertCircle, Circle, CheckCircle, Archive, Clock, Trash2, Check, FileText, Info, Pin, Tag, GripVertical, Calendar, SlidersHorizontal, Pencil, Palette, LayoutGrid } from 'lucide-react';
 import { CompactFilterBar, DateFilterOption, PriorityOption } from '../Common/CompactFilterBar';
 import { useApp } from '../../context/AppContext';
@@ -1585,16 +1586,12 @@ export function ProjectKanbanBoard() {
           .sort((a, b) => a.position - b.position);
         
         const columnNode = (
-          <SortableContext
-            key={column.id}
-            items={columnTasks.map(task => task.id)}
-            strategy={verticalListSortingStrategy}
-          >
+          <React.Fragment key={column.id}>
             <SortableKanbanColumn 
               column={column}
               tasks={columnTasks}
             />
-          </SortableContext>
+          </React.Fragment>
         );
         
         // In single-column view, wrap with fixed width (600px like Pins)
@@ -1860,16 +1857,11 @@ export function ProjectKanbanBoard() {
                   </div>
                 </div>
 
-                {/* Projects List - Sortable */}
+                {/* Projects List - DnD temporarily disabled */}
                 <div className="flex-1 overflow-y-auto">
-                  <SortableContext 
-                    items={projects.map(p => p.id)}
-                    strategy={verticalListSortingStrategy}
-                  >
                     {projects.map((project) => (
                       <SortableProject key={project.id} project={project} />
                     ))}
-                  </SortableContext>
                   
                   {/* Empty state */}
                   {projects.length === 0 && (
