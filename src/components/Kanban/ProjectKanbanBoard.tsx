@@ -108,9 +108,13 @@ export function ProjectKanbanBoard() {
     }
   });
 
-  // Persist view mode
+  // Persist view mode and notify other components
   useEffect(() => {
     localStorage.setItem('taskfuchs-project-view-mode', JSON.stringify(viewMode));
+    // Dispatch event to hide/show ColumnSwitcher based on view mode
+    window.dispatchEvent(new CustomEvent('project-view-mode-changed', { 
+      detail: { viewMode } 
+    }));
   }, [viewMode]);
 
   // Collapsed sections in list view
@@ -602,22 +606,24 @@ export function ProjectKanbanBoard() {
   ];
 
   // List View Column Dropzone Component - makes each column a droppable target
-  const ListViewColumnDropzone = ({ 
+  // ✨ OPTIMIZED: No DropIndicator to prevent layout shifts and flicker
+  const ListViewColumnDropzone = React.memo(({ 
     columnId, 
     visibleTasks, 
-    overId: currentOverId,
     isMinimalDesign: minDesign,
     column,
     t: translate,
-    accentColor
+    accentColor,
+    onAddTask
   }: {
     columnId: string;
     visibleTasks: Task[];
-    overId: string | null;
+    overId?: string | null; // Not used anymore
     isMinimalDesign: boolean;
     column: ProjectKanbanColumn;
     t: (key: string, fallback?: string) => string;
     accentColor: string;
+    onAddTask: (columnId: string) => void;
   }) => {
     const { setNodeRef, isOver } = useDroppable({
       id: `list-column-${columnId}`,
@@ -633,14 +639,12 @@ export function ProjectKanbanBoard() {
     return (
       <div 
         ref={setNodeRef}
-        className={`px-4 pb-3 transition-all duration-200 ${
-          isDropTarget ? 'ring-2 ring-offset-2 rounded-lg' : ''
+        className={`px-4 pb-3 transition-colors duration-150 rounded-lg ${
+          isDropTarget ? 'ring-2 ring-offset-1' : ''
         }`}
         style={{
-          ...(isDropTarget && {
-            ringColor: accentColor,
-            backgroundColor: `${accentColor}10`,
-          })
+          ringColor: isDropTarget ? accentColor : 'transparent',
+          backgroundColor: isDropTarget ? `${accentColor}08` : 'transparent',
         }}
       >
         {visibleTasks.length > 0 ? (
@@ -648,52 +652,36 @@ export function ProjectKanbanBoard() {
             items={visibleTasks.map(task => task.id)}
             strategy={verticalListSortingStrategy}
           >
-            <div className="space-y-1">
+            {/* ✨ NO space-y to prevent layout shifts - use fixed margins */}
+            <div className="flex flex-col">
               {visibleTasks.map((task, index) => (
-                <React.Fragment key={task.id}>
-                  {/* Drop Indicator */}
-                  <DropIndicator 
-                    isVisible={currentOverId === task.id}
-                    position="top"
+                <div 
+                  key={task.id}
+                  className="mb-1 last:mb-0"
+                  style={{ contain: 'layout' }}
+                >
+                  <TaskCard
+                    task={task}
+                    isFirst={index === 0}
+                    isLast={index === visibleTasks.length - 1}
+                    currentColumn={column}
+                    isCompactListView={true}
                   />
-                  <div 
-                    className={`rounded-lg ${
-                      minDesign
-                        ? 'bg-white dark:bg-gray-800 shadow-sm'
-                        : 'bg-white/90 dark:bg-gray-800/90 shadow-sm'
-                    }`}
-                  >
-                    <TaskCard
-                      task={task}
-                      isFirst={index === 0}
-                      isLast={index === visibleTasks.length - 1}
-                      currentColumn={column}
-                    />
-                  </div>
-                  {/* Final drop indicator after last task */}
-                  {index === visibleTasks.length - 1 && (
-                    <DropIndicator 
-                      isVisible={currentOverId === `${columnId}-end`}
-                      position="bottom"
-                    />
-                  )}
-                </React.Fragment>
+                </div>
               ))}
             </div>
           </SortableContext>
         ) : (
           // Empty column droppable area
           <div 
-            className={`text-center py-6 text-sm rounded-lg border-2 border-dashed transition-all duration-200 ${
+            className={`text-center py-4 text-sm rounded-lg border-2 border-dashed transition-colors duration-150 ${
               minDesign
                 ? 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500'
                 : 'border-gray-200/60 dark:border-gray-700/60 text-gray-400/80 dark:text-gray-500/80'
-            } ${isDropTarget ? 'border-solid scale-[1.01]' : ''}`}
+            }`}
             style={{
-              ...(isDropTarget && {
-                borderColor: accentColor,
-                backgroundColor: `${accentColor}15`,
-              })
+              borderColor: isDropTarget ? accentColor : undefined,
+              backgroundColor: isDropTarget ? `${accentColor}12` : undefined,
             }}
           >
             {isDropTarget 
@@ -702,9 +690,22 @@ export function ProjectKanbanBoard() {
             }
           </div>
         )}
+        
+        {/* Add Task Button */}
+        <button
+          onClick={() => onAddTask(columnId)}
+          className={`mt-2 w-full flex items-center justify-center gap-2 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+            minDesign
+              ? 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+              : 'text-gray-500 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-gray-700/50'
+          }`}
+        >
+          <Plus className="w-4 h-4" />
+          {translate('projects.add_task', 'Aufgabe hinzufügen')}
+        </button>
       </div>
     );
-  };
+  });
 
   // Sortable Project Component
   const SortableProject = ({ project }: { project: Column }) => {
@@ -2721,11 +2722,20 @@ export function ProjectKanbanBoard() {
                                 <ListViewColumnDropzone
                                   columnId={column.id}
                                   visibleTasks={visibleTasks}
-                                  overId={overId}
                                   isMinimalDesign={isMinimalDesign}
                                   column={column}
                                   t={t}
                                   accentColor={state.preferences.accentColor}
+                                  onAddTask={(colId) => {
+                                    const targetCol = projectColumns.find(c => c.id === colId);
+                                    if (targetCol) {
+                                      setSmartTaskTargetColumn({
+                                        ...targetCol,
+                                        kanbanColumnId: targetCol.id
+                                      });
+                                      setShowSmartTaskModal(true);
+                                    }
+                                  }}
                                 />
                               )}
                             </div>
@@ -3091,7 +3101,7 @@ export function ProjectKanbanBoard() {
 
         {/* ✨ Elegant DragOverlay for Tasks, Projects, and Columns */}
         <DragOverlay
-          dropAnimation={{
+          dropAnimation={viewMode === 'list' ? null : {
             duration: 200,
             easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
           }}
@@ -3104,10 +3114,12 @@ export function ProjectKanbanBoard() {
             <div style={{
               transform: 'translateX(-70px) translateY(10px)',
               filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',
+              width: viewMode === 'list' ? '600px' : '280px', // Wider in list view
             }}>
               <TaskCard
                 task={activeTask}
                 isInDragOverlay={true}
+                isCompactListView={viewMode === 'list'}
               />
             </div>
           )}

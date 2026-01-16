@@ -45,9 +45,10 @@ interface TaskCardProps {
   isFocusMode?: boolean;
   currentColumn?: any; // Column where this task is currently displayed
   isDeadlineReminder?: boolean; // True when task is shown as deadline reminder
+  isCompactListView?: boolean; // True when displaying in project list view (single line)
 }
 
-const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTask = false, isFirst = false, isLast = false, isInDragOverlay = false, isFocusMode = false, currentColumn, isDeadlineReminder = false }: TaskCardProps) => {
+const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTask = false, isFirst = false, isLast = false, isInDragOverlay = false, isFocusMode = false, currentColumn, isDeadlineReminder = false, isCompactListView = false }: TaskCardProps) => {
   const { state, dispatch } = useApp();
   const { triggerCelebration } = useCelebration();
   const { t } = useTranslation();
@@ -759,9 +760,9 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
         // ✨ NUCLEAR: Completely isolated style - NO useSortable interference
         ...dragOverlayStyle,
         marginBottom: isDraggedOriginal ? '0px' : '4px', // Remove spacing for dragged card
-        height: isDraggedOriginal ? '0px' : (isFocusMode ? '40px' : '70px'), // Completely collapse dragged card
-        minHeight: isDraggedOriginal ? '0px' : (isFocusMode ? '40px' : '70px'),
-        maxHeight: isDraggedOriginal ? '0px' : (isFocusMode ? '40px' : '70px'),
+        height: isDraggedOriginal ? '0px' : (isFocusMode || isCompactListView ? '44px' : '70px'), // Completely collapse dragged card
+        minHeight: isDraggedOriginal ? '0px' : (isFocusMode || isCompactListView ? '44px' : '70px'),
+        maxHeight: isDraggedOriginal ? '0px' : (isFocusMode || isCompactListView ? '44px' : '70px'),
         '--accent-color': accentColor,
         '--accent-color-rgb': accentRgb ? `${accentRgb.r}, ${accentRgb.g}, ${accentRgb.b}` : '14, 165, 233',
         // ✨ COMPLETE COLLAPSE: Remove card entirely from layout during drag
@@ -877,6 +878,45 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
               }`}>
                 {task.title}
               </h3>
+              
+              {/* Compact List View - Inline badges */}
+              {isCompactListView && (
+                <div className="flex items-center gap-2 ml-auto mr-2 flex-shrink-0">
+                  {/* Time estimate */}
+                  {totalEstimatedTime > 0 && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                      <Clock className="w-2.5 h-2.5" />
+                      {formatTime(totalEstimatedTime)}
+                    </span>
+                  )}
+                  
+                  {/* Subtasks count */}
+                  {totalSubtasks > 0 && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                      <CheckSquare className="w-2.5 h-2.5" />
+                      {totalSubtasks}
+                    </span>
+                  )}
+                  
+                  {/* Date badge */}
+                  {taskDateDisplay && (
+                    <span 
+                      className="text-[10px] px-1.5 py-0.5 rounded flex items-center gap-1"
+                      style={{
+                        backgroundColor: taskDateDisplay.isPast 
+                          ? (isDarkMode ? '#7F1D1D' : '#FEE2E2')
+                          : 'rgba(var(--accent-color-rgb), 0.15)',
+                        color: taskDateDisplay.isPast 
+                          ? (isDarkMode ? '#FCA5A5' : '#DC2626')
+                          : 'var(--accent-color)'
+                      }}
+                    >
+                      {taskDateDisplay.icon}
+                      {taskDateDisplay.text}
+                    </span>
+                  )}
+                </div>
+              )}
               
               {/* Deadline Icons - Show different icons based on context */}
               {!isFocusMode && (
@@ -1023,7 +1063,8 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
         </div>
 
         {/* Bottom area - Time, Subtasks, Tags and Context Badge */}
-        {!isFocusMode && ((hasAnyTimeEstimate || totalSubtasks > 0) || (taskProjectDisplay || taskDateDisplay) || (task.tags && task.tags.length > 0)) && (
+        {/* Hide in compact list view - info is shown inline */}
+        {!isFocusMode && !isCompactListView && ((hasAnyTimeEstimate || totalSubtasks > 0) || (taskProjectDisplay || taskDateDisplay) || (task.tags && task.tags.length > 0)) && (
           <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mt-1 gap-2 h-[18px]">
             <div className="flex items-center space-x-1.5 flex-shrink-0">
               {/* Time display - show if task has time estimate OR tracked time */}

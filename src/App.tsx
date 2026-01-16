@@ -133,6 +133,7 @@ function ColumnSwitcher({
 }: ColumnSwitcherProps) {
   const [projectSidebarMinimized, setProjectSidebarMinimized] = React.useState(false);
   const [taskSidebarMinimized, setTaskSidebarMinimized] = React.useState(false);
+  const [projectViewMode, setProjectViewMode] = React.useState<'board' | 'list'>('board');
 
   // Listen for project sidebar state changes
   React.useEffect(() => {
@@ -160,8 +161,26 @@ function ColumnSwitcher({
     };
   }, []);
 
-  // Show for tasks, kanban, and pins views
+  // Listen for project view mode changes (board/list)
+  React.useEffect(() => {
+    const handleProjectViewModeChange = (event: any) => {
+      setProjectViewMode(event.detail.viewMode);
+    };
+
+    window.addEventListener('project-view-mode-changed', handleProjectViewModeChange);
+    
+    return () => {
+      window.removeEventListener('project-view-mode-changed', handleProjectViewModeChange);
+    };
+  }, []);
+
+  // Show for tasks, kanban (board view only), and pins views
   if (currentView !== 'tasks' && currentView !== 'kanban' && currentView !== 'pins') {
+    return null;
+  }
+
+  // Hide in kanban list view - column count doesn't apply there
+  if (currentView === 'kanban' && projectViewMode === 'list') {
     return null;
   }
 
