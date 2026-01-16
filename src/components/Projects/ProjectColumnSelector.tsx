@@ -45,21 +45,25 @@ export function ProjectColumnSelector({
       .sort((a, b) => a.order - b.order);
   };
 
-  const handleProjectSelect = (project: Column) => {
+  // Direct assignment: project without columns OR first column of project with columns
+  const handleDirectProjectAssign = (project: Column) => {
     const kanbanColumns = getProjectKanbanColumns(project.id);
     
     if (kanbanColumns.length === 0) {
-      // If no columns, directly select the project
+      // No columns exist - assign directly to project (no column)
       handleColumnSelect(project.id);
     } else {
-      // If has columns, show them
-      if (selectedProjectId === project.id) {
-        // If already selected, deselect
-        setSelectedProjectId(null);
-      } else {
-        // Select the project to show columns
-        setSelectedProjectId(project.id);
-      }
+      // Columns exist - assign to first column
+      handleColumnSelect(project.id, kanbanColumns[0].id);
+    }
+  };
+
+  // Toggle column visibility
+  const toggleProjectExpand = (projectId: string) => {
+    if (selectedProjectId === projectId) {
+      setSelectedProjectId(null);
+    } else {
+      setSelectedProjectId(projectId);
     }
   };
 
@@ -193,18 +197,25 @@ export function ProjectColumnSelector({
                   <div key={project.id} className="space-y-1">
                     {/* Project Row */}
                     <div
-                      className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors duration-200 h-16 ${
+                      className={`flex items-center justify-between p-3 rounded-lg transition-colors duration-200 h-16 ${
                         isCurrent
                           ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700'
                           : 'hover:bg-gray-50 dark:hover:bg-gray-700'
                       }`}
-                      onClick={() => handleProjectSelect(project)}
                     >
-                      <div className="flex items-center space-x-3 flex-1">
+                      {/* Project name - click to assign directly */}
+                      <button
+                        className="flex items-center space-x-3 flex-1 cursor-pointer text-left"
+                        onClick={() => handleDirectProjectAssign(project)}
+                        title={kanbanColumns.length > 0 
+                          ? `Zur Spalte "${kanbanColumns[0].title}" zuweisen`
+                          : 'Projekt zuweisen'
+                        }
+                      >
                         <FolderOpen 
                           className="w-5 h-5 flex-shrink-0"
                           style={{ 
-                            color: isCurrent ? getAccentColor() : undefined 
+                            color: project.color || (isCurrent ? getAccentColor() : undefined)
                           }}
                         />
                         <div className="flex-1 min-w-0">
@@ -222,20 +233,29 @@ export function ProjectColumnSelector({
                           </div>
                           {kanbanColumns.length > 0 && (
                             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                              {kanbanColumns.length} Spalten
+                              → {kanbanColumns[0].title} (von {kanbanColumns.length} Spalten)
                             </p>
                           )}
                         </div>
-                        <div className="flex items-center space-x-2">
-                          {kanbanColumns.length > 0 && (
-                            <ChevronRight 
-                              className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
-                                isSelected ? 'rotate-90' : ''
-                              }`}
-                            />
-                          )}
-                        </div>
-                      </div>
+                      </button>
+                      
+                      {/* Chevron to expand columns - only if there are columns */}
+                      {kanbanColumns.length > 0 && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleProjectExpand(project.id);
+                          }}
+                          className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                          title="Andere Spalte wählen"
+                        >
+                          <ChevronRight 
+                            className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
+                              isSelected ? 'rotate-90' : ''
+                            }`}
+                          />
+                        </button>
+                      )}
                     </div>
 
                     {/* Kanban Columns (if project is selected and has columns) */}

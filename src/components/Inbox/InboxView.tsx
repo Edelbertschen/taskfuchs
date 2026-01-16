@@ -1754,7 +1754,7 @@ function InboxTaskCard({
   onTaskClick
 }: InboxTaskCardProps) {
   const { state, dispatch } = useApp();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { actions, inboxView } = useAppTranslation();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
@@ -2317,28 +2317,86 @@ function InboxTaskCard({
                       .filter(col => col.projectId === project.id)
                       .sort((a, b) => (a.order || 0) - (b.order || 0));
                     
+                    // Handler for direct project assignment
+                    const handleDirectProjectAssign = (e: React.MouseEvent) => {
+                      e.stopPropagation();
+                      
+                      let targetColumnId: string | undefined;
+                      
+                      if (projectKanbanColumns.length === 0) {
+                        // No columns - create "Allgemein" column
+                        const newColumnId = `kanban-col-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+                        const columnTitle = i18n.language === 'en' ? 'General' : 'Allgemein';
+                        
+                        dispatch({
+                          type: 'ADD_PROJECT_KANBAN_COLUMN',
+                          payload: {
+                            id: newColumnId,
+                            title: columnTitle,
+                            projectId: project.id,
+                            order: 0
+                          }
+                        });
+                        
+                        targetColumnId = newColumnId;
+                      } else {
+                        // Assign to first column
+                        targetColumnId = projectKanbanColumns[0].id;
+                      }
+                      
+                      dispatch({
+                        type: 'UPDATE_TASK',
+                        payload: {
+                          ...task,
+                          projectId: project.id,
+                          kanbanColumnId: targetColumnId
+                        }
+                      });
+                      
+                      setShowProjectSubmenu(false);
+                      setExpandedProjectId(null);
+                      setContextMenu(null);
+                    };
+                    
                     return (
                       <div key={project.id}>
-                        {/* Project header - click to expand/collapse */}
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setExpandedProjectId(isExpanded ? null : project.id);
-                          }}
-                          className={`w-full flex items-center gap-3 px-3 py-2 text-sm transition-colors ${
+                        {/* Project header row */}
+                        <div
+                          className={`flex items-center gap-3 px-3 py-2 text-sm transition-colors ${
                             isExpanded 
                               ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300' 
                               : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                           }`}
                         >
                           <div 
-                            className="w-3 h-3 rounded" 
+                            className="w-3 h-3 rounded flex-shrink-0" 
                             style={{ backgroundColor: project.color || accentColor }}
                           />
-                          <span className="flex-1 text-left truncate font-medium">{project.title}</span>
-                          {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />}
-                          <ChevronRight className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
-                        </button>
+                          {/* Project name - click to assign directly */}
+                          <button
+                            onClick={handleDirectProjectAssign}
+                            className="flex-1 text-left truncate font-medium hover:underline"
+                            title={projectKanbanColumns.length > 0 
+                              ? `Zur Spalte "${projectKanbanColumns[0].title}" zuweisen`
+                              : 'Projekt zuweisen (erstellt "Allgemein"-Spalte)'
+                            }
+                          >
+                            {project.title}
+                          </button>
+                          {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0" />}
+                          {/* Chevron to expand columns */}
+                          {projectKanbanColumns.length > 0 && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setExpandedProjectId(isExpanded ? null : project.id);
+                              }}
+                              className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded"
+                            >
+                              <ChevronRight className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+                            </button>
+                          )}
+                        </div>
                         
                         {/* Expanded column list */}
                         {isExpanded && projectKanbanColumns.length > 0 && (
@@ -2373,13 +2431,6 @@ function InboxTaskCard({
                                 </button>
                               );
                             })}
-                          </div>
-                        )}
-                        
-                        {/* No columns message */}
-                        {isExpanded && projectKanbanColumns.length === 0 && (
-                          <div className="ml-4 px-3 py-2 text-xs text-gray-400 dark:text-gray-500 italic">
-                            {t('task_context_menu.no_columns', 'Keine Spalten')}
                           </div>
                         )}
                       </div>

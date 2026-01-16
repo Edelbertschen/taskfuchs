@@ -113,6 +113,9 @@ export function ProjectKanbanBoard() {
     localStorage.setItem('taskfuchs-project-view-mode', JSON.stringify(viewMode));
   }, [viewMode]);
 
+  // Collapsed sections in list view
+  const [collapsedListSections, setCollapsedListSections] = useState<string[]>([]);
+
   // Project Assignment Modal states
   const [showProjectColumnSelector, setShowProjectColumnSelector] = useState(false);
   const [draggedTaskForProjectAssignment, setDraggedTaskForProjectAssignment] = useState<Task | null>(null);
@@ -597,6 +600,111 @@ export function ProjectKanbanBoard() {
     '#E54D42', '#E89830', '#DFBF3C', '#4CAF50', '#26A69A', 
     '#2196F3', '#5C6BC0', '#9C27B0', '#EC407A', '#78909C'
   ];
+
+  // List View Column Dropzone Component - makes each column a droppable target
+  const ListViewColumnDropzone = ({ 
+    columnId, 
+    visibleTasks, 
+    overId: currentOverId,
+    isMinimalDesign: minDesign,
+    column,
+    t: translate,
+    accentColor
+  }: {
+    columnId: string;
+    visibleTasks: Task[];
+    overId: string | null;
+    isMinimalDesign: boolean;
+    column: ProjectKanbanColumn;
+    t: (key: string, fallback?: string) => string;
+    accentColor: string;
+  }) => {
+    const { setNodeRef, isOver } = useDroppable({
+      id: `list-column-${columnId}`,
+      data: {
+        type: 'list-column-dropzone',
+        columnId: columnId,
+      }
+    });
+
+    // Visual feedback when hovering over the dropzone
+    const isDropTarget = isOver;
+
+    return (
+      <div 
+        ref={setNodeRef}
+        className={`px-4 pb-3 transition-all duration-200 ${
+          isDropTarget ? 'ring-2 ring-offset-2 rounded-lg' : ''
+        }`}
+        style={{
+          ...(isDropTarget && {
+            ringColor: accentColor,
+            backgroundColor: `${accentColor}10`,
+          })
+        }}
+      >
+        {visibleTasks.length > 0 ? (
+          <SortableContext
+            items={visibleTasks.map(task => task.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            <div className="space-y-1">
+              {visibleTasks.map((task, index) => (
+                <React.Fragment key={task.id}>
+                  {/* Drop Indicator */}
+                  <DropIndicator 
+                    isVisible={currentOverId === task.id}
+                    position="top"
+                  />
+                  <div 
+                    className={`rounded-lg ${
+                      minDesign
+                        ? 'bg-white dark:bg-gray-800 shadow-sm'
+                        : 'bg-white/90 dark:bg-gray-800/90 shadow-sm'
+                    }`}
+                  >
+                    <TaskCard
+                      task={task}
+                      isFirst={index === 0}
+                      isLast={index === visibleTasks.length - 1}
+                      currentColumn={column}
+                    />
+                  </div>
+                  {/* Final drop indicator after last task */}
+                  {index === visibleTasks.length - 1 && (
+                    <DropIndicator 
+                      isVisible={currentOverId === `${columnId}-end`}
+                      position="bottom"
+                    />
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+          </SortableContext>
+        ) : (
+          // Empty column droppable area
+          <div 
+            className={`text-center py-6 text-sm rounded-lg border-2 border-dashed transition-all duration-200 ${
+              minDesign
+                ? 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500'
+                : 'border-gray-200/60 dark:border-gray-700/60 text-gray-400/80 dark:text-gray-500/80'
+            } ${isDropTarget ? 'border-solid scale-[1.01]' : ''}`}
+            style={{
+              ...(isDropTarget && {
+                borderColor: accentColor,
+                backgroundColor: `${accentColor}15`,
+              })
+            }}
+          >
+            {isDropTarget 
+              ? translate('projects.drop_here', 'Hier ablegen')
+              : translate('projects.no_tasks_in_column', 'Keine Aufgaben in dieser Spalte')
+            }
+          </div>
+        )}
+      </div>
+    );
+  };
 
   // Sortable Project Component
   const SortableProject = ({ project }: { project: Column }) => {
@@ -1301,6 +1409,33 @@ export function ProjectKanbanBoard() {
       // Success haptic feedback
       if (navigator.vibrate) {
         navigator.vibrate([30, 10, 30]);
+      }
+    } else if (overId.startsWith('list-column-')) {
+      // Dropping on a list view column dropzone
+      const targetColumnId = overId.replace('list-column-', '');
+      const listTargetColumn = projectColumns.find(col => col.id === targetColumnId);
+      
+      if (listTargetColumn) {
+        const columnTasks = state.tasks
+          .filter(task => task.kanbanColumnId === targetColumnId && task.id !== activeId)
+          .sort((a, b) => a.position - b.position);
+        
+        const newPosition = columnTasks.length > 0 ? Math.max(...columnTasks.map(t => t.position)) + 1 : 0;
+        
+        dispatch({
+          type: 'UPDATE_TASK',
+          payload: {
+            ...activeTask,
+            columnId: selectedProject.id,
+            kanbanColumnId: targetColumnId,
+            position: newPosition
+          }
+        });
+
+        // Success haptic feedback
+        if (navigator.vibrate) {
+          navigator.vibrate([30, 10, 30]);
+        }
       }
     } else if (overTask && overTask.kanbanColumnId) {
       // Dropping on a task - insert at that position
@@ -2515,7 +2650,7 @@ export function ProjectKanbanBoard() {
                   {/* List View */}
                   {viewMode === 'list' && (
                     <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-4" style={{ paddingTop: '16px' }}>
-                      <div className="max-w-4xl mx-auto space-y-6">
+                      <div className="max-w-4xl mx-auto space-y-4">
                         {displayColumns.map((column) => {
                           if (!column) return null;
                           
@@ -2529,60 +2664,69 @@ export function ProjectKanbanBoard() {
                             ? columnTasks 
                             : columnTasks.filter(task => !task.completed);
                           
+                          // Check if section is collapsed
+                          const isCollapsed = collapsedListSections.includes(column.id);
+                          
                           return (
-                            <div key={column.id} className="mb-6">
-                              {/* Column Header */}
-                              <div className={`flex items-center gap-3 mb-3 pb-2 border-b ${
-                                isMinimalDesign 
-                                  ? 'border-gray-200 dark:border-gray-700' 
-                                  : 'border-gray-200/60 dark:border-gray-700/60'
-                              }`}>
-                                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+                            <div 
+                              key={column.id} 
+                              className={`rounded-xl overflow-hidden ${
+                                isMinimalDesign
+                                  ? 'bg-gray-50 dark:bg-gray-800/50'
+                                  : 'bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm'
+                              }`}
+                            >
+                              {/* Section Header - Clickable to collapse */}
+                              <button
+                                onClick={() => {
+                                  setCollapsedListSections(prev => 
+                                    prev.includes(column.id)
+                                      ? prev.filter(id => id !== column.id)
+                                      : [...prev, column.id]
+                                  );
+                                }}
+                                className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${
+                                  isMinimalDesign 
+                                    ? 'hover:bg-gray-100 dark:hover:bg-gray-700/50' 
+                                    : 'hover:bg-white/60 dark:hover:bg-gray-700/60'
+                                }`}
+                              >
+                                {/* Collapse Icon */}
+                                <ChevronDown 
+                                  className={`w-4 h-4 text-gray-400 transition-transform ${
+                                    isCollapsed ? '-rotate-90' : ''
+                                  }`} 
+                                />
+                                
+                                {/* Section Title */}
+                                <h3 
+                                  className="text-base font-semibold flex-1 text-left"
+                                  style={{ color: state.preferences.accentColor }}
+                                >
                                   {column.title}
                                 </h3>
-                                <span className={`text-xs px-2 py-0.5 rounded-full ${
+                                
+                                {/* Task Count Badge */}
+                                <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${
                                   isMinimalDesign
-                                    ? 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
-                                    : 'bg-gray-100/80 dark:bg-gray-800/80 text-gray-500 dark:text-gray-400'
+                                    ? 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+                                    : 'bg-white/80 dark:bg-gray-700/80 text-gray-600 dark:text-gray-300'
                                 }`}>
-                                  {visibleTasks.length}
+                                  {visibleTasks.length} {visibleTasks.length === 1 ? t('common.task', 'Aufgabe') : t('common.tasks', 'Aufgaben')}
                                 </span>
-                              </div>
+                              </button>
                               
-                              {/* Tasks */}
-                              {visibleTasks.length > 0 ? (
-                                <SortableContext
-                                  items={visibleTasks.map(task => task.id)}
-                                  strategy={verticalListSortingStrategy}
-                                >
-                                  <div className="space-y-1">
-                                    {visibleTasks.map((task, index) => (
-                                      <div 
-                                        key={task.id}
-                                        className={`${
-                                          isMinimalDesign
-                                            ? 'bg-white dark:bg-gray-800 rounded-lg shadow-sm'
-                                            : 'bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg shadow-sm'
-                                        }`}
-                                      >
-                                        <TaskCard
-                                          task={task}
-                                          isFirst={index === 0}
-                                          isLast={index === visibleTasks.length - 1}
-                                          currentColumn={column}
-                                        />
-                                      </div>
-                                    ))}
-                                  </div>
-                                </SortableContext>
-                              ) : (
-                                <div className={`text-center py-6 text-sm ${
-                                  isMinimalDesign
-                                    ? 'text-gray-400 dark:text-gray-500'
-                                    : 'text-gray-400/80 dark:text-gray-500/80'
-                                }`}>
-                                  {t('projects.no_tasks_in_column', 'Keine Aufgaben in dieser Spalte')}
-                                </div>
+                              {/* Tasks - Collapsible */}
+                              {!isCollapsed && (
+                                <ListViewColumnDropzone
+                                  columnId={column.id}
+                                  visibleTasks={visibleTasks}
+                                  overId={overId}
+                                  isMinimalDesign={isMinimalDesign}
+                                  column={column}
+                                  t={t}
+                                  accentColor={state.preferences.accentColor}
+                                />
                               )}
                             </div>
                           );
