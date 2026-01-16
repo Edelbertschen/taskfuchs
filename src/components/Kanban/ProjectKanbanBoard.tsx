@@ -181,7 +181,7 @@ export function ProjectKanbanBoard() {
 
   // Ref for horizontal scrolling
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  
+
   // Close color picker when clicking outside
   useEffect(() => {
     if (!colorPickerProjectId) return;
@@ -607,9 +607,6 @@ export function ProjectKanbanBoard() {
 
   // List View Column Dropzone Component - makes each column a droppable target
   // ✨ NO React.memo - needs to re-render when parentOverId changes
-  // ✨ ANTI-FLICKER: Store last stable drop position to prevent flickering
-  const lastDropPositionRef = useRef<{ columnId: string; index: number } | null>(null);
-
   const ListViewColumnDropzone = ({ 
     columnId, 
     visibleTasks, 
@@ -639,60 +636,25 @@ export function ProjectKanbanBoard() {
       }
     });
 
-    // ✨ STABLE DROP INDICATOR LOGIC - Anti-flicker with sticky position
-    // Only update position when clearly moving to a different task
+    // ✨ SIMPLE DROP INDICATOR LOGIC - No complexity, just works
+    // Find which task is being hovered (if any)
+    const hoveredTaskIndex = visibleTasks.findIndex(task => task.id === parentOverId);
     
-    const getDropPosition = (): { type: 'before-task' | 'end' | 'none'; taskIndex?: number } => {
-      if (!activeTaskId) {
-        lastDropPositionRef.current = null;
-        return { type: 'none' };
-      }
-      
-      // Check if hovering over a task in this column
-      const hoveredTaskIndex = visibleTasks.findIndex(task => task.id === parentOverId);
-      const isHoveringOverColumnDropzone = parentOverId === `list-column-${columnId}`;
-      
-      // Not hovering over this column at all
-      if (hoveredTaskIndex === -1 && !isHoveringOverColumnDropzone && !isOver) {
-        // Keep showing last position in this column to prevent flicker during transition
-        if (lastDropPositionRef.current?.columnId === columnId) {
-          return lastDropPositionRef.current.index === -1 
-            ? { type: 'end' } 
-            : { type: 'before-task', taskIndex: lastDropPositionRef.current.index };
-        }
-        return { type: 'none' };
-      }
-      
-      // Hovering over a specific task
+    // Calculate drop position - SIMPLE and DIRECT
+    let dropIndex: number | null = null;
+    
+    if (activeTaskId) {
       if (hoveredTaskIndex !== -1) {
-        const hoveredTask = visibleTasks[hoveredTaskIndex];
-        
-        // Skip the dragged task itself - show at next position
-        if (hoveredTask.id === activeTaskId) {
-          const nextIndex = hoveredTaskIndex + 1;
-          if (nextIndex < visibleTasks.length) {
-            lastDropPositionRef.current = { columnId, index: nextIndex };
-            return { type: 'before-task', taskIndex: nextIndex };
-          }
-          lastDropPositionRef.current = { columnId, index: -1 };
-          return { type: 'end' };
+        // Hovering over a specific task - show indicator BEFORE it
+        // Unless it's the dragged task itself
+        if (visibleTasks[hoveredTaskIndex].id !== activeTaskId) {
+          dropIndex = hoveredTaskIndex;
         }
-        
-        // Update sticky position
-        lastDropPositionRef.current = { columnId, index: hoveredTaskIndex };
-        return { type: 'before-task', taskIndex: hoveredTaskIndex };
+      } else if (isOver) {
+        // Hovering over the column dropzone (empty area below tasks)
+        dropIndex = visibleTasks.length; // End of list
       }
-      
-      // Hovering over column area (empty space) - show at end
-      if (isHoveringOverColumnDropzone || isOver) {
-        lastDropPositionRef.current = { columnId, index: -1 };
-        return { type: 'end' };
-      }
-      
-      return { type: 'none' };
-    };
-    
-    const dropPosition = getDropPosition();
+    }
 
     return (
       <div 
@@ -707,42 +669,42 @@ export function ProjectKanbanBoard() {
             <div className="flex flex-col">
               {visibleTasks.map((task, index) => {
                 const isThisTaskBeingDragged = activeTaskId === task.id;
-                // Only show indicator BEFORE this task if this is the exact drop position
-                const showIndicatorBefore = dropPosition.type === 'before-task' && dropPosition.taskIndex === index;
+                // Show indicator BEFORE this task only at calculated dropIndex
+                const showIndicatorBefore = dropIndex === index && !isThisTaskBeingDragged;
                 
                 return (
                   <div key={task.id}>
-                    {/* ✨ Drop Space - Only show at the SINGLE calculated position */}
-                    {!isThisTaskBeingDragged && (
-                      <DropIndicator 
-                        isVisible={showIndicatorBefore}
-                        position="top"
-                        compact={true}
-                      />
-                    )}
-                    
-                    {/* Task Card */}
-                    <TaskCard
-                      task={task}
-                      isFirst={index === 0}
-                      isLast={index === visibleTasks.length - 1}
-                      currentColumn={column}
-                      isCompactListView={true}
+                    {/* ✨ Drop indicator - simple: show before task at dropIndex */}
+                    <DropIndicator 
+                      isVisible={showIndicatorBefore}
+                      position="top"
+                      compact={true}
                     />
+                    
+                    {/* Task Card - hide if being dragged */}
+                    <div style={{ opacity: isThisTaskBeingDragged ? 0.3 : 1 }}>
+                      <TaskCard
+                        task={task}
+                        isFirst={index === 0}
+                        isLast={index === visibleTasks.length - 1}
+                        currentColumn={column}
+                        isCompactListView={true}
+                      />
+          </div>
                   </div>
                 );
               })}
               
-              {/* ✨ Drop indicator at END - only when hovering column, not a task */}
+              {/* ✨ Drop indicator at END of list */}
               <DropIndicator 
-                isVisible={dropPosition.type === 'end'}
+                isVisible={dropIndex === visibleTasks.length}
                 position="bottom"
                 compact={true}
-              />
-            </div>
+            />
+          </div>
           </SortableContext>
         ) : (
-          // Empty column droppable area - gestrichelte Box
+          // Empty column droppable area
           <div 
             className={`text-center py-4 text-sm rounded-lg border-2 border-dashed transition-all duration-150 ${
               minDesign
@@ -763,7 +725,7 @@ export function ProjectKanbanBoard() {
         )}
         
         {/* Add Task Button - More prominent and readable */}
-        <button
+            <button
           onClick={() => onAddTask(columnId)}
           className={`mt-3 w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all border-2 border-dashed ${
             minDesign
@@ -783,7 +745,7 @@ export function ProjectKanbanBoard() {
         >
           <Plus className="w-4 h-4" />
           {translate('projects.add_task', 'Aufgabe hinzufügen')}
-        </button>
+            </button>
       </div>
     );
   };
@@ -1313,9 +1275,6 @@ export function ProjectKanbanBoard() {
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
     const activeData = active.data.current;
-    
-    // Reset anti-flicker ref on drag start
-    lastDropPositionRef.current = null;
     
     // Handle task dragging
     if (activeData?.type === 'task') {
@@ -2607,11 +2566,11 @@ export function ProjectKanbanBoard() {
                 <div className="mx-4 mt-3 flex-shrink-0 flex items-center gap-3">
                   {/* Board/List Toggle */}
                   <div className={`flex items-center rounded-lg p-0.5 ${
-                    isMinimalDesign 
+                      isMinimalDesign
                       ? 'bg-gray-100 dark:bg-gray-800' 
                       : 'bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm'
                   }`}>
-                    <button
+                            <button
                       onClick={() => setViewMode('board')}
                       className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
                         viewMode === 'board'
@@ -2622,8 +2581,8 @@ export function ProjectKanbanBoard() {
                     >
                       <LayoutGrid className="w-3.5 h-3.5" />
                       <span>Board</span>
-                    </button>
-                    <button
+                            </button>
+                          <button
                       onClick={() => setViewMode('list')}
                       className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
                         viewMode === 'list'
@@ -2636,9 +2595,9 @@ export function ProjectKanbanBoard() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                       </svg>
                       <span>Liste</span>
-                    </button>
-                  </div>
-                  
+                                </button>
+                        </div>
+
                   {/* Filter Bar */}
                   {(showFilterDropdown || filterPinned) && (
                     <CompactFilterBar
@@ -3191,14 +3150,15 @@ export function ProjectKanbanBoard() {
           style={{
             zIndex: 9999,
             pointerEvents: 'none',
+            // ✨ CRITICAL: Match exact width of list content area
+            width: viewMode === 'list' ? 'calc(100% - 32px)' : undefined,
+            maxWidth: viewMode === 'list' ? '1200px' : undefined,
+            left: viewMode === 'list' ? '16px' : undefined,
           }}
         >
           {activeTask && (
             <div style={{
-              filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',
-              // Fixed width matching the column content area
-              width: viewMode === 'list' ? '800px' : '280px',
-              maxWidth: viewMode === 'list' ? 'calc(100vw - 450px)' : '280px',
+              filter: 'drop-shadow(0 6px 16px rgba(0,0,0,0.12))',
             }}>
               <TaskCard
                 task={activeTask}
