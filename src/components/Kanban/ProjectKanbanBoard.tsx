@@ -2156,7 +2156,7 @@ export function ProjectKanbanBoard() {
                       tasks={filteredTasks}
                       showCompleted={state.viewState.projectKanban.showCompleted}
                       isMinimalDesign={isMinimalDesign}
-                      columnCount={columnCount}
+                      columnCount={state.viewState.projectKanban.columnCount || 3}
                       isDarkMode={isDarkMode}
                       accentColor={state.preferences.accentColor}
                       onAddTask={(columnId) => {
