@@ -209,10 +209,15 @@ export function ProjectBoardView({
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
-                                style={provided.draggableProps.style}
+                                style={{
+                                  ...provided.draggableProps.style,
+                                  // ✨ Ensure visibility during drag
+                                  opacity: 1,
+                                  visibility: 'visible',
+                                }}
                                 className={`${
                                   snapshot.isDragging 
-                                    ? 'shadow-lg ring-2 ring-blue-500/30 rounded-lg z-50' 
+                                    ? 'shadow-xl ring-2 ring-blue-500/40 rounded-lg z-[9999]' 
                                     : ''
                                 }`}
                               >
