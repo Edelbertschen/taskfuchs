@@ -46,9 +46,10 @@ interface TaskCardProps {
   currentColumn?: any; // Column where this task is currently displayed
   isDeadlineReminder?: boolean; // True when task is shown as deadline reminder
   isCompactListView?: boolean; // True when displaying in project list view (single line)
+  disableInternalDnd?: boolean; // True to disable internal @dnd-kit useSortable (for @hello-pangea/dnd)
 }
 
-const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTask = false, isFirst = false, isLast = false, isInDragOverlay = false, isFocusMode = false, currentColumn, isDeadlineReminder = false, isCompactListView = false }: TaskCardProps) => {
+const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTask = false, isFirst = false, isLast = false, isInDragOverlay = false, isFocusMode = false, currentColumn, isDeadlineReminder = false, isCompactListView = false, disableInternalDnd = false }: TaskCardProps) => {
   const { state, dispatch } = useApp();
   const { triggerCelebration } = useCelebration();
   const { t } = useTranslation();
@@ -102,27 +103,26 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
     return () => clearInterval(interval);
   }, [state.activeTimer?.isActive]);
 
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform: originalTransform,
-    transition,
-    isDragging: isSortableDragging,
-  } = useSortable({ 
+  // ✨ Conditionally use @dnd-kit's useSortable - disabled for @hello-pangea/dnd contexts
+  const sortableResult = useSortable({ 
     id: task.id,
     data: {
       type: 'task',
       task: task,
       currentColumn: currentColumn
-    }
+    },
+    disabled: disableInternalDnd, // Disable when using external DnD system
   });
 
-  // ✨ NUCLEAR: Block transform completely at the source
-  const transform = null; // Always null to prevent ANY transforms
-  
-  // ✨ Compatibility alias for existing code
-  const isDragging = isSortableDragging;
+  // Extract values, using defaults when internal DnD is disabled
+  const attributes = disableInternalDnd ? {} : sortableResult.attributes;
+  const listeners = disableInternalDnd ? {} : sortableResult.listeners;
+  const setNodeRef = disableInternalDnd ? undefined : sortableResult.setNodeRef;
+  const transition = disableInternalDnd ? undefined : sortableResult.transition;
+  const isSortableDragging = disableInternalDnd ? false : sortableResult.isDragging;
+
+  // ✨ Use prop isDragging when internal DnD is disabled
+  const isDragging = disableInternalDnd ? propIsDragging : isSortableDragging;
 
   // Focus input when editing starts
   useEffect(() => {
@@ -160,22 +160,27 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
     }
   }, [isEditingTitle, editTitle, task.title]);
 
-  // ✨ NUCLEAR FIX: Create completely clean style object
+  // ✨ Style object - different behavior for internal vs external DnD
   const style = useMemo(() => {
-    // Create new object that NEVER includes useSortable transforms
+    // When using external DnD (@hello-pangea/dnd), don't hide the element
+    if (disableInternalDnd) {
+      return {
+        transition: 'all 200ms cubic-bezier(0.16, 1, 0.3, 1)',
+        zIndex: 1,
+      };
+    }
+    
+    // For @dnd-kit: Hide original during drag since DragOverlay shows the dragged version
     return {
-      // Completely block transforms - even during drag moves
       transform: 'none !important',
       transition: isSortableDragging ? 'none' : 'all 200ms cubic-bezier(0.16, 1, 0.3, 1)',
-      // Hide original during drag since DragOverlay shows the dragged version
-      opacity: isSortableDragging ? 0 : 1,
+      opacity: isSortableDragging ? 0.15 : 1, // Semi-transparent placeholder like Superproductivity
       zIndex: 1,
-      // Force override any external transforms
       WebkitTransform: 'none !important',
       MozTransform: 'none !important',
       msTransform: 'none !important',
     };
-  }, [isSortableDragging]);
+  }, [isSortableDragging, disableInternalDnd]);
 
   const getPriorityBorderClass = (priority?: string) => {
     switch (priority) {

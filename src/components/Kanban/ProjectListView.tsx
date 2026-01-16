@@ -195,6 +195,8 @@ export function ProjectListView({
                                       isLast={index === visibleTasks.length - 1}
                                       currentColumn={column}
                                       isCompactListView={true}
+                                      disableInternalDnd={true}
+                                      isDragging={snapshot.isDragging}
                                     />
                                   </div>
                                 )}
