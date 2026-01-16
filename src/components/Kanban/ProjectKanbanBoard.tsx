@@ -624,143 +624,9 @@ export function ProjectKanbanBoard() {
     '#2196F3', '#5C6BC0', '#9C27B0', '#EC407A', '#78909C'
   ];
 
-  // List View Column Dropzone Component - mirrors TaskColumn behavior
-  // ✨ NO React.memo - needs to re-render when parentOverId changes
-  const ListViewColumnDropzone = ({ 
-    columnId, 
-    visibleTasks, 
-    parentOverId,
-    activeTaskId,
-    isMinimalDesign: minDesign,
-    column,
-    t: translate,
-    accentColor,
-    onAddTask
-  }: {
-    columnId: string;
-    visibleTasks: Task[];
-    parentOverId: string | null; // From parent DndContext
-    activeTaskId: string | null; // ID of the task being dragged
-    isMinimalDesign: boolean;
-    column: ProjectKanbanColumn;
-    t: (key: string, fallback?: string) => string;
-    accentColor: string;
-    onAddTask: (columnId: string) => void;
-  }) => {
-    const { setNodeRef } = useDroppable({
-      id: `list-column-${columnId}`,
-      data: {
-        type: 'list-column-dropzone',
-        columnId: columnId,
-      }
-    });
-
-    // ✨ TaskColumn-style drop indicator logic (stableOverId)
-    const allowBottomDrop = Boolean(activeTaskId && parentOverId === `list-column-${columnId}`);
-
-    const getStableDropIndicator = (taskId: string) => {
-      if (!activeTaskId) return false;
-      if (activeTaskId === taskId) return false;
-      if (!parentOverId) return false;
-      return parentOverId === taskId;
-    };
-
-    return (
-      <div 
-        ref={setNodeRef}
-        className="px-4 pb-3"
-      >
-        {visibleTasks.length > 0 ? (
-          <SortableContext
-            items={visibleTasks.map(task => task.id)}
-            strategy={verticalListSortingStrategy}
-          >
-            <div className="flex flex-col">
-              {visibleTasks.map((task, index) => {
-                const isThisTaskBeingDragged = activeTaskId === task.id;
-                const showDropIndicatorAbove = getStableDropIndicator(task.id);
-                
-                return (
-                  <div key={task.id}>
-                    {/* ✨ Drop Space - Only show if this task is NOT being dragged */}
-                    {!isThisTaskBeingDragged && (
-                      <DropIndicator 
-                        isVisible={showDropIndicatorAbove}
-                        position="top"
-                        compact={true}
-                      />
-                    )}
-                    
-                    {/* Task Card */}
-                    <TaskCard
-                      task={task}
-                      isFirst={index === 0}
-                      isLast={index === visibleTasks.length - 1}
-                      currentColumn={column}
-                      isCompactListView={true}
-                    />
-                  </div>
-                );
-              })}
-              
-              {/* ✨ Drop indicator at end of list - TaskColumn behavior */}
-              <DropIndicator 
-                isVisible={allowBottomDrop && activeTaskId !== null}
-                position="bottom"
-                compact={true}
-              />
-            </div>
-          </SortableContext>
-        ) : (
-          // Empty column droppable area - show drop indicator when dragging
-          <div>
-            <DropIndicator 
-              isVisible={allowBottomDrop && activeTaskId !== null}
-              position="bottom"
-              compact={true}
-            />
-            {!activeTaskId && (
-              <div 
-                className={`text-center py-4 text-sm rounded-lg border-2 border-dashed transition-all duration-150 ${
-                  minDesign
-                    ? 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500'
-                    : 'border-gray-200/60 dark:border-gray-700/60 text-gray-400/80 dark:text-gray-500/80'
-                }`}
-                style={{
-                  minHeight: '44px',
-                }}
-              >
-                {translate('projects.no_tasks_in_column', 'Keine Aufgaben in dieser Spalte')}
-              </div>
-            )}
-          </div>
-        )}
-        
-        {/* Add Task Button - More prominent and readable */}
-            <button
-          onClick={() => onAddTask(columnId)}
-          className={`mt-3 w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all border-2 border-dashed ${
-            minDesign
-              ? 'text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700'
-              : 'text-gray-600 dark:text-gray-300 border-gray-300/80 dark:border-gray-600/80 hover:border-gray-400/90 dark:hover:border-gray-500/90 hover:bg-white/50 dark:hover:bg-gray-700/50'
-          }`}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = accentColor;
-            e.currentTarget.style.color = accentColor;
-            e.currentTarget.style.backgroundColor = `${accentColor}10`;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = '';
-            e.currentTarget.style.color = '';
-            e.currentTarget.style.backgroundColor = '';
-          }}
-        >
-          <Plus className="w-4 h-4" />
-          {translate('projects.add_task', 'Aufgabe hinzufügen')}
-            </button>
-      </div>
-    );
-  };
+  // List View - Simple task display WITHOUT DnD (stable, no flickering)
+  // DnD is disabled in list view to ensure a smooth user experience
+  // Tasks can still be clicked to open and edited, just not drag-reordered in this view
 
   // Sortable Project Component
   const SortableProject = ({ project }: { project: Column }) => {
@@ -2775,28 +2641,67 @@ export function ProjectKanbanBoard() {
                                 </span>
                               </button>
                               
-                              {/* Tasks - Collapsible */}
+                              {/* Tasks - Collapsible - Simple list without DnD */}
                               {!isCollapsed && (
-                                <ListViewColumnDropzone
-                                  columnId={column.id}
-                                  visibleTasks={visibleTasks}
-                                  parentOverId={stableOverId}
-                                  activeTaskId={activeTask?.id || null}
-                                  isMinimalDesign={isMinimalDesign}
-                                  column={column}
-                                  t={t}
-                                  accentColor={state.preferences.accentColor}
-                                  onAddTask={(colId) => {
-                                    const targetCol = projectColumns.find(c => c.id === colId);
-                                    if (targetCol) {
-                                      setSmartTaskTargetColumn({
-                                        ...targetCol,
-                                        kanbanColumnId: targetCol.id
-                                      });
-                                      setShowSmartTaskModal(true);
-                                    }
-                                  }}
-                                />
+                                <div className="px-4 pb-3">
+                                  {visibleTasks.length > 0 ? (
+                                    <div className="flex flex-col gap-1">
+                                      {visibleTasks.map((task, index) => (
+                                        <TaskCard
+                                          key={task.id}
+                                          task={task}
+                                          isFirst={index === 0}
+                                          isLast={index === visibleTasks.length - 1}
+                                          currentColumn={column}
+                                          isCompactListView={true}
+                                        />
+                                      ))}
+                                    </div>
+                                  ) : (
+                                    <div 
+                                      className={`text-center py-4 text-sm rounded-lg border-2 border-dashed ${
+                                        isMinimalDesign
+                                          ? 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500'
+                                          : 'border-gray-200/60 dark:border-gray-700/60 text-gray-400/80 dark:text-gray-500/80'
+                                      }`}
+                                      style={{ minHeight: '44px' }}
+                                    >
+                                      {t('projects.no_tasks_in_column', 'Keine Aufgaben in dieser Spalte')}
+                                    </div>
+                                  )}
+                                  
+                                  {/* Add Task Button */}
+                                  <button
+                                    onClick={() => {
+                                      const targetCol = projectColumns.find(c => c.id === column.id);
+                                      if (targetCol) {
+                                        setSmartTaskTargetColumn({
+                                          ...targetCol,
+                                          kanbanColumnId: targetCol.id
+                                        });
+                                        setShowSmartTaskModal(true);
+                                      }
+                                    }}
+                                    className={`mt-3 w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all border-2 border-dashed ${
+                                      isMinimalDesign
+                                        ? 'text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                        : 'text-gray-600 dark:text-gray-300 border-gray-300/80 dark:border-gray-600/80 hover:border-gray-400/90 dark:hover:border-gray-500/90 hover:bg-white/50 dark:hover:bg-gray-700/50'
+                                    }`}
+                                    onMouseEnter={(e) => {
+                                      e.currentTarget.style.borderColor = state.preferences.accentColor;
+                                      e.currentTarget.style.color = state.preferences.accentColor;
+                                      e.currentTarget.style.backgroundColor = `${state.preferences.accentColor}10`;
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.currentTarget.style.borderColor = '';
+                                      e.currentTarget.style.color = '';
+                                      e.currentTarget.style.backgroundColor = '';
+                                    }}
+                                  >
+                                    <Plus className="w-4 h-4" />
+                                    {t('projects.add_task', 'Aufgabe hinzufügen')}
+                                  </button>
+                                </div>
                               )}
                             </div>
                           );
