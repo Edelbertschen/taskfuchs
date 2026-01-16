@@ -3064,19 +3064,22 @@ export function ProjectKanbanBoard() {
 
 
 
-        {/* ✨ Elegant DragOverlay for Tasks, Projects, and Columns */}
+        {/* ✨ Clean DragOverlay - NO manual transform offsets (like Superproductivity) */}
         <DragOverlay
-          dropAnimation={null}
+          dropAnimation={{
+            duration: 200,
+            easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
+          }}
           style={{
             zIndex: 9999,
-            pointerEvents: 'none',
           }}
         >
           {activeTask && (
             <div style={{
-              // ✨ Match TaskBoard overlay behavior
-              transform: `translateX(${sidebarMinimized ? '-76px' : 'calc(-76px - 320px)'}) translateY(-100px)`,
-              filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',
+              // ✨ NO transform offset - let @dnd-kit handle positioning automatically
+              boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+              borderRadius: '8px',
+              cursor: 'grabbing',
             }}>
               <TaskCard
                 task={activeTask}
