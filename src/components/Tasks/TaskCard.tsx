@@ -738,7 +738,10 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
   return (
     <div
       ref={(node) => {
-        setNodeRef(node);
+        // Only call setNodeRef when using internal @dnd-kit
+        if (setNodeRef) {
+          setNodeRef(node);
+        }
         if (cardRef.current !== node) {
           (cardRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
         }

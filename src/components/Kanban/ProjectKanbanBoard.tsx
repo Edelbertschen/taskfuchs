@@ -2941,22 +2941,19 @@ export function ProjectKanbanBoard() {
 
 
 
-        {/* ✨ Clean DragOverlay - NO manual transform offsets (like Superproductivity) */}
+        {/* ✨ DragOverlay with same offset compensation as TaskBoard (Planer) */}
         <DragOverlay
-          dropAnimation={{
-            duration: 200,
-            easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
-          }}
+          dropAnimation={null}
           style={{
             zIndex: 9999,
+            pointerEvents: 'none',
           }}
         >
           {activeTask && (
             <div style={{
-              // ✨ NO transform offset - let @dnd-kit handle positioning automatically
-              boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
-              borderRadius: '8px',
-              cursor: 'grabbing',
+              // ✨ SAME offset as Planer (TaskBoard) to compensate for sidebar
+              transform: `translateX(${sidebarVisible ? 'calc(-76px - 320px)' : '-76px'}) translateY(-100px)`,
+              filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',
             }}>
               <TaskCard
                 task={activeTask}
