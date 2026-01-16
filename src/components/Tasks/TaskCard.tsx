@@ -574,15 +574,15 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
     return { name: project.title, color: project.color };
   };
 
-  // CORRECTED: Show project name when task is in PLANNER (date column)
+  // ALWAYS show project name on task card (user request)
   const getTaskProjectDisplay = () => {
     const project = getTaskProject();
-    if (!project || !currentColumn) return null;
+    if (!project) return null;
     
-    // Only show project name when displayed in a DATE column (Planner)
-    if (currentColumn.type !== 'date') return null;
-    
-    return project.name;
+    return {
+      name: project.name,
+      color: project.color
+    };
   };
   
   // Get project color for left border indicator (show in ALL views)
@@ -879,7 +879,7 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
                 {task.title}
               </h3>
               
-              {/* Compact List View - Inline badges */}
+              {/* Compact List View - Inline badges (Project, Date, Time, Subtasks) */}
               {isCompactListView && (
                 <div className="flex items-center gap-2 ml-auto mr-2 flex-shrink-0">
                   {/* Time estimate */}
@@ -898,21 +898,36 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
                     </span>
                   )}
                   
-                  {/* Date badge */}
+                  {/* Project badge - always show */}
+                  {taskProjectDisplay && (
+                    <span 
+                      className="text-[10px] px-1.5 py-0.5 rounded flex items-center gap-1"
+                      style={{
+                        backgroundColor: `${taskProjectDisplay.color || accentColor}15`,
+                        color: taskProjectDisplay.color || accentColor
+                      }}
+                      title={taskProjectDisplay.name}
+                    >
+                      <FolderOpen className="w-2.5 h-2.5" />
+                      <span className="max-w-[50px] truncate">{taskProjectDisplay.name}</span>
+                    </span>
+                  )}
+                  
+                  {/* Date badge - only for past dates */}
                   {taskDateDisplay && (
                     <span 
                       className="text-[10px] px-1.5 py-0.5 rounded flex items-center gap-1"
                       style={{
                         backgroundColor: taskDateDisplay.isPast 
                           ? (isDarkMode ? '#7F1D1D' : '#FEE2E2')
-                          : 'rgba(var(--accent-color-rgb), 0.15)',
+                          : `${accentColor}15`,
                         color: taskDateDisplay.isPast 
                           ? (isDarkMode ? '#FCA5A5' : '#DC2626')
-                          : 'var(--accent-color)'
+                          : accentColor
                       }}
                     >
-                      {taskDateDisplay.icon}
-                      {taskDateDisplay.text}
+                      <Calendar className="w-2.5 h-2.5" />
+                      {taskDateDisplay.date}
                     </span>
                   )}
                 </div>
@@ -1062,10 +1077,12 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
           </div>
         </div>
 
-        {/* Bottom area - Time, Subtasks, Tags and Context Badge */}
+        {/* Bottom area - Time, Subtasks, Project and Date */}
         {/* Hide in compact list view - info is shown inline */}
-        {!isFocusMode && !isCompactListView && ((hasAnyTimeEstimate || totalSubtasks > 0) || (taskProjectDisplay || taskDateDisplay) || (task.tags && task.tags.length > 0)) && (
+        {/* Tags removed per user request - use filters instead */}
+        {!isFocusMode && !isCompactListView && (hasAnyTimeEstimate || totalSubtasks > 0 || taskProjectDisplay || taskDateDisplay) && (
           <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mt-1 gap-2 h-[18px]">
+            {/* Left side: Time and Subtasks */}
             <div className="flex items-center space-x-1.5 flex-shrink-0">
               {/* Time display - show if task has time estimate OR tracked time */}
               {(() => {
@@ -1097,74 +1114,54 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
               )}
             </div>
             
-            {/* Tags - elegant small pills */}
-            {task.tags && task.tags.length > 0 && (
-              <div className="flex items-center gap-1 flex-1 min-w-0 overflow-hidden">
-                <Tag className="w-2.5 h-2.5 flex-shrink-0 opacity-60" />
-                <div className="flex items-center gap-1 overflow-hidden">
-                  {task.tags.slice(0, 3).map((tag, index) => (
-                    <span
-                      key={index}
-                      className={`inline-flex items-center px-1.5 py-0 text-[10px] font-medium rounded-full truncate max-w-[60px] transition-opacity ${
-                        task.completed ? 'opacity-60' : 'opacity-80 hover:opacity-100'
-                      }`}
-                      style={{
-                        backgroundColor: task.completed 
-                          ? (isDarkMode ? '#374151' : '#E5E7EB') 
-                          : `${accentColor}20`,
-                        color: task.completed 
-                          ? (isDarkMode ? '#9CA3AF' : '#6B7280') 
-                          : accentColor,
-                      }}
-                      title={tag}
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                  {task.tags.length > 3 && (
-                    <span 
-                      className="text-[10px] opacity-60"
-                      title={task.tags.slice(3).join(', ')}
-                    >
-                      +{task.tags.length - 3}
-                    </span>
-                  )}
-                </div>
-              </div>
-            )}
-            
-            {/* Context Badge - Date */}
-            {taskDateDisplay && (
-              <span 
-                className={`inline-flex items-center gap-1.5 px-2 py-0.5 text-xs font-medium rounded-md transition-opacity flex-shrink-0 ${
-                  task.completed ? 'opacity-70' : 'opacity-90 hover:opacity-100'
-                }`}
-                style={{
-                  backgroundColor: task.completed 
-                    ? (isDarkMode ? '#374151' : '#D1D5DB')
-                    : taskDateDisplay.isPast 
-                      ? (isDarkMode ? '#7F1D1D' : '#FEE2E2')
-                      : accentColor + '15',
-                  color: task.completed 
-                    ? (isDarkMode ? '#9CA3AF' : '#6B7280')
-                    : taskDateDisplay.isPast 
-                      ? (isDarkMode ? '#FCA5A5' : '#DC2626')
-                      : accentColor
-                }}
-                title={`${t('planner.assigned_date_label')} ${taskDateDisplay.date}`}
-              >
-                <Calendar className="w-3 h-3" style={{ 
-                  color: task.completed 
-                    ? (isDarkMode ? '#9CA3AF' : '#6B7280')
-                    : taskDateDisplay.isPast 
-                      ? (isDarkMode ? '#FCA5A5' : '#DC2626')
-                      : accentColor 
-                }} />
-                <span>
-                  {taskDateDisplay.date}
+            {/* Right side: Project and Date - always visible */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {/* Project Badge - always show if task has a project */}
+              {taskProjectDisplay && (
+                <span 
+                  className={`inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium rounded transition-opacity flex-shrink-0 ${
+                    task.completed ? 'opacity-60' : 'opacity-90 hover:opacity-100'
+                  }`}
+                  style={{
+                    backgroundColor: task.completed 
+                      ? (isDarkMode ? '#374151' : '#E5E7EB')
+                      : `${taskProjectDisplay.color || accentColor}15`,
+                    color: task.completed 
+                      ? (isDarkMode ? '#9CA3AF' : '#6B7280')
+                      : (taskProjectDisplay.color || accentColor),
+                  }}
+                  title={taskProjectDisplay.name}
+                >
+                  <FolderOpen className="w-2.5 h-2.5" />
+                  <span className="max-w-[60px] truncate">{taskProjectDisplay.name}</span>
                 </span>
-              </span>
-            )}
+              )}
+              
+              {/* Date Badge - only show for past dates (not in planner) */}
+              {taskDateDisplay && (
+                <span 
+                  className={`inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium rounded transition-opacity flex-shrink-0 ${
+                    task.completed ? 'opacity-70' : 'opacity-90 hover:opacity-100'
+                  }`}
+                  style={{
+                    backgroundColor: task.completed 
+                      ? (isDarkMode ? '#374151' : '#D1D5DB')
+                      : taskDateDisplay.isPast 
+                        ? (isDarkMode ? '#7F1D1D' : '#FEE2E2')
+                        : accentColor + '15',
+                    color: task.completed 
+                      ? (isDarkMode ? '#9CA3AF' : '#6B7280')
+                      : taskDateDisplay.isPast 
+                        ? (isDarkMode ? '#FCA5A5' : '#DC2626')
+                        : accentColor
+                  }}
+                  title={`${t('planner.assigned_date_label')} ${taskDateDisplay.date}`}
+                >
+                  <Calendar className="w-2.5 h-2.5" />
+                  <span>{taskDateDisplay.date}</span>
+                </span>
+              )}
+            </div>
           </div>
         )}
       </div>

@@ -606,7 +606,7 @@ export function ProjectKanbanBoard() {
   ];
 
   // List View Column Dropzone Component - makes each column a droppable target
-  // ✨ OPTIMIZED: No DropIndicator to prevent layout shifts and flicker
+  // ✨ OPTIMIZED: Better dropzone visualization like board view
   const ListViewColumnDropzone = React.memo(({ 
     columnId, 
     visibleTasks, 
@@ -639,21 +639,32 @@ export function ProjectKanbanBoard() {
     return (
       <div 
         ref={setNodeRef}
-        className={`px-4 pb-3 transition-colors duration-150 rounded-lg ${
-          isDropTarget ? 'ring-2 ring-offset-1' : ''
+        className={`px-4 pb-3 transition-all duration-200 rounded-lg relative ${
+          isDropTarget ? 'scale-[1.005]' : ''
         }`}
         style={{
-          ringColor: isDropTarget ? accentColor : 'transparent',
           backgroundColor: isDropTarget ? `${accentColor}08` : 'transparent',
+          boxShadow: isDropTarget ? `inset 0 0 0 2px ${accentColor}60, 0 0 12px ${accentColor}20` : 'none',
         }}
       >
+        {/* Drop Target Indicator - Animated glow like board view */}
+        {isDropTarget && (
+          <div 
+            className="absolute inset-0 rounded-lg pointer-events-none animate-pulse"
+            style={{
+              background: `linear-gradient(135deg, ${accentColor}10 0%, ${accentColor}05 100%)`,
+              border: `2px dashed ${accentColor}50`,
+            }}
+          />
+        )}
+        
         {visibleTasks.length > 0 ? (
           <SortableContext
             items={visibleTasks.map(task => task.id)}
             strategy={verticalListSortingStrategy}
           >
             {/* ✨ NO space-y to prevent layout shifts - use fixed margins */}
-            <div className="flex flex-col">
+            <div className="flex flex-col relative">
               {visibleTasks.map((task, index) => (
                 <div 
                   key={task.id}
@@ -672,16 +683,17 @@ export function ProjectKanbanBoard() {
             </div>
           </SortableContext>
         ) : (
-          // Empty column droppable area
+          // Empty column droppable area - more prominent
           <div 
-            className={`text-center py-4 text-sm rounded-lg border-2 border-dashed transition-colors duration-150 ${
+            className={`text-center py-6 text-sm rounded-lg border-2 border-dashed transition-all duration-200 ${
               minDesign
                 ? 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500'
                 : 'border-gray-200/60 dark:border-gray-700/60 text-gray-400/80 dark:text-gray-500/80'
             }`}
             style={{
               borderColor: isDropTarget ? accentColor : undefined,
-              backgroundColor: isDropTarget ? `${accentColor}12` : undefined,
+              backgroundColor: isDropTarget ? `${accentColor}15` : undefined,
+              transform: isDropTarget ? 'scale(1.02)' : 'scale(1)',
             }}
           >
             {isDropTarget 
@@ -691,14 +703,25 @@ export function ProjectKanbanBoard() {
           </div>
         )}
         
-        {/* Add Task Button */}
+        {/* Add Task Button - More prominent */}
         <button
           onClick={() => onAddTask(columnId)}
-          className={`mt-2 w-full flex items-center justify-center gap-2 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+          className={`mt-3 w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all border-2 border-dashed ${
             minDesign
-              ? 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-              : 'text-gray-500 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-gray-700/50'
+              ? 'text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
+              : 'text-gray-500 dark:text-gray-400 border-gray-200/60 dark:border-gray-700/60 hover:border-gray-300/80 dark:hover:border-gray-600/80 hover:bg-white/30 dark:hover:bg-gray-700/30'
           }`}
+          style={{
+            borderColor: undefined,
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = accentColor;
+            e.currentTarget.style.color = accentColor;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = '';
+            e.currentTarget.style.color = '';
+          }}
         >
           <Plus className="w-4 h-4" />
           {translate('projects.add_task', 'Aufgabe hinzufügen')}
