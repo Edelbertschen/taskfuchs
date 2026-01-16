@@ -607,6 +607,9 @@ export function ProjectKanbanBoard() {
 
   // List View Column Dropzone Component - makes each column a droppable target
   // ✨ NO React.memo - needs to re-render when parentOverId changes
+  // ✨ ANTI-FLICKER: Store last stable drop position to prevent flickering
+  const lastDropPositionRef = useRef<{ columnId: string; index: number } | null>(null);
+
   const ListViewColumnDropzone = ({ 
     columnId, 
     visibleTasks, 
@@ -636,35 +639,53 @@ export function ProjectKanbanBoard() {
       }
     });
 
-    // ✨ STABLE DROP INDICATOR LOGIC - Only ONE indicator, no jumping
-    // Check if any task in THIS column is being hovered
-    const hoveredTaskIndex = visibleTasks.findIndex(task => task.id === parentOverId);
-    const isHoveringOverTaskInThisColumn = hoveredTaskIndex !== -1;
+    // ✨ STABLE DROP INDICATOR LOGIC - Anti-flicker with sticky position
+    // Only update position when clearly moving to a different task
     
-    // Check if column dropzone itself is being hovered (not a task)
-    const isHoveringOverColumnDropzone = parentOverId === `list-column-${columnId}`;
-    
-    // Determine the single drop position - STABLE logic
     const getDropPosition = (): { type: 'before-task' | 'end' | 'none'; taskIndex?: number } => {
-      if (!activeTaskId) return { type: 'none' };
+      if (!activeTaskId) {
+        lastDropPositionRef.current = null;
+        return { type: 'none' };
+      }
       
-      // Priority 1: If hovering over a specific task in this column, show BEFORE that task
-      if (isHoveringOverTaskInThisColumn) {
+      // Check if hovering over a task in this column
+      const hoveredTaskIndex = visibleTasks.findIndex(task => task.id === parentOverId);
+      const isHoveringOverColumnDropzone = parentOverId === `list-column-${columnId}`;
+      
+      // Not hovering over this column at all
+      if (hoveredTaskIndex === -1 && !isHoveringOverColumnDropzone && !isOver) {
+        // Keep showing last position in this column to prevent flicker during transition
+        if (lastDropPositionRef.current?.columnId === columnId) {
+          return lastDropPositionRef.current.index === -1 
+            ? { type: 'end' } 
+            : { type: 'before-task', taskIndex: lastDropPositionRef.current.index };
+        }
+        return { type: 'none' };
+      }
+      
+      // Hovering over a specific task
+      if (hoveredTaskIndex !== -1) {
         const hoveredTask = visibleTasks[hoveredTaskIndex];
-        // Don't show indicator if hovering over the dragged task itself
+        
+        // Skip the dragged task itself - show at next position
         if (hoveredTask.id === activeTaskId) {
-          // When over the dragged task, check if there's a next task to show before
-          // This prevents the indicator from disappearing completely
-          if (hoveredTaskIndex < visibleTasks.length - 1) {
-            return { type: 'before-task', taskIndex: hoveredTaskIndex + 1 };
+          const nextIndex = hoveredTaskIndex + 1;
+          if (nextIndex < visibleTasks.length) {
+            lastDropPositionRef.current = { columnId, index: nextIndex };
+            return { type: 'before-task', taskIndex: nextIndex };
           }
+          lastDropPositionRef.current = { columnId, index: -1 };
           return { type: 'end' };
         }
+        
+        // Update sticky position
+        lastDropPositionRef.current = { columnId, index: hoveredTaskIndex };
         return { type: 'before-task', taskIndex: hoveredTaskIndex };
       }
       
-      // Priority 2: If hovering over column dropzone (empty area), show at END
+      // Hovering over column area (empty space) - show at end
       if (isHoveringOverColumnDropzone || isOver) {
+        lastDropPositionRef.current = { columnId, index: -1 };
         return { type: 'end' };
       }
       
@@ -1292,6 +1313,9 @@ export function ProjectKanbanBoard() {
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
     const activeData = active.data.current;
+    
+    // Reset anti-flicker ref on drag start
+    lastDropPositionRef.current = null;
     
     // Handle task dragging
     if (activeData?.type === 'task') {
@@ -3163,24 +3187,18 @@ export function ProjectKanbanBoard() {
 
         {/* ✨ Elegant DragOverlay for Tasks, Projects, and Columns */}
         <DragOverlay
-          dropAnimation={viewMode === 'list' ? null : {
-            duration: 200,
-            easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
-          }}
+          dropAnimation={null}
           style={{
             zIndex: 9999,
             pointerEvents: 'none',
-            // Full width for list view to match actual card width
-            width: viewMode === 'list' ? 'calc(100vw - 400px)' : undefined,
           }}
         >
           {activeTask && (
             <div style={{
-              transform: viewMode === 'list' 
-                ? 'translateX(-100px) translateY(10px)' 
-                : 'translateX(-70px) translateY(10px)',
               filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',
-              width: '100%', // Fill container width
+              // Fixed width matching the column content area
+              width: viewMode === 'list' ? '800px' : '280px',
+              maxWidth: viewMode === 'list' ? 'calc(100vw - 450px)' : '280px',
             }}>
               <TaskCard
                 task={activeTask}
