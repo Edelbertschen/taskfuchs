@@ -574,10 +574,14 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
     return { name: project.title, color: project.color };
   };
 
-  // ALWAYS show project name on task card (user request)
+  // Show project name on task card - but NOT inside "Projekte" view (redundant)
   const getTaskProjectDisplay = () => {
     const project = getTaskProject();
     if (!project) return null;
+    
+    // Don't show project name when already inside a project (kanban column)
+    // currentColumn with projectId means we're in the project view
+    if (currentColumn?.projectId) return null;
     
     return {
       name: project.name,
@@ -909,7 +913,7 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
                       title={taskProjectDisplay.name}
                     >
                       <FolderOpen className="w-2.5 h-2.5" />
-                      <span className="max-w-[50px] truncate">{taskProjectDisplay.name}</span>
+                      <span className="max-w-[80px] truncate">{taskProjectDisplay.name}</span>
                     </span>
                   )}
                   
@@ -1133,7 +1137,7 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
                   title={taskProjectDisplay.name}
                 >
                   <FolderOpen className="w-2.5 h-2.5" />
-                  <span className="max-w-[60px] truncate">{taskProjectDisplay.name}</span>
+                  <span className="max-w-[80px] truncate">{taskProjectDisplay.name}</span>
                 </span>
               )}
               

@@ -703,24 +703,23 @@ export function ProjectKanbanBoard() {
           </div>
         )}
         
-        {/* Add Task Button - More prominent */}
+        {/* Add Task Button - More prominent and readable */}
         <button
           onClick={() => onAddTask(columnId)}
-          className={`mt-3 w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all border-2 border-dashed ${
+          className={`mt-3 w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all border-2 border-dashed ${
             minDesign
-              ? 'text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
-              : 'text-gray-500 dark:text-gray-400 border-gray-200/60 dark:border-gray-700/60 hover:border-gray-300/80 dark:hover:border-gray-600/80 hover:bg-white/30 dark:hover:bg-gray-700/30'
+              ? 'text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700'
+              : 'text-gray-600 dark:text-gray-300 border-gray-300/80 dark:border-gray-600/80 hover:border-gray-400/90 dark:hover:border-gray-500/90 hover:bg-white/50 dark:hover:bg-gray-700/50'
           }`}
-          style={{
-            borderColor: undefined,
-          }}
           onMouseEnter={(e) => {
             e.currentTarget.style.borderColor = accentColor;
             e.currentTarget.style.color = accentColor;
+            e.currentTarget.style.backgroundColor = `${accentColor}10`;
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.borderColor = '';
             e.currentTarget.style.color = '';
+            e.currentTarget.style.backgroundColor = '';
           }}
         >
           <Plus className="w-4 h-4" />
