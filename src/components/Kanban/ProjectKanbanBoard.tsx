@@ -606,11 +606,12 @@ export function ProjectKanbanBoard() {
   ];
 
   // List View Column Dropzone Component - makes each column a droppable target
-  // ✨ OPTIMIZED: Better dropzone visualization like board view
-  const ListViewColumnDropzone = React.memo(({ 
+  // ✨ NO React.memo - needs to re-render when parentOverId changes
+  const ListViewColumnDropzone = ({ 
     columnId, 
     visibleTasks, 
     parentOverId,
+    isDragging,
     isMinimalDesign: minDesign,
     column,
     t: translate,
@@ -620,6 +621,7 @@ export function ProjectKanbanBoard() {
     columnId: string;
     visibleTasks: Task[];
     parentOverId: string | null; // From parent DndContext
+    isDragging: boolean; // Whether any task is being dragged
     isMinimalDesign: boolean;
     column: ProjectKanbanColumn;
     t: (key: string, fallback?: string) => string;
@@ -637,25 +639,29 @@ export function ProjectKanbanBoard() {
     // Visual feedback: Either directly over the column dropzone OR over a task in this column
     const isOverTaskInThisColumn = parentOverId && visibleTasks.some(task => task.id === parentOverId);
     const isDropTarget = isOver || isOverTaskInThisColumn || parentOverId === `list-column-${columnId}`;
+    
+    // Show dropzone hint when dragging but not over this column
+    const showDropHint = isDragging && !isDropTarget;
 
     return (
       <div 
         ref={setNodeRef}
-        className={`px-4 pb-3 transition-all duration-200 rounded-lg relative ${
-          isDropTarget ? 'scale-[1.005]' : ''
+        className={`px-4 pb-3 transition-all duration-200 rounded-xl relative ${
+          isDropTarget ? 'scale-[1.01]' : ''
         }`}
         style={{
-          backgroundColor: isDropTarget ? `${accentColor}08` : 'transparent',
-          boxShadow: isDropTarget ? `inset 0 0 0 2px ${accentColor}60, 0 0 12px ${accentColor}20` : 'none',
+          backgroundColor: isDropTarget ? `${accentColor}12` : (showDropHint ? `${accentColor}05` : 'transparent'),
+          boxShadow: isDropTarget ? `inset 0 0 0 3px ${accentColor}, 0 0 20px ${accentColor}30` : 'none',
+          border: showDropHint ? `2px dashed ${accentColor}30` : (isDropTarget ? 'none' : '2px solid transparent'),
         }}
       >
-        {/* Drop Target Indicator - Animated glow like board view */}
+        {/* Drop Target Indicator - Strong visual feedback */}
         {isDropTarget && (
           <div 
-            className="absolute inset-0 rounded-lg pointer-events-none animate-pulse"
+            className="absolute inset-0 rounded-xl pointer-events-none"
             style={{
-              background: `linear-gradient(135deg, ${accentColor}10 0%, ${accentColor}05 100%)`,
-              border: `2px dashed ${accentColor}50`,
+              background: `linear-gradient(135deg, ${accentColor}15 0%, ${accentColor}08 100%)`,
+              animation: 'pulse 1s ease-in-out infinite',
             }}
           />
         )}
@@ -729,7 +735,7 @@ export function ProjectKanbanBoard() {
         </button>
       </div>
     );
-  });
+  };
 
   // Sortable Project Component
   const SortableProject = ({ project }: { project: Column }) => {
@@ -2747,6 +2753,7 @@ export function ProjectKanbanBoard() {
                                   columnId={column.id}
                                   visibleTasks={visibleTasks}
                                   parentOverId={overId}
+                                  isDragging={!!activeTask}
                                   isMinimalDesign={isMinimalDesign}
                                   column={column}
                                   t={t}
