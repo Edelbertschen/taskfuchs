@@ -73,8 +73,6 @@ export function ProjectKanbanBoard() {
   const [overId, setOverId] = useState<string | null>(null);
   const [stableOverId, setStableOverId] = useState<string | null>(null);
   const stabilizeOverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const [dragOverlayWidth, setDragOverlayWidth] = useState<number | null>(null);
-  const [dragOverlayHeight, setDragOverlayHeight] = useState<number | null>(null);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showSmartTaskModal, setShowSmartTaskModal] = useState(false);
@@ -129,7 +127,7 @@ export function ProjectKanbanBoard() {
 
     stabilizeOverTimeoutRef.current = setTimeout(() => {
       setStableOverId(overId);
-    }, 8); // small delay for stability without noticeable lag
+    }, 4); // match TaskColumn timing
 
     return () => {
       if (stabilizeOverTimeoutRef.current) {
@@ -626,7 +624,7 @@ export function ProjectKanbanBoard() {
     '#2196F3', '#5C6BC0', '#9C27B0', '#EC407A', '#78909C'
   ];
 
-  // List View Column Dropzone Component - makes each column a droppable target
+  // List View Column Dropzone Component - mirrors TaskColumn behavior
   // ✨ NO React.memo - needs to re-render when parentOverId changes
   const ListViewColumnDropzone = ({ 
     columnId, 
@@ -657,26 +655,15 @@ export function ProjectKanbanBoard() {
       }
     });
 
-    // ✨ SIMPLE DROP INDICATOR LOGIC - No complexity, just works
-    // Find which task is being hovered (if any)
-    const hoveredTaskIndex = visibleTasks.findIndex(task => task.id === parentOverId);
-    const isOverColumn = parentOverId === `list-column-${columnId}`;
-    
-    // Calculate drop position - SIMPLE and DIRECT
-    let dropIndex: number | null = null;
-    
-    if (activeTaskId) {
-      if (hoveredTaskIndex !== -1) {
-        // Hovering over a specific task - show indicator BEFORE it
-        // Unless it's the dragged task itself
-        if (visibleTasks[hoveredTaskIndex].id !== activeTaskId) {
-          dropIndex = hoveredTaskIndex;
-        }
-      } else if (isOverColumn) {
-        // Hovering over the column dropzone (empty area below tasks)
-        dropIndex = visibleTasks.length; // End of list
-      }
-    }
+    // ✨ TaskColumn-style drop indicator logic (stableOverId)
+    const allowBottomDrop = Boolean(activeTaskId && parentOverId === `list-column-${columnId}`);
+
+    const getStableDropIndicator = (taskId: string) => {
+      if (!activeTaskId) return false;
+      if (activeTaskId === taskId) return false;
+      if (!parentOverId) return false;
+      return parentOverId === taskId;
+    };
 
     return (
       <div 
@@ -691,58 +678,61 @@ export function ProjectKanbanBoard() {
             <div className="flex flex-col">
               {visibleTasks.map((task, index) => {
                 const isThisTaskBeingDragged = activeTaskId === task.id;
-                // Show indicator BEFORE this task only at calculated dropIndex
-                const showIndicatorBefore = dropIndex === index && !isThisTaskBeingDragged;
+                const showDropIndicatorAbove = getStableDropIndicator(task.id);
                 
                 return (
                   <div key={task.id}>
-                    {/* ✨ Drop indicator - simple: show before task at dropIndex */}
-                    <DropIndicator 
-                      isVisible={showIndicatorBefore}
-                      position="top"
-                      compact={true}
-                    />
-                    
-                    {/* Task Card - hide if being dragged */}
-                    <div style={{ opacity: isThisTaskBeingDragged ? 0.3 : 1 }}>
-                      <TaskCard
-                        task={task}
-                        isFirst={index === 0}
-                        isLast={index === visibleTasks.length - 1}
-                        currentColumn={column}
-                        isCompactListView={true}
+                    {/* ✨ Drop Space - Only show if this task is NOT being dragged */}
+                    {!isThisTaskBeingDragged && (
+                      <DropIndicator 
+                        isVisible={showDropIndicatorAbove}
+                        position="top"
+                        compact={true}
                       />
-          </div>
+                    )}
+                    
+                    {/* Task Card */}
+                    <TaskCard
+                      task={task}
+                      isFirst={index === 0}
+                      isLast={index === visibleTasks.length - 1}
+                      currentColumn={column}
+                      isCompactListView={true}
+                    />
                   </div>
                 );
               })}
               
-              {/* ✨ Drop indicator at END of list */}
+              {/* ✨ Drop indicator at end of list - TaskColumn behavior */}
               <DropIndicator 
-                isVisible={dropIndex === visibleTasks.length}
+                isVisible={allowBottomDrop && activeTaskId !== null}
                 position="bottom"
                 compact={true}
-            />
-          </div>
+              />
+            </div>
           </SortableContext>
         ) : (
-          // Empty column droppable area
-          <div 
-            className={`text-center py-4 text-sm rounded-lg border-2 border-dashed transition-all duration-150 ${
-              minDesign
-                ? 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500'
-                : 'border-gray-200/60 dark:border-gray-700/60 text-gray-400/80 dark:text-gray-500/80'
-            }`}
-            style={{
-              borderColor: isOverColumn ? accentColor : undefined,
-              backgroundColor: isOverColumn ? `${accentColor}15` : undefined,
-              minHeight: '44px',
-            }}
-          >
-            {isOverColumn 
-              ? translate('projects.drop_here', 'Hier ablegen')
-              : translate('projects.no_tasks_in_column', 'Keine Aufgaben in dieser Spalte')
-            }
+          // Empty column droppable area - show drop indicator when dragging
+          <div>
+            <DropIndicator 
+              isVisible={allowBottomDrop && activeTaskId !== null}
+              position="bottom"
+              compact={true}
+            />
+            {!activeTaskId && (
+              <div 
+                className={`text-center py-4 text-sm rounded-lg border-2 border-dashed transition-all duration-150 ${
+                  minDesign
+                    ? 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500'
+                    : 'border-gray-200/60 dark:border-gray-700/60 text-gray-400/80 dark:text-gray-500/80'
+                }`}
+                style={{
+                  minHeight: '44px',
+                }}
+              >
+                {translate('projects.no_tasks_in_column', 'Keine Aufgaben in dieser Spalte')}
+              </div>
+            )}
           </div>
         )}
         
@@ -1298,24 +1288,6 @@ export function ProjectKanbanBoard() {
     const { active } = event;
     const activeData = active.data.current;
     
-    // Capture original size for DragOverlay to prevent width changes
-    const taskNode = typeof active.id === 'string'
-      ? document.querySelector(`[data-task-id="${active.id}"]`) as HTMLElement | null
-      : null;
-    if (taskNode) {
-      const rect = taskNode.getBoundingClientRect();
-      setDragOverlayWidth(Math.round(rect.width));
-      setDragOverlayHeight(Math.round(rect.height));
-    } else {
-      const initialRect = active.rect.current?.initial;
-      if (initialRect) {
-        setDragOverlayWidth(Math.round(initialRect.width));
-        setDragOverlayHeight(Math.round(initialRect.height));
-      } else {
-        setDragOverlayWidth(null);
-        setDragOverlayHeight(null);
-      }
-    }
     setStableOverId(null);
     
     // Handle task dragging
@@ -1360,8 +1332,6 @@ export function ProjectKanbanBoard() {
     setActiveTask(null);
     setOverId(null);
     setStableOverId(null);
-    setDragOverlayWidth(null);
-    setDragOverlayHeight(null);
     setActiveProjectId(null);
     setActiveColumnId(null);
 
@@ -1600,8 +1570,6 @@ export function ProjectKanbanBoard() {
     setActiveTask(null);
     setOverId(null);
     setStableOverId(null);
-    setDragOverlayWidth(null);
-    setDragOverlayHeight(null);
     setActiveProjectId(null);
   };
 
@@ -2301,7 +2269,6 @@ export function ProjectKanbanBoard() {
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
-      collisionDetection={viewMode === 'list' ? pointerWithin : undefined}
       sensors={sensors}
     >
       <div className={`h-full w-full flex overflow-hidden ${
@@ -3202,11 +3169,9 @@ export function ProjectKanbanBoard() {
         >
           {activeTask && (
             <div style={{
-              filter: 'drop-shadow(0 6px 16px rgba(0,0,0,0.12))',
-              width: dragOverlayWidth ? `${dragOverlayWidth}px` : undefined,
-              minWidth: dragOverlayWidth ? `${dragOverlayWidth}px` : undefined,
-              maxWidth: dragOverlayWidth ? `${dragOverlayWidth}px` : undefined,
-              height: dragOverlayHeight ? `${dragOverlayHeight}px` : undefined,
+              // ✨ Match TaskBoard overlay behavior
+              transform: `translateX(${sidebarMinimized ? '-76px' : 'calc(-76px - 320px)'}) translateY(-100px)`,
+              filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',
             }}>
               <TaskCard
                 task={activeTask}
