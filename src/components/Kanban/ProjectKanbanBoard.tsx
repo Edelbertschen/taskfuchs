@@ -33,24 +33,8 @@ export function ProjectKanbanBoard() {
   const { actions, forms, titles, messages, kanban } = useAppTranslation();
   const { performEmailToTaskAction } = useEmail();
   
-  // ✨ CRITICAL FIX: Precise sensors to prevent springing (same as TaskBoard)
-  // Mobile-friendly DnD activation
-  const mouseSensor = useSensor(MouseSensor, {
-    activationConstraint: {
-      distance: 4,
-    },
-  });
-  
-  const touchSensor = useSensor(TouchSensor, {
-    activationConstraint: {
-      delay: 180,
-      tolerance: 8,
-    },
-  });
-  
-  const sensors = useSensors(mouseSensor, touchSensor);
+  // ✨ DnD now handled by @hello-pangea/dnd in ProjectBoardView and ProjectListView
   const isMinimalDesign = state.preferences.minimalDesign;
-  const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
   const [stableOverId, setStableOverId] = useState<string | null>(null);
   const stabilizeOverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -133,8 +117,7 @@ export function ProjectKanbanBoard() {
   // Removed local columnOffset - now using state.projectColumnOffset from global state
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [editingProjectTitle, setEditingProjectTitle] = useState('');
-  const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
-  const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
+  // ✨ DnD state removed - now handled by @hello-pangea/dnd in child components
   const [shouldEditNewColumn, setShouldEditNewColumn] = useState(false);
   const [deleteConfirmProjectId, setDeleteConfirmProjectId] = useState<string | null>(null);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
@@ -689,7 +672,7 @@ export function ProjectKanbanBoard() {
               }`
             : `border-b border-white/15 hover:bg-black/40`
         } ${
-          isTaskDropZone && activeTask ? 'ring-2 ring-offset-1' : ''
+          false /* DnD removed */ ? 'ring-2 ring-offset-1' : ''
           } ${
             isDragging ? 'opacity-30 scale-95' : ''
         }`}
@@ -700,19 +683,19 @@ export function ProjectKanbanBoard() {
           backgroundColor: isMinimalDesign
             ? (isSelected 
                 ? getAccentColorStyles().bgLight.backgroundColor
-                : isTaskDropZone && activeTask
+                : false /* DnD removed */
                 ? '#f3f4f6'
                   : isDragging 
                   ? 'transparent'
                   : undefined)
             : (isSelected 
                 ? (getAccentColorStyles().bg.backgroundColor + '1A') 
-                : isTaskDropZone && activeTask
+                : false /* DnD removed */
                 ? (getAccentColorStyles().bg.backgroundColor + '20')
                   : isDragging
                   ? 'transparent'
                   : undefined),
-          ...(isTaskDropZone && activeTask ? {
+          ...(false /* DnD removed */ ? {
             ringColor: isMinimalDesign 
               ? getAccentColorStyles().border.borderColor + '50'
               : getAccentColorStyles().border.borderColor + '50'
@@ -1100,298 +1083,7 @@ export function ProjectKanbanBoard() {
     return true;
   });
 
-  // Custom collision detection
-  // ✨ REMOVED: Custom collision detection to prevent springing
-  // Using default collision detection for smoother drag & drop
-
-  const handleDragStart = (event: DragStartEvent) => {
-    const { active } = event;
-    const activeData = active.data.current;
-    
-    setStableOverId(null);
-    
-    // Handle task dragging
-    if (activeData?.type === 'task') {
-      const task = state.tasks.find(t => t.id === active.id);
-      if (task) {
-        setActiveTask(task);
-        if (navigator.vibrate) {
-          navigator.vibrate(50);
-        }
-      }
-      return;
-    }
-    
-    // Handle column dragging
-    if (activeData?.type === 'column') {
-      setActiveColumnId(active.id as string);
-      if (navigator.vibrate) {
-        navigator.vibrate(50);
-      }
-      return;
-    }
-    
-    // Handle project dragging (from sidebar)
-        const project = projects.find(p => p.id === active.id);
-        if (project) {
-          setActiveProjectId(project.id);
-          if (navigator.vibrate) {
-            navigator.vibrate(50);
-      }
-    }
-  };
-
-  const handleDragOver = (event: DragOverEvent) => {
-    const { active, over } = event;
-    setOverId(over ? over.id as string : null);
-  };
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    
-    setActiveTask(null);
-    setOverId(null);
-    setStableOverId(null);
-    setActiveProjectId(null);
-    setActiveColumnId(null);
-
-    if (!over) return;
-
-    const activeData = active.data.current;
-    const overData = over.data.current;
-
-    // Handle task dropped on planner assignment zone
-    if (activeTask && overData?.type === 'planner-assignment') {
-      // Create a custom event for planner assignment
-      const plannerEvent = new CustomEvent('plannerAssignment', {
-        detail: { task: activeTask }
-      });
-      window.dispatchEvent(plannerEvent);
-      return;
-    }
-
-    // Handle column reordering
-    if (activeData?.type === 'column' && over.id !== active.id && selectedProject) {
-      const oldIndex = projectColumns.findIndex(col => col.id === active.id);
-      const newIndex = projectColumns.findIndex(col => col.id === over.id);
-      
-      if (oldIndex !== -1 && newIndex !== -1) {
-        const reorderedColumns = arrayMove(projectColumns, oldIndex, newIndex);
-        dispatch({
-          type: 'REORDER_PROJECT_KANBAN_COLUMNS',
-          payload: {
-            projectId: selectedProject.id,
-            columnIds: reorderedColumns.map(col => col.id)
-          }
-        });
-      }
-      return;
-    }
-
-    // Handle project reordering
-    if (activeProjectId && over.id !== active.id) {
-      const oldIndex = projects.findIndex(p => p.id === active.id);
-      const newIndex = projects.findIndex(p => p.id === over.id);
-      
-      if (oldIndex !== -1 && newIndex !== -1) {
-        const reorderedProjects = arrayMove(projects, oldIndex, newIndex);
-        reorderedProjects.forEach((project, index) => {
-          dispatch({
-            type: 'UPDATE_COLUMN',
-            payload: {
-              ...project,
-              order: index
-            }
-          });
-        });
-      }
-      return;
-    }
-
-    // Handle task dropped on project in sidebar
-    if (activeTask && activeData?.type === 'task') {
-      const targetProject = projects.find(p => p.id === over.id);
-      if (targetProject && targetProject.id !== selectedProject?.id) {
-        // Show project column selector for cross-project assignment
-        setDraggedTaskForProjectAssignment(activeTask);
-        setTargetProjectId(targetProject.id);
-        setShowProjectColumnSelector(true);
-        return;
-      }
-    }
-
-    if (!activeTask || !selectedProject) return;
-
-    const activeId = active.id as string;
-    const overId = over.id as string;
-    
-    // Check if dropping on a column
-    const targetColumn = projectColumns.find(col => col.id === overId);
-    const isDroppingOnColumnTop = overId.endsWith('-top');
-    const overTask = state.tasks.find(t => t.id === overId);
-
-    if (isDroppingOnColumnTop) {
-      // Dropping on top drop zone - insert at position 0
-      const targetColumnId = overId.replace('-top', '');
-      const targetColumn = projectColumns.find(col => col.id === targetColumnId);
-      
-      if (targetColumn) {
-        // Shift all tasks in target column down by 1
-        const updatedTasks = state.tasks.map(task => {
-          if (task.id === activeId) {
-            return {
-              ...task,
-              columnId: selectedProject.id,
-              kanbanColumnId: targetColumn.id,
-              position: 0,
-              updatedAt: new Date().toISOString()
-            };
-          } else if (task.kanbanColumnId === targetColumn.id && task.id !== activeId) {
-            // Shift all tasks in target column down by 1
-            return {
-              ...task,
-              position: task.position + 1,
-              updatedAt: new Date().toISOString()
-            };
-          }
-          return task;
-        });
-
-        dispatch({
-          type: 'SET_TASKS',
-          payload: updatedTasks
-        });
-
-        // Success haptic feedback
-        if (navigator.vibrate) {
-          navigator.vibrate([30, 10, 30]);
-        }
-      }
-    } else if (targetColumn) {
-      // Dropping on a column - place at the end
-      const columnTasks = state.tasks
-        .filter(task => task.kanbanColumnId === targetColumn.id && task.id !== activeId)
-        .sort((a, b) => a.position - b.position);
-      
-      const newPosition = columnTasks.length > 0 ? Math.max(...columnTasks.map(t => t.position)) + 1 : 0;
-      
-      dispatch({
-        type: 'UPDATE_TASK',
-        payload: {
-          ...activeTask,
-          columnId: selectedProject.id,
-          kanbanColumnId: targetColumn.id,
-          position: newPosition
-        }
-      });
-
-      // Success haptic feedback
-      if (navigator.vibrate) {
-        navigator.vibrate([30, 10, 30]);
-      }
-    } else if (overId.startsWith('list-column-')) {
-      // Dropping on a list view column dropzone
-      const targetColumnId = overId.replace('list-column-', '');
-      const listTargetColumn = projectColumns.find(col => col.id === targetColumnId);
-      
-      if (listTargetColumn) {
-        const columnTasks = state.tasks
-          .filter(task => task.kanbanColumnId === targetColumnId && task.id !== activeId)
-          .sort((a, b) => a.position - b.position);
-        
-        const newPosition = columnTasks.length > 0 ? Math.max(...columnTasks.map(t => t.position)) + 1 : 0;
-        
-        dispatch({
-          type: 'UPDATE_TASK',
-          payload: {
-            ...activeTask,
-            columnId: selectedProject.id,
-            kanbanColumnId: targetColumnId,
-            position: newPosition
-          }
-        });
-
-        // Success haptic feedback
-        if (navigator.vibrate) {
-          navigator.vibrate([30, 10, 30]);
-        }
-      }
-    } else if (overTask && overTask.kanbanColumnId) {
-      // Dropping on a task - insert at that position
-      const targetColumnId = overTask.kanbanColumnId;
-      const targetPosition = overTask.position;
-      const currentPosition = activeTask.position;
-      const currentColumnId = activeTask.kanbanColumnId;
-
-      // Update all tasks in the target column
-      const updatedTasks = state.tasks.map(task => {
-        if (task.id === activeId) {
-          // Move the dragged task to the target position
-          return {
-            ...task,
-            columnId: selectedProject.id,
-            kanbanColumnId: targetColumnId,
-            position: targetPosition
-          };
-        } else if (task.kanbanColumnId === targetColumnId && task.id !== activeId) {
-          if (currentColumnId === targetColumnId) {
-            // Moving within the same column
-            if (currentPosition < targetPosition) {
-              // Moving down: shift tasks between current and target position up
-              if (task.position > currentPosition && task.position <= targetPosition) {
-                return {
-                  ...task,
-                  position: task.position - 1
-                };
-              }
-            } else {
-              // Moving up: shift tasks between target and current position down
-              if (task.position >= targetPosition && task.position < currentPosition) {
-                return {
-                  ...task,
-                  position: task.position + 1
-                };
-              }
-            }
-          } else {
-            // Moving to a different column: shift tasks in target column down
-            if (task.position >= targetPosition) {
-              return {
-                ...task,
-                position: task.position + 1
-              };
-            }
-          }
-        } else if (task.kanbanColumnId === currentColumnId && task.id !== activeId && currentColumnId !== targetColumnId) {
-          // Shift tasks in the old column up to fill the gap
-          if (task.position > currentPosition) {
-            return {
-              ...task,
-              position: task.position - 1
-            };
-          }
-        }
-        return task;
-      });
-
-      dispatch({
-        type: 'SET_TASKS',
-        payload: updatedTasks
-      });
-
-      // Success haptic feedback
-      if (navigator.vibrate) {
-        navigator.vibrate([30, 10, 30]);
-      }
-    }
-  };
-
-  const handleDragCancel = () => {
-    setActiveTask(null);
-    setOverId(null);
-    setStableOverId(null);
-    setActiveProjectId(null);
-  };
+  // ✨ DnD handlers removed - now handled by @hello-pangea/dnd in ProjectBoardView and ProjectListView
 
   const handleProjectSelect = (projectId: string) => {
     dispatch({ type: 'SET_PROJECT_KANBAN_SELECTED_PROJECT', payload: projectId });
@@ -1808,8 +1500,8 @@ export function ProjectKanbanBoard() {
         <TaskColumn
           column={column}
           tasks={tasks}
-          overId={overId}
-          activeTask={activeTask}
+          overId={null}
+          activeTask={null}
           activeColumn={null}
           onFocusColumn={handleFocusColumn}
           onSmartTaskAdd={handleSmartTaskAdd}
@@ -2864,7 +2556,7 @@ export function ProjectKanbanBoard() {
 
 
 
-      </div>
+            </div>
     </>
   );
 }
