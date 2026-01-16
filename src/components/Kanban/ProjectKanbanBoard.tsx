@@ -636,27 +636,32 @@ export function ProjectKanbanBoard() {
       }
     });
 
-    // ✨ STABLE DROP INDICATOR LOGIC - Same as TaskColumn (Board view)
-    const getStableDropIndicator = (taskId: string, index: number): boolean => {
-      if (!activeTaskId) return false;
+    // ✨ PRECISE DROP INDICATOR LOGIC - Only ONE indicator at a time
+    // Find which task is being hovered over (if any)
+    const hoveredTaskIndex = visibleTasks.findIndex(task => task.id === parentOverId);
+    const isHoveringOverTask = hoveredTaskIndex !== -1;
+    const isHoveringOverColumn = parentOverId === `list-column-${columnId}` || isOver;
+    
+    // Determine the single drop position
+    const getDropPosition = (): { type: 'before-task' | 'end' | 'none'; taskIndex?: number } => {
+      if (!activeTaskId) return { type: 'none' };
       
-      // Don't show indicator if dragging the same task
-      if (activeTaskId === taskId) return false;
+      // If hovering over a specific task, show indicator BEFORE that task
+      if (isHoveringOverTask) {
+        // Don't show indicator if hovering over the dragged task itself
+        if (visibleTasks[hoveredTaskIndex].id === activeTaskId) return { type: 'none' };
+        return { type: 'before-task', taskIndex: hoveredTaskIndex };
+      }
       
-      // Check if hovering over this specific task
-      if (parentOverId === taskId) return true;
+      // If hovering over the column area (not over a task), show at END
+      if (isHoveringOverColumn) {
+        return { type: 'end' };
+      }
       
-      // Check if hovering over the column dropzone AND this is the first task
-      if (parentOverId === `list-column-${columnId}` && index === 0) return true;
-      
-      return false;
+      return { type: 'none' };
     };
-
-    // Check if we should show bottom drop indicator (for empty column or after last task)
-    const showBottomDropIndicator = activeTaskId && (
-      (isOver && visibleTasks.length === 0) || 
-      (parentOverId === `list-column-${columnId}` && visibleTasks.length > 0)
-    );
+    
+    const dropPosition = getDropPosition();
 
     return (
       <div 
@@ -668,18 +673,20 @@ export function ProjectKanbanBoard() {
             items={visibleTasks.map(task => task.id)}
             strategy={verticalListSortingStrategy}
           >
-            <div className="flex flex-col relative">
+            <div className="flex flex-col">
               {visibleTasks.map((task, index) => {
-                const showDropIndicatorAbove = getStableDropIndicator(task.id, index);
                 const isThisTaskBeingDragged = activeTaskId === task.id;
+                // Only show indicator BEFORE this task if this is the exact drop position
+                const showIndicatorBefore = dropPosition.type === 'before-task' && dropPosition.taskIndex === index;
                 
                 return (
                   <div key={task.id}>
-                    {/* ✨ Drop Space - Only show if this task is NOT being dragged */}
+                    {/* ✨ Drop Space - Only show at the SINGLE calculated position */}
                     {!isThisTaskBeingDragged && (
                       <DropIndicator 
-                        isVisible={showDropIndicatorAbove}
+                        isVisible={showIndicatorBefore}
                         position="top"
+                        compact={true}
                       />
                     )}
                     
@@ -695,17 +702,18 @@ export function ProjectKanbanBoard() {
                 );
               })}
               
-              {/* ✨ Drop indicator at end of list */}
+              {/* ✨ Drop indicator at END - only when hovering column, not a task */}
               <DropIndicator 
-                isVisible={!!showBottomDropIndicator && !visibleTasks.some(t => t.id === parentOverId)}
+                isVisible={dropPosition.type === 'end'}
                 position="bottom"
+                compact={true}
               />
             </div>
           </SortableContext>
         ) : (
-          // Empty column droppable area - gestrichelte Box wie im Board
+          // Empty column droppable area - gestrichelte Box
           <div 
-            className={`text-center py-6 text-sm rounded-xl border-2 border-dashed transition-all duration-200 ${
+            className={`text-center py-4 text-sm rounded-lg border-2 border-dashed transition-all duration-150 ${
               minDesign
                 ? 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500'
                 : 'border-gray-200/60 dark:border-gray-700/60 text-gray-400/80 dark:text-gray-500/80'
@@ -713,8 +721,7 @@ export function ProjectKanbanBoard() {
             style={{
               borderColor: isOver ? accentColor : undefined,
               backgroundColor: isOver ? `${accentColor}15` : undefined,
-              transform: isOver ? 'scale(1.01)' : 'scale(1)',
-              minHeight: isOver ? '80px' : '60px',
+              minHeight: '44px',
             }}
           >
             {isOver 
