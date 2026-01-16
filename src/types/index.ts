@@ -194,6 +194,9 @@ export interface UserPreferences {
   theme: 'light' | 'dark' | 'system';
   language: 'en' | 'de';
   accentColor: string;
+  pomodoro?: {
+    enabled: boolean;
+  };
   minimalDesign?: boolean; // Minimalistic design without glass effects
   backgroundImage?: string; // URL für Hintergrundbild im Aufgaben-Bereich
   backgroundType?: 'image' | 'color' | 'gradient'; // Art des Hintergrunds

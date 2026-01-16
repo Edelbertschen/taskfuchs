@@ -1299,13 +1299,22 @@ export function ProjectKanbanBoard() {
     const activeData = active.data.current;
     
     // Capture original size for DragOverlay to prevent width changes
-    const initialRect = active.rect.current?.initial;
-    if (initialRect) {
-      setDragOverlayWidth(Math.round(initialRect.width));
-      setDragOverlayHeight(Math.round(initialRect.height));
+    const taskNode = typeof active.id === 'string'
+      ? document.querySelector(`[data-task-id="${active.id}"]`) as HTMLElement | null
+      : null;
+    if (taskNode) {
+      const rect = taskNode.getBoundingClientRect();
+      setDragOverlayWidth(Math.round(rect.width));
+      setDragOverlayHeight(Math.round(rect.height));
     } else {
-      setDragOverlayWidth(null);
-      setDragOverlayHeight(null);
+      const initialRect = active.rect.current?.initial;
+      if (initialRect) {
+        setDragOverlayWidth(Math.round(initialRect.width));
+        setDragOverlayHeight(Math.round(initialRect.height));
+      } else {
+        setDragOverlayWidth(null);
+        setDragOverlayHeight(null);
+      }
     }
     setStableOverId(null);
     
@@ -2292,7 +2301,7 @@ export function ProjectKanbanBoard() {
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
-              // ✨ REMOVED: Using default collision detection for smoother drag & drop
+      collisionDetection={viewMode === 'list' ? pointerWithin : undefined}
       sensors={sensors}
     >
       <div className={`h-full w-full flex overflow-hidden ${

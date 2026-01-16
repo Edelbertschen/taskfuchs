@@ -561,7 +561,7 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
 
   // Get accent color and dark mode from preferences
   const accentColor = state.preferences.accentColor || '#0ea5e9';
-  const isDarkMode = state.preferences.darkMode;
+  const isDarkMode = state.preferences.theme === 'dark';
 
   // Get project info for task (name and color)
   const getTaskProject = () => {
@@ -741,6 +741,7 @@ const TaskCard = React.memo(({ task, isDragging: propIsDragging = false, isNewTa
       {...(!isBulkMode ? attributes : {})}
       {...(!isBulkMode ? listeners : {})}
       data-task-card="true"
+      data-task-id={task.id}
       className={`group relative flex items-center rounded-lg card-hover task-card ${
         isActiveTimer ? '' : 'overflow-hidden'
       } ${
