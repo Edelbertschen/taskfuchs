@@ -71,6 +71,10 @@ export function ProjectKanbanBoard() {
   const isMinimalDesign = state.preferences.minimalDesign;
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
+  const [stableOverId, setStableOverId] = useState<string | null>(null);
+  const stabilizeOverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [dragOverlayWidth, setDragOverlayWidth] = useState<number | null>(null);
+  const [dragOverlayHeight, setDragOverlayHeight] = useState<number | null>(null);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showSmartTaskModal, setShowSmartTaskModal] = useState(false);
@@ -116,6 +120,23 @@ export function ProjectKanbanBoard() {
       detail: { viewMode } 
     }));
   }, [viewMode]);
+
+  // ✨ Stabilize overId for list view to prevent flickering indicators
+  useEffect(() => {
+    if (stabilizeOverTimeoutRef.current) {
+      clearTimeout(stabilizeOverTimeoutRef.current);
+    }
+
+    stabilizeOverTimeoutRef.current = setTimeout(() => {
+      setStableOverId(overId);
+    }, 8); // small delay for stability without noticeable lag
+
+    return () => {
+      if (stabilizeOverTimeoutRef.current) {
+        clearTimeout(stabilizeOverTimeoutRef.current);
+      }
+    };
+  }, [overId]);
 
   // Collapsed sections in list view
   const [collapsedListSections, setCollapsedListSections] = useState<string[]>([]);
@@ -628,7 +649,7 @@ export function ProjectKanbanBoard() {
     accentColor: string;
     onAddTask: (columnId: string) => void;
   }) => {
-    const { setNodeRef, isOver } = useDroppable({
+    const { setNodeRef } = useDroppable({
       id: `list-column-${columnId}`,
       data: {
         type: 'list-column-dropzone',
@@ -639,6 +660,7 @@ export function ProjectKanbanBoard() {
     // ✨ SIMPLE DROP INDICATOR LOGIC - No complexity, just works
     // Find which task is being hovered (if any)
     const hoveredTaskIndex = visibleTasks.findIndex(task => task.id === parentOverId);
+    const isOverColumn = parentOverId === `list-column-${columnId}`;
     
     // Calculate drop position - SIMPLE and DIRECT
     let dropIndex: number | null = null;
@@ -650,7 +672,7 @@ export function ProjectKanbanBoard() {
         if (visibleTasks[hoveredTaskIndex].id !== activeTaskId) {
           dropIndex = hoveredTaskIndex;
         }
-      } else if (isOver) {
+      } else if (isOverColumn) {
         // Hovering over the column dropzone (empty area below tasks)
         dropIndex = visibleTasks.length; // End of list
       }
@@ -712,12 +734,12 @@ export function ProjectKanbanBoard() {
                 : 'border-gray-200/60 dark:border-gray-700/60 text-gray-400/80 dark:text-gray-500/80'
             }`}
             style={{
-              borderColor: isOver ? accentColor : undefined,
-              backgroundColor: isOver ? `${accentColor}15` : undefined,
+              borderColor: isOverColumn ? accentColor : undefined,
+              backgroundColor: isOverColumn ? `${accentColor}15` : undefined,
               minHeight: '44px',
             }}
           >
-            {isOver 
+            {isOverColumn 
               ? translate('projects.drop_here', 'Hier ablegen')
               : translate('projects.no_tasks_in_column', 'Keine Aufgaben in dieser Spalte')
             }
@@ -1276,6 +1298,17 @@ export function ProjectKanbanBoard() {
     const { active } = event;
     const activeData = active.data.current;
     
+    // Capture original size for DragOverlay to prevent width changes
+    const initialRect = active.rect.current?.initial;
+    if (initialRect) {
+      setDragOverlayWidth(Math.round(initialRect.width));
+      setDragOverlayHeight(Math.round(initialRect.height));
+    } else {
+      setDragOverlayWidth(null);
+      setDragOverlayHeight(null);
+    }
+    setStableOverId(null);
+    
     // Handle task dragging
     if (activeData?.type === 'task') {
       const task = state.tasks.find(t => t.id === active.id);
@@ -1317,6 +1350,9 @@ export function ProjectKanbanBoard() {
     
     setActiveTask(null);
     setOverId(null);
+    setStableOverId(null);
+    setDragOverlayWidth(null);
+    setDragOverlayHeight(null);
     setActiveProjectId(null);
     setActiveColumnId(null);
 
@@ -1554,6 +1590,9 @@ export function ProjectKanbanBoard() {
   const handleDragCancel = () => {
     setActiveTask(null);
     setOverId(null);
+    setStableOverId(null);
+    setDragOverlayWidth(null);
+    setDragOverlayHeight(null);
     setActiveProjectId(null);
   };
 
@@ -2765,7 +2804,7 @@ export function ProjectKanbanBoard() {
                                 <ListViewColumnDropzone
                                   columnId={column.id}
                                   visibleTasks={visibleTasks}
-                                  parentOverId={overId}
+                                  parentOverId={stableOverId}
                                   activeTaskId={activeTask?.id || null}
                                   isMinimalDesign={isMinimalDesign}
                                   column={column}
@@ -3150,15 +3189,15 @@ export function ProjectKanbanBoard() {
           style={{
             zIndex: 9999,
             pointerEvents: 'none',
-            // ✨ CRITICAL: Match exact width of list content area
-            width: viewMode === 'list' ? 'calc(100% - 32px)' : undefined,
-            maxWidth: viewMode === 'list' ? '1200px' : undefined,
-            left: viewMode === 'list' ? '16px' : undefined,
           }}
         >
           {activeTask && (
             <div style={{
               filter: 'drop-shadow(0 6px 16px rgba(0,0,0,0.12))',
+              width: dragOverlayWidth ? `${dragOverlayWidth}px` : undefined,
+              minWidth: dragOverlayWidth ? `${dragOverlayWidth}px` : undefined,
+              maxWidth: dragOverlayWidth ? `${dragOverlayWidth}px` : undefined,
+              height: dragOverlayHeight ? `${dragOverlayHeight}px` : undefined,
             }}>
               <TaskCard
                 task={activeTask}
